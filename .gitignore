@@ -1,0 +1,26 @@
+.DS_Store
+node_modules/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/test/unit/coverage/
+/test/e2e/reports/
+selenium-debug.log
+.env
+.env.development
+.env.production
+.env.staging
+/src/utils/git
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Docker Submodule Ignore
+node-npm-docker
+package-lock.json
+
