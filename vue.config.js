@@ -33,7 +33,8 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    proxy: process.env.VUE_APP_BASE_API
+    proxy: "http://localhost:8000"
+    // process.env.VUE_APP_BASE_API
     // proxy: "http://localhost:8000"
     //   {
     //   // change xxx-api/login => mock/login
