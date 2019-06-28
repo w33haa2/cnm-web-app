@@ -33,8 +33,8 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    // proxy: process.env.VUE_APP_BASE_API
     proxy: process.env.VUE_APP_BASE_API
+    // proxy: "http://localhost:8000"
     //   {
     //   // change xxx-api/login => mock/login
     //   // detail: https://cli.vuejs.org/config/#devserver-proxy
