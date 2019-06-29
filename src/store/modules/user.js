@@ -86,7 +86,7 @@ const mutations = {
 
 const actions = {
   authenticate({ commit }, params) {
-    const slug = 'auth.login'
+    const slug = 'api.attendance.create.bulk.data'
     STATE_API({ slug, params: params.data }, commit, [LOGIN.initial, LOGIN.success, LOGIN.fail])
   },
   logout({ commit }) {
