@@ -2,7 +2,6 @@
   <div class="app-container">
     <div v-if="user">
       <el-row :gutter="20">
-
         <el-col :span="6" :xs="24">
           <user-card :user="user" />
         </el-col>
@@ -22,13 +21,13 @@
               <el-tab-pane label="Timeline" name="timeline">
                 <timeline :timeline="user.status_logs" />
               </el-tab-pane>
-              <el-tab-pane label="Account" name="account">
+              <el-tab-pane label="Subordinates" name="subordinates">
                 <!-- <account :user="{name: user.info.full_name,email:user.company_details.email}" /> -->
+                <subordinates :user="user" />
               </el-tab-pane>
             </el-tabs>
           </el-card>
         </el-col>
-
       </el-row>
     </div>
   </div>
@@ -43,10 +42,20 @@ import Account from './components/Account'
 import About from './components/About'
 import CompanyDetails from './components/CompanyDetails'
 import BenefitIDs from './components/BenefitIDs'
+import Subordinates from './components/Subordinates'
 
 export default {
   name: 'Profile',
-  components: { UserCard, Activity, Timeline, About, Account, CompanyDetails, 'benefit-ids': BenefitIDs },
+  components: {
+    UserCard,
+    Activity,
+    Timeline,
+    About,
+    Account,
+    CompanyDetails,
+    'benefit-ids': BenefitIDs,
+    Subordinates
+  },
   data() {
     return {
       user: {},
@@ -54,24 +63,19 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'name',
-      'avatar',
-      'roles'
-    ])
+    ...mapGetters(['name', 'avatar', 'roles'])
   },
   created() {
     this.getUser()
   },
   methods: {
     getUser() {
-      // this.user = {
-      //   name: this.name,
-      //   role: this.roles.join(' | '),
-      //   email: 'admin@test.com',
-      //   avatar: this.avatar
-      // }
+      // PLEASE USE
+      // $route.params.id
+      // to fetch actual user profile
 
+      // THIS IS ONLY A TEST VARIABLE
+      // structure may vary on the request results
       this.user = {
         info: {
           full_name: 'Emmanuel James Eng Lajom',
@@ -102,7 +106,7 @@ export default {
         },
         status_logs: [
           {
-            description: 'You\'re Promoted!',
+            description: "You're Promoted!",
             type: 'Acive',
             content: 'Changed employee Status to Active 12/25/2018',
             date: '12/25/2018'
@@ -110,7 +114,8 @@ export default {
           {
             description: 'Officially Hired',
             type: 'New',
-            content: 'Activated CNM WebApp Account with employee status of New 11/30/2018',
+            content:
+              'Activated CNM WebApp Account with employee status of New 11/30/2018',
             date: '11/30/2018'
           }
         ]

@@ -83,59 +83,14 @@ export const constantRoutes = [
       }
     ]
   },
-  /**
-   * Children refers to routes that is under a main route,
-   * Main routes refer to a route that has many sub-routes (e.g Employees route)
-   * Main and children routes requires meta for info display
-   * Component refers to the component that it will render on the container tab
-   */
-  {
-    name: 'Documentation 1',
-    path: '/documentation',
-    meta: {
-      title: 'Documentation 1',
-      icon: 'nested'
-    },
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation 1',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      },
-      {
-        path: 'index2',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation 2',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'Guide', icon: 'guide', noCache: true }
-      }
-    ]
-  },
   {
     path: '/profile',
     component: Layout,
-    redirect: '/profile/index',
     hidden: true,
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/profile/index'),
-        name: 'Profile',
-        meta: { title: 'Profile', icon: 'user', noCache: true }
+        path: 'index/:id*',
+        component: () => import('@/views/profile/index')
       }
     ]
   }
@@ -146,45 +101,128 @@ export const constantRoutes = [
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
+  // {
+  //   path: "/permission",
+  //   component: Layout,
+  //   redirect: "/permission/page",
+  //   alwaysShow: true, // will always show the root menu
+  //   name: "Permission",
+  //   meta: {
+  //     title: "Permission",
+  //     icon: "lock",
+  //     roles: ["admin", "editor"] // you can set roles in root nav
+  //   },
+  //   children: [
+  //     {
+  //       path: "page",
+  //       component: () => import("@/views/permission/page"),
+  //       name: "PagePermission",
+  //       meta: {
+  //         title: "Page Permission",
+  //         roles: ["admin"] // or you can only set roles in sub nav
+  //       }
+  //     },
+  //     {
+  //       path: "directive",
+  //       component: () => import("@/views/permission/directive"),
+  //       name: "DirectivePermission",
+  //       meta: {
+  //         title: "Directive Permission"
+  //         // if do not set roles, means: this page does not require permission
+  //       }
+  //     },
+  //     {
+  //       path: "role",
+  //       component: () => import("@/views/permission/role"),
+  //       name: "RolePermission",
+  //       meta: {
+  //         title: "Role Permission",
+  //         roles: ["admin"]
+  //       }
+  //     }
+  //   ]
+  // },
   {
-    path: '/permission',
+    path: 'incident_reports',
     component: Layout,
-    redirect: '/permission/page',
-    alwaysShow: true, // will always show the root menu
-    name: 'Permission',
+    // redirect: "/incident_reports",
+    //  alwaysShow: true, // will always show the root menu
+    name: 'Incident Reports',
     meta: {
-      title: 'Permission',
-      icon: 'lock',
-      roles: [] // you can set roles in root nav
+      title: 'Incident Reports',
+      icon: 'documentation'
+      //  roles: ["admin", "editor"] // you can set roles in root nav
     },
     children: [
       {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
+        path: '/receive',
+        component: () => import('@/views/incident_reports/receive'),
+        name: 'Receive',
         meta: {
-          title: 'Page Permission',
-          roles: [] // or you can only set roles in sub nav
+          title: 'Receive'
+          //  roles: ["admin"] // or you can only set roles in sub nav
         }
       },
       {
-        path: 'directive',
-        component: () => import('@/views/permission/directive'),
-        name: 'DirectivePermission',
+        path: '/issue',
+        component: () => import('@/views/incident_reports/issue'),
+        name: 'Issue',
         meta: {
-          title: 'Directive Permission'
-          // if do not set roles, means: this page does not require permission
+          title: 'Issue'
+          // if do not set roles, means: this page does not require incident_report
         }
       },
       {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
+        path: '/all',
+        component: () => import('@/views/incident_reports/all'),
+        name: 'All',
         meta: {
-          title: 'Role Permission',
-          roles: []
+          title: 'All'
+          // roles: ["admin"]
         }
       }
+    ]
+  },
+
+  {
+    path: 'agent',
+    component: Layout,
+    // redirect: "/agent",
+    //  alwaysShow: true, // will always show the root menu
+    name: 'Agent',
+    meta: {
+      title: 'Agent',
+      icon: 'agent-headset'
+      //  roles: ["admin", "editor"] // you can set roles in root nav
+    },
+    children: [
+      {
+        path: '/schedule',
+        component: () => import('@/views/agent/schedule'),
+        name: 'Schedule',
+        meta: {
+          title: 'Schedule'
+          //  roles: ["admin"] // or you can only set roles in sub nav
+        }
+      },
+      {
+        path: '/leave',
+        component: () => import('@/views/agent/leave'),
+        name: 'Leave',
+        meta: {
+          title: 'Leave'
+          // if do not set roles, means: this page does not require incident_report
+        }
+      }
+      //     // {
+      //     //   path: "/all",
+      //     //   component: () => import("@/views/agent/all"),
+      //     //   name: "All",
+      //     //   meta: {
+      //     //     title: "All"
+      //     //     // roles: ["admin"]
+      //     //   }
+      //     // }
     ]
   },
 
@@ -227,7 +265,11 @@ export const asyncRoutes = [
         path: 'edit/:id(\\d+)',
         component: () => import('@/views/example/edit'),
         name: 'EditArticle',
-        meta: { title: 'Edit Article', noCache: true, activeMenu: '/example/list' },
+        meta: {
+          title: 'Edit Article',
+          noCache: true,
+          activeMenu: '/example/list'
+        },
         hidden: true
       },
       {
@@ -404,11 +446,12 @@ export const asyncRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
-const createRouter = () => new Router({
-  mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+const createRouter = () =>
+  new Router({
+    // mode: 'history', // require service support
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes
+  })
 
 const router = createRouter()
 

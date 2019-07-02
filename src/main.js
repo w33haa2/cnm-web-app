@@ -28,6 +28,11 @@ Vue.use(Element, {
   locale
 })
 
+import VueI18n from 'vue-i18n'
+Vue.use(VueI18n)
+
+Vue.config.lang = 'en'
+
 // register global utility filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
