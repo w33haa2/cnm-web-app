@@ -13,12 +13,15 @@ const getters = {
   errorLogs: state => state.errorLog.logs,
   // log in state
   loginState: state => state.user.loggingInState,
-  //incident reports
+  // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
   incidentReports: state => state.incident_report.reports,
   irErrors: state => state.incident_report.errors,
   // users
   employees: state => state.employee.employees,
+  employeesData: state => state.employee.employeesData,
+  employeesTotal: state => state.employee.employeesTotal,
+  employeesFetchState: state => state.employee.employeesFetchState,
   allPosition: state => state.employee.accesslevels,
   formResponse: state => state.employee.form_request_response
 }

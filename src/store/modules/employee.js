@@ -1,9 +1,21 @@
 import axios from 'axios'
+import { STATE_API } from '@/utils/api/api-helper'
+import { generateMutationTypes } from '@/utils/api/state-mutation'
+
+const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
+
 const state = {
   employees: {
     data: [],
     rows: 0
   },
+  employeesData: [],
+  employeeFetchState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  employeesTotal: 0,
   accesslevels: [
     {
       'id': 1,
@@ -143,8 +155,46 @@ const mutations = {
     state.employees.rows = employees.count
   },
   DEFINE_ACCESSLEVELS: (state, accesslevels) => (state.accesslevels = accesslevels),
-  FORM_RESPONSE: (state, response) => (state.form_request_response = response)
+  FORM_RESPONSE: (state, response) => (state.form_request_response = response),
   // DEFINE_RECENT_EMPLOYEES: (state, response) => (state.form_request_response = response),
+   /**
+   * Commits initial state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES.initial](state) {
+    state.employeeFetchState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES.success](state, payload) {
+    state.employeeFetchState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+    state.employeesData = payload.meta.metadata
+    state.employeesTotal = payload.meta.count 
+  },
+  /**
+   * Commits fail state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES.fail](state, payload) {
+    state.employeeFetchState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.errors = payload.response.data.title
+    state.employeesData = []
+  }
+  
 }
 
 const actions = {
@@ -153,6 +203,16 @@ const actions = {
   },
   clearErrorLog({ commit }) {
     commit('CLEAR_ERROR_LOG')
+  },
+  /**
+   * Action for fetching employees
+   * @param commit
+   * @param params
+   */
+  fetchEmployees({ commit },params) {
+    const slug = 'api.users.fetchAll'
+    params = params.data
+    STATE_API({ slug, params }, commit, [FETCH_EMPLOYEES.initial, FETCH_EMPLOYEES.success, FETCH_EMPLOYEES.fail])
   },
   async fetchUsers({ commit }, query) {
     let endpoint = '/api/v1/users?'
@@ -185,7 +245,6 @@ const actions = {
         endpoint += '&' + v
       })
     }
-    alert(endpoint)
 
     const response = await axios.get(endpoint)
     // filter admin accounts with id no 1, 3

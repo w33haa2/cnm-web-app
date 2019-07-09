@@ -1,6 +1,6 @@
 <template>
-  <div class="dashboard-editor-container">
-
+  <div class="app-container">
+    <div class="filter-container">
     <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
     <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}">
@@ -36,7 +36,7 @@
     <!-- DISPLAY RECORDS & PAGINATION -->
     <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}">
-        <el-input v-model="table_config.query.search.query" placeholder="Search..." size="mini">
+        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
           <el-select slot="prepend" v-model="table_config.query.search.target" placeholder="Select" style="width:150px;">
             <el-option v-for="(option,index) in table_config.searchable_fields" :key="index" :label="option.label" :value="option.value" />
           </el-select>
@@ -52,7 +52,7 @@
           :current-page.sync="table_config.page"
           :page-size="table_config.display_size"
           layout="total, sizes, prev, pager, next"
-          :total="employees.rows"
+          :total="employeesTotal"
           @size-change="tableSizeChange"
           @current-change="tablePageChange"
         />
@@ -75,7 +75,7 @@
     </el-row> -->
     <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
-        <transaction-table :table-data="employees.data" @sort="onColumnSort" />
+        <transaction-table :table-data="employeesData" @sort="onColumnSort" />
       </el-col>
       <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <todo-list />
@@ -84,6 +84,7 @@
         <box-card />
       </el-col> -->
     </el-row>
+  </div>
   </div>
 </template>
 
@@ -116,6 +117,7 @@ export default {
   },
   data() {
     return {
+      searchQuery: "",
       table_config: {
         searchable_fields: [
           { value: 'full_name', label: 'Name' }
@@ -127,11 +129,15 @@ export default {
           },
           limit: 10,
           offset: 0,
-          sort: null,
-          order: null
+          // sort: null,
+          // order: null
         },
         data: [],
         rows: 0
+      },
+      query: {
+        limit: 10,
+        offset: 0,
       },
       form: {
         toggle: false,
@@ -143,36 +149,60 @@ export default {
 
     }
   },
-  created() {
+  mounted() {
     // fetch and commit table data via vuex action
-    this.fetchUsers(this.table_config.query)
+    const data = this.query
+    this.fetchEmployees({ data })
+    this.$root.$on("employee_table.refresh", this.refreshTable)
     // setup filter select
   },
   computed: {
-    ...mapGetters(['employees', 'allPosition'])
+    ...mapGetters(['employees', 'allPosition','employeesData','employeesTotal'])
   },
   watch: {
-    employees: function() {
-      this.employees = this.employees
+    searchQuery: function(newData)  {
+      if (newData !== "") {
+        this.query["target[]"] = "full_name"
+        this.query.query = newData
+        // this.query.target = "full_name"
+        // this.query.query = newData
+        const data = this.query
+        this.fetchEmployees({ data })
+      }
+      else{
+        this.query["target[]"] = ""
+        this.query.query = ""
+        const data = this.query
+        this.fetchEmployees({ data })
+      }
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions']),
+    ...mapActions(['fetchUsers', 'fetchPositions',"fetchEmployees"]),
+    refreshTable(){
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
     tableSizeChange(value) {
-      this.table_config.query.limit = value
-      // alert('size changed: '+ value)
-      this.fetchUsers(this.table_config.query)
+      this.query.limit = value
+      const data = this.query
+      this.fetchEmployees({ data })
+      // this.table_config.query.limit = value
+      // // alert('size changed: '+ value)
+      // this.fetchUsers(this.table_config.query)
     },
     tablePageChange(value) {
-      this.table_config.query.offset = value - 1
-      // alert('page changed: '+ value)
-      this.fetchUsers(this.table_config.query)
+      this.query.offset = value - 1
+      const data = this.query
+      this.fetchEmployees({ data })
+      // // alert('page changed: '+ value)
+      // this.fetchUsers(this.table_config.query)
     },
     onColumnSort(value) {
-      alert('deym')
-      this.table_config.query.sort = value.sort
-      this.table_config.query.order = value.order
-      this.fetchUsers(this.table_config.query)
+      this.query.sort = value.sort
+      this.query.order = value.order
+      const data = this.query
+      this.fetchEmployees({ data })
     }
   }
 }

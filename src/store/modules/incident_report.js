@@ -13,7 +13,7 @@ const state = {
     fail: false
   },
   reports: [],
-  errors: null,
+  errors: null
 }
 
 /**
@@ -24,22 +24,22 @@ const mutations = {
    * Commits initial state for fetching incident reports
    * @param state
    */
-  [FETCH_INCIDENT_REPORTS.initial] (state) {
+  [FETCH_INCIDENT_REPORTS.initial](state) {
     state.fetchingIRState = {
       initial: true,
       success: false,
-      fail: false,
+      fail: false
     }
   },
   /**
    * Commits success state for fetching incident reports
    * @param state
    */
-  [FETCH_INCIDENT_REPORTS.success] (state,payload) {
+  [FETCH_INCIDENT_REPORTS.success](state, payload) {
     state.fetchingIRState = {
       initial: false,
       success: true,
-      fail: false,
+      fail: false
     }
     state.reports = payload.meta
   },
@@ -47,14 +47,14 @@ const mutations = {
    * Commits fail state for fetching incident reports
    * @param state
    */
-  [FETCH_INCIDENT_REPORTS.fail] (state,payload) {
+  [FETCH_INCIDENT_REPORTS.fail](state, payload) {
     state.fetchingIRState = {
       initial: false,
       success: false,
-      fail: true,
+      fail: true
     }
     state.errors = payload.response.data.title
-  },
+  }
 }
 
 const actions = {
@@ -63,10 +63,10 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchReports ({commit}) {
+  fetchReports({ commit }) {
     const slug = 'api.reports.fetchAll'
-    STATE_API({slug}, commit, [FETCH_INCIDENT_REPORTS.initial, FETCH_INCIDENT_REPORTS.success, FETCH_INCIDENT_REPORTS.fail])
-  },
+    STATE_API({ slug }, commit, [FETCH_INCIDENT_REPORTS.initial, FETCH_INCIDENT_REPORTS.success, FETCH_INCIDENT_REPORTS.fail])
+  }
 }
 
 export default {

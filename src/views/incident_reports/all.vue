@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import {mapActions, mapGetters} from "vuex"
+import { mapActions, mapGetters } from 'vuex'
 import { Message } from 'element-ui'
 export default {
   data() {
@@ -157,19 +157,17 @@ export default {
   },
   computed: {
     ...mapGetters(
-      ["fetchingIncidentReports","incidentReports","irErrors"]
+      ['fetchingIncidentReports', 'incidentReports', 'irErrors']
     )
   },
   watch: {
-    fetchingIncidentReports({initial, success, fail}) {
+    fetchingIncidentReports({ initial, success, fail }) {
       if (initial) {
 
-      }
-      else if (success) {
+      } else if (success) {
 
-      }
-      else if (fail) {
-         Message.error({ message: this.irErrors, duration: '2500' })
+      } else if (fail) {
+        Message.error({ message: this.irErrors, duration: '2500' })
       }
     }
   },
@@ -178,7 +176,7 @@ export default {
   },
   methods: {
     ...mapActions(
-      ["fetchReports"]
+      ['fetchReports']
     ),
     handleCommand(command) {
       const id = command.split('||')[1]

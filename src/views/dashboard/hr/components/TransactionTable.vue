@@ -16,10 +16,10 @@
       </template>
       <template slot-scope="scope">
         <div class="user-block">
-          <img v-if="scope.row.info.image_url" class="img-circle" :src="scope.row.info.image_url">
+          <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
           <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
             <div style="align-self:center;width:100%;text-align:center;" class="text-point-eight-em">
-              {{ getAvatarLetters(scope.row.info.firstname,scope.row.info.lastname) }}
+              {{ getAvatarLetters(scope.row.fname,scope.row.lname) }}
             </div>
           </div>
           <span class="username text-muted">

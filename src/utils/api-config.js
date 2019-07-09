@@ -234,14 +234,14 @@ const api = {
           }
         },
         // endregion access levels
-        // region request schedules
+        // region reports
         reports: {
           $prefix: 'reports',
 
           fetchAll: {
             $url: '',
             $method: 'GET'
-          },
+          }
           // create: {
           //   $url: 'create',
           //   $method: 'POST'
@@ -287,7 +287,62 @@ const api = {
           //   $format: Template(() => `fetch/${managed_by_id}`)
           // }
         },
-        // endregion request schedules
+        // endregion reports
+        
+        // region users
+        users: {
+          $prefix: 'users',
+
+          fetchAll: {
+            $url: '',
+            $method: 'GET'
+          }
+          // create: {
+          //   $url: 'create',
+          //   $method: 'POST'
+          // },
+          // update: {
+          //   $url: 'update',
+          //   $method: 'POST',
+          //   $requires: ['request_schedule_id'],
+          //   $format: Template(() => `update/${request_schedule_id}`)
+          // },
+          // delete: {
+          //   $url: 'delete',
+          //   $method: 'POST',
+          //   $requires: ['request_schedule_id'],
+          //   $format: Template(() => `delete/${request_schedule_id}`)
+          // },
+          // search: {
+          //   $url: 'search',
+          //   $method: 'GET'
+          // },
+          // fetch: {
+          //   $url: 'fetch',
+          //   $method: 'GET',
+          //   $requires: ['request_schedule_id'],
+          //   $format: Template(() => `fetch/${request_schedule_id}`)
+          // },
+          // applicant: {
+          //   $url: 'applicant',
+          //   $method: 'GET',
+          //   $requires: ['applicant_id'],
+          //   $format: Template(() => `fetch/${applicant_id}`)
+          // },
+          // requested_by: {
+          //   $url: 'requested_by',
+          //   $method: 'GET',
+          //   $requires: ['requested_by_id'],
+          //   $format: Template(() => `fetch/${requested_by_id}`)
+          // },
+          // managed_by: {
+          //   $url: 'managed_by',
+          //   $method: 'GET',
+          //   $requires: ['managed_by_id'],
+          //   $format: Template(() => `fetch/${managed_by_id}`)
+          // }
+        }
+        // endregion users
       }
     }
     // endregion API paths
