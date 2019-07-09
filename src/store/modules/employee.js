@@ -10,6 +10,7 @@ const state = {
     rows: 0
   },
   employeesData: [],
+  employeeErrors: "",
   employeeFetchState: {
     initial: false,
     success: false,
@@ -157,7 +158,7 @@ const mutations = {
   DEFINE_ACCESSLEVELS: (state, accesslevels) => (state.accesslevels = accesslevels),
   FORM_RESPONSE: (state, response) => (state.form_request_response = response),
   // DEFINE_RECENT_EMPLOYEES: (state, response) => (state.form_request_response = response),
-   /**
+  /**
    * Commits initial state for fetching employees
    * @param state
    */
@@ -179,7 +180,7 @@ const mutations = {
       fail: false
     }
     state.employeesData = payload.meta.metadata
-    state.employeesTotal = payload.meta.count 
+    state.employeesTotal = payload.meta.count
   },
   /**
    * Commits fail state for fetching employees
@@ -191,10 +192,10 @@ const mutations = {
       success: false,
       fail: true
     }
-    state.errors = payload.response.data.title
+    state.employeeErrors = payload.response.data.title
     state.employeesData = []
   }
-  
+
 }
 
 const actions = {
@@ -209,7 +210,7 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchEmployees({ commit },params) {
+  fetchEmployees({ commit }, params) {
     const slug = 'api.users.fetchAll'
     params = params.data
     STATE_API({ slug, params }, commit, [FETCH_EMPLOYEES.initial, FETCH_EMPLOYEES.success, FETCH_EMPLOYEES.fail])

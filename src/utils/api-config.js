@@ -288,7 +288,7 @@ const api = {
           // }
         },
         // endregion reports
-        
+
         // region users
         users: {
           $prefix: 'users',

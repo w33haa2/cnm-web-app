@@ -21,6 +21,7 @@ const getters = {
   employees: state => state.employee.employees,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
+  employeeErrors: state => state.employee.employeeErrors,
   employeesFetchState: state => state.employee.employeesFetchState,
   allPosition: state => state.employee.accesslevels,
   formResponse: state => state.employee.form_request_response

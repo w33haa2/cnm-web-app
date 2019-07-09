@@ -36,9 +36,15 @@
         </span>
       </template>
       <template>
-        <el-button
-          size="mini"
-        ><i class="el-icon-edit" /></el-button>
+<!--        <el-button-->
+<!--          size="mini"-->
+<!--        ><i class="el-icon-edit" /></el-button>-->
+        <el-select  @change="onSelect" v-model="selectedOption" placeholder="Action" style="width:150px;">
+          <el-option  v-for="item in options"
+           :key="item.value"
+           :label="item.label"
+          :value="item.value"/>
+        </el-select>
       </template>
     </el-table-column>
     <!-- <el-table-column label="Supervisor" width="200" >
@@ -65,14 +71,24 @@ export default {
   },
   data() {
     return {
-      list:
-        {
+      list: {
           data: [],
           filters: {
             status: [],
             head: []
           }
         },
+      selectedOption: '',
+      options: [
+        {
+          value: "edit",
+          label: "Edit"
+        },
+        {
+          value: "delete",
+          label: "Delete"
+        },
+      ],
       multiSelect: [],
       avatarPrefix,
       sort: {
@@ -93,7 +109,9 @@ export default {
         this.list = response.data.items.slice(0, 8)
       })
     },
-
+    onSelect(param) {
+      this.selectedOption = param
+    },
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {
     //   return row.company_details.head === value
