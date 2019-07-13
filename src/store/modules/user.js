@@ -13,7 +13,11 @@ var ls = new SecureLS({
 
 const state = {
   token: ls.get('token').access_token,
-  name: '',
+  userDetails: {
+    full_name: ls.get('token_info').full_name,
+    birth_date: ls.get('token_info').birth_date,
+
+  },
   avatar: '',
   introduction: '',
   loggingInState: {

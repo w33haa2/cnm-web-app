@@ -312,7 +312,7 @@ const api = {
             $method: 'POST',
             $requires: ['user_id'],
             $format: Template(() => `delete/${user_id}`)
-          },
+          }
           // search: {
           //   $url: 'search',
           //   $method: 'GET'

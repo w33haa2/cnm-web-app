@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" style="width: 100%;" @selection-change="handleSelectionChange">
+  <el-table v-loading="employeeFetchState.initial" :data="tableData" style="width: 100%;" @selection-change="handleSelectionChange">
     <el-table-column
       type="selection"
       width="55"
@@ -28,22 +28,23 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Edit" fixed>
+    <el-table-column   label="Edit" fixed>
 
       <template slot="header">
         <span style="float:left">
           <h4 class="text-muted">Action</h4>
         </span>
       </template>
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="$root.$emit('employee_table.edit',scope.row)"
-        ><i class="el-icon-edit" /></el-button>
-        <el-button
-          size="mini"
-          @click="$root.$emit('employee_table.delete',scope.row.id)"
-        ><i class="el-icon-delete" /></el-button>
+      <template slot-scope="scope" align="center">
+        <el-dropdown @command="handleAction">
+            <span class="el-dropdown-link">
+              <i class="el-icon-more" />
+            </span>
+          <el-dropdown-menu slot="dropdown" >
+            <el-dropdown-item icon="el-icon-edit" :command="{type: 'update', params: scope.row}">Update</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-delete" :command="{type: 'delete', params: scope.row.id}"> Delete</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </template>
     </el-table-column>
     <!-- <el-table-column label="Supervisor" width="200" >
@@ -66,7 +67,7 @@ export default {
   components: { TableExpansion },
   props: ['tableData'],
   computed: {
-    ...mapGetters(['allPosition'])
+    ...mapGetters(['allPosition','employeeFetchState'])
   },
   data() {
     return {
@@ -111,9 +112,13 @@ export default {
         this.list = response.data.items.slice(0, 8)
       })
     },
-    onSelect(param) {
-      this.value = param
-      console.log(param)
+    handleAction(param) {
+      if(param.type === "update"){
+        this.$root.$emit('employee_table.edit',param.params)
+      }
+      else{
+        this.$root.$emit('employee_table.delete',param.params)
+      }
     },
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {

@@ -195,7 +195,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees','deleteEmployee']),
+    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'deleteEmployee']),
     refreshTable() {
       const data = this.query
       this.fetchEmployees({ data })
@@ -212,7 +212,7 @@ export default {
       }).then((result) => {
         if (result.value) {
           const data = {
-            user_id : params
+            user_id: params
           }
           this.deleteEmployee({ data })
         }
