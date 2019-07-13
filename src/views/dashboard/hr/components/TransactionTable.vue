@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" style="width: 100%;" @selection-change="handleSelectionChange">
+  <el-table v-loading="employeeFetchState.initial" :data="tableData" style="width: 100%;" @selection-change="handleSelectionChange">
     <el-table-column
       type="selection"
       width="55"
@@ -35,16 +35,16 @@
           <h4 class="text-muted">Action</h4>
         </span>
       </template>
-      <template>
-<!--        <el-button-->
-<!--          size="mini"-->
-<!--        ><i class="el-icon-edit" /></el-button>-->
-        <el-select  @change="onSelect" v-model="selectedOption" placeholder="Action" style="width:150px;">
-          <el-option  v-for="item in options"
-           :key="item.value"
-           :label="item.label"
-          :value="item.value"/>
-        </el-select>
+      <template slot-scope="scope" align="center">
+        <el-dropdown @command="handleAction">
+          <span class="el-dropdown-link">
+            <i class="el-icon-more" />
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item icon="el-icon-edit" :command="{type: 'update', params: scope.row}">Update</el-dropdown-item>
+            <el-dropdown-item icon="el-icon-delete" :command="{type: 'delete', params: scope.row.id}"> Delete</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </template>
     </el-table-column>
     <!-- <el-table-column label="Supervisor" width="200" >
@@ -67,27 +67,30 @@ export default {
   components: { TableExpansion },
   props: ['tableData'],
   computed: {
-    ...mapGetters(['allPosition'])
+    ...mapGetters(['allPosition', 'employeeFetchState'])
   },
   data() {
     return {
       list: {
-          data: [],
-          filters: {
-            status: [],
-            head: []
-          }
-        },
-      selectedOption: '',
+        data: [],
+        filters: {
+          status: [],
+          head: []
+        }
+      },
+      value: {
+        value: 'edit',
+        label: 'Edit'
+      },
       options: [
         {
-          value: "edit",
-          label: "Edit"
+          value: 'edit',
+          label: 'Edit'
         },
         {
-          value: "delete",
-          label: "Delete"
-        },
+          value: 'delete',
+          label: 'Delete'
+        }
       ],
       multiSelect: [],
       avatarPrefix,
@@ -109,8 +112,12 @@ export default {
         this.list = response.data.items.slice(0, 8)
       })
     },
-    onSelect(param) {
-      this.selectedOption = param
+    handleAction(param) {
+      if (param.type === 'update') {
+        this.$root.$emit('employee_table.edit', param.params)
+      } else {
+        this.$root.$emit('employee_table.delete', param.params)
+      }
     },
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {
