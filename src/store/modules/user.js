@@ -15,7 +15,7 @@ const state = {
   token: ls.get('token').access_token,
   userDetails: {
     full_name: ls.get('token_info').full_name,
-    birth_date: ls.get('token_info').birth_date,
+    birth_date: ls.get('token_info').birth_date
 
   },
   avatar: '',

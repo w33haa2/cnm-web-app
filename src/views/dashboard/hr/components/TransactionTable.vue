@@ -28,7 +28,7 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column   label="Edit" fixed>
+    <el-table-column label="Edit" fixed>
 
       <template slot="header">
         <span style="float:left">
@@ -37,10 +37,10 @@
       </template>
       <template slot-scope="scope" align="center">
         <el-dropdown @command="handleAction">
-            <span class="el-dropdown-link">
-              <i class="el-icon-more" />
-            </span>
-          <el-dropdown-menu slot="dropdown" >
+          <span class="el-dropdown-link">
+            <i class="el-icon-more" />
+          </span>
+          <el-dropdown-menu slot="dropdown">
             <el-dropdown-item icon="el-icon-edit" :command="{type: 'update', params: scope.row}">Update</el-dropdown-item>
             <el-dropdown-item icon="el-icon-delete" :command="{type: 'delete', params: scope.row.id}"> Delete</el-dropdown-item>
           </el-dropdown-menu>
@@ -67,7 +67,7 @@ export default {
   components: { TableExpansion },
   props: ['tableData'],
   computed: {
-    ...mapGetters(['allPosition','employeeFetchState'])
+    ...mapGetters(['allPosition', 'employeeFetchState'])
   },
   data() {
     return {
@@ -113,11 +113,10 @@ export default {
       })
     },
     handleAction(param) {
-      if(param.type === "update"){
-        this.$root.$emit('employee_table.edit',param.params)
-      }
-      else{
-        this.$root.$emit('employee_table.delete',param.params)
+      if (param.type === 'update') {
+        this.$root.$emit('employee_table.edit', param.params)
+      } else {
+        this.$root.$emit('employee_table.delete', param.params)
       }
     },
     // table filter callback {Element UI} functions
