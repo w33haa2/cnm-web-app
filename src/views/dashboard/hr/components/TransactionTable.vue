@@ -35,16 +35,15 @@
           <h4 class="text-muted">Action</h4>
         </span>
       </template>
-      <template>
-<!--        <el-button-->
-<!--          size="mini"-->
-<!--        ><i class="el-icon-edit" /></el-button>-->
-        <el-select  @change="onSelect" v-model="selectedOption" placeholder="Action" style="width:150px;">
-          <el-option  v-for="item in options"
-           :key="item.value"
-           :label="item.label"
-          :value="item.value"/>
-        </el-select>
+      <template slot-scope="scope">
+        <el-button
+          size="mini"
+          @click="$root.$emit('employee_table.edit',scope.row)"
+        ><i class="el-icon-edit" /></el-button>
+        <el-button
+          size="mini"
+          @click="$root.$emit('employee_table.delete',scope.row.id)"
+        ><i class="el-icon-delete" /></el-button>
       </template>
     </el-table-column>
     <!-- <el-table-column label="Supervisor" width="200" >
@@ -72,22 +71,25 @@ export default {
   data() {
     return {
       list: {
-          data: [],
-          filters: {
-            status: [],
-            head: []
-          }
-        },
-      selectedOption: '',
+        data: [],
+        filters: {
+          status: [],
+          head: []
+        }
+      },
+      value: {
+        value: 'edit',
+        label: 'Edit'
+      },
       options: [
         {
-          value: "edit",
-          label: "Edit"
+          value: 'edit',
+          label: 'Edit'
         },
         {
-          value: "delete",
-          label: "Delete"
-        },
+          value: 'delete',
+          label: 'Delete'
+        }
       ],
       multiSelect: [],
       avatarPrefix,
@@ -110,7 +112,8 @@ export default {
       })
     },
     onSelect(param) {
-      this.selectedOption = param
+      this.value = param
+      console.log(param)
     },
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {

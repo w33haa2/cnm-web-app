@@ -145,7 +145,7 @@ const api = {
             $url: 'stats',
             $method: 'GET'
           },
-          fetch: {
+          fetchSchedule: {
             $url: 'fetch',
             $method: 'GET',
             $requires: ['schedule_id'],
@@ -296,7 +296,7 @@ const api = {
           fetchAll: {
             $url: '',
             $method: 'GET'
-          }
+          },
           // create: {
           //   $url: 'create',
           //   $method: 'POST'
@@ -307,12 +307,12 @@ const api = {
           //   $requires: ['request_schedule_id'],
           //   $format: Template(() => `update/${request_schedule_id}`)
           // },
-          // delete: {
-          //   $url: 'delete',
-          //   $method: 'POST',
-          //   $requires: ['request_schedule_id'],
-          //   $format: Template(() => `delete/${request_schedule_id}`)
-          // },
+          delete: {
+            $url: 'delete',
+            $method: 'POST',
+            $requires: ['user_id'],
+            $format: Template(() => `delete/${user_id}`)
+          },
           // search: {
           //   $url: 'search',
           //   $method: 'GET'
