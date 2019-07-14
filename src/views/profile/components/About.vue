@@ -5,7 +5,7 @@
         <span class="username text-muted">Full Name</span>
       </div>
       <p>
-        {{ user.info.full_name }}
+        {{ user.full_name }}
       </p>
     </div>
     <div class="post">
@@ -13,7 +13,7 @@
         <span class="username text-muted">Birth Date</span>
       </div>
       <p>
-        {{ user.info.birthdate }}
+        {{ user.birth_date }}
       </p>
     </div>
     <div class="post">
@@ -21,7 +21,7 @@
         <span class="username text-muted">Gender</span>
       </div>
       <p>
-        {{ user.info.gender }}
+        {{ user.gender }}
       </p>
     </div>
     <div class="post">
@@ -29,7 +29,7 @@
         <span class="username text-muted">Address</span>
       </div>
       <p>
-        {{ user.info.address }}
+        {{ user.address }}
       </p>
     </div>
     <div class="post">
@@ -37,7 +37,7 @@
         <span class="username text-muted">Personal Email</span>
       </div>
       <p>
-        {{ user.info.p_mail }}
+        {{ user.p_email !== null ? user.p_email : 'N/A' }}
       </p>
     </div>
     <div class="post">
@@ -45,7 +45,7 @@
         <span class="username text-muted">Contact Number</span>
       </div>
       <p>
-        {{ user.info.contact_number }}
+        {{ user.contact_number !== null ? user.contact_number : 'N/A' }}
       </p>
     </div>
   </div>
@@ -68,9 +68,6 @@ export default {
       avatarPrefix,
       carouselPrefix
     }
-  },
-  created() {
-    console.log(this.user)
   }
 }
 </script>

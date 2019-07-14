@@ -19,6 +19,7 @@ const getters = {
   irErrors: state => state.incident_report.errors,
   // users
   employees: state => state.employee.employees,
+  userDetails: state => state.user.userDetails,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,

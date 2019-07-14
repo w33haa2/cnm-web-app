@@ -3,17 +3,17 @@
     <div v-if="user">
       <el-row :gutter="20">
         <el-col :span="6" :xs="24">
-          <user-card :user="user" />
+          <user-card :user="userDetails" />
         </el-col>
 
         <el-col :span="18" :xs="24">
           <el-card>
             <el-tabs v-model="activeTab">
               <el-tab-pane label="About" name="about">
-                <about :user="user" />
+                <about :user="userDetails" />
               </el-tab-pane>
               <el-tab-pane label="Company Details" name="company_details">
-                <company-details :user="user" />
+                <company-details :user="userDetails" />
               </el-tab-pane>
               <el-tab-pane label="Benefit IDs" name="benefit_ids">
                 <benefit-ids :user="user" />
@@ -63,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['name', 'avatar', 'roles'])
+    ...mapGetters(['name', 'avatar', 'roles', 'userDetails'])
   },
   created() {
     this.getUser()
