@@ -6,16 +6,16 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
-          <div>Hello</div>
-          {{ user.role }}
+        <pan-thumb :image="user.image_url === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : user.image_url" :height="'100px'" :width="'100px'" :hoverable="false">
+
+          {{ user.position }}
         </pan-thumb>
       </div>
       <div class="box-center">
-        <div class="user-name text-center">{{ user.info.shortened_name }}</div>
+        <div class="user-name text-center">{{ user.full_name }}</div>
         <div
           class="user-role text-center text-muted"
-        >{{ user.company_details.position | uppercaseFirst }}</div>
+        >{{ user.position | uppercaseFirst }}</div>
       </div>
     </div>
 
@@ -71,7 +71,7 @@ export default {
         }
       }
     }
-  }
+  },
 }
 </script>
 

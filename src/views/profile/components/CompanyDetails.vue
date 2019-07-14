@@ -5,7 +5,7 @@
         <span class="username text-muted">CNM ID</span>
       </div>
       <p>
-        {{ user.company_details.company_id }}
+        {{ user.company_id }}
       </p>
     </div>
     <div class="post">
@@ -13,7 +13,7 @@
         <span class="username text-muted">Position</span>
       </div>
       <p>
-        {{ user.company_details.position }}
+        {{ user.position }}
       </p>
     </div>
     <div class="post">
@@ -21,7 +21,7 @@
         <span class="username text-muted">Head</span>
       </div>
       <p>
-        {{ user.company_details.head }}
+        {{ user.head !== null ? user.head : 'N/A' }}
       </p>
     </div>
     <div class="post">
@@ -29,7 +29,7 @@
         <span class="username text-muted">Hired Date</span>
       </div>
       <p>
-        {{ user.company_details.hired_date }}
+        {{ user.hired_date }}
       </p>
     </div>
     <div class="post">
@@ -37,7 +37,7 @@
         <span class="username text-muted">Company Email</span>
       </div>
       <p>
-        {{ user.company_details.email }}
+        {{ user.c_email }}
       </p>
     </div>
     <div class="post">
@@ -45,7 +45,7 @@
         <span class="username text-muted">Contract</span>
       </div>
       <p>
-        {{ user.company_details.contract }}
+        {{ user.contract }}
       </p>
     </div>
   </div>
@@ -69,9 +69,6 @@ export default {
       carouselPrefix
     }
   },
-  created() {
-    console.log(this.user)
-  }
 }
 </script>
 
