@@ -68,7 +68,7 @@ export default {
       avatarPrefix,
       carouselPrefix
     }
-  },
+  }
 }
 </script>
 

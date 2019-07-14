@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     // add map getters for logged_user_id
-    ...mapGetters(['sidebar', 'avatar', 'device','userDetails'])
+    ...mapGetters(['sidebar', 'avatar', 'device', 'userDetails'])
   },
   methods: {
     ...mapActions(['logout']),

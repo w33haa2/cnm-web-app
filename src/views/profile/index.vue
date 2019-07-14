@@ -63,7 +63,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['name', 'avatar', 'roles','userDetails'])
+    ...mapGetters(['name', 'avatar', 'roles', 'userDetails'])
   },
   created() {
     this.getUser()
