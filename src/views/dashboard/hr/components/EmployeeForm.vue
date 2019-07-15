@@ -252,7 +252,6 @@ export default {
           duration: 1000 * 5
         })
       } else if (response.status == 200) {
-        this.$root.$emit('employee_table.refresh')
         this.$message({
           message: 'You have succussfuly added an Employee',
           type: 'success',
@@ -270,7 +269,7 @@ export default {
     this.cascadeSelectHead()
   },
   methods: {
-    ...mapActions(['fetchUsers', 'addUser', 'fetchEmployees']),
+    ...mapActions(['fetchUsers', 'addUser']),
     captured: function(value) {
       this.form.employee.image = value
       console.log(value)

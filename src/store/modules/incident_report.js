@@ -1,6 +1,9 @@
 import { STATE_API } from '@/utils/api/api-helper'
 import { generateMutationTypes } from '@/utils/api/state-mutation'
-const FETCH_INCIDENT_REPORTS = generateMutationTypes('incident_reports', 'FETCH_INCIDENT_REPORTS')
+const FETCH_INCIDENT_REPORTS = generateMutationTypes(
+  'incident_reports',
+  'FETCH_INCIDENT_REPORTS'
+)
 
 /**
  * State
@@ -65,7 +68,11 @@ const actions = {
    */
   fetchReports({ commit }) {
     const slug = 'api.reports.fetchAll'
-    STATE_API({ slug }, commit, [FETCH_INCIDENT_REPORTS.initial, FETCH_INCIDENT_REPORTS.success, FETCH_INCIDENT_REPORTS.fail])
+    STATE_API({ slug }, commit, [
+      FETCH_INCIDENT_REPORTS.initial,
+      FETCH_INCIDENT_REPORTS.success,
+      FETCH_INCIDENT_REPORTS.fail
+    ])
   }
 }
 

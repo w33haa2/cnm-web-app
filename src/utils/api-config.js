@@ -297,6 +297,10 @@ const api = {
             $url: '',
             $method: 'GET'
           },
+          statusList: {
+            $url: 'status_list',
+            $method: 'GET'
+          },
           // create: {
           //   $url: 'create',
           //   $method: 'POST'
@@ -371,6 +375,4 @@ function Template(cb) {
 /**
  * Export const api for api-helper consumption.
  */
-export {
-  api
-}
+export { api }

@@ -1,4 +1,3 @@
-
 import SecureLS from 'secure-ls'
 // import axios from 'axios'
 import { STATE_API } from '@/utils/api/api-helper'
@@ -6,6 +5,14 @@ import { generateMutationTypes } from '@/utils/api/state-mutation'
 import router, { resetRouter } from '@/router'
 const LOGIN = generateMutationTypes('auth', 'LOGIN')
 const LOGOUT = generateMutationTypes('auth', 'LOGOUT')
+const FETCH_USER_STATUS_LIST = generateMutationTypes(
+  'user_status',
+  'FETCH_USER_STATUS_LIST'
+)
+const FETCH_POTENTIAL_HEAD = generateMutationTypes(
+  'position_cascade_select',
+  'FETCH_POTENTIAL_HEAD'
+)
 
 var ls = new SecureLS({
   encodingType: 'aes'
@@ -39,7 +46,28 @@ const state = {
     success: false,
     fail: false
   },
-  roles: []
+  roles: [],
+  // structure
+  data: {
+    statusList: [],
+    potentialHead: []
+  },
+  fetchState: {
+    statusList: {
+      initial: false,
+      success: false,
+      fail: false
+    },
+    potentialHead: {
+      initial: false,
+      success: false,
+      fail: false
+    }
+  },
+  errors: {
+    statusList: null,
+    potentialHead: null
+  }
 }
 const mutations = {
   [LOGIN.initial](state) {
@@ -64,7 +92,10 @@ const mutations = {
     state.userDetails.contact_number = payload.meta.user.info.contact_number
     state.userDetails.company_id = payload.meta.user.company_id
     state.userDetails.position = payload.meta.user.access.name
-    state.userDetails.head = payload.meta.user.access.parent !== null ? payload.meta.user.access.parent : 'N/A'
+    state.userDetails.head =
+      payload.meta.user.access.parent !== null
+        ? payload.meta.user.access.parent
+        : 'N/A'
     state.userDetails.hired_date = payload.meta.user.info.hired_date
     state.userDetails.c_email = payload.meta.user.email
     state.userDetails.image_url = payload.meta.user.info.image_url
@@ -92,12 +123,11 @@ const mutations = {
       middlename: state.userDetails.middlename,
       lastname: state.userDetails.lastname,
       id: state.userDetails.id
-
     })
 
-    router.push({
-      path: '/dashboard'
-    })
+    // router.push({
+    //   path: "/dashboard"
+    // });
   },
   [LOGIN.fail](state, payload) {
     state.loggingInState = {
@@ -122,8 +152,58 @@ const mutations = {
     state.userFullName = null
     state.userEmail = null
     state.loginSuccess = false
+  },
+  // FETCH USER STATUS LIST
+  // initial
+  [FETCH_USER_STATUS_LIST.initial](state) {
+    state.fetchState.statusList = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  [FETCH_USER_STATUS_LIST.success](state, payload) {
+    state.fetchState.statusList = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+    state.data.statusList = payload.meta.metadata
+  },
+  [FETCH_USER_STATUS_LIST.fail](state, payload) {
+    state.fetchState.statusList = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.errors.statusList = payload.response.data.title
+  },
+  // FETCH POTENTIAL HEAD LIST
+  // initial
+  [FETCH_POTENTIAL_HEAD.initial](state) {
+    state.fetchState.potentialHead = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  [FETCH_POTENTIAL_HEAD.success](state, payload) {
+    state.fetchState.potentialHead = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+    state.data.potentialHead = payload.meta.metadata
+  },
+  [FETCH_POTENTIAL_HEAD.fail](state, payload) {
+    state.fetchState.statusList = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.errors.potentialHead = payload.response.data.title
   }
-  // SET_TOKEN: (state, token) => {
+  // SET_TOK,EN: (state, token) => {
   //   state.token = token
   // },
   // SET_INTRODUCTION: (state, introduction) => {
@@ -143,104 +223,34 @@ const mutations = {
 const actions = {
   authenticate({ commit }, params) {
     const slug = 'auth.login'
-    STATE_API({ slug, params: params.data }, commit, [LOGIN.initial, LOGIN.success, LOGIN.fail])
+    STATE_API({ slug, params: params.data }, commit, [
+      LOGIN.initial,
+      LOGIN.success,
+      LOGIN.fail
+    ])
   },
   logout({ commit }) {
     const slug = 'auth.logout'
     STATE_API({ slug }, commit, [LOGOUT.success, LOGOUT.fail])
+  },
+  // fetch user_status_list
+  fetchStatusList({ commit }) {
+    const slug = 'api.users.statusList'
+    STATE_API({ slug }, commit, [
+      FETCH_USER_STATUS_LIST.initial,
+      FETCH_USER_STATUS_LIST.success,
+      FETCH_USER_STATUS_LIST.fail
+    ])
+  },
+  fetchPotentialHead({ commit }, params) {
+    const slug = 'api.users.fetchAll'
+    params = params.data
+    STATE_API({ slug, params }, commit, [
+      FETCH_POTENTIAL_HEAD.initial,
+      FETCH_POTENTIAL_HEAD.success,
+      FETCH_POTENTIAL_HEAD.fail
+    ])
   }
-  // user login
-  // login({ commit }, userInfo) {
-  //   const { username, password } = userInfo
-  //   return new Promise((resolve, reject) => {
-  //     login({ username: username.trim(), password: password }).then(response => {
-  //       const { data } = response
-  //       commit('SET_TOKEN', data.token)
-  //       setToken(data.token)
-  //       resolve()
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
-  //
-  // // get user info
-  // getInfo({ commit, state }) {
-  //   return new Promise((resolve, reject) => {
-  //     getInfo(state.token).then(response => {
-  //       const { data } = response
-  //
-  //       if (!data) {
-  //         reject('Verification failed, please Login again.')
-  //       }
-  //
-  //       const { roles, name, avatar, introduction } = data
-  //
-  //       // roles must be a non-empty array
-  //       if (!roles || roles.length <= 0) {
-  //         reject('getInfo: roles must be a non-null array!')
-  //       }
-  //
-  //       commit('SET_ROLES', roles)
-  //       commit('SET_NAME', name)
-  //       commit('SET_AVATAR', avatar)
-  //       commit('SET_INTRODUCTION', introduction)
-  //       resolve(data)
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
-  //
-  // // user logout
-  // logout({ commit, state }) {
-  //   return new Promise((resolve, reject) => {
-  //     logout(state.token).then(() => {
-  //       commit('SET_TOKEN', '')
-  //       commit('SET_ROLES', [])
-  //       removeToken()
-  //       resetRouter()
-  //       resolve()
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
-  //
-  // // remove token
-  // resetToken({ commit }) {
-  //   return new Promise(resolve => {
-  //     commit('SET_TOKEN', '')
-  //     commit('SET_ROLES', [])
-  //     removeToken()
-  //     resolve()
-  //   })
-  // },
-  //
-  // // dynamically modify permissions
-  // changeRoles({ commit, dispatch }, role) {
-  //   return new Promise(async resolve => {
-  //     const token = role + '-token'
-  //
-  //     commit('SET_TOKEN', token)
-  //     setToken(token)
-  //
-  //     const { roles } = await dispatch('getInfo')
-  //
-  //     resetRouter()
-  //
-  //     // generate accessible routes map based on roles
-  //     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
-  //
-  //     // dynamically add accessible routes
-  //     router.addRoutes(accessRoutes)
-  //
-  //     // reset visited views and cached views
-  //     dispatch('tagsView/delAllViews', null, { root: true })
-  //
-  //     resolve()
-  //   })
-  // }
 }
 
 export default {

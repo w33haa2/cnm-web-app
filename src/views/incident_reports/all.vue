@@ -156,16 +156,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(
-      ['fetchingIncidentReports', 'incidentReports', 'irErrors']
-    )
+    ...mapGetters(['fetchingIncidentReports', 'incidentReports', 'irErrors'])
   },
   watch: {
     fetchingIncidentReports({ initial, success, fail }) {
       if (initial) {
-
       } else if (success) {
-
       } else if (fail) {
         Message.error({ message: this.irErrors, duration: '2500' })
       }
@@ -175,9 +171,7 @@ export default {
     this.fetchReports()
   },
   methods: {
-    ...mapActions(
-      ['fetchReports']
-    ),
+    ...mapActions(['fetchReports']),
     handleCommand(command) {
       const id = command.split('||')[1]
       const action = command.split('||')[0]

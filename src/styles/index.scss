@@ -291,3 +291,9 @@ td .cell {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.validation-has-error {
+  .error {
+    color: red;
+  }
+}

@@ -4,7 +4,7 @@
     <input ref="fileInput" type="file" style="display:none" @change="fileChanged">
     <!-- <div style="width:100%;margin-bottom:3px;">
             <el-button size="mini" style="width:100%">Browse</el-button>
-    </div>-->
+        </div> -->
     <div style="width:100%">
       <el-button size="mini" style="width:100%" @click="camera_dialog=true">Camera</el-button>
     </div>
@@ -46,34 +46,13 @@
       </el-row>
       <el-row style="margin-top:5px;">
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:8}" :lg="{span:8}" :xl="{span:8}">
-          <el-button
-            type="danger"
-            :plain="true"
-            size="mini"
-            style="width:100%"
-            :disabled="vueCam.buttons.start"
-            @click="onStart"
-          >Start</el-button>
+          <el-button type="danger" :plain="true" size="mini" style="width:100%" :disabled="vueCam.buttons.start" @click="onStart">Start</el-button>
         </el-col>
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:8}" :lg="{span:8}" :xl="{span:8}">
-          <el-button
-            type="danger"
-            :plain="true"
-            size="mini"
-            style="width:100%"
-            :disabled="vueCam.buttons.capture"
-            @click="capture"
-          >Capture</el-button>
+          <el-button type="danger" :plain="true" size="mini" style="width:100%" :disabled="vueCam.buttons.capture" @click="capture">Capture</el-button>
         </el-col>
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:8}" :lg="{span:8}" :xl="{span:8}">
-          <el-button
-            type="danger"
-            :plain="true"
-            size="mini"
-            style="width:100%"
-            :disabled="vueCam.buttons.stop"
-            @click="onStop"
-          >Close</el-button>
+          <el-button type="danger" :plain="true" size="mini" style="width:100%" :disabled="vueCam.buttons.stop" @click="onStop">Close</el-button>
         </el-col>
       </el-row>
     </el-dialog>
@@ -107,7 +86,9 @@ export default {
   },
   computed: {
     device: function() {
-      return this.vueCam.devices.find(n => n.deviceId === this.vueCam.deviceId)
+      return this.vueCam.devices.find(
+        n => n.deviceId === this.vueCam.deviceId
+      )
     }
   },
   watch: {
@@ -140,12 +121,9 @@ export default {
 
       const date = new Date().valueOf()
       let text = ''
-      const possibleText =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      const possibleText = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
       for (let i = 0; i < 5; i++) {
-        text += possibleText.charAt(
-          Math.floor(Math.random() * possibleText.length)
-        )
+        text += possibleText.charAt(Math.floor(Math.random() * possibleText.length))
       }
 
       // Replace extension according to your media type
@@ -195,11 +173,7 @@ export default {
       var byteCharacters = atob(b64Data)
       var byteArrays = []
 
-      for (
-        var offset = 0;
-        offset < byteCharacters.length;
-        offset += sliceSize
-      ) {
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
         var slice = byteCharacters.slice(offset, offset + sliceSize)
 
         var byteNumbers = new Array(slice.length)
@@ -221,4 +195,5 @@ export default {
 </script>
 
 <style>
+
 </style>
