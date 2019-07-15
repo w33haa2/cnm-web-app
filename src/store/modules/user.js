@@ -125,9 +125,9 @@ const mutations = {
       id: state.userDetails.id
     });
 
-    router.push({
-      path: "/dashboard"
-    });
+    // router.push({
+    //   path: "/dashboard"
+    // });
   },
   [LOGIN.fail](state, payload) {
     state.loggingInState = {
