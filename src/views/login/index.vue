@@ -70,9 +70,9 @@
       width="30%"
     >
       <label>New Password</label>
-      <el-input v-model="newPassword1" type="password" style="margin-top:3px; margin-bottom:10px;"></el-input>
+      <el-input v-model="newPassword1" type="password" style="margin-top:3px; margin-bottom:10px;" />
       <label style="margin-top:5px; margin-bottom:3px">Confirm New Password</label>
-      <el-input v-model="newPassword2" type="password" style="margin-top:3px; margin-bottom:5px;"></el-input>
+      <el-input v-model="newPassword2" type="password" style="margin-top:3px; margin-bottom:5px;" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="logout">Cancel</el-button>
         <el-button type="primary" @click="confirmChangePass">Confirm</el-button>
@@ -82,113 +82,113 @@
 </template>
 
 <script>
-import { validEmail } from "@/utils/validate";
-import { Message } from "element-ui";
-import { mapActions, mapGetters } from "vuex";
+import { validEmail } from '@/utils/validate'
+import { Message } from 'element-ui'
+import { mapActions, mapGetters } from 'vuex'
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validEmail(value)) {
-        callback(new Error("Please enter the correct email"));
+        callback(new Error('Please enter the correct email'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error("The password can not be less than 6 digits"));
+        callback(new Error('The password can not be less than 6 digits'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     return {
       changePassDiag: false,
       loginForm: {
-        username: "",
-        password: ""
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", validator: validateUsername }
+          { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
-          { required: true, trigger: "blur", validator: validatePassword }
+          { required: true, trigger: 'blur', validator: validatePassword }
         ]
       },
-      passwordType: "password",
+      passwordType: 'password',
       capsTooltip: false,
       loading: false,
       showDialog: false,
       redirect: undefined,
       otherQuery: {},
-      newPassword1: "",
-      newPassword2: ""
-    };
+      newPassword1: '',
+      newPassword2: ''
+    }
   },
   computed: {
-    ...mapGetters(["loginState"])
+    ...mapGetters(['loginState'])
   },
   watch: {
     $route: {
       handler: function(route) {
-        const query = route.query;
+        const query = route.query
         if (query) {
-          this.redirect = query.redirect;
-          this.otherQuery = this.getOtherQuery(query);
+          this.redirect = query.redirect
+          this.otherQuery = this.getOtherQuery(query)
         }
       },
       immediate: true
     },
     loginState({ initial, success, fail }) {
       if (initial) {
-        this.loading = true;
+        this.loading = true
       } else if (success) {
-        this.loading = false;
-        this.changePassDiag = true;
+        this.loading = false
+        this.changePassDiag = true
       } else if (fail) {
         Message.error({
-          message: "Invalid username or password",
-          duration: "2500"
-        });
-        this.loading = false;
+          message: 'Invalid username or password',
+          duration: '2500'
+        })
+        this.loading = false
       }
     }
   },
   mounted() {
-    if (this.loginForm.username === "") {
-      this.$refs.username.focus();
-    } else if (this.loginForm.password === "") {
-      this.$refs.password.focus();
+    if (this.loginForm.username === '') {
+      this.$refs.username.focus()
+    } else if (this.loginForm.password === '') {
+      this.$refs.password.focus()
     }
   },
 
   methods: {
-    ...mapActions(["authenticate", "logout"]),
+    ...mapActions(['authenticate', 'logout']),
     checkCapslock({ shiftKey, key } = {}) {
       if (key && key.length === 1) {
         if (
-          (shiftKey && (key >= "a" && key <= "z")) ||
-          (!shiftKey && (key >= "A" && key <= "Z"))
+          (shiftKey && (key >= 'a' && key <= 'z')) ||
+          (!shiftKey && (key >= 'A' && key <= 'Z'))
         ) {
-          this.capsTooltip = true;
+          this.capsTooltip = true
         } else {
-          this.capsTooltip = false;
+          this.capsTooltip = false
         }
       }
-      if (key === "CapsLock" && this.capsTooltip === true) {
-        this.capsTooltip = false;
+      if (key === 'CapsLock' && this.capsTooltip === true) {
+        this.capsTooltip = false
       }
     },
     showPwd() {
-      if (this.passwordType === "password") {
-        this.passwordType = "";
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
       } else {
-        this.passwordType = "password";
+        this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus();
-      });
+        this.$refs.password.focus()
+      })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
@@ -196,27 +196,27 @@ export default {
           const data = {
             username: this.loginForm.username,
             password: this.loginForm.password
-          };
-          this.authenticate({ data });
+          }
+          this.authenticate({ data })
         }
-      });
+      })
     },
     getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== "redirect") {
-          acc[cur] = query[cur];
+        if (cur !== 'redirect') {
+          acc[cur] = query[cur]
         }
-        return acc;
-      }, {});
+        return acc
+      }, {})
     },
     confirmChangePass() {
       // validate first
       this.$router.push({
-        path: "/dashboard"
-      });
+        path: '/dashboard'
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
