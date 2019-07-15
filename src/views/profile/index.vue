@@ -43,6 +43,7 @@ import About from './components/About'
 import CompanyDetails from './components/CompanyDetails'
 import BenefitIDs from './components/BenefitIDs'
 import Subordinates from './components/Subordinates'
+import axios from 'axios'
 
 export default {
   name: 'Profile',
@@ -76,50 +77,7 @@ export default {
 
       // THIS IS ONLY A TEST VARIABLE
       // structure may vary on the request results
-      this.user = {
-        info: {
-          full_name: 'Emmanuel James Eng Lajom',
-          firstname: 'Emmanuel James',
-          middlename: 'Eng',
-          lastname: 'Lajom',
-          suffix: null,
-          birthdate: '12/25/1991',
-          gender: 'Male',
-          address: 'Lower Binugao, Toril, Davao City',
-          shortened_name: 'Emmanuel Lajom',
-          p_mail: 'jamesenglajom@gmail.com',
-          contact_number: '0900-0000-000'
-        },
-        company_details: {
-          company_id: '16',
-          email: 'jeng@cnmsolutions.net',
-          contract: 'Signed',
-          position: 'Developer',
-          hired_date: '11/30/2018',
-          head: 'Maricel Obsiana'
-        },
-        benefit_ids: {
-          sss: 'SSS-0000',
-          philhealth: 'PhilHealth-0000',
-          pagibig: 'PagIbig-0000',
-          tin: 'TIN-0000'
-        },
-        status_logs: [
-          {
-            description: "You're Promoted!",
-            type: 'Acive',
-            content: 'Changed employee Status to Active 12/25/2018',
-            date: '12/25/2018'
-          },
-          {
-            description: 'Officially Hired',
-            type: 'New',
-            content:
-              'Activated CNM WebApp Account with employee status of New 11/30/2018',
-            date: '11/30/2018'
-          }
-        ]
-      }
+
     }
   }
 }
