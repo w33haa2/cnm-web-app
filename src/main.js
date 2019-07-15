@@ -18,6 +18,7 @@ import _ from 'lodash'
 import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
+import VueSweetalert2 from 'vue-sweetalert2' // sweetalert
 
 import * as filters from './filters' // global filters
 
@@ -30,6 +31,7 @@ Vue.use(Element, {
 
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
+Vue.use(VueSweetalert2)
 
 Vue.config.lang = 'en'
 

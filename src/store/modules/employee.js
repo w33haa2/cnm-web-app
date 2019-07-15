@@ -3,15 +3,20 @@ import { STATE_API } from '@/utils/api/api-helper'
 import { generateMutationTypes } from '@/utils/api/state-mutation'
 
 const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
-
+const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
 const state = {
   employees: {
     data: [],
     rows: 0
   },
   employeesData: [],
-  employeeErrors: "",
+  employeeErrors: '',
   employeeFetchState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  employeeDeleteState: {
     initial: false,
     success: false,
     fail: false
@@ -194,6 +199,40 @@ const mutations = {
     }
     state.employeeErrors = payload.response.data.title
     state.employeesData = []
+  },
+  /**
+   * Commits initial state for deleting employees
+   * @param state
+   */
+  [DELETE_EMPLOYEES.initial](state) {
+    state.employeeDeleteState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for deleting employees
+   * @param state
+   */
+  [DELETE_EMPLOYEES.success](state) {
+    state.employeeDeleteState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+  },
+  /**
+   * Commits fail state for deleting employees
+   * @param state
+   */
+  [DELETE_EMPLOYEES.fail](state, payload) {
+    state.employeeDeleteState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.employeeErrors = payload.response.data.title
   }
 
 }
@@ -214,6 +253,16 @@ const actions = {
     const slug = 'api.users.fetchAll'
     params = params.data
     STATE_API({ slug, params }, commit, [FETCH_EMPLOYEES.initial, FETCH_EMPLOYEES.success, FETCH_EMPLOYEES.fail])
+  },
+  /**
+   * Action for fetching employees
+   * @param commit
+   * @param params
+   */
+  deleteEmployee({ commit }, params) {
+    const slug = 'api.users.delete'
+    params = params.data
+    STATE_API({ slug, params }, commit, [DELETE_EMPLOYEES.initial, DELETE_EMPLOYEES.success, DELETE_EMPLOYEES.fail])
   },
   async fetchUsers({ commit }, query) {
     let endpoint = '/api/v1/users?'

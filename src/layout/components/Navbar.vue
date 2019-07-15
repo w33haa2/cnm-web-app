@@ -24,11 +24,14 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar" />
+          <img
+            :src="userDetails.image_url === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : userDetails.image_url"
+            class="user-avatar"
+          />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link :to="'/profile/index/'+this.logged_user_id">
+          <router-link :to="'/profile/index/'+userDetails.id">
             <el-dropdown-item>Profile</el-dropdown-item>
           </router-link>
           <router-link to="/">
@@ -63,7 +66,7 @@ export default {
   },
   computed: {
     // add map getters for logged_user_id
-    ...mapGetters(["sidebar", "avatar", "device"])
+    ...mapGetters(["sidebar", "avatar", "device", "userDetails"])
   },
   methods: {
     ...mapActions(["logout"]),

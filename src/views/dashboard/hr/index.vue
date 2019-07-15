@@ -78,7 +78,6 @@
         <transaction-table :table-data="employees.data" @sort="onColumnSort" />
       </el-col>
       <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
-        <todo-list />
       </el-col>
       <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <box-card />
@@ -116,6 +115,8 @@ export default {
   },
   data() {
     return {
+      searchQuery: '',
+      dialogVisibility: false,
       table_config: {
         searchable_fields: [
           { value: 'full_name', label: 'Name' }
@@ -145,19 +146,75 @@ export default {
   },
   created() {
     // fetch and commit table data via vuex action
-    this.fetchUsers(this.table_config.query)
+    const data = this.query
+    this.fetchEmployees({ data })
+    this.$root.$on('employee_table.refresh', this.refreshTable)
+    this.$root.$on('employee_table.edit', this.editUser)
+    this.$root.$on('employee_table.delete', this.deleteUser)
     // setup filter select
   },
   computed: {
-    ...mapGetters(['employees', 'allPosition'])
+    ...mapGetters(['employees', 'allPosition', 'employeesData', 'employeesTotal', 'employeeFetchState', 'employeeDeleteState', 'employeeErrors'])
   },
   watch: {
-    employees: function() {
-      this.employees = this.employees
+    searchQuery: function(newData) {
+      if (newData !== '') {
+        this.query['target[]'] = 'full_name'
+        this.query.query = newData
+        // this.query.target = "full_name"
+        // this.query.query = newData
+        const data = this.query
+        this.fetchEmployees({ data })
+      } else {
+        this.query['target[]'] = ''
+        this.query.query = ''
+        const data = this.query
+        this.fetchEmployees({ data })
+      }
+    },
+    employeeFetchState({ initial, success, fail }) {
+      if (fail) {
+        Message.error({ message: this.employeeErrors, duration: '2500' })
+      }
+    },
+    employeeDeleteState({ initial, success, fail }) {
+      if (fail) {
+        Message.error({ message: this.employeeErrors, duration: '2500' })
+      }
+      if (success) {
+        const data = this.query
+        this.fetchEmployees({ data })
+        Message.success({ message: 'Successfully deleted an employee', duration: '2500' })
+      }
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions']),
+    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'deleteEmployee']),
+    refreshTable() {
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
+    deleteUser(params) {
+      this.$swal({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.value) {
+          const data = {
+            user_id: params
+          }
+          this.deleteEmployee({ data })
+        }
+      })
+    },
+    editUser(params) {
+      console.log(params)
+    },
     tableSizeChange(value) {
       this.table_config.query.limit = value
       // alert('size changed: '+ value)

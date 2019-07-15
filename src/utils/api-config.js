@@ -145,10 +145,10 @@ const api = {
             $url: "stats",
             $method: "GET"
           },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["schedule_id"],
+          fetchSchedule: {
+            $url: 'fetch',
+            $method: 'GET',
+            $requires: ['schedule_id'],
             $format: Template(() => `fetch/${schedule_id}`)
           },
           work: {
@@ -311,12 +311,12 @@ const api = {
           //   $requires: ['request_schedule_id'],
           //   $format: Template(() => `update/${request_schedule_id}`)
           // },
-          // delete: {
-          //   $url: 'delete',
-          //   $method: 'POST',
-          //   $requires: ['request_schedule_id'],
-          //   $format: Template(() => `delete/${request_schedule_id}`)
-          // },
+          delete: {
+            $url: 'delete',
+            $method: 'POST',
+            $requires: ['user_id'],
+            $format: Template(() => `delete/${user_id}`)
+          }
           // search: {
           //   $url: 'search',
           //   $method: 'GET'

@@ -17,10 +17,12 @@ const getters = {
   irErrors: state => state.incident_report.errors,
   // employee module
   employees: state => state.employee.employees,
+  userDetails: state => state.user.userDetails,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,
-  employeesFetchState: state => state.employee.employeesFetchState,
+  employeeFetchState: state => state.employee.employeeFetchState,
+  employeeDeleteState: state => state.employee.employeeDeleteState,
   allPosition: state => state.employee.accesslevels,
   formResponse: state => state.employee.form_request_response,
 
