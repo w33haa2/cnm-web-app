@@ -41,5 +41,5 @@ const getters = {
   // END
   // store/modules/user
   // =================================================================
-};
-export default getters;
+}
+export default getters
