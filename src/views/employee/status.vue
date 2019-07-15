@@ -45,22 +45,22 @@ export default {
   data() {
     return {
       status: [
-        { type: "new", status: "active" },
-        { type: "active", status: "active" },
-        { type: "suspended", status: "inactive" },
-        { type: "terminated", status: "inactive" },
-        { type: "resigned", status: "inactive" }
+        { type: 'new', status: 'active' },
+        { type: 'active', status: 'active' },
+        { type: 'suspended', status: 'inactive' },
+        { type: 'terminated', status: 'inactive' },
+        { type: 'resigned', status: 'inactive' }
       ]
-    };
+    }
   },
   computed: {},
   created() {},
   methods: {
     filterHeadName(head_id) {
-      return accesslevels.filter(i => i.id == head_id)[0].name;
+      return accesslevels.filter(i => i.id == head_id)[0].name
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

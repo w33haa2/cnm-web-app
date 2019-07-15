@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h4 style="color:#646464">Sanction Level</h4>
-    <!-- 
+    <!--
     <el-alert
       title="This list is uneditable, Please contact service provider."
       type="info"
@@ -49,12 +49,12 @@ export default {
   data() {
     return {
       sanction_types: [
-        { id: 1, type_number: 1, type_description: "Absentism" },
-        { id: 2, type_number: 2, type_description: "Tardiness" }
+        { id: 1, type_number: 1, type_description: 'Absentism' },
+        { id: 2, type_number: 2, type_description: 'Tardiness' }
       ]
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

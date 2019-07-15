@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h4 style="color:#646464">Positions</h4>
-    <!-- 
+    <!--
     <el-alert
       title="This list is uneditable, Please contact service provider."
       type="info"
@@ -54,138 +54,138 @@ export default {
       accesslevels: [
         {
           id: 1,
-          code: "superadmin",
-          name: "Admin",
+          code: 'superadmin',
+          name: 'Admin',
           parent: null
         },
         {
           id: 2,
-          code: "hrm",
-          name: "HR Manager",
+          code: 'hrm',
+          name: 'HR Manager',
           parent: 1
         },
         {
           id: 3,
-          code: "hrmassistant",
-          name: "HR Assistant",
+          code: 'hrmassistant',
+          name: 'HR Assistant',
           parent: 2
         },
         {
           id: 4,
-          code: "itsupervisor",
-          name: "IT Supervisor",
+          code: 'itsupervisor',
+          name: 'IT Supervisor',
           parent: 1
         },
         {
           id: 5,
-          code: "itspecialist",
-          name: "IT Specialist",
+          code: 'itspecialist',
+          name: 'IT Specialist',
           parent: 4
         },
         {
           id: 6,
-          code: "itsupport",
-          name: "IT Support",
+          code: 'itsupport',
+          name: 'IT Support',
           parent: 4
         },
         {
           id: 7,
-          code: "maintenancestaff",
-          name: "Maintenance Staff",
+          code: 'maintenancestaff',
+          name: 'Maintenance Staff',
           parent: 2
         },
         {
           id: 8,
-          code: "tqmanager",
-          name: "T & Q Manager",
+          code: 'tqmanager',
+          name: 'T & Q Manager',
           parent: 1
         },
         {
           id: 9,
-          code: "producttrainer",
-          name: "Product Trainer",
+          code: 'producttrainer',
+          name: 'Product Trainer',
           parent: 8
         },
         {
           id: 10,
-          code: "qasupervisor",
-          name: "QA Supervisor",
+          code: 'qasupervisor',
+          name: 'QA Supervisor',
           parent: 8
         },
         {
           id: 11,
-          code: "qaanalyst",
-          name: "Quality Assurance Analyst",
+          code: 'qaanalyst',
+          name: 'Quality Assurance Analyst',
           parent: 10
         },
         {
           id: 12, // 12
-          code: "rtamanager",
-          name: "RTA Manager",
+          code: 'rtamanager',
+          name: 'RTA Manager',
           parent: 1
         },
         {
           id: 13, // 13
-          code: "rtasupervisor",
-          name: "RTA Supervisor",
+          code: 'rtasupervisor',
+          name: 'RTA Supervisor',
           parent: 12
         },
         {
           id: 14, // 14
-          code: "rtaanalyst",
-          name: "RTA Analyst",
+          code: 'rtaanalyst',
+          name: 'RTA Analyst',
           parent: 13
         },
         {
           id: 15, // 15
-          code: "operationsmanager",
-          name: "Operations Manager",
+          code: 'operationsmanager',
+          name: 'Operations Manager',
           parent: 1
         },
         {
           id: 16, // 16
-          code: "teamleader",
-          name: "Team Leader",
+          code: 'teamleader',
+          name: 'Team Leader',
           parent: 15
         },
         {
           id: 17, // 17
-          code: "representative_op",
-          name: "Representative - Order Placer",
+          code: 'representative_op',
+          name: 'Representative - Order Placer',
           parent: 16
         },
         {
           id: 18, // 18
-          code: "accountant",
-          name: "Accountant",
+          code: 'accountant',
+          name: 'Accountant',
           parent: 2
         },
         {
           id: 19, // 19
-          code: "financeofficer",
-          name: "Finance Officer",
+          code: 'financeofficer',
+          name: 'Finance Officer',
           parent: 1
         },
         {
           id: 20, // 20
-          code: "payrollassistant",
-          name: "Payroll Assistant",
+          code: 'payrollassistant',
+          name: 'Payroll Assistant',
           parent: 19
         }
       ]
-    };
+    }
   },
   computed: {},
   created() {},
   methods: {
     filterHeadName(head_id) {
-      let result = this.accesslevels.filter(i => i.id == head_id);
+      const result = this.accesslevels.filter(i => i.id == head_id)
       if (result.length > 0) {
-        return result[0].name;
+        return result[0].name
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

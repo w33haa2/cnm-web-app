@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h4 style="color:#646464">Sanction Level</h4>
-    <!-- 
+    <!--
     <el-alert
       title="This list is uneditable, Please contact service provider."
       type="info"
@@ -46,16 +46,16 @@
 
 <script>
 export default {
-  name: "level",
+  name: 'Level',
   data() {
     return {
       sanction_levels: [
-        { id: 1, level_number: 1, level_description: "Written" },
-        { id: 2, level_number: 2, level_description: "Verbal" }
+        { id: 1, level_number: 1, level_description: 'Written' },
+        { id: 2, level_number: 2, level_description: 'Verbal' }
       ]
-    };
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

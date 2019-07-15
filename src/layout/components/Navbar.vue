@@ -27,7 +27,7 @@
           <img
             :src="userDetails.image_url === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : userDetails.image_url"
             class="user-avatar"
-          >
+          />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -47,13 +47,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
+import { mapGetters, mapActions } from "vuex";
+import Breadcrumb from "@/components/Breadcrumb";
+import Hamburger from "@/components/Hamburger";
+import ErrorLog from "@/components/ErrorLog";
+import Screenfull from "@/components/Screenfull";
+import SizeSelect from "@/components/SizeSelect";
+import Search from "@/components/HeaderSearch";
 
 export default {
   components: {
@@ -66,19 +66,19 @@ export default {
   },
   computed: {
     // add map getters for logged_user_id
-    ...mapGetters(['sidebar', 'avatar', 'device', 'userDetails'])
+    ...mapGetters(["sidebar", "avatar", "device", "userDetails"])
   },
   methods: {
-    ...mapActions(['logout']),
+    ...mapActions(["logout"]),
     toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
+      this.$store.dispatch("app/toggleSideBar");
     },
     async logoutEvent() {
-      await this.logout()
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      await this.logout();
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

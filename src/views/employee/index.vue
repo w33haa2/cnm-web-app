@@ -126,14 +126,14 @@
 </template>
 
 <script>
-import TransactionTable from "./components/TransactionTable";
-import SelectSearch from "./components/select_search";
-import EmployeeForm from "./components/EmployeeForm";
-import { mapGetters, mapActions } from "vuex";
-import { Message } from "element-ui";
+import TransactionTable from './components/TransactionTable'
+import SelectSearch from './components/select_search'
+import EmployeeForm from './components/EmployeeForm'
+import { mapGetters, mapActions } from 'vuex'
+import { Message } from 'element-ui'
 
 export default {
-  name: "DashboardHR",
+  name: 'DashboardHR',
   components: {
     TransactionTable,
     SelectSearch,
@@ -141,20 +141,20 @@ export default {
   },
   data() {
     return {
-      searchQuery: "",
+      searchQuery: '',
       table_config: {
         searchable_fields: [
-          { value: "full_name", label: "Name" },
-          { value: "position", label: "Position" },
-          { value: "email", label: "Email" },
-          { value: "contract", label: "Contract" },
-          { value: "status", label: "Status" },
-          { value: "gender", label: "Gender" },
-          { value: "address", label: "Address" }
+          { value: 'full_name', label: 'Name' },
+          { value: 'position', label: 'Position' },
+          { value: 'email', label: 'Email' },
+          { value: 'contract', label: 'Contract' },
+          { value: 'status', label: 'Status' },
+          { value: 'gender', label: 'Gender' },
+          { value: 'address', label: 'Address' }
         ],
         query: {
           search: {
-            target: "full_name",
+            target: 'full_name',
             query: null
           },
           limit: 10,
@@ -172,77 +172,77 @@ export default {
       form: {
         toggle: false,
         action: {
-          value: "add",
-          label: "Add"
+          value: 'add',
+          label: 'Add'
         }
       }
-    };
+    }
   },
   mounted() {
     // fetch and commit table data via vuex action
-    const data = this.query;
-    this.fetchEmployees({ data });
-    this.$root.$on("employee_table.refresh", this.refreshTable);
+    const data = this.query
+    this.fetchEmployees({ data })
+    this.$root.$on('employee_table.refresh', this.refreshTable)
     // setup filter select
   },
   computed: {
     ...mapGetters([
-      "employees",
-      "allPosition",
-      "employeesData",
-      "employeesTotal",
-      "employeesFetchState"
+      'employees',
+      'allPosition',
+      'employeesData',
+      'employeesTotal',
+      'employeesFetchState'
     ])
   },
   watch: {
     employeeData: function(v) {
-      console.log(v);
+      console.log(v)
     },
     searchQuery: function(newData) {
-      if (newData !== "") {
-        this.query["target[]"] = this.table_config.query.search.target;
-        this.query.query = newData;
+      if (newData !== '') {
+        this.query['target[]'] = this.table_config.query.search.target
+        this.query.query = newData
         // this.query.target = "full_name"
         // this.query.query = newData
-        const data = this.query;
-        this.fetchEmployees({ data });
+        const data = this.query
+        this.fetchEmployees({ data })
       } else {
-        this.query["target[]"] = "";
-        this.query.query = "";
-        const data = this.query;
-        this.fetchEmployees({ data });
+        this.query['target[]'] = ''
+        this.query.query = ''
+        const data = this.query
+        this.fetchEmployees({ data })
       }
     },
     employeesFetchState({ initial, success, fail }) {
       if (fail) {
-        Message.error({ message: this.irErrors, duration: "2500" });
+        Message.error({ message: this.irErrors, duration: '2500' })
       }
     }
   },
   methods: {
-    ...mapActions(["fetchUsers", "fetchPositions", "fetchEmployees"]),
+    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),
     refreshTable() {
-      const data = this.query;
-      this.fetchEmployees({ data });
+      const data = this.query
+      this.fetchEmployees({ data })
     },
     tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      this.fetchEmployees({ data });
+      this.query.limit = value
+      const data = this.query
+      this.fetchEmployees({ data })
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchEmployees({ data });
+      this.query.offset = (value - 1) * this.query.limit
+      const data = this.query
+      this.fetchEmployees({ data })
     },
     onColumnSort(value) {
-      this.query.sort = value.sort;
-      this.query.order = value.order ? "asc" : "desc";
-      const data = this.query;
-      this.fetchEmployees({ data });
+      this.query.sort = value.sort
+      this.query.order = value.order ? 'asc' : 'desc'
+      const data = this.query
+      this.fetchEmployees({ data })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
