@@ -1,6 +1,9 @@
-import { STATE_API } from '@/utils/api/api-helper'
-import { generateMutationTypes } from '@/utils/api/state-mutation'
-const FETCH_INCIDENT_REPORTS = generateMutationTypes('incident_reports', 'FETCH_INCIDENT_REPORTS')
+import { STATE_API } from "@/utils/api/api-helper";
+import { generateMutationTypes } from "@/utils/api/state-mutation";
+const FETCH_INCIDENT_REPORTS = generateMutationTypes(
+  "incident_reports",
+  "FETCH_INCIDENT_REPORTS"
+);
 
 /**
  * State
@@ -14,7 +17,7 @@ const state = {
   },
   reports: [],
   errors: null
-}
+};
 
 /**
  * Mutators
@@ -29,7 +32,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    }
+    };
   },
   /**
    * Commits success state for fetching incident reports
@@ -40,8 +43,8 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    }
-    state.reports = payload.meta
+    };
+    state.reports = payload.meta;
   },
   /**
    * Commits fail state for fetching incident reports
@@ -52,10 +55,10 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    }
-    state.errors = payload.response.data.title
+    };
+    state.errors = payload.response.data.title;
   }
-}
+};
 
 const actions = {
   /**
@@ -64,13 +67,17 @@ const actions = {
    * @param params
    */
   fetchReports({ commit }) {
-    const slug = 'api.reports.fetchAll'
-    STATE_API({ slug }, commit, [FETCH_INCIDENT_REPORTS.initial, FETCH_INCIDENT_REPORTS.success, FETCH_INCIDENT_REPORTS.fail])
+    const slug = "api.reports.fetchAll";
+    STATE_API({ slug }, commit, [
+      FETCH_INCIDENT_REPORTS.initial,
+      FETCH_INCIDENT_REPORTS.success,
+      FETCH_INCIDENT_REPORTS.fail
+    ]);
   }
-}
+};
 
 export default {
   state,
   mutations,
   actions
-}
+};

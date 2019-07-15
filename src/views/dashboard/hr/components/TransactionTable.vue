@@ -16,10 +16,10 @@
       </template>
       <template slot-scope="scope">
         <div class="user-block">
-          <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
+          <img v-if="scope.row.info.image_url" class="img-circle" :src="scope.row.info.image_url">
           <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
             <div style="align-self:center;width:100%;text-align:center;" class="text-point-eight-em">
-              {{ getAvatarLetters(scope.row.fname,scope.row.lname) }}
+              {{ getAvatarLetters(scope.row.info.firstname,scope.row.info.lastname) }}
             </div>
           </div>
           <span class="username text-muted">
@@ -36,15 +36,9 @@
         </span>
       </template>
       <template>
-<!--        <el-button-->
-<!--          size="mini"-->
-<!--        ><i class="el-icon-edit" /></el-button>-->
-        <el-select  @change="onSelect" v-model="selectedOption" placeholder="Action" style="width:150px;">
-          <el-option  v-for="item in options"
-           :key="item.value"
-           :label="item.label"
-          :value="item.value"/>
-        </el-select>
+        <el-button
+          size="mini"
+        ><i class="el-icon-edit" /></el-button>
       </template>
     </el-table-column>
     <!-- <el-table-column label="Supervisor" width="200" >
@@ -71,24 +65,14 @@ export default {
   },
   data() {
     return {
-      list: {
+      list:
+        {
           data: [],
           filters: {
             status: [],
             head: []
           }
         },
-      selectedOption: '',
-      options: [
-        {
-          value: "edit",
-          label: "Edit"
-        },
-        {
-          value: "delete",
-          label: "Delete"
-        },
-      ],
       multiSelect: [],
       avatarPrefix,
       sort: {
@@ -109,9 +93,7 @@ export default {
         this.list = response.data.items.slice(0, 8)
       })
     },
-    onSelect(param) {
-      this.selectedOption = param
-    },
+
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {
     //   return row.company_details.head === value

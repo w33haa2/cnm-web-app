@@ -11,19 +11,33 @@ const getters = {
   roles: state => state.user.roles,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
-  // log in state
-  loginState: state => state.user.loggingInState,
   // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
   incidentReports: state => state.incident_report.reports,
   irErrors: state => state.incident_report.errors,
-  // users
+  // employee module
   employees: state => state.employee.employees,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,
   employeesFetchState: state => state.employee.employeesFetchState,
   allPosition: state => state.employee.accesslevels,
-  formResponse: state => state.employee.form_request_response
-}
-export default getters
+  formResponse: state => state.employee.form_request_response,
+
+  // ================================================================
+  // list of state from store/modules/user
+  // START
+  // =============== start data
+  statusList: state => state.user.data.statusList,
+  potentialHead: state => state.user.data.potentialHead,
+  // =============== end data
+
+  // =============== start state
+  loginState: state => state.user.loggingInState,
+  fetchStateStatusList: state => state.user.fetchState.statusList
+  // =============== end state
+  // END
+  // store/modules/user
+  // =================================================================
+};
+export default getters;

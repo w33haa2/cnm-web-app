@@ -1,26 +1,26 @@
 <template>
-  <div class="app-container">
-    <div class="filter-container">
-      <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}">
-          <el-button size="mini" @click="form.toggle = !form.toggle">Add Employee</el-button>
-          <el-button-group>
-            <el-button size="mini">Import</el-button>
-            <el-button size="mini">Export</el-button>
-          </el-button-group>
-        </el-col>
-      </el-row>
+  <div class="dashboard-editor-container">
 
-      <!-- EMPLOYEE FORM ELEMENT -->
-      <el-row v-if="form.toggle" :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span:24}">
-          <employee-form />
-        </el-col>
-      </el-row>
+    <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
+    <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}">
+        <el-button size="mini" @click="form.toggle = !form.toggle">Add Employee</el-button>
+        <el-button-group>
+          <el-button size="mini">Import</el-button>
+          <el-button size="mini">Export</el-button>
+        </el-button-group>
+      </el-col>
+    </el-row>
 
-      <!-- MULTI SEARCH & FILTER, CHANGE STATUS ELEMENTS -->
-      <!-- <el-row :gutter="8">
+    <!-- EMPLOYEE FORM ELEMENT -->
+    <el-row v-if="form.toggle" :gutter="8" style="padding-right:8px;margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span:24}">
+        <employee-form />
+      </el-col>
+    </el-row>
+
+    <!-- MULTI SEARCH & FILTER, CHANGE STATUS ELEMENTS -->
+    <!-- <el-row :gutter="8">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 20}" :xl="{span:20}" style="padding-right:8px;margin-bottom:10px;">
         <select-search style="width:100%" :multiple="true" :filterable="true" :remote="true" :size="'mini'" autocomplete="on" placeholder="Search and select..." :data="select_search[filtered.by].data" @filter="filterEmployee" />
       </el-col>
@@ -32,34 +32,34 @@
       </el-col>
     </el-row> -->
 
-      <!-- SIMPLE BACKEND SEARCH INPUT -->
-      <!-- DISPLAY RECORDS & PAGINATION -->
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}">
-          <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-            <el-select slot="prepend" v-model="table_config.query.search.target" placeholder="Select" style="width:150px;">
-              <el-option v-for="(option,index) in table_config.searchable_fields" :key="index" :label="option.label" :value="option.value" />
-            </el-select>
-            <el-button slot="append"><i class="el-icon-search" /></el-button>
-          </el-input>
-        </el-col>
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}">
-          <el-pagination
-            style="float:right"
-            small
-            background
-            :page-sizes="[10, 25, 50]"
-            :current-page.sync="table_config.page"
-            :page-size="table_config.display_size"
-            layout="total, sizes, prev, pager, next"
-            :total="employeesTotal"
-            @size-change="tableSizeChange"
-            @current-change="tablePageChange"
-          />
-        </el-col>
-      </el-row>
+    <!-- SIMPLE BACKEND SEARCH INPUT -->
+    <!-- DISPLAY RECORDS & PAGINATION -->
+    <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}">
+        <el-input v-model="table_config.query.search.query" placeholder="Search..." size="mini">
+          <el-select slot="prepend" v-model="table_config.query.search.target" placeholder="Select" style="width:150px;">
+            <el-option v-for="(option,index) in table_config.searchable_fields" :key="index" :label="option.label" :value="option.value" />
+          </el-select>
+          <el-button slot="append"><i class="el-icon-search" /></el-button>
+        </el-input>
+      </el-col>
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}">
+        <el-pagination
+          style="float:right"
+          small
+          background
+          :page-sizes="[10, 25, 50]"
+          :current-page.sync="table_config.page"
+          :page-size="table_config.display_size"
+          layout="total, sizes, prev, pager, next"
+          :total="employees.rows"
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
+        />
+      </el-col>
+    </el-row>
 
-      <!-- <el-row :gutter="2">
+    <!-- <el-row :gutter="2">
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:10px;">
 
         <el-tag>
@@ -73,18 +73,17 @@
         </el-tag>
       </el-col>
     </el-row> -->
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
-          <transaction-table :table-data="employeesData" @sort="onColumnSort" />
-        </el-col>
+    <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}">
+        <transaction-table :table-data="employees.data" @sort="onColumnSort" />
+      </el-col>
       <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <todo-list />
       </el-col>
       <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
         <box-card />
       </el-col> -->
-      </el-row>
-    </div>
+    </el-row>
   </div>
 </template>
 
@@ -100,7 +99,6 @@ import BoxCard from './components/BoxCard'
 import SelectSearch from './components/select_search'
 import EmployeeForm from './components/EmployeeForm'
 import { mapGetters, mapActions } from 'vuex'
-import { Message } from 'element-ui'
 
 export default {
   name: 'DashboardHR',
@@ -118,7 +116,6 @@ export default {
   },
   data() {
     return {
-      searchQuery: '',
       table_config: {
         searchable_fields: [
           { value: 'full_name', label: 'Name' }
@@ -129,16 +126,12 @@ export default {
             query: null
           },
           limit: 10,
-          offset: 0
-          // sort: null,
-          // order: null
+          offset: 0,
+          sort: null,
+          order: null
         },
         data: [],
         rows: 0
-      },
-      query: {
-        limit: 10,
-        offset: 0
       },
       form: {
         toggle: false,
@@ -150,64 +143,36 @@ export default {
 
     }
   },
-  mounted() {
+  created() {
     // fetch and commit table data via vuex action
-    const data = this.query
-    this.fetchEmployees({ data })
-    this.$root.$on('employee_table.refresh', this.refreshTable)
+    this.fetchUsers(this.table_config.query)
     // setup filter select
   },
   computed: {
-    ...mapGetters(['employees', 'allPosition', 'employeesData', 'employeesTotal','employeesFetchState'])
+    ...mapGetters(['employees', 'allPosition'])
   },
   watch: {
-    searchQuery: function(newData) {
-      if (newData !== '') {
-        this.query['target[]'] = 'full_name'
-        this.query.query = newData
-        // this.query.target = "full_name"
-        // this.query.query = newData
-        const data = this.query
-        this.fetchEmployees({ data })
-      } else {
-        this.query['target[]'] = ''
-        this.query.query = ''
-        const data = this.query
-        this.fetchEmployees({ data })
-      }
-    },
-    employeesFetchState({initial, success, fail}) {
-      if (fail) {
-        Message.error({ message: this.irErrors, duration: '2500' })
-      }
+    employees: function() {
+      this.employees = this.employees
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),
-    refreshTable() {
-      const data = this.query
-      this.fetchEmployees({ data })
-    },
+    ...mapActions(['fetchUsers', 'fetchPositions']),
     tableSizeChange(value) {
-      this.query.limit = value
-      const data = this.query
-      this.fetchEmployees({ data })
-      // this.table_config.query.limit = value
-      // // alert('size changed: '+ value)
-      // this.fetchUsers(this.table_config.query)
+      this.table_config.query.limit = value
+      // alert('size changed: '+ value)
+      this.fetchUsers(this.table_config.query)
     },
     tablePageChange(value) {
-      this.query.offset = value - 1
-      const data = this.query
-      this.fetchEmployees({ data })
-      // // alert('page changed: '+ value)
-      // this.fetchUsers(this.table_config.query)
+      this.table_config.query.offset = value - 1
+      // alert('page changed: '+ value)
+      this.fetchUsers(this.table_config.query)
     },
     onColumnSort(value) {
-      this.query.sort = value.sort
-      this.query.order = value.order
-      const data = this.query
-      this.fetchEmployees({ data })
+      // alert('deym')
+      this.table_config.query.sort = value.sort
+      this.table_config.query.order = value.order
+      this.fetchUsers(this.table_config.query)
     }
   }
 }

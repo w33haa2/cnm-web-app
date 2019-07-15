@@ -49,7 +49,7 @@
             <div v-if="false" class="td-name-avatar">
               <span>TD</span>
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image">
+            <img v-else :src="scope.row.issuedby.image" class="td-image" />
             <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
           </div>
         </template>
@@ -60,7 +60,7 @@
             <div v-if="false" class="td-name-avatar">
               <span>TD</span>
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image">
+            <img v-else :src="scope.row.issuedby.image" class="td-image" />
             <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
           </div>
         </template>
@@ -94,8 +94,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import { Message } from 'element-ui'
+import { mapActions, mapGetters } from "vuex";
+import { Message } from "element-ui";
 export default {
   data() {
     return {
@@ -153,44 +153,38 @@ export default {
       //     response: null
       //   }
       // ]
-    }
+    };
   },
   computed: {
-    ...mapGetters(
-      ['fetchingIncidentReports', 'incidentReports', 'irErrors']
-    )
+    ...mapGetters(["fetchingIncidentReports", "incidentReports", "irErrors"])
   },
   watch: {
     fetchingIncidentReports({ initial, success, fail }) {
       if (initial) {
-
       } else if (success) {
-
       } else if (fail) {
-        Message.error({ message: this.irErrors, duration: '2500' })
+        Message.error({ message: this.irErrors, duration: "2500" });
       }
     }
   },
   mounted() {
-    this.fetchReports()
+    this.fetchReports();
   },
   methods: {
-    ...mapActions(
-      ['fetchReports']
-    ),
+    ...mapActions(["fetchReports"]),
     handleCommand(command) {
-      const id = command.split('||')[1]
-      const action = command.split('||')[0]
+      const id = command.split("||")[1];
+      const action = command.split("||")[0];
       switch (action) {
-        case 'update':
-          this.form.show = true
-          this.form.action = action
-          this.form.update_id = id
-          break
+        case "update":
+          this.form.show = true;
+          this.form.action = action;
+          this.form.update_id = id;
+          break;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

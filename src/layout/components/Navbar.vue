@@ -24,7 +24,7 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -35,7 +35,7 @@
             <el-dropdown-item>Dashboard</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided>
-            <span style="display:block;" @click="logout">Log Out</span>
+            <span style="display:block;" @click="logoutEvent">Log Out</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -44,13 +44,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
+import { mapGetters, mapActions } from "vuex";
+import Breadcrumb from "@/components/Breadcrumb";
+import Hamburger from "@/components/Hamburger";
+import ErrorLog from "@/components/ErrorLog";
+import Screenfull from "@/components/Screenfull";
+import SizeSelect from "@/components/SizeSelect";
+import Search from "@/components/HeaderSearch";
 
 export default {
   components: {
@@ -63,15 +63,19 @@ export default {
   },
   computed: {
     // add map getters for logged_user_id
-    ...mapGetters(['sidebar', 'avatar', 'device'])
+    ...mapGetters(["sidebar", "avatar", "device"])
   },
   methods: {
-    ...mapActions(['logout']),
+    ...mapActions(["logout"]),
     toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
+      this.$store.dispatch("app/toggleSideBar");
+    },
+    async logoutEvent() {
+      await this.logout();
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
