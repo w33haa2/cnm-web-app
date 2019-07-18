@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center>
+  <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
     <el-row>
       <el-col style="background-color:white;" :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
         Company Details
@@ -8,7 +8,7 @@
             <!-- <camera @image="captured" /> -->
             <div style="width=100%;margin-top:15px;padding-right:15px;padding-left:15px;">
               <img :src="vueCam.img" width="100%" style="cursor:pointer" @click="$refs.fileInput.click()">
-              <input ref="fileInput" type="file" style="display:none" @change="fileChanged">
+              <input ref="fileInput" type="file" style="display:none" accept="image/png, image/jpeg" @change="fileChanged">
               <!-- <div style="width:100%;margin-bottom:3px;">
                     <el-button size="mini" style="width:100%">Browse</el-button>
             </div>-->
@@ -103,7 +103,7 @@
               </el-col>
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:12}" :xl="{span:12}" style="padding:5px" :class="{'validation-has-error':form.required.parent_id}">
                 <span>Head</span>
-                <el-select v-model="form.employee.parent_id" size="mini" style="width:100%;margin-top:3px;" placeholder="Select..." :disabled="potentialHead.length<1">
+                <el-select v-model="form.employee.parent_id" size="mini" style="width:100%;margin-top:3px;" placeholder="Select..." :disabled="disable.parent_select">
                   <el-option
                     v-for="item in options.head"
                     :key="item.value"
@@ -145,11 +145,11 @@
             </el-col> -->
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:12}" :xl="{span:12}" style="padding:5px" :class="{'validation-has-error':form.required.status}">
                 <span>Status</span>
-                <el-select v-model="form.employee.status" size="mini" style="width:100%;margin-top:3px;" placeholder="Select...">
+                <el-select v-model="form.employee.status_id" size="mini" style="width:100%;margin-top:3px;" placeholder="Select..." :disabled="disable.status_select">
                   <el-option
                     v-for="(item,i) in options.statusList"
                     :key="i"
-                    :label="item.status"
+                    :label="item.type"
                     :value="item.id"
                   />
                 </el-select>
@@ -256,8 +256,15 @@
           <el-col :xs="{span:24}" :sm="{span:12}" :md="{span:3}" :lg="{span:3}" :xl="{span:3}" style="padding:5px">
             <el-button size="mini" style="width:100%" @click="clearForm">Clear</el-button>
           </el-col>
-          <el-col :xs="{span:24}" :sm="{span:12}" :md="{span:3,offset:18}" :lg="{span:3,offset:18}" :xl="{span:3,offset:18}" style="padding:5px">
-            <el-button size="mini" type="danger" style="width:100%" :loading="form.loading" @click="storeEmployee">Submit</el-button>
+          <el-col :xs="{span:24}" :sm="{span:12}" :md="{span:3}" :lg="{span:6, offset:15}" :xl="{span:6, offset:15}">
+            <el-col :xs="{span:24}" :sm="{span:12}" :md="{span:12}" :lg="{span:12}" :xl="{span:12}" style="padding:5px">
+              <el-button size="mini" style="width:100%" :plain="true" @click="closeEmployeeModal">Cancel</el-button>
+            </el-col>
+            <el-col :xs="{span:24}" :sm="{span:12}" :md="{span:12}" :lg="{span:12}" :xl="{span:12}" style="padding:5px">
+              <el-button size="mini" type="danger" style="width:100%" :loading="form.loading" :disabled="disable.form_confirm" @click="storeEmployee">Submit</el-button>
+
+            </el-col>
+
           </el-col>
         </el-row>
       </el-col>
@@ -304,13 +311,37 @@ export default {
   },
   props: ['toggle', 'data'],
   watch: {
-    'potentialHead': function(v) {
-      // if action is add
-      this.form.employee.parent_id = v[0].id
-      this.options.head = v.map(function(i) { return { value: i.id, label: i.full_name } })
-      // else action edit
-      // write code here
-      // this.options.head = v.filter(i = i.id != user_edit_id)
+    fetchStateStatusList({ initial, success, fail }) {
+      if (initial) {
+        this.disable.status_select = true
+        this.disable.form_confirm = true
+      }
+      if (success) {
+        this.disable.status_select = false
+        this.disable.form_confirm = false
+        this.form.employee.status_id = this.statusList[0].id
+        this.options.statusList = this.statusList.map(function(i) { return { value: i.id, label: i.full_name } })
+      }
+      if (fail) {
+        this.disable.status_select = true
+        this.disable.form_confirm = true
+      }
+    },
+    fetchStatePotentialHead({ initial, success, fail }) {
+      if (initial) {
+        this.disable.parent_select = true
+        this.disable.form_confirm = true
+      }
+      if (success) {
+        this.disable.parent_select = false
+        this.disable.form_confirm = false
+        this.form.employee.parent_id = this.potentialHead[0].id
+        this.options.head = this.potentialHead.map(function(i) { return { value: i.id, label: i.full_name } })
+      }
+      if (fail) {
+        this.disable.parent_select = true
+        this.disable.form_confirm = true
+      }
     },
     'form.employee.access_id': function(v) {
       const parent_id = this.allPosition.filter(i => i.id === v)[0].parent
@@ -320,11 +351,14 @@ export default {
       }
       this.fetchPotentialHead({ data })
     },
-    'form.employee.status': function(v) {
+    'form.employee.status_id': function(v) {
+      this.form.employee.status = this.statusList.filter(i => i.id == v)[0].status
       this.form.employee.type = this.statusList.filter(i => i.id == v)[0].type
     },
     'statusList': function(v) {
       this.options.statusList = v
+      this.form.employee.status = v.filter(i => i.id == this.form.employee.status_id)[0].status
+      this.form.employee.type = v.filter(i => i.id == this.form.employee.status_id)[0].type
     },
     'vueCam.camera': function(id) {
       this.vueCam.deviceId = id
@@ -352,30 +386,50 @@ export default {
     formResponse: function() {
       console.log(this.formResponse)
       const response = this.formResponse
-      if (response.status == 422) {
-        const errors = Object.keys(response.data.errors)
-        console.log(errors)
-        errors.forEach((v, i) => {
-          this.form.required[v] = true
-        })
-        if (errors.indexOf('excel_hash') >= 0) {
-          this.$message({
-            message: 'This is a duplicate record.',
-            type: 'warning',
-            duration: 1000 * 5
+      // if (response.status == 422) {
+      //   const errors = Object.keys(response.data.errors)
+      //   console.log(errors)
+      //   errors.forEach((v, i) => {
+      //     this.form.required[v] = true
+      //   })
+      //   if (errors.indexOf('excel_hash') >= 0) {
+      //     this.$message({
+      //       message: 'This is a duplicate record.',
+      //       type: 'warning',
+      //       duration: 1000 * 5
+      //     })
+      //   } else {
+      //     this.$message({
+      //       message: 'Please correct all the hihglighted field',
+      //       duration: 1000 * 5
+      //     })
+      //   }
+      // } else
+      if (response.status == 500) {
+        if (response.data.title == 'Data Validation Error.') {
+          const errors = Object.keys(response.data.meta.errors)
+          errors.forEach((v, i) => {
+            this.form.required[v] = true
           })
+          if (errors.indexOf('excelhash') >= 0) {
+            this.$message({
+              message: 'This is a duplicate record.',
+              type: 'warning',
+              duration: 1000 * 5
+            })
+          } else {
+            this.$message({
+              message: 'Please correct all the hihglighted field',
+              duration: 1000 * 5
+            })
+          }
         } else {
           this.$message({
-            message: 'Please correct all the hihglighted field',
+            message: 'Oops.. Nothing is saved, something is wrong.',
+            type: 'error',
             duration: 1000 * 5
           })
         }
-      } else if (response.status == 500) {
-        this.$message({
-          message: 'Oops.. Nothing is saved, something is wrong.',
-          type: 'error',
-          duration: 1000 * 5
-        })
       } else if (response.status == 200) {
         this.$message({
           message: 'You have succussfuly added an Employee',
@@ -400,8 +454,16 @@ export default {
     this.options.position = position
   },
   methods: {
+    closeEmployeeModal() {
+      this.clearFormErrors()
+      this.clearForm()
+      this.$emit('closeEmployeeModal', false)
+    },
     fileChanged(event) {
-      this.$emit('image', event.target.files[0])
+      // this.$emit('image', event.target.files[0])
+      this.form.employee.image = event.target.files[0]
+      this.vueCam.img = URL.createObjectURL(event.target.files[0])
+      console.log(this.form.employee.image)
     },
     capture() {
       this.vueCam.buttons.capture = true
@@ -427,7 +489,7 @@ export default {
       // call method that creates a blob from dataUri
       this.form.employee.image = new File([imageBlob], imageName, { type: conType })
       // this.$emit("image", imageFile);
-      // console.log(imageFile);
+      console.log(this.form.employee.image)
     },
     onStarted(stream) {
       console.log('On Started Event', stream)
@@ -499,9 +561,9 @@ export default {
       this.clearFormErrors()
       const data = this.toFormData(this.form.employee)
       // console.log(data.values)
-      this.form.employee.firstname = 'Emman ' + Math.random().toString(36).substr(2, 5)
-      this.form.employee.email = 'jeng@ssws.' + Math.random().toString(36).substr(2, 5)
-      this.form.employee.excel_hash = 'jeng' + Math.random().toString(36).substr(2, 5)
+      // this.form.employee.firstname = 'Emman ' + Math.random().toString(36).substr(2, 5)
+      // this.form.employee.email = 'jeng@ssws.' + Math.random().toString(36).substr(2, 5)
+      // this.form.employee.excel_hash = 'jeng' + Math.random().toString(36).substr(2, 5)
       // this.form.employee.firstname = 'Emman '+Math.random().toString(36).substr(2, 5);
       this.addUser(data)
     },
@@ -522,6 +584,8 @@ export default {
       this.form.employee.status = 1
       this.form.employee.type = null
       this.form.employee.benefits = []
+      this.form.employee.image = null,
+      this.vueCam.img = 'favicon.ico'
     },
     clearFormErrors() {
       const keys = Object.keys(this.form.required)
@@ -550,7 +614,7 @@ export default {
     device: function() {
       return this.vueCam.devices.find(n => n.deviceId === this.vueCam.deviceId)
     },
-    ...mapGetters(['potentialHead', 'allPosition', 'formResponse', 'fetchStateStatusList', 'statusList'])
+    ...mapGetters(['potentialHead', 'allPosition', 'formResponse', 'fetchStateStatusList', 'statusList', 'fetchStatePotentialHead'])
   },
   data() {
     return {
@@ -586,6 +650,11 @@ export default {
       dialog: {
         camera: false
       },
+      disable: {
+        parent_select: false,
+        status_select: false,
+        form_confirm: false
+      },
       form: {
         employee: {
           // ----------------------------------
@@ -602,7 +671,7 @@ export default {
           excel_hash: 'emmanueljamesenglajomunyot',
           status_date: '4/20/2015',
           birthdate: '12/25/1991',
-          gender: 'male',
+          gender: 'Male',
           benefits: [
             '099999902',
             '099999902',
@@ -614,7 +683,8 @@ export default {
           email: 'jeng@ssws.dev' + Math.random().toString(36).substr(2, 5),
           hired_date: '4/20/2015',
           company_id: '105',
-          status: 1,
+          status_id: 1,
+          status: null,
           contract: null,
           type: 'new',
           // ----------------------------------
@@ -647,7 +717,7 @@ export default {
           email: true,
           company_id: true,
           p_email: false,
-          excel_hash: false,
+          excelhash: false,
           hired_date: true,
           birthdate: true,
           address: true,
@@ -655,7 +725,7 @@ export default {
           middlename: true,
           lastname: true,
           parent_id: true,
-          type: false,
+          // type: false,
           status: true
         },
         has_errors: false,

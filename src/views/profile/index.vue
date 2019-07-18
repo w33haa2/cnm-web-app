@@ -16,7 +16,7 @@
                 <company-details :user="userDetails" />
               </el-tab-pane>
               <el-tab-pane label="Benefit IDs" name="benefit_ids">
-                <benefit-ids :user="user" />
+                <benefit-ids :user="userDetails" />
               </el-tab-pane>
               <el-tab-pane label="Timeline" name="timeline">
                 <timeline :timeline="user.status_logs" />
@@ -44,6 +44,7 @@ import CompanyDetails from './components/CompanyDetails'
 import BenefitIDs from './components/BenefitIDs'
 import Subordinates from './components/Subordinates'
 import axios from 'axios'
+import store from '../../store'
 
 export default {
   name: 'Profile',
@@ -60,24 +61,39 @@ export default {
   data() {
     return {
       user: {},
-      activeTab: 'about'
+      activeTab: 'about',
+      userDetails: {},
+      token: store.state.user.token,
+      subordinates: []
     }
   },
   computed: {
-    ...mapGetters(['name', 'avatar', 'roles', 'userDetails'])
+    ...mapGetters(['name', 'avatar', 'roles'])
   },
   created() {
     this.getUser()
   },
   methods: {
     getUser() {
-      // PLEASE USE
-      // $route.params.id
-      // to fetch actual user profile
-
-      // THIS IS ONLY A TEST VARIABLE
-      // structure may vary on the request results
-
+      alert(this.token)
+      const token = this.token
+      axios
+        .get('api/v1/users/fetch/' + this.$route.params.id, {
+          headers: {
+            Authorization: 'Bearer ' + this.token,
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => {
+          alert('success')
+          console.log(res.data.meta.metadata[0])
+          this.userDetails = res.data.meta.metadata[0]
+        })
+        .catch(err => {
+          alert('failed')
+          console.log(err)
+        })
     }
   }
 }

@@ -4,49 +4,37 @@
       <div class="user-block">
         <span class="username text-muted">Full Name</span>
       </div>
-      <p>
-        {{ user.full_name }}
-      </p>
+      <p>{{ user.full_name }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Birth Date</span>
       </div>
-      <p>
-        {{ user.birth_date }}
-      </p>
+      <p>{{ user.birthdate }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Gender</span>
       </div>
-      <p>
-        {{ user.gender }}
-      </p>
+      <p>{{ user.gender }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Address</span>
       </div>
-      <p>
-        {{ user.address }}
-      </p>
+      <p>{{ user.address ? user.address : "N/A" }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Personal Email</span>
       </div>
-      <p>
-        {{ user.p_email !== null ? user.p_email : 'N/A' }}
-      </p>
+      <p>{{ user.p_email ? user.p_email : 'N/A' }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Contact Number</span>
       </div>
-      <p>
-        {{ user.contact_number !== null ? user.contact_number : 'N/A' }}
-      </p>
+      <p>{{ user.contact_number ? user.contact_number : 'N/A' }}</p>
     </div>
   </div>
 </template>
@@ -75,14 +63,13 @@ export default {
 <style lang="scss" scoped>
 .user-activity {
   .user-block {
-
     .username,
     .description {
       display: block;
       padding: 2px 0;
     }
 
-    .username{
+    .username {
       font-size: 16px;
       color: #000;
     }
@@ -114,7 +101,6 @@ export default {
     .image {
       width: 100%;
       height: 100%;
-
     }
 
     .user-images {
@@ -135,14 +121,12 @@ export default {
     }
 
     .link-black {
-
       &:hover,
       &:focus {
         color: #999;
       }
     }
   }
-
 }
 
 .box-center {

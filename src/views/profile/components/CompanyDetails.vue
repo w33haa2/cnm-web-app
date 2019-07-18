@@ -4,49 +4,37 @@
       <div class="user-block">
         <span class="username text-muted">CNM ID</span>
       </div>
-      <p>
-        {{ user.company_id }}
-      </p>
+      <p>{{ user.company_id }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Position</span>
       </div>
-      <p>
-        {{ user.position }}
-      </p>
+      <p>{{ user.position }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Head</span>
       </div>
-      <p>
-        {{ user.head !== null ? user.head : 'N/A' }}
-      </p>
+      <p>{{ user.head_name ? user.head_name : 'N/A' }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Hired Date</span>
       </div>
-      <p>
-        {{ user.hired_date }}
-      </p>
+      <p>{{ user.hired_date }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Company Email</span>
       </div>
-      <p>
-        {{ user.c_email }}
-      </p>
+      <p>{{ user.email }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">Contract</span>
       </div>
-      <p>
-        {{ user.contract }}
-      </p>
+      <p>{{ user.contract }}</p>
     </div>
   </div>
 </template>
@@ -75,14 +63,13 @@ export default {
 <style lang="scss" scoped>
 .user-activity {
   .user-block {
-
     .username,
     .description {
       display: block;
       padding: 2px 0;
     }
 
-    .username{
+    .username {
       font-size: 16px;
       color: #000;
     }
@@ -114,7 +101,6 @@ export default {
     .image {
       width: 100%;
       height: 100%;
-
     }
 
     .user-images {
@@ -135,14 +121,12 @@ export default {
     }
 
     .link-black {
-
       &:hover,
       &:focus {
         color: #999;
       }
     }
   }
-
 }
 
 .box-center {

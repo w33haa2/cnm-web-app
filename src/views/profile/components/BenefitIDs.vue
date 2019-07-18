@@ -4,33 +4,25 @@
       <div class="user-block">
         <span class="username text-muted">SSS</span>
       </div>
-      <p>
-        {{ user.benefit_ids.sss }}
-      </p>
+      <p>{{ user.benefits[0].id_number }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">PhilHealth</span>
       </div>
-      <p>
-        {{ user.benefit_ids.philhealth }}
-      </p>
+      <p>{{ user.benefits[1].id_number }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">PagIbig</span>
       </div>
-      <p>
-        {{ user.benefit_ids.pagibig }}
-      </p>
+      <p>{{ user.benefits[2].id_number }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">TIN</span>
       </div>
-      <p>
-        {{ user.benefit_ids.tin }}
-      </p>
+      <p>{{ user.benefits[3].id_number }}</p>
     </div>
   </div>
 </template>
@@ -62,14 +54,13 @@ export default {
 <style lang="scss" scoped>
 .user-activity {
   .user-block {
-
     .username,
     .description {
       display: block;
       padding: 2px 0;
     }
 
-    .username{
+    .username {
       font-size: 16px;
       color: #000;
     }
@@ -101,7 +92,6 @@ export default {
     .image {
       width: 100%;
       height: 100%;
-
     }
 
     .user-images {
@@ -122,14 +112,12 @@ export default {
     }
 
     .link-black {
-
       &:hover,
       &:focus {
         color: #999;
       }
     }
   }
-
 }
 
 .box-center {

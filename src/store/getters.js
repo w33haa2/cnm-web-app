@@ -36,7 +36,8 @@ const getters = {
 
   // =============== start state
   loginState: state => state.user.loggingInState,
-  fetchStateStatusList: state => state.user.fetchState.statusList
+  fetchStateStatusList: state => state.user.fetchState.statusList,
+  fetchStatePotentialHead: state => state.user.fetchState.potentialHead
   // =============== end state
   // END
   // store/modules/user

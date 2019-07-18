@@ -196,7 +196,7 @@ const mutations = {
     state.data.potentialHead = payload.meta.metadata
   },
   [FETCH_POTENTIAL_HEAD.fail](state, payload) {
-    state.fetchState.statusList = {
+    state.fetchState.potentialHead = {
       initial: false,
       success: false,
       fail: true

@@ -10,7 +10,7 @@
           :lg="{span: 12}"
           :xl="{span: 12}"
         >
-          <el-button size="mini" @click="form.toggle = !form.toggle">Add Employee</el-button>
+          <el-button size="mini" @click="form.toggle = true">Add Employee</el-button>
           <el-button-group>
             <el-button size="mini">Import</el-button>
             <el-button size="mini">Export</el-button>
@@ -24,7 +24,11 @@
           <employee-form :toggle="form.toggle" :data />
         </el-col>
       </el-row>-->
-      <employee-form :toggle="form.toggle" :data="{action:'Add', id:null}" />
+      <employee-form
+        :toggle="form.toggle"
+        :data="{action:'Add', id:null}"
+        @closeEmployeeModal="closeEmployeeModal"
+      />
 
       <!-- MULTI SEARCH & FILTER, CHANGE STATUS ELEMENTS -->
       <!-- <el-row :gutter="8">
@@ -221,6 +225,9 @@ export default {
   },
   methods: {
     ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),
+    closeEmployeeModal(v) {
+      this.form.toggle = v
+    },
     refreshTable() {
       const data = this.query
       this.fetchEmployees({ data })
