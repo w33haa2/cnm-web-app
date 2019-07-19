@@ -199,6 +199,7 @@ const mutations = {
     }
     state.employeeErrors = payload.response.data.title
     state.employeesData = []
+    state.employeesTotal = 0
   },
   /**
    * Commits initial state for deleting employees
@@ -271,43 +272,7 @@ const actions = {
       DELETE_EMPLOYEES.fail
     ])
   },
-  async fetchUsers({ commit }, query) {
-    let endpoint = '/api/v1/users?'
-    const params = []
 
-    if (query.search.query) {
-      endpoint = 'api/v1/users/search?query=' + query.search.query
-      query.search.target.forEach((v, i) => {
-        endpoint += '&target[]=' + v
-      })
-    }
-    if (query.limit) {
-      params.push('limit=' + query.limit)
-    }
-    if (query.offset) {
-      params.push('offset=' + query.offset)
-    }
-    if (query.sort) {
-      params.push('sort=' + query.sort)
-    }
-    if (query.order != null) {
-      let order = 'asc'
-      if (!query.order) {
-        order = 'desc'
-      }
-      params.push('order=' + order)
-    }
-    if (params.length > 0) {
-      params.forEach((v, i) => {
-        endpoint += '&' + v
-      })
-    }
-
-    const response = await axios.get(endpoint)
-    // filter admin accounts with id no 1, 3
-    const filtered = response.data.meta
-    commit('DEFINE_USERS', filtered)
-  },
   addUser({ commit }, employee) {
     const url = 'api/v1/users/create'
     axios

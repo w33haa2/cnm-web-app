@@ -61,14 +61,14 @@ const api = {
           update: {
             $url: 'update',
             $method: 'POST',
-            $requires: ['attendance_id'],
-            $format: Template(() => `update/${attendance_id}`)
+            $requires: ['id'],
+            $format: Template(() => `update/${id}`)
           },
           delete: {
             $url: 'delete',
             $method: 'POST',
-            $requires: ['attendance_id'],
-            $format: Template(() => `delete/${attendance_id}`)
+            $requires: ['id'],
+            $format: Template(() => `delete/${id}`)
           },
           search: {
             $url: 'search',
@@ -77,8 +77,8 @@ const api = {
           fetch: {
             $url: 'fetch',
             $method: 'GET',
-            $requires: ['attendance_id'],
-            $format: Template(() => `fetch/${attendance_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           }
         },
         // endregion attendance
@@ -98,8 +98,8 @@ const api = {
           fetch: {
             $url: 'agents',
             $method: 'GET',
-            $requires: ['agent_id'],
-            $format: Template(() => `fetch/${agent_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           },
           create: {
             // $url: "create",
@@ -128,14 +128,14 @@ const api = {
           update: {
             $url: 'update',
             $method: 'POST',
-            $requires: ['schedule_id'],
-            $format: Template(() => `update/${schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `update/${id}`)
           },
           delete: {
             $url: 'delete',
             $method: 'POST',
-            $requires: ['schedule_id'],
-            $format: Template(() => `delete/${schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `delete/${id}`)
           },
           search: {
             $url: 'search',
@@ -148,8 +148,8 @@ const api = {
           fetchSchedule: {
             $url: 'fetch',
             $method: 'GET',
-            $requires: ['schedule_id'],
-            $format: Template(() => `fetch/${schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           },
           work: {
             $url: 'work',
@@ -175,14 +175,14 @@ const api = {
           update: {
             $url: 'update',
             $method: 'POST',
-            $requires: ['request_schedule_id'],
-            $format: Template(() => `update/${request_schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `update/${id}`)
           },
           delete: {
             $url: 'delete',
             $method: 'POST',
-            $requires: ['request_schedule_id'],
-            $format: Template(() => `delete/${request_schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `delete/${id}`)
           },
           search: {
             $url: 'search',
@@ -191,26 +191,26 @@ const api = {
           fetch: {
             $url: 'fetch',
             $method: 'GET',
-            $requires: ['request_schedule_id'],
-            $format: Template(() => `fetch/${request_schedule_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           },
           applicant: {
             $url: 'applicant',
             $method: 'GET',
-            $requires: ['applicant_id'],
-            $format: Template(() => `fetch/${applicant_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           },
           requested_by: {
             $url: 'requested_by',
             $method: 'GET',
-            $requires: ['requested_by_id'],
-            $format: Template(() => `fetch/${requested_by_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           },
           managed_by: {
             $url: 'managed_by',
             $method: 'GET',
-            $requires: ['managed_by_id'],
-            $format: Template(() => `fetch/${managed_by_id}`)
+            $requires: ['id'],
+            $format: Template(() => `fetch/${id}`)
           }
         },
         // endregion request schedules
@@ -241,6 +241,18 @@ const api = {
           fetchAll: {
             $url: '',
             $method: 'GET'
+          },
+          issuedTo: {
+            $url: 'issued_to',
+            $method: 'GET',
+            $requires: ['id'],
+            $format: Template(() => `issued_to/${id}`)
+          },
+          issuedBy: {
+            $url: 'issued_by',
+            $method: 'GET',
+            $requires: ['id'],
+            $format: Template(() => `issued_by/${id}`)
           }
           // create: {
           //   $url: 'create',
