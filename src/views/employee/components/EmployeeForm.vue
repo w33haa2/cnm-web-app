@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+  <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false" top="2vh">
     <el-row>
       <el-col style="background-color:white;" :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
         Company Details
@@ -311,6 +311,11 @@ export default {
   },
   props: ['toggle', 'data'],
   watch: {
+    data(v) {
+      if (v.action == 'Update') {
+        this.fillUpdateForm(v.data)
+      }
+    },
     fetchStateStatusList({ initial, success, fail }) {
       if (initial) {
         this.disable.status_select = true
@@ -454,6 +459,41 @@ export default {
     this.options.position = position
   },
   methods: {
+    fillUpdateForm(data) {
+      this.vueCam.img = data.image
+
+      this.form.employee = {
+        // ----------------------------------
+        // test data
+        // ----------------------------------
+        image: null,
+        firstname: data.fname,
+        middlename: data.mname,
+        lastname: data.lname,
+        suffix: data.suffix,
+        address: data.address,
+        contact_number: data.contact,
+        excel_hash: data.excel_hash,
+        status_date: moment().format('MM/DD/YYYY'),
+        birthdate: data.birthdate,
+        gender: data.gender,
+        benefits: [
+          data.benefits[0].id_number,
+          data.benefits[1].id_number,
+          data.benefits[2].id_number,
+          data.benefits[3].id_number
+        ],
+        access_id: 2,
+        parent_id: data.parent_id,
+        email: data.email,
+        hired_date: data.hired_date,
+        company_id: data.company_id,
+        status_id: this.statusList.filter(i => i.type == data.type)[0].id,
+        status: data.status,
+        contract: data.contract,
+        type: data.type
+      }
+    },
     closeEmployeeModal() {
       this.clearFormErrors()
       this.clearForm()
@@ -463,7 +503,6 @@ export default {
       // this.$emit('image', event.target.files[0])
       this.form.employee.image = event.target.files[0]
       this.vueCam.img = URL.createObjectURL(event.target.files[0])
-      console.log(this.form.employee.image)
     },
     capture() {
       this.vueCam.buttons.capture = true
@@ -669,7 +708,7 @@ export default {
           contact_number: '09099999999',
           // p_email: "jamesenglajom@gmail.com"+Math.random().toString(36).substr(2, 5),
           excel_hash: 'emmanueljamesenglajomunyot',
-          status_date: '4/20/2015',
+          status_date: moment().format('MM/DD/YYYY'),
           birthdate: '12/25/1991',
           gender: 'Male',
           benefits: [
@@ -714,19 +753,19 @@ export default {
 
         },
         required: {
-          email: true,
-          company_id: true,
-          p_email: false,
+          email: false,
+          company_id: false,
+          // p_email: false,
           excelhash: false,
-          hired_date: true,
-          birthdate: true,
-          address: true,
-          firstname: true,
-          middlename: true,
-          lastname: true,
-          parent_id: true,
+          hired_date: false,
+          birthdate: false,
+          address: false,
+          firstname: false,
+          middlename: false,
+          lastname: false,
+          parent_id: false,
           // type: false,
-          status: true
+          status: false
         },
         has_errors: false,
         loading: false

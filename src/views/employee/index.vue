@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <h4>Employee</h4>
     <div class="filter-container">
       <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
@@ -10,40 +11,28 @@
           :lg="{span: 12}"
           :xl="{span: 12}"
         >
-          <el-button size="mini" @click="form.toggle = true">Add Employee</el-button>
+          <el-button
+            size="mini"
+            @click="form.toggle = true, form.action_data={action:'Create',data:null}"
+          >Create Employee</el-button>
           <el-button-group>
-            <el-button size="mini">Import</el-button>
+            <el-button size="mini" @click="$refs.excelInput.click()">Import</el-button>
+            <input
+              ref="excelInput"
+              type="file"
+              style="display:none"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              @change="excelChanged"
+            >
             <el-button size="mini">Export</el-button>
           </el-button-group>
         </el-col>
       </el-row>
-
-      <!-- EMPLOYEE FORM ELEMENT -->
-      <!-- <el-row v-if="form.toggle" :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span:24}">
-          <employee-form :toggle="form.toggle" :data />
-        </el-col>
-      </el-row>-->
       <employee-form
         :toggle="form.toggle"
-        :data="{action:'Add', id:null}"
+        :data="form.action_data"
         @closeEmployeeModal="closeEmployeeModal"
       />
-
-      <!-- MULTI SEARCH & FILTER, CHANGE STATUS ELEMENTS -->
-      <!-- <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 20}" :xl="{span:20}" style="padding-right:8px;margin-bottom:10px;">
-        <select-search style="width:100%" :multiple="true" :filterable="true" :remote="true" :size="'mini'" autocomplete="on" placeholder="Search and select..." :data="select_search[filtered.by].data" @filter="filterEmployee" />
-      </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 4}" :xl="{span:4}" style="padding-right:8px;margin-bottom:10px;">
-        <el-button size="mini" type="danger" style="width:100%" :disabled="multiSelect.length===0">Change Status</el-button>
-        <el-select v-model="filtered.by" style="width:100%" size="mini">
-          <el-option v-for="option in options.filter" :key="option.value" :value="option.value" :label="option.label" />
-        </el-select>
-      </el-col>
-      </el-row>-->
-
-      <!-- SIMPLE BACKEND SEARCH INPUT -->
       <!-- DISPLAY RECORDS & PAGINATION -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
         <el-col
@@ -94,20 +83,6 @@
         </el-col>
       </el-row>
 
-      <!-- <el-row :gutter="2">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 24}" :xl="{span: 24}" style="padding-right:8px;margin-bottom:10px;">
-
-        <el-tag>
-          {{ filtered.count+' record/s' }}
-        </el-tag>
-        <el-tag>
-          {{ filtered.count+' displayed' }}
-        </el-tag>
-        <el-tag>
-          {{ filtered.count+' selected' }}
-        </el-tag>
-      </el-col>
-      </el-row>-->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
         <el-col
           :xs="{span: 24}"
@@ -122,7 +97,7 @@
             type="error"
             :description="employeeErrors"
           />
-          <transaction-table :table-data="employeesData" />
+          <transaction-table :table-data="employeesData" @dropdownCommand="dropdownCommand" />
         </el-col>
       </el-row>
     </div>
@@ -135,7 +110,7 @@ import SelectSearch from './components/select_search'
 import EmployeeForm from './components/EmployeeForm'
 import { mapGetters, mapActions } from 'vuex'
 import { Message } from 'element-ui'
-
+import excel from 'xlsx'
 export default {
   name: 'DashboardHR',
   components: {
@@ -175,9 +150,9 @@ export default {
       },
       form: {
         toggle: false,
-        action: {
-          value: 'add',
-          label: 'Add'
+        action_data: {
+          action: 'Create',
+          data: null
         }
       }
     }
@@ -219,6 +194,35 @@ export default {
   },
   methods: {
     ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),
+    dropdownCommand(v) {
+      switch (v.action) {
+        case 'edit':
+          this.form.toggle = true
+          this.form.action_data = {
+            action: 'Update',
+            data: this.getUpdateData(v.id)
+          }
+          break
+      }
+    },
+    getUpdateData(id) {
+      console.log(this.employeesData.filter(i => i.id == id)[0])
+
+      return this.employeesData.filter(i => i.id == id)[0]
+    },
+    excelChanged(e) {
+      var files = e.target.files
+      var f = files[0]
+      var reader = new FileReader()
+      reader.onload = function(e) {
+        var data = new Uint8Array(e.target.result)
+        var workbook = excel.read(data, { type: 'array' })
+
+        /* DO SOMETHING WITH workbook HERE */
+      }
+      reader.readAsArrayBuffer(f)
+      console.log(reader)
+    },
     closeEmployeeModal(v) {
       this.form.toggle = v
     },

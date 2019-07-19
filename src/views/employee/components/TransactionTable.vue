@@ -26,14 +26,14 @@
           </div>
           <span>
             <el-tag :type="scope.row.status=='ACTIVE'?'success':'danger'">
-              <el-dropdown>
+              <el-dropdown @command="handleCommand">
                 <span class="el-dropdown-link">
                   {{ scope.row.full_name }}
                   <i class="el-icon-arrow-down el-icon--right" />
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item>Edit</el-dropdown-item>
-                  <el-dropdown-item>Delete</el-dropdown-item>
+                  <el-dropdown-item :command="'edit:'+scope.row.id">Update</el-dropdown-item>
+                  <!-- <el-dropdown-item>Delete</el-dropdown-item> -->
                 </el-dropdown-menu>
               </el-dropdown>
             </el-tag>
@@ -144,17 +144,6 @@ export default {
           head: []
         }
       },
-      selectedOption: '',
-      options: [
-        {
-          value: 'edit',
-          label: 'Edit'
-        },
-        {
-          value: 'delete',
-          label: 'Delete'
-        }
-      ],
       multiSelect: [],
       avatarPrefix,
       sort: {
@@ -163,7 +152,6 @@ export default {
       }
     }
   },
-
   methods: {}
 }
 </script>
