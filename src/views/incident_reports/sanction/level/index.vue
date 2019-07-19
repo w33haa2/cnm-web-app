@@ -86,7 +86,7 @@
 
 <script>
 export default {
-  name: 'Level',
+  name: "Level",
   data() {
     return {
       sanction_levels: [
@@ -116,7 +116,7 @@ export default {
       // submit action
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

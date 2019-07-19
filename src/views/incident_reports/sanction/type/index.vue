@@ -86,37 +86,37 @@
 
 <script>
 export default {
-  name: 'Level',
+  name: "Level",
   data() {
     return {
       sanction_levels: [
-        { id: 1, level_number: 1, level_description: 'Written' },
-        { id: 2, level_number: 2, level_description: 'Verbal' }
+        { id: 1, level_number: 1, level_description: "Written" },
+        { id: 2, level_number: 2, level_description: "Verbal" }
       ],
       modal_show: false,
       form: {
-        action: 'Create',
+        action: "Create",
         // input models
         level_number: null,
         level_description: null
       }
-    }
+    };
   },
   methods: {
     resetForm() {
-      this.form.action = 'Create'
-      this.form.level_number = null
-      this.form.level_description = null
+      this.form.action = "Create";
+      this.form.level_number = null;
+      this.form.level_description = null;
     },
     cancelForm() {
-      this.resetForm()
-      this.modal_show = false
+      this.resetForm();
+      this.modal_show = false;
     },
     submitForm() {
       // submit action
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

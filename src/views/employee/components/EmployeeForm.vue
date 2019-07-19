@@ -311,9 +311,9 @@ export default {
   },
   props: ['toggle', 'data'],
   watch: {
-    data(v) {
-      if (v.action == 'Update') {
-        this.fillUpdateForm(v.data)
+    data(v){
+      if(v.action=="Update"){
+        this.fillUpdateForm(v.data);
       }
     },
     fetchStateStatusList({ initial, success, fail }) {
@@ -459,40 +459,40 @@ export default {
     this.options.position = position
   },
   methods: {
-    fillUpdateForm(data) {
-      this.vueCam.img = data.image
-
-      this.form.employee = {
-        // ----------------------------------
-        // test data
-        // ----------------------------------
-        image: null,
-        firstname: data.fname,
-        middlename: data.mname,
-        lastname: data.lname,
-        suffix: data.suffix,
-        address: data.address,
-        contact_number: data.contact,
-        excel_hash: data.excel_hash,
-        status_date: moment().format('MM/DD/YYYY'),
-        birthdate: data.birthdate,
-        gender: data.gender,
-        benefits: [
-          data.benefits[0].id_number,
-          data.benefits[1].id_number,
-          data.benefits[2].id_number,
-          data.benefits[3].id_number
-        ],
-        access_id: 2,
-        parent_id: data.parent_id,
-        email: data.email,
-        hired_date: data.hired_date,
-        company_id: data.company_id,
-        status_id: this.statusList.filter(i => i.type == data.type)[0].id,
-        status: data.status,
-        contract: data.contract,
-        type: data.type
-      }
+    fillUpdateForm(data){
+        this.vueCam.img = data.image;
+        
+        this.form.employee = {
+          // ----------------------------------
+          // test data
+          // ----------------------------------
+          image: null,
+          firstname: data.fname,
+          middlename: data.mname,
+          lastname: data.lname,
+          suffix: data.suffix,
+          address: data.address,
+          contact_number: data.contact,
+          excel_hash: data.excel_hash,
+          status_date: moment().format('MM/DD/YYYY'),
+          birthdate: data.birthdate,
+          gender: data.gender,
+          benefits: [
+            data.benefits[0].id_number,
+            data.benefits[1].id_number,
+            data.benefits[2].id_number,
+            data.benefits[3].id_number,
+          ],
+          access_id: 2,
+          parent_id: data.parent_id,
+          email: data.email,
+          hired_date: data.hired_date,
+          company_id: data.company_id,
+          status_id: this.statusList.filter(i=>i.type.toLowerCase() == data.type.toLowerCase())[0].id,
+          status: data.status,
+          contract: data.contract,
+          type: data.type
+        }
     },
     closeEmployeeModal() {
       this.clearFormErrors()
