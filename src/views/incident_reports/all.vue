@@ -32,9 +32,9 @@
       v-if="fetchingIncidentReports.fail"
       title="Error!"
       type="error"
-      :description="irErrors">
-    </el-alert>
-    <el-table :data="incidentReports" v-loading="fetchingIncidentReports.initial" style="width: 100%;margin-top:30px;">
+      :description="irErrors"
+    />
+    <el-table v-loading="fetchingIncidentReports.initial" :data="incidentReports" style="width: 100%;margin-top:30px;">
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">

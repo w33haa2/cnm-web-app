@@ -120,9 +120,9 @@
             v-if="employeeFetchState.fail"
             title="Error!"
             type="error"
-            :description="employeeErrors">
-          </el-alert>
-          <transaction-table  :table-data="employeesData" />
+            :description="employeeErrors"
+          />
+          <transaction-table :table-data="employeesData" />
         </el-col>
       </el-row>
     </div>
@@ -215,7 +215,7 @@ export default {
         const data = this.query
         this.fetchEmployees({ data })
       }
-    },
+    }
   },
   methods: {
     ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),

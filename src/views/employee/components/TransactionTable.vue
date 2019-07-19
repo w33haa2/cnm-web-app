@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" v-loading="employeeFetchState.initial" style="width: 100%;">
+  <el-table v-loading="employeeFetchState.initial" :data="tableData" style="width: 100%;">
     <!-- <el-table-column type="selection" width="55" fixed /> -->
     <el-table-column label="CNM ID" fixed>
       <template slot-scope="{row}">
@@ -133,7 +133,7 @@ export default {
   components: { TableExpansion },
   props: ['tableData'],
   computed: {
-    ...mapGetters(['allPosition','employeeFetchState'])
+    ...mapGetters(['allPosition', 'employeeFetchState'])
   },
   data() {
     return {

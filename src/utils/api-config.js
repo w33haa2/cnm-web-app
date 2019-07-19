@@ -253,7 +253,7 @@ const api = {
             $method: 'GET',
             $requires: ['id'],
             $format: Template(() => `issued_by/${id}`)
-          },
+          }
           // create: {
           //   $url: 'create',
           //   $method: 'POST'

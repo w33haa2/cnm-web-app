@@ -11,9 +11,9 @@
           layout="total, sizes, prev, pager, next"
           :total="incidentReportsTotal"
           background
+          small
           @size-change="tableSizeChange"
           @current-change="tablePageChange"
-          small
         />
       </el-col>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
@@ -29,7 +29,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="incidentReports" v-loading="fetchingReceivedIncidentReports.initial" style="width: 100%;margin-top:30px;">
+    <el-table v-loading="fetchingReceivedIncidentReports.initial" :data="incidentReports" style="width: 100%;margin-top:30px;">
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
@@ -150,25 +150,24 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['fetchingReceivedIncidentReports','incidentReports','incidentReportsTotal','irErrors','userDetails'])
-  },
-  mounted() {
-    this.query.id = this.userDetails.id
-    this.fetchReceivedReports(this.query)
+    ...mapGetters(['fetchingReceivedIncidentReports', 'incidentReports', 'incidentReportsTotal', 'irErrors', 'userDetails'])
   },
   watch: {
     searchQuery(newData) {
-      if(newData !== '') {
+      if (newData !== '') {
         this.query['target[]'] = 'full_name'
         this.query.query = newData
         this.fetchReceivedReports(this.query)
-      }
-      else {
+      } else {
         delete this.query['target[]']
         delete this.query.query
         this.fetchReceivedReports(this.query)
       }
     }
+  },
+  mounted() {
+    this.query.id = this.userDetails.id
+    this.fetchReceivedReports(this.query)
   },
   methods: {
     ...mapActions(['fetchReceivedReports']),

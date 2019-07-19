@@ -17,16 +17,16 @@
           :page-size="100"
           layout="total, sizes, prev, pager, next"
           :total="incidentReportsTotal"
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
           background
           small
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
         />
       </el-col>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-input v-model="searchQuery" placeholder="Search..." size="mini">
           <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option value="1"/>
+            <el-option value="1" />
           </el-select>
           <el-button slot="append">
             <i class="el-icon-search" />
@@ -39,10 +39,10 @@
       v-if="fetchingIssuedIncidentReports.fail"
       title="Error!"
       type="error"
-      :description="irErrors">
-    </el-alert>
+      :description="irErrors"
+    />
     <!-- Table -->
-    <el-table :data="incidentReports" v-loading="fetchingIssuedIncidentReports.initial" style="width: 100%;margin-top:10px;">
+    <el-table v-loading="fetchingIssuedIncidentReports.initial" :data="incidentReports" style="width: 100%;margin-top:10px;">
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
@@ -121,23 +121,22 @@ export default {
       query: {
         limit: 10,
         offset: 0
-      },
+      }
     }
   },
   computed: {
     routesData() {
       return this.routes
     },
-    ...mapGetters(['fetchingIssuedIncidentReports','incidentReports','incidentReportsTotal','irErrors','userDetails'])
+    ...mapGetters(['fetchingIssuedIncidentReports', 'incidentReports', 'incidentReportsTotal', 'irErrors', 'userDetails'])
   },
   watch: {
     searchQuery(newData) {
-      if(newData !== '') {
+      if (newData !== '') {
         this.query['target[]'] = 'full_name'
         this.query.query = newData
         this.fetchIssuedReports(this.query)
-      }
-      else {
+      } else {
         delete this.query['target[]']
         delete this.query.query
         this.fetchIssuedReports(this.query)

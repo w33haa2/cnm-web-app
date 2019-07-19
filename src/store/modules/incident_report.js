@@ -163,7 +163,7 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchReports({ commit }, params ) {
+  fetchReports({ commit }, params) {
     const slug = 'api.reports.fetchAll'
     STATE_API({ slug, params }, commit, [
       FETCH_INCIDENT_REPORTS.initial,
@@ -176,7 +176,7 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchIssuedReports({ commit }, params ) {
+  fetchIssuedReports({ commit }, params) {
     const slug = 'api.reports.issuedTo'
     STATE_API({ slug, params }, commit, [
       FETCH_ISSUED_INCIDENT_REPORTS.initial,
@@ -189,7 +189,7 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchReceivedReports({ commit }, params ) {
+  fetchReceivedReports({ commit }, params) {
     const slug = 'api.reports.issuedBy'
     STATE_API({ slug, params }, commit, [
       FETCH_RECEIVED_INCIDENT_REPORTS.initial,
