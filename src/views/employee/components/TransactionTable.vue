@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" style="width: 100%;">
+  <el-table :data="tableData" v-loading="employeeFetchState.initial" style="width: 100%;">
     <!-- <el-table-column type="selection" width="55" fixed /> -->
     <el-table-column label="CNM ID" fixed>
       <template slot-scope="{row}">
@@ -68,7 +68,7 @@
     </el-table-column>
     <el-table-column label="type" width="200">
       <template slot-scope="{row}">
-        <el-tag :type="row.status=='ACTIVE'?'success':'danger'">{{ row.type }}</el-tag>
+        <el-tag :type="row.status=='ACTIVE'?'success':'danger'">{{ row.type != '' ? row.type : 'N/A' }}</el-tag>
       </template>
     </el-table-column>
     <el-table-column label="Contract" width="200">
@@ -133,7 +133,7 @@ export default {
   components: { TableExpansion },
   props: ['tableData'],
   computed: {
-    ...mapGetters(['allPosition'])
+    ...mapGetters(['allPosition','employeeFetchState'])
   },
   data() {
     return {
@@ -163,47 +163,8 @@ export default {
       }
     }
   },
-  created() {
-    this.fetchUsers()
-    // this.fetchAccessLevels();
-  },
-  methods: {
-    ...mapActions(['fetchAccessLevels', 'fetchUsers']),
-    // local component functions
-    fetchData() {
-      transactionList().then(response => {
-        this.list = response.data.items.slice(0, 8)
-      })
-    },
-    onSelect(param) {
-      this.selectedOption = param
-    },
-    // table filter callback {Element UI} functions
-    // filterHeads(value, row) {
-    //   return row.company_details.head === value
-    // },
-    // filterStatus(value, row) {
-    //   return row.info.status === value
-    // },
-    // multiple filterhandler
-    filterHandler(value, row, column) {
-      const property = column['property']
-      return row[property] === value
-    },
-    handleSelectionChange(val) {
-      this.multiSelect = val
-      this.$emit('table-select', this.multiSelect)
-    },
-    columnSort(column) {
-      if (this.sort.field != column) {
-        this.sort.field = column
-        this.sort.order = true
-      } else {
-        this.sort.order = !this.sort.order
-      }
-      this.$emit('sort', { sort: this.sort.field, order: this.sort.order })
-    }
-  }
+
+  methods: {}
 }
 </script>
 

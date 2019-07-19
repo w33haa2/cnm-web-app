@@ -27,7 +27,14 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="incidentReports" style="width: 100%;margin-top:30px;">
+    <br>
+    <el-alert
+      v-if="fetchingIncidentReports.fail"
+      title="Error!"
+      type="error"
+      :description="irErrors">
+    </el-alert>
+    <el-table :data="incidentReports" v-loading="fetchingIncidentReports.initial" style="width: 100%;margin-top:30px;">
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
@@ -95,78 +102,14 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
-import { Message } from 'element-ui'
 export default {
   data() {
-    return {
-      // ir: [
-      //   {
-      //     id: 1,
-      //     issuedby: {
-      //       image:
-      //         'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-      //       full_name: 'Emmanuel James Eng Lajom'
-      //     },
-      //     sanction: {
-      //       type: 'Absentism',
-      //       level: 'Verbal'
-      //     },
-      //     date_filed: '2019-06-10',
-      //     description:
-      //       'This is the description input by the person who filed the IR.',
-      //     response: {
-      //       message:
-      //         'This is the response input by the person who received the IR.',
-      //       date: '2019-16-11'
-      //     }
-      //   },
-      //   {
-      //     id: 1,
-      //     issuedby: {
-      //       image:
-      //         'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-      //       full_name: 'Emmanuel James Eng Lajom'
-      //     },
-      //     sanction: {
-      //       type: 'Absentism',
-      //       level: 'Verbal'
-      //     },
-      //     date_filed: '2019-06-10',
-      //     description:
-      //       'This is the description input by the person who filed the IR.',
-      //     response: null
-      //   },
-      //   {
-      //     id: 1,
-      //     issuedby: {
-      //       image:
-      //         'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-      //       full_name: 'Emmanuel James Eng Lajom'
-      //     },
-      //     sanction: {
-      //       type: 'Absentism',
-      //       level: 'Verbal'
-      //     },
-      //     date_filed: '2019-06-10',
-      //     description:
-      //       'This is the description input by the person who filed the IR.',
-      //     response: null
-      //   }
-      // ]
-    }
+    return {}
   },
   computed: {
     ...mapGetters(['fetchingIncidentReports', 'incidentReports', 'irErrors'])
   },
-  watch: {
-    fetchingIncidentReports({ initial, success, fail }) {
-      if (initial) {
-      } else if (success) {
-      } else if (fail) {
-        Message.error({ message: this.irErrors, duration: '2500' })
-      }
-    }
-  },
+  watch: {},
   mounted() {
     this.fetchReports()
   },

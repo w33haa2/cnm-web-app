@@ -116,14 +116,14 @@
           :lg="{span: 24}"
           :xl="{span: 24}"
         >
-          <transaction-table :table-data="employeesData" />
+          <el-alert
+            v-if="employeeFetchState.fail"
+            title="Error!"
+            type="error"
+            :description="employeeErrors">
+          </el-alert>
+          <transaction-table  :table-data="employeesData" />
         </el-col>
-        <!-- <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
-        <todo-list />
-      </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
-        <box-card />
-        </el-col>-->
       </el-row>
     </div>
   </div>
@@ -192,10 +192,11 @@ export default {
   computed: {
     ...mapGetters([
       'employees',
+      'employeeErrors',
       'allPosition',
       'employeesData',
       'employeesTotal',
-      'employeesFetchState'
+      'employeeFetchState'
     ])
   },
   watch: {
@@ -206,8 +207,6 @@ export default {
       if (newData !== '') {
         this.query['target[]'] = this.table_config.query.search.target
         this.query.query = newData
-        // this.query.target = "full_name"
-        // this.query.query = newData
         const data = this.query
         this.fetchEmployees({ data })
       } else {
@@ -217,11 +216,6 @@ export default {
         this.fetchEmployees({ data })
       }
     },
-    employeesFetchState({ initial, success, fail }) {
-      if (fail) {
-        Message.error({ message: this.irErrors, duration: '2500' })
-      }
-    }
   },
   methods: {
     ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees']),

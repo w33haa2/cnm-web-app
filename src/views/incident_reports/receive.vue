@@ -6,16 +6,18 @@
     <el-row>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-pagination
-          :page-sizes="[100, 200, 300, 400]"
+          :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
-          :total="400"
+          :total="incidentReportsTotal"
           background
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
           small
         />
       </el-col>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input placeholder="Search..." size="mini">
+        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
           <el-select slot="prepend" placeholder="Select" style="width:150px;">
             <el-option />
           </el-select>
@@ -27,7 +29,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="ir" style="width: 100%;margin-top:30px;">
+    <el-table :data="incidentReports" v-loading="fetchingReceivedIncidentReports.initial" style="width: 100%;margin-top:30px;">
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
@@ -82,9 +84,15 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
+      query: {
+        limit: 10,
+        offset: 0
+      },
+      searchQuery: '',
       ir: [
         {
           id: 1,
@@ -141,9 +149,37 @@ export default {
       ]
     }
   },
-  computed: {},
-  created() {},
+  computed: {
+    ...mapGetters(['fetchingReceivedIncidentReports','incidentReports','incidentReportsTotal','irErrors','userDetails'])
+  },
+  mounted() {
+    this.query.id = this.userDetails.id
+    this.fetchReceivedReports(this.query)
+  },
+  watch: {
+    searchQuery(newData) {
+      if(newData !== '') {
+        this.query['target[]'] = 'full_name'
+        this.query.query = newData
+        this.fetchReceivedReports(this.query)
+      }
+      else {
+        delete this.query['target[]']
+        delete this.query.query
+        this.fetchReceivedReports(this.query)
+      }
+    }
+  },
   methods: {
+    ...mapActions(['fetchReceivedReports']),
+    tableSizeChange(value) {
+      this.query.limit = value
+      this.fetchReceivedReports(this.query)
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit
+      this.fetchReceivedReports(this.query)
+    },
     handleCommand(command) {
       const id = command.split('||')[1]
       const action = command.split('||')[0]
