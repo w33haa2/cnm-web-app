@@ -4,6 +4,7 @@ import { generateMutationTypes } from '@/utils/api/state-mutation'
 
 const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
 const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
+const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
 const state = {
   employees: {
     data: [],
@@ -17,6 +18,11 @@ const state = {
     fail: false
   },
   employeeDeleteState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  employeeUpdateState: {
     initial: false,
     success: false,
     fail: false
@@ -234,6 +240,40 @@ const mutations = {
       fail: true
     }
     state.employeeErrors = payload.response.data.title
+  },
+  /**
+   * Commits initial state for deleting employees
+   * @param state
+   */
+  [UPDATE_EMPLOYEES.initial](state) {
+    state.employeeDeleteState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for deleting employees
+   * @param state
+   */
+  [UPDATE_EMPLOYEES.success](state) {
+    state.employeeDeleteState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+  },
+  /**
+   * Commits fail state for deleting employees
+   * @param state
+   */
+  [UPDATE_EMPLOYEES.fail](state, payload) {
+    state.employeeUpdateState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.employeeErrors = payload.response.data.title
   }
 }
 
@@ -272,9 +312,38 @@ const actions = {
       DELETE_EMPLOYEES.fail
     ])
   },
-
+  /**
+   * Action for fetching employees
+   * @param commit
+   * @param params
+   */
+  updateEmployee({ commit }, params) {
+    const slug = 'api.users.update'
+    console.log(params)
+    STATE_API({ slug, params }, commit, [
+      UPDATE_EMPLOYEES.initial,
+      UPDATE_EMPLOYEES.success,
+      UPDATE_EMPLOYEES.fail
+    ])
+  },
   addUser({ commit }, employee) {
     const url = 'api/v1/users/create'
+    axios
+      .post(url, employee)
+      .then(res => {
+        this.dispatch('fetchUsers')
+        console.log(res.status)
+        commit('FORM_RESPONSE', res)
+      })
+      .catch(error => {
+        console.log(error)
+        commit('FORM_RESPONSE', error.response)
+      })
+
+    console.log(response)
+  },
+  updateUser({ commit }, employee) {
+    const url = 'api/v1/users/update/'+employee.get('id')
     axios
       .post(url, employee)
       .then(res => {

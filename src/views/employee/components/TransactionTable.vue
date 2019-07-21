@@ -170,7 +170,6 @@ export default {
       this.selectedOption = param;
     },
     handleCommand(command) {
-      alert("Action is : " + command);
       this.$emit("dropdownCommand", {
         action: command.split(":")[0],
         id: command.split(":")[1]
