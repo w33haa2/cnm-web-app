@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Sanction Level</h4>
+    <h4 style="color:#646464">Sanction Type</h4>
 
     <el-row>
       <el-col>
@@ -33,7 +33,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="sanction_types" style="width: 100%;margin-top:30px;">
+    <el-table :data="sanctionTypes.options" style="width: 100%;margin-top:30px;">
       <el-table-column align="center" label="Type Number">
         <template slot-scope="scope">{{ scope.row.type_number }}</template>
       </el-table-column>
@@ -90,14 +90,11 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
 export default {
   name: "Type",
   data() {
     return {
-      sanction_types: [
-        { id: 1, type_number: 1, type_description: "Absentism" },
-        { id: 2, type_number: 2, type_description: "Littering" }
-      ],
       modal_show: false,
       form: {
         action: "Create",
@@ -107,7 +104,14 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapGetters(["sanctionTypes"])
+  },
+  mounted() {
+    this.fetchSanctionTypes();
+  },
   methods: {
+    ...mapActions(["fetchSanctionTypes"]),
     updateRow(row) {
       this.form.action = "Update";
       this.form.type_number = row.type_number;

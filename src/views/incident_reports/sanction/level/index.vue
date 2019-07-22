@@ -33,7 +33,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="sanction_levels" style="width: 100%;margin-top:30px;">
+    <el-table :data="sanctionLevels.options" style="width: 100%;margin-top:30px;">
       <el-table-column align="center" label="Level Number">
         <template slot-scope="scope">{{ scope.row.level_number }}</template>
       </el-table-column>
@@ -90,14 +90,11 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
 export default {
   name: "Level",
   data() {
     return {
-      sanction_levels: [
-        { id: 1, level_number: 1, level_description: "Written" },
-        { id: 2, level_number: 2, level_description: "Verbal" }
-      ],
       modal_show: false,
       form: {
         action: "Create",
@@ -107,7 +104,14 @@ export default {
       }
     };
   },
+  mounted() {
+    this.fetchSanctionLevels();
+  },
+  computed: {
+    ...mapGetters(["sanctionLevels"])
+  },
   methods: {
+    ...mapActions(["fetchSanctionLevels"]),
     updateRow(row) {
       this.form.action = "Update";
       this.form.level_number = row.level_number;

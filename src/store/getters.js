@@ -13,8 +13,10 @@ const getters = {
   errorLogs: state => state.errorLog.logs,
   // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
-  fetchingIssuedIncidentReports: state => state.incident_report.fetchingIssuedIRState,
-  fetchingReceivedIncidentReports: state => state.incident_report.fetchingReceivedIRState,
+  fetchingIssuedIncidentReports: state =>
+    state.incident_report.fetchingIssuedIRState,
+  fetchingReceivedIncidentReports: state =>
+    state.incident_report.fetchingReceivedIRState,
   incidentReports: state => state.incident_report.reports,
   incidentReportsTotal: state => state.incident_report.reports_total,
   irErrors: state => state.incident_report.errors,
@@ -41,10 +43,27 @@ const getters = {
   // =============== start state
   loginState: state => state.user.loggingInState,
   fetchStateStatusList: state => state.user.fetchState.statusList,
-  fetchStatePotentialHead: state => state.user.fetchState.potentialHead
+  fetchStatePotentialHead: state => state.user.fetchState.potentialHead,
   // =============== end state
   // END
   // store/modules/user
   // =================================================================
-}
-export default getters
+
+  // ================================================================
+  // list of state from store/modules/sanction
+  // START
+  // =============== start data
+  sanctionLevels: state => state.sanction_level.sanction_levels,
+  sanctionTypes: state => state.sanction_type.sanction_types,
+  // =============== end data
+
+  // =============== start state
+  fetchSanctionLevelState: state =>
+    state.sanction_level.fetchingSanctionLevelState,
+  fetchSanctionTypeState: state => state.sanction_type.fetchingSanctionTypeState
+  // =============== end state
+  // END
+  // store/modules/sanction
+  // =================================================================
+};
+export default getters;
