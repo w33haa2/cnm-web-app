@@ -1,16 +1,16 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /* Router Modules */
-import componentsRouter from './modules/components'
-import chartsRouter from './modules/charts'
-import tableRouter from './modules/table'
-import IrRouter from './modules/Ir'
+import componentsRouter from "./modules/components";
+import chartsRouter from "./modules/charts";
+import tableRouter from "./modules/table";
+import IrRouter from "./modules/Ir";
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -40,61 +40,61 @@ import IrRouter from './modules/Ir'
  */
 export const constantRoutes = [
   {
-    path: '/redirect',
+    path: "/redirect",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/redirect/:path*',
-        component: () => import('@/views/redirect/index')
+        path: "/redirect/:path*",
+        component: () => import("@/views/redirect/index")
       }
     ]
   },
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
+    path: "/login",
+    component: () => import("@/views/login/index"),
     hidden: true
   },
   {
-    path: '/auth-redirect',
-    component: () => import('@/views/login/auth-redirect'),
+    path: "/auth-redirect",
+    component: () => import("@/views/login/auth-redirect"),
     hidden: true
   },
   {
-    path: '/404',
-    component: () => import('@/views/error-page/404'),
+    path: "/404",
+    component: () => import("@/views/error-page/404"),
     hidden: true
   },
   {
-    path: '/401',
-    component: () => import('@/views/error-page/401'),
+    path: "/401",
+    component: () => import("@/views/error-page/401"),
     hidden: true
   },
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect: '/dashboard',
+    redirect: "/dashboard",
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+        path: "dashboard",
+        component: () => import("@/views/dashboard/index"),
+        name: "Dashboard",
+        meta: { title: "Dashboard", icon: "dashboard", affix: true }
       }
     ]
   },
   {
-    path: '/profile',
+    path: "/profile",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'index/:id*',
-        component: () => import('@/views/profile/index')
+        path: "index/:id*",
+        component: () => import("@/views/profile/index")
       }
     ]
   }
-]
+];
 
 /**
  * asyncRoutes
@@ -102,41 +102,41 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: 'employee',
+    path: "employee",
     component: Layout,
     // redirect: "/agent",
     //  alwaysShow: true, // will always show the root menu
-    name: 'Employee',
+    name: "Employee",
     meta: {
-      title: 'Employee',
-      icon: 'user',
-      roles: ['Admin']
+      title: "Employee",
+      icon: "user",
+      roles: ["Admin"]
     },
     children: [
       {
-        path: '/employee',
-        component: () => import('@/views/employee/index'),
-        name: 'List',
+        path: "/employee",
+        component: () => import("@/views/employee/index"),
+        name: "List",
         meta: {
-          title: 'List'
+          title: "List"
           //  roles: ["admin"] // or you can only set roles in sub nav
         }
       },
       {
-        path: '/employee/position',
-        component: () => import('@/views/employee/position'),
-        name: 'Position',
+        path: "/employee/position",
+        component: () => import("@/views/employee/position"),
+        name: "Position",
         meta: {
-          title: 'Position'
+          title: "Position"
           // if do not set roles, means: this page does not requireincident_report
         }
       },
       {
-        path: '/employee/status',
-        component: () => import('@/views/employee/status'),
-        name: 'Status',
+        path: "/employee/status",
+        component: () => import("@/views/employee/status"),
+        name: "Status",
         meta: {
-          title: 'Status'
+          title: "Status"
           // if do not set roles, means: this page does not requireincident_report
         }
       }
@@ -144,33 +144,51 @@ export const asyncRoutes = [
   },
   IrRouter,
   {
-    path: 'agent',
+    path: "agent",
     component: Layout,
     // redirect: "/agent",
     //  alwaysShow: true, // will always show the root menu
-    name: 'Agent',
+    name: "Agent",
     meta: {
-      title: 'Agent',
-      icon: 'agent-headset'
+      title: "Agent",
+      icon: "agent-headset"
       //  roles: ["admin", "editor"] // you can set roles in root nav
     },
     children: [
       {
-        path: '/agent/schedule',
-        component: () => import('@/views/agent/schedule'),
-        name: 'Schedule',
+        path: "/agent/schedule",
+        component: () => import("@/views/agent/schedule"),
+        name: "Schedule",
         meta: {
-          title: 'Schedule'
+          title: "Schedule"
           //  roles: ["admin"] // or you can only set roles in sub nav
         }
       },
       {
-        path: '/agent/leave',
-        component: () => import('@/views/agent/leave'),
-        name: 'Leave',
+        path: "/agent/leave",
+        component: () => import("@/views/agent/leave"),
+        name: "Leave",
         meta: {
-          title: 'Leave'
+          title: "Leave"
           // if do not set roles, means: this page does not requireincident_report
+        }
+      }
+    ]
+  },
+  {
+    path: "action_logs",
+    component: Layout,
+    redirect: "/action_logs",
+    //  alwaysShow: true, // will always show the root menu
+    children: [
+      {
+        path: "/action_logs",
+        component: () => import("@/views/action_logs"),
+        name: "Action Logs",
+        meta: {
+          title: "Action Logs",
+          icon: "form"
+          //  roles: ["admin"] // or you can only set roles in sub nav
         }
       }
     ]
@@ -393,22 +411,22 @@ export const asyncRoutes = [
   // },
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
+  { path: "*", redirect: "/404", hidden: true }
+];
 
 const createRouter = () =>
   new Router({
     // mode: 'history', // require service support
     scrollBehavior: () => ({ y: 0 }),
     routes: constantRoutes
-  })
+  });
 
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
 
-export default router
+export default router;

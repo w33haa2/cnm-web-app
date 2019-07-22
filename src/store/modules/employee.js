@@ -246,7 +246,7 @@ const mutations = {
    * @param state
    */
   [UPDATE_EMPLOYEES.initial](state) {
-    state.employeeDeleteState = {
+    state.employeeUpdateState = {
       initial: true,
       success: false,
       fail: false
@@ -257,7 +257,7 @@ const mutations = {
    * @param state
    */
   [UPDATE_EMPLOYEES.success](state) {
-    state.employeeDeleteState = {
+    state.employeeUpdateState = {
       initial: false,
       success: true,
       fail: false
