@@ -41,9 +41,11 @@
         <template slot-scope="scope">{{ scope.row.type_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Edit">
-        <el-button :plain="true" size="mini">
-          <i class="el-icon-edit-outline" />
-        </el-button>
+        <template slot-scope="scope">
+          <el-button :plain="true" @click="updateRow(scope.row)">
+            <i class="el-icon-edit-outline" />
+          </el-button>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -54,6 +56,7 @@
       :close-on-press-escape="false"
       :show-close="false"
       :title="form.action + ' Sanction Type'"
+      width="30%"
     >
       <label width="100%">Type Number</label>
       <el-row>
@@ -63,6 +66,7 @@
             style="margin-top:3px; margin-bottom:10px;width:100%"
             :step="1"
             step-strictly
+            size="mini"
           />
         </el-col>
       </el-row>
@@ -73,12 +77,13 @@
             v-model="form.type_description"
             type="text"
             style="margin-top:3px; margin-bottom:5px;"
+            size="mini"
           />
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Confirm</el-button>
+        <el-button @click="cancelForm" size="mini">Cancel</el-button>
+        <el-button type="danger" @click="submitForm" size="mini">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -86,12 +91,12 @@
 
 <script>
 export default {
-  name: "Level",
+  name: "Type",
   data() {
     return {
-      sanction_levels: [
-        { id: 1, level_number: 1, level_description: "Written" },
-        { id: 2, level_number: 2, level_description: "Verbal" }
+      sanction_types: [
+        { id: 1, type_number: 1, type_description: "Absentism" },
+        { id: 2, type_number: 2, type_description: "Littering" }
       ],
       modal_show: false,
       form: {
@@ -103,10 +108,16 @@ export default {
     };
   },
   methods: {
+    updateRow(row) {
+      this.form.action = "Update";
+      this.form.type_number = row.type_number;
+      this.form.type_description = row.type_description;
+      this.modal_show = true;
+    },
     resetForm() {
       this.form.action = "Create";
-      this.form.level_number = null;
-      this.form.level_description = null;
+      this.form.type_number = null;
+      this.form.type_description = null;
     },
     cancelForm() {
       this.resetForm();
@@ -114,6 +125,11 @@ export default {
     },
     submitForm() {
       // submit action
+      if (this.form.action == "Create") {
+        // create
+      } else {
+        // update
+      }
     }
   }
 };
