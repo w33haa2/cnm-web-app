@@ -29,8 +29,11 @@
     </el-row>
 
     <!-- Table -->
-    <el-table v-loading="fetchingReceivedIncidentReports.initial" :data="incidentReports" style="width: 100%;margin-top:30px;">
-      <el-table-column fixed type="selection" width="55" />
+    <el-table
+      v-loading="fetchingReceivedIncidentReports.initial"
+      :data="incidentReports"
+      style="width: 100%;margin-top:30px;"
+    >
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
           <el-dropdown @command="handleCommand">
@@ -51,10 +54,10 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="Sanction Type" width="220">
-        <template slot-scope="scope">{{ scope.row.sanction.type }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.sanction_type.type_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Sanction Level" width="220">
-        <template slot-scope="scope">{{ scope.row.sanction.level }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
@@ -63,19 +66,19 @@
         </template>
       </el-table-column>
       <el-table-column align="header-center" label="Description" width="350">
-        <template slot-scope="scope">{{ scope.row.description }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Date Filed" width="220">
-        <template slot-scope="scope">{{ scope.row.date_filed }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.created_at.date }}</template>
       </el-table-column>
       <el-table-column align="center" label="Issued by" width="220">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <div v-if="false" class="td-name-avatar">
+            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image" />
+            <div v-else class="td-name-avatar">
               <span>TD</span>
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image">
-            <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
+            <div class="td-name">{{ scope.row.issued_by.full_name }}</div>
           </div>
         </template>
       </el-table-column>
@@ -84,7 +87,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -92,106 +95,58 @@ export default {
         limit: 10,
         offset: 0
       },
-      searchQuery: '',
-      ir: [
-        {
-          id: 1,
-          issuedby: {
-            image:
-              'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-            full_name: 'Emmanuel James Eng Lajom'
-          },
-          sanction: {
-            type: 'Absentism',
-            level: 'Verbal'
-          },
-          date_filed: '2019-06-10',
-          description:
-            'This is the description input by the person who filed the IR.',
-          response: {
-            message:
-              'This is the response input by the person who received the IR.',
-            date: '2019-16-11'
-          }
-        },
-        {
-          id: 1,
-          issuedby: {
-            image:
-              'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-            full_name: 'Emmanuel James Eng Lajom'
-          },
-          sanction: {
-            type: 'Absentism',
-            level: 'Verbal'
-          },
-          date_filed: '2019-06-10',
-          description:
-            'This is the description input by the person who filed the IR.',
-          response: null
-        },
-        {
-          id: 1,
-          issuedby: {
-            image:
-              'https://wpimg.wallstcn.com/e7d23d71-cf19-4b90-a1cc-f56af8c0903d.png',
-            full_name: 'Emmanuel James Eng Lajom'
-          },
-          sanction: {
-            type: 'Absentism',
-            level: 'Verbal'
-          },
-          date_filed: '2019-06-10',
-          description:
-            'This is the description input by the person who filed the IR.',
-          response: null
-        }
-      ]
-    }
+      searchQuery: ""
+    };
   },
   computed: {
-    ...mapGetters(['fetchingReceivedIncidentReports', 'incidentReports', 'incidentReportsTotal', 'irErrors', 'userDetails'])
+    ...mapGetters([
+      "fetchingReceivedIncidentReports",
+      "incidentReports",
+      "incidentReportsTotal",
+      "irErrors",
+      "userDetails"
+    ])
   },
   watch: {
     searchQuery(newData) {
-      if (newData !== '') {
-        this.query['target[]'] = 'full_name'
-        this.query.query = newData
-        this.fetchReceivedReports(this.query)
+      if (newData !== "") {
+        this.query["target[]"] = "full_name";
+        this.query.query = newData;
+        this.fetchReceivedReports(this.query);
       } else {
-        delete this.query['target[]']
-        delete this.query.query
-        this.fetchReceivedReports(this.query)
+        delete this.query["target[]"];
+        delete this.query.query;
+        this.fetchReceivedReports(this.query);
       }
     }
   },
   mounted() {
-    this.query.id = this.userDetails.id
-    this.fetchReceivedReports(this.query)
+    this.query.id = this.userDetails.id;
+    this.fetchReceivedReports(this.query);
   },
   methods: {
-    ...mapActions(['fetchReceivedReports']),
+    ...mapActions(["fetchReceivedReports"]),
     tableSizeChange(value) {
-      this.query.limit = value
-      this.fetchReceivedReports(this.query)
+      this.query.limit = value;
+      this.fetchReceivedReports(this.query);
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
-      this.fetchReceivedReports(this.query)
+      this.query.offset = (value - 1) * this.query.limit;
+      this.fetchReceivedReports(this.query);
     },
     handleCommand(command) {
-      const id = command.split('||')[1]
-      const action = command.split('||')[0]
+      const id = command.split("||")[1];
+      const action = command.split("||")[0];
       switch (action) {
-        case 'update':
-          this.form.show = true
-          this.form.action = action
-          this.form.update_id = id
-          break
+        case "update":
+          this.form.show = true;
+          this.form.action = action;
+          this.form.update_id = id;
+          break;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

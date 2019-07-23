@@ -1,11 +1,9 @@
 <template>
   <div class="app-container">
-    <el-button :plain="true" size="mini" @click="createForm">File a Report</el-button>
-
     <h4 style="color:#646464">Filed Reports</h4>
-
+    <el-button :plain="true" size="mini" @click="createForm">File a Report</el-button>
     <!-- Search and Pagination -->
-    <el-row>
+    <el-row style="width: 100%;margin-top:30px;">
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-pagination
           :page-sizes="[10, 25, 50]"
@@ -42,7 +40,6 @@
       :data="incidentReports"
       style="width: 100%;margin-top:10px;"
     >
-      <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
           <el-dropdown @command="handleCommand">
@@ -171,7 +168,7 @@ export default {
     return {
       searchQuery: "",
       form: {
-        show: true,
+        show: false,
         action: "Create",
         update_id: null,
         sanction_type_id: null,

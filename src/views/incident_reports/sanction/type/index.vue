@@ -11,16 +11,6 @@
     <!-- Search and Pagination -->
     <el-row style="width: 100%;margin-top:30px;">
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-pagination
-          :page-sizes="[25, 50, 100]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next"
-          :total="25"
-          background
-          small
-        />
-      </el-col>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-input placeholder="Search..." size="mini">
           <el-select slot="prepend" placeholder="Select" style="width:150px;">
             <el-option />
@@ -29,6 +19,16 @@
             <i class="el-icon-search" />
           </el-button>
         </el-input>
+      </el-col>
+      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
+        <el-pagination
+          :page-sizes="[25, 50, 100]"
+          :page-size="100"
+          layout="total, sizes, prev, pager, next"
+          :total="25"
+          background
+          small
+        />
       </el-col>
     </el-row>
 

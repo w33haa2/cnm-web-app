@@ -37,6 +37,7 @@ const getters = {
   // START
   // =============== start data
   statusList: state => state.user.data.statusList,
+  statusListCount: state => state.user.count.statusList,
   potentialHead: state => state.user.data.potentialHead,
   // =============== end data
 
