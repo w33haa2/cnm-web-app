@@ -311,9 +311,9 @@ export default {
   },
   props: ['toggle', 'data'],
   watch: {
-    data(v){
-      if(v.action=="Update"){
-        this.fillUpdateForm(v.data);
+    data(v) {
+      if (v.action == 'Update') {
+        this.fillUpdateForm(v.data)
       }
     },
     fetchStateStatusList({ initial, success, fail }) {
@@ -344,9 +344,9 @@ export default {
         this.options.head = this.potentialHead.map(function(i) { return { value: i.id, label: i.full_name } })
       }
       if (fail) {
-        if(this.form.employee.access_id==1){
+        if (this.form.employee.access_id == 1) {
           this.disable.form_confirm = false
-        }else{
+        } else {
           this.disable.form_confirm = true
         }
         this.disable.parent_select = true
@@ -456,7 +456,7 @@ export default {
     }
     this.fetchPotentialHead({ data })
     const status_query = {}
-    this.fetchStatusList({status_query})
+    this.fetchStatusList({ status_query })
   },
   created() {
     var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
@@ -464,37 +464,37 @@ export default {
     this.options.position = position
   },
   methods: {
-    fillUpdateForm(data){
-        this.vueCam.img = data.image? data.image: "default.gif";
-        
-        this.form.employee = {
-          image: null,
-          firstname: data.fname,
-          middlename: data.mname,
-          lastname: data.lname,
-          suffix: data.suffix,
-          address: data.address,
-          contact_number: data.contact,
-          excel_hash: data.excel_hash,
-          status_date: moment().format('MM/DD/YYYY'),
-          birthdate: data.birthdate,
-          gender: data.gender,
-          benefits: [
-            data.benefits[0].id_number,
-            data.benefits[1].id_number,
-            data.benefits[2].id_number,
-            data.benefits[3].id_number,
-          ],
-          access_id: data.access_id,
-          parent_id: data.parent_id,
-          email: data.email,
-          hired_date: data.hired_date,
-          company_id: data.company_id,
-          status_id: this.statusList.filter(i=> i.type.toLowerCase() == data.type.toLowerCase())[0].id,
-          status: data.status,
-          contract: data.contract,
-          type: data.type
-        }
+    fillUpdateForm(data) {
+      this.vueCam.img = data.image ? data.image : 'default.gif'
+
+      this.form.employee = {
+        image: null,
+        firstname: data.fname,
+        middlename: data.mname,
+        lastname: data.lname,
+        suffix: data.suffix,
+        address: data.address,
+        contact_number: data.contact,
+        excel_hash: data.excel_hash,
+        status_date: moment().format('MM/DD/YYYY'),
+        birthdate: data.birthdate,
+        gender: data.gender,
+        benefits: [
+          data.benefits[0].id_number,
+          data.benefits[1].id_number,
+          data.benefits[2].id_number,
+          data.benefits[3].id_number
+        ],
+        access_id: data.access_id,
+        parent_id: data.parent_id,
+        email: data.email,
+        hired_date: data.hired_date,
+        company_id: data.company_id,
+        status_id: this.statusList.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,
+        status: data.status,
+        contract: data.contract,
+        type: data.type
+      }
     },
     closeEmployeeModal() {
       this.clearFormErrors()
@@ -622,12 +622,12 @@ export default {
       keys.forEach((v, i) => {
         this.form.employee[v] = null
       })
-      this.form.employee.gender = 'Male';
-      this.form.employee.status_id = 1;
-      this.form.employee.access_id = 1;
-      this.form.employee.type = null;
-      this.form.employee.benefits = [];
-      this.form.employee.image = null;
+      this.form.employee.gender = 'Male'
+      this.form.employee.status_id = 1
+      this.form.employee.access_id = 1
+      this.form.employee.type = null
+      this.form.employee.benefits = []
+      this.form.employee.image = null
       this.vueCam.img = 'default.gif'
     },
     clearFormErrors() {
@@ -668,7 +668,7 @@ export default {
       image: null,
       camera_dialog: false,
       vueCam: {
-        img: "default.gif",
+        img: 'default.gif',
         imgfile: null,
         camera: null,
         deviceId: null,
