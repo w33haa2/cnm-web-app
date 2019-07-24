@@ -2,7 +2,7 @@
   <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false" top="2vh">
     <el-row>
       <el-col style="background-color:white;" :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
-        Company Details
+        <p>Company Details</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:4}" :xl="{span:4}">
             <!-- <camera @image="captured" /> -->
@@ -162,7 +162,7 @@
             </el-row>
           </el-col>
         </el-row>
-        <h6 style="margin-top:10px;">Personal Details</h6>
+        <p>Personal Details</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
             <el-row>
@@ -229,7 +229,7 @@
             </el-row>
           </el-col>
         </el-row>
-        <h6 style="margin-top:10px;">Benefit IDs</h6>
+        <p>Benefit ID</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
             <el-row>
@@ -346,9 +346,11 @@ export default {
       if (fail) {
         if(this.form.employee.access_id==1){
           this.disable.form_confirm = false
+        this.form.employee.parent_id = null
         }else{
           this.disable.form_confirm = true
         }
+        
         this.disable.parent_select = true
       }
     },
@@ -494,6 +496,9 @@ export default {
           status: data.status,
           contract: data.contract,
           type: data.type
+        }
+        if(this.form.employee.access_id == 1){
+          this.form.employee.parent_id = null
         }
     },
     closeEmployeeModal() {
