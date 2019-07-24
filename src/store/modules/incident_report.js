@@ -1,17 +1,21 @@
-import { STATE_API } from "@/utils/api/api-helper";
-import { generateMutationTypes } from "@/utils/api/state-mutation";
+import { STATE_API } from '@/utils/api/api-helper'
+import { generateMutationTypes } from '@/utils/api/state-mutation'
 const FETCH_INCIDENT_REPORTS = generateMutationTypes(
-  "incident_reports",
-  "FETCH_INCIDENT_REPORTS"
-);
+  'incident_reports',
+  'FETCH_INCIDENT_REPORTS'
+)
+const CREATE_INCIDENT_REPORTS = generateMutationTypes(
+  'incident_reports',
+  'FETCH_INCIDENT_REPORTS'
+)
 const FETCH_ISSUED_INCIDENT_REPORTS = generateMutationTypes(
-  "incident_reports",
-  "FETCH_ISSUED_INCIDENT_REPORTS"
-);
+  'incident_reports',
+  'FETCH_ISSUED_INCIDENT_REPORTS'
+)
 const FETCH_RECEIVED_INCIDENT_REPORTS = generateMutationTypes(
-  "incident_reports",
-  "FETCH_RECEIVED_INCIDENT_REPORTS"
-);
+  'incident_reports',
+  'FETCH_RECEIVED_INCIDENT_REPORTS'
+)
 
 /**
  * State
@@ -19,6 +23,11 @@ const FETCH_RECEIVED_INCIDENT_REPORTS = generateMutationTypes(
 
 const state = {
   fetchingIRState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  creatingIRState: {
     initial: false,
     success: false,
     fail: false
@@ -36,7 +45,7 @@ const state = {
   reports: [],
   reports_total: 0,
   errors: null
-};
+}
 
 /**
  * Mutators
@@ -51,7 +60,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    };
+    }
   },
   /**
    * Commits success state for fetching incident reports
@@ -62,8 +71,8 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    };
-    state.reports = payload.meta.all_reports;
+    }
+    state.reports = payload.meta.all_reports
   },
   /**
    * Commits fail state for fetching incident reports
@@ -74,10 +83,10 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    };
-    state.errors = payload.response.data.title;
-    state.reports = [];
-    state.reports_total = 0;
+    }
+    state.errors = payload.response.data.title
+    state.reports = []
+    state.reports_total = 0
   },
   /**
    * Commits initial state for fetching incident reports
@@ -88,7 +97,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    };
+    }
   },
   /**
    * Commits success state for fetching incident reports
@@ -99,9 +108,9 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    };
-    state.reports = payload.meta.reports;
-    state.reports_total = payload.meta.count;
+    }
+    state.reports = payload.meta.reports
+    state.reports_total = payload.meta.count
   },
   /**
    * Commits fail state for fetching incident reports
@@ -112,10 +121,10 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    };
-    state.errors = payload.response.data.title;
-    state.reports = [];
-    state.reports_total = 0;
+    }
+    state.errors = payload.response.data.title
+    state.reports = []
+    state.reports_total = 0
   },
   /**
    * Commits initial state for fetching incident reports
@@ -126,7 +135,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    };
+    }
   },
   /**
    * Commits success state for fetching incident reports
@@ -137,9 +146,9 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    };
-    state.reports = payload.meta.reports;
-    state.reports_total = payload.meta.count;
+    }
+    state.reports = payload.meta.reports
+    state.reports_total = payload.meta.count
   },
   /**
    * Commits fail state for fetching incident reports
@@ -150,12 +159,46 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    };
-    state.errors = payload.response.data.title;
-    state.reports = [];
-    state.reports_total = 0;
+    }
+    state.errors = payload.response.data.title
+    state.reports = []
+    state.reports_total = 0
+  },
+  /**
+   * Commits initial state for fetching incident reports
+   * @param state
+   */
+  [CREATE_INCIDENT_REPORTS.initial](state) {
+    state.creatingIRState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for fetching incident reports
+   * @param state
+   */
+  [CREATE_INCIDENT_REPORTS.success](state, payload) {
+    state.creatingIRState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+  },
+  /**
+   * Commits fail state for fetching incident reports
+   * @param state
+   */
+  [CREATE_INCIDENT_REPORTS.fail](state, payload) {
+    state.creatingIRState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.errors = payload.response.data.title
   }
-};
+}
 
 const actions = {
   /**
@@ -164,12 +207,25 @@ const actions = {
    * @param params
    */
   fetchReports({ commit }, params) {
-    const slug = "api.reports.fetchAll";
+    const slug = 'api.reports.fetchAll'
     STATE_API({ slug, params }, commit, [
       FETCH_INCIDENT_REPORTS.initial,
       FETCH_INCIDENT_REPORTS.success,
       FETCH_INCIDENT_REPORTS.fail
-    ]);
+    ])
+  },
+  /**
+   * Action for creating reports
+   * @param commit
+   * @param params
+   */
+  createReports({ commit }, params) {
+    const slug = 'api.reports.create'
+    STATE_API({ slug, params }, commit, [
+      FETCH_INCIDENT_REPORTS.initial,
+      FETCH_INCIDENT_REPORTS.success,
+      FETCH_INCIDENT_REPORTS.fail
+    ])
   },
   /**
    * Action for fetching incident reports
@@ -177,12 +233,12 @@ const actions = {
    * @param params
    */
   fetchIssuedReports({ commit }, params) {
-    const slug = "api.reports.issuedBy";
+    const slug = 'api.reports.issuedBy'
     STATE_API({ slug, params }, commit, [
       FETCH_ISSUED_INCIDENT_REPORTS.initial,
       FETCH_ISSUED_INCIDENT_REPORTS.success,
       FETCH_ISSUED_INCIDENT_REPORTS.fail
-    ]);
+    ])
   },
   /**
    * Action for fetching incident reports
@@ -190,17 +246,17 @@ const actions = {
    * @param params
    */
   fetchReceivedReports({ commit }, params) {
-    const slug = "api.reports.issuedTo";
+    const slug = 'api.reports.issuedTo'
     STATE_API({ slug, params }, commit, [
       FETCH_RECEIVED_INCIDENT_REPORTS.initial,
       FETCH_RECEIVED_INCIDENT_REPORTS.success,
       FETCH_RECEIVED_INCIDENT_REPORTS.fail
-    ]);
+    ])
   }
-};
+}
 
 export default {
   state,
   mutations,
   actions
-};
+}
