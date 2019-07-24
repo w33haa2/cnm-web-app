@@ -311,9 +311,9 @@ export default {
   },
   props: ['toggle', 'data'],
   watch: {
-    data(v){
-      if(v.action=="Update"){
-        this.fillUpdateForm(v.data);
+    data(v) {
+      if (v.action == 'Update') {
+        this.fillUpdateForm(v.data)
       }
     },
     fetchStateStatusList({ initial, success, fail }) {
@@ -344,9 +344,9 @@ export default {
         this.options.head = this.potentialHead.map(function(i) { return { value: i.id, label: i.full_name } })
       }
       if (fail) {
-        if(this.form.employee.access_id==1){
+        if (this.form.employee.access_id == 1) {
           this.disable.form_confirm = false
-        this.form.employee.parent_id = null
+          this.form.employee.parent_id = null
         }else{
           this.disable.form_confirm = true
         }
@@ -458,7 +458,7 @@ export default {
     }
     this.fetchPotentialHead({ data })
     const status_query = {}
-    this.fetchStatusList({status_query})
+    this.fetchStatusList({ status_query })
   },
   created() {
     var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
@@ -627,12 +627,12 @@ export default {
       keys.forEach((v, i) => {
         this.form.employee[v] = null
       })
-      this.form.employee.gender = 'Male';
-      this.form.employee.status_id = 1;
-      this.form.employee.access_id = 1;
-      this.form.employee.type = null;
-      this.form.employee.benefits = [];
-      this.form.employee.image = null;
+      this.form.employee.gender = 'Male'
+      this.form.employee.status_id = 1
+      this.form.employee.access_id = 1
+      this.form.employee.type = null
+      this.form.employee.benefits = []
+      this.form.employee.image = null
       this.vueCam.img = 'default.gif'
     },
     clearFormErrors() {
@@ -673,7 +673,7 @@ export default {
       image: null,
       camera_dialog: false,
       vueCam: {
-        img: "default.gif",
+        img: 'default.gif',
         imgfile: null,
         camera: null,
         deviceId: null,

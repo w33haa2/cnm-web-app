@@ -17,7 +17,7 @@
       </template>
       <template slot-scope="scope">
         <div class="user-block">
-          <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+          <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
           <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
             <div
               style="align-self:center;width:100%;text-align:center;"
@@ -129,15 +129,15 @@
 </template>
 
 <script>
-const avatarPrefix = "?imageView2/1/w/80/h/80";
-import TableExpansion from "./TableExpansion";
-import moment from "moment";
-import { mapGetters, mapActions } from "vuex";
+const avatarPrefix = '?imageView2/1/w/80/h/80'
+import TableExpansion from './TableExpansion'
+import moment from 'moment'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   components: { TableExpansion },
-  props: ["tableData"],
+  props: ['tableData'],
   computed: {
-    ...mapGetters(["allPosition", "employeeFetchState"])
+    ...mapGetters(['allPosition', 'employeeFetchState'])
   },
   data() {
     return {
@@ -151,31 +151,31 @@ export default {
       multiSelect: [],
       avatarPrefix,
       sort: {
-        field: "full_name",
+        field: 'full_name',
         order: true
       }
-    };
+    }
   },
   created() {
-    this.fetchUsers();
+    this.fetchUsers()
     // this.fetchAccessLevels();
   },
   methods: {
-    ...mapActions(["fetchAccessLevels", "fetchUsers"]),
+    ...mapActions(['fetchAccessLevels', 'fetchUsers']),
     // local component functions
     fetchData() {
       transactionList().then(response => {
-        this.list = response.data.items.slice(0, 8);
-      });
+        this.list = response.data.items.slice(0, 8)
+      })
     },
     onSelect(param) {
-      this.selectedOption = param;
+      this.selectedOption = param
     },
     handleCommand(command) {
-      this.$emit("dropdownCommand", {
-        action: command.split(":")[0],
-        id: command.split(":")[1]
-      });
+      this.$emit('dropdownCommand', {
+        action: command.split(':')[0],
+        id: command.split(':')[1]
+      })
     },
     // table filter callback {Element UI} functions
     // filterHeads(value, row) {
@@ -186,24 +186,24 @@ export default {
     // },
     // multiple filterhandler
     filterHandler(value, row, column) {
-      const property = column["property"];
-      return row[property] === value;
+      const property = column['property']
+      return row[property] === value
     },
     handleSelectionChange(val) {
-      this.multiSelect = val;
-      this.$emit("table-select", this.multiSelect);
+      this.multiSelect = val
+      this.$emit('table-select', this.multiSelect)
     },
     columnSort(column) {
       if (this.sort.field != column) {
-        this.sort.field = column;
-        this.sort.order = true;
+        this.sort.field = column
+        this.sort.order = true
       } else {
-        this.sort.order = !this.sort.order;
+        this.sort.order = !this.sort.order
       }
-      this.$emit("sort", { sort: this.sort.field, order: this.sort.order });
+      this.$emit('sort', { sort: this.sort.field, order: this.sort.order })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

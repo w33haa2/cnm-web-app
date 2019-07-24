@@ -27,7 +27,7 @@
         </el-input>
       </el-col>
     </el-row>
-    <br />
+    <br>
     <el-alert
       v-if="fetchingIssuedIncidentReports.fail"
       title="Error!"
@@ -56,7 +56,7 @@
       <el-table-column align="center" label="Issued To" width="220">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image" />
+            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
             <div v-else class="td-name-avatar">
               <span>TD</span>
             </div>
@@ -110,7 +110,7 @@
       <label>Sanction Type</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-select size="mini" style="width:100%" v-model="form.sanction_type_id">
+          <el-select v-model="form.sanction_type_id" size="mini" style="width:100%">
             <el-option
               v-for="(types,index) in sanctionTypes.options"
               :key="types.id"
@@ -123,7 +123,7 @@
       <label>Sanction Level</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-select size="mini" style="width:100%" v-model="form.sanction_level_id">
+          <el-select v-model="form.sanction_level_id" size="mini" style="width:100%">
             <el-option
               v-for="(levels,index) in sanctionLevels.options"
               :key="levels.id"
@@ -137,39 +137,40 @@
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
           <el-input
+            v-model="form.description"
             type="textarea"
             placeholder="Description..."
             size="mini"
-            v-model="form.description"
           />
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini">Confirm</el-button>
+        <el-button size="mini" @click="cancelForm">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import path from "path";
-import { deepClone } from "@/utils";
-import { mapActions, mapGetters } from "vuex";
+import path from 'path'
+import { Message } from "element-ui"
+import { deepClone } from '@/utils'
+import { mapActions, mapGetters } from 'vuex'
 const defaultRole = {
-  key: "",
-  name: "",
-  description: "",
+  key: '',
+  name: '',
+  description: '',
   routes: []
-};
+}
 
 export default {
   data() {
     return {
-      searchQuery: "",
+      searchQuery: '',
       form: {
         show: false,
-        action: "Create",
+        action: 'Create',
         update_id: null,
         sanction_type_id: null,
         sanction_level_id: null,
@@ -181,70 +182,92 @@ export default {
         limit: 10,
         offset: 0
       }
-    };
+    }
   },
   computed: {
     routesData() {
-      return this.routes;
+      return this.routes
     },
     ...mapGetters([
-      "fetchingIssuedIncidentReports",
-      "incidentReports",
-      "incidentReportsTotal",
-      "irErrors",
-      "userDetails",
-      "sanctionLevels",
-      "sanctionTypes",
-      "fetchingSanctionTypeState"
+      'fetchingIssuedIncidentReports',
+      'incidentReports',
+      'incidentReportsTotal',
+      'irErrors',
+      'userDetails',
+      'creatingIncidentReports',
+      'sanctionLevels',
+      'sanctionTypes',
+      'fetchingSanctionTypeState'
     ])
   },
   watch: {
     sanctionLevels(v) {
-      this.form.sanction_level_id = v.options[0].id;
+      this.form.sanction_level_id = v.options[0].id
     },
     sanctionTypes(v) {
-      this.form.sanction_type_id = v.options[0].id;
+      this.form.sanction_type_id = v.options[0].id
     },
     searchQuery(newData) {
-      if (newData !== "") {
-        this.query["target[]"] = "full_name";
-        this.query.query = newData;
-        this.fetchIssuedReports(this.query);
+      if (newData !== '') {
+        this.query['target[]'] = 'full_name'
+        this.query.query = newData
+        this.fetchIssuedReports(this.query)
       } else {
-        delete this.query["target[]"];
-        delete this.query.query;
-        this.fetchIssuedReports(this.query);
+        delete this.query['target[]']
+        delete this.query.query
+        this.fetchIssuedReports(this.query)
+      }
+    },
+    creatingIncidentReports({initial, success, fail}) {
+      if (success) {
+        this.fetchIssuedReports(this.query)
+        this.clearForm()
+        this.form.show = false
+        Message.success({ message: 'Successfully submitted report', duration: "2500" })
+      } else if (fail) {
+        Message.error({ message: this.irErrors, duration: "2500" })
       }
     }
   },
   mounted() {
-    this.query.id = this.userDetails.id;
-    this.fetchIssuedReports(this.query);
-    this.fetchSanctionLevels();
-    this.fetchSanctionTypes();
+    this.query.id = this.userDetails.id
+    this.fetchIssuedReports(this.query)
+    this.fetchSanctionLevels()
+    this.fetchSanctionTypes()
   },
   methods: {
     ...mapActions([
-      "fetchIssuedReports",
-      "fetchSanctionLevels",
-      "fetchSanctionTypes"
+      'fetchIssuedReports',
+      'fetchSanctionLevels',
+      'fetchSanctionTypes',
+      'createReports'
     ]),
     submitForm() {
-      if (this.form.action == "Create") {
+      if (this.form.action == 'Create') {
         // trigger create
+        console.log(this.form.sanction_type_id,this.form.description,this.form.sanction_level_id, this.userDetails.id)
+        const data = {
+          sanction_type_id: this.form.sanction_type_id,
+          sanction_level_id: this.form.sanction_level_id,
+          description: this.form.description,
+          user_reports_id: this.userDetails.id,
+          filed_by: this.userDetails.id,
+
+        }
+        this.createReports(data)
       } else {
         // update
       }
     },
     handleCommand(command) {
-      let action = command.split(":")[0],
-        id = command.split(":")[1];
+      const action = command.split(':')[0]
+      const id = command.split(':')[1]
 
       switch (action) {
-        case "Update":
-          let data = this.incidentReports.filter(
+        case 'Update':
+          const data = this.incidentReports.filter(
             i => i.report_details.id == id
-          )[0];
+          )[0]
           this.form = {
             show: true,
             action: action,
@@ -254,41 +277,41 @@ export default {
             description: data.report_details.description,
             user_reports_id: data.issued_to.id,
             filed_by: data.issued_by.id
-          };
-          break;
+          }
+          break
       }
     },
     createForm() {
-      this.clearForm();
-      this.form.show = true;
-      this.form.sanction_level_id = this.sanctionLevels.options[0].id;
-      this.form.sanction_type_id = this.sanctionTypes.options[0].id;
+      this.clearForm()
+      this.form.show = true
+      this.form.sanction_level_id = this.sanctionLevels.options[0].id
+      this.form.sanction_type_id = this.sanctionTypes.options[0].id
     },
     clearForm() {
       this.form = {
-        action: "Create",
+        action: 'Create',
         update_id: null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
         user_reports_id: null,
         filed_by: null
-      };
+      }
     },
     cancelForm() {
-      this.clearForm();
-      this.form.show = false;
+      this.clearForm()
+      this.form.show = false
     },
     tableSizeChange(value) {
-      this.query.limit = value;
-      this.fetchIssuedReports(this.query);
+      this.query.limit = value
+      this.fetchIssuedReports(this.query)
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      this.fetchIssuedReports(this.query);
+      this.query.offset = (value - 1) * this.query.limit
+      this.fetchIssuedReports(this.query)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
