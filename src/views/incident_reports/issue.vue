@@ -154,6 +154,7 @@
 
 <script>
 import path from 'path'
+import { Message } from "element-ui"
 import { deepClone } from '@/utils'
 import { mapActions, mapGetters } from 'vuex'
 const defaultRole = {
@@ -193,6 +194,7 @@ export default {
       'incidentReportsTotal',
       'irErrors',
       'userDetails',
+      'creatingIncidentReports',
       'sanctionLevels',
       'sanctionTypes',
       'fetchingSanctionTypeState'
@@ -215,6 +217,16 @@ export default {
         delete this.query.query
         this.fetchIssuedReports(this.query)
       }
+    },
+    creatingIncidentReports({initial, success, fail}) {
+      if (success) {
+        this.fetchIssuedReports(this.query)
+        this.clearForm()
+        this.form.show = false
+        Message.success({ message: 'Successfully submitted report', duration: "2500" })
+      } else if (fail) {
+        Message.error({ message: this.irErrors, duration: "2500" })
+      }
     }
   },
   mounted() {
@@ -233,10 +245,16 @@ export default {
     submitForm() {
       if (this.form.action == 'Create') {
         // trigger create
+        console.log(this.form.sanction_type_id,this.form.description,this.form.sanction_level_id, this.userDetails.id)
         const data = {
+          sanction_type_id: this.form.sanction_type_id,
+          sanction_level_id: this.form.sanction_level_id,
+          description: this.form.description,
+          user_reports_id: this.userDetails.id,
+          filed_by: this.userDetails.id,
 
         }
-        this.createReports()
+        this.createReports(data)
       } else {
         // update
       }

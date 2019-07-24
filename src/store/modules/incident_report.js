@@ -222,9 +222,9 @@ const actions = {
   createReports({ commit }, params) {
     const slug = 'api.reports.create'
     STATE_API({ slug, params }, commit, [
-      FETCH_INCIDENT_REPORTS.initial,
-      FETCH_INCIDENT_REPORTS.success,
-      FETCH_INCIDENT_REPORTS.fail
+      CREATE_INCIDENT_REPORTS.initial,
+      CREATE_INCIDENT_REPORTS.success,
+      CREATE_INCIDENT_REPORTS.fail
     ])
   },
   /**

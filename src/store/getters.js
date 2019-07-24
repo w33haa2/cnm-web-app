@@ -13,6 +13,7 @@ const getters = {
   errorLogs: state => state.errorLog.logs,
   // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
+  creatingIncidentReports: state => state.incident_report.creatingIRState,
   fetchingIssuedIncidentReports: state =>
     state.incident_report.fetchingIssuedIRState,
   fetchingReceivedIncidentReports: state =>
