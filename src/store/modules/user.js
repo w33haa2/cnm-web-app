@@ -106,7 +106,7 @@ const mutations = {
       success: true,
       fail: false
     }
-    state.comrades = payload.meta.all_reports
+    state.comrades = payload.meta.metadata
     state.comradesTotal = payload.meta.count
   },
   /**

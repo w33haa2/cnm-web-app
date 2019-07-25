@@ -25,6 +25,7 @@ const getters = {
   employees: state => state.employee.employees,
   userDetails: state => state.user.userDetails,
   comrades: state => state.user.comrades,
+  comradesTotal: state => state.user.comradesTotal,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,

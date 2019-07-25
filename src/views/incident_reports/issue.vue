@@ -102,8 +102,13 @@
       <label width="100%">To</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-select size="mini" style="width:100%">
-            <el-option value="1">Manuel</el-option>
+          <el-select size="mini" v-model="form.user_reports_id" style="width:100%">
+            <el-option
+              v-for="(comrade,index) in comrades"
+              :key="index"
+              :value="comrade.id"
+              :label="comrade.full_name"
+            />
           </el-select>
         </el-col>
       </el-row>
@@ -193,6 +198,7 @@ export default {
       'incidentReports',
       'incidentReportsTotal',
       'irErrors',
+      'comrades',
       'userDetails',
       'creatingIncidentReports',
       'sanctionLevels',
@@ -252,7 +258,7 @@ export default {
           sanction_type_id: this.form.sanction_type_id,
           sanction_level_id: this.form.sanction_level_id,
           description: this.form.description,
-          user_reports_id: this.userDetails.id,
+          user_reports_id: this.form.user_reports_id,
           filed_by: this.userDetails.id
 
         }
