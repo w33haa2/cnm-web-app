@@ -24,10 +24,12 @@ const getters = {
   // employee module
   employees: state => state.employee.employees,
   userDetails: state => state.user.userDetails,
+  comrades: state => state.user.comrades,
   employeesData: state => state.employee.employeesData,
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,
   employeeFetchState: state => state.employee.employeeFetchState,
+  fetchingComradeState: state => state.employee.fetchingComradeState,
   employeeDeleteState: state => state.employee.employeeDeleteState,
   employeeUpdateState: state => state.employee.employeeUpdateState,
   allPosition: state => state.employee.accesslevels,
@@ -67,5 +69,5 @@ const getters = {
   // END
   // store/modules/sanction
   // =================================================================
-};
-export default getters;
+}
+export default getters
