@@ -2,7 +2,7 @@
   <el-dialog :title="data.action+' Employee Form'" :visible.sync="toggle" width="80%" center :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false" top="2vh">
     <el-row>
       <el-col style="background-color:white;" :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
-        Company Details
+        <p>Company Details</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:4}" :xl="{span:4}">
             <!-- <camera @image="captured" /> -->
@@ -162,7 +162,7 @@
             </el-row>
           </el-col>
         </el-row>
-        <h6 style="margin-top:10px;">Personal Details</h6>
+        <p>Personal Details</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
             <el-row>
@@ -229,7 +229,7 @@
             </el-row>
           </el-col>
         </el-row>
-        <h6 style="margin-top:10px;">Benefit IDs</h6>
+        <p>Benefit ID</p>
         <el-row>
           <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
             <el-row>
@@ -346,9 +346,11 @@ export default {
       if (fail) {
         if (this.form.employee.access_id == 1) {
           this.disable.form_confirm = false
-        } else {
+          this.form.employee.parent_id = null
+        }else{
           this.disable.form_confirm = true
         }
+        
         this.disable.parent_select = true
       }
     },
@@ -464,37 +466,40 @@ export default {
     this.options.position = position
   },
   methods: {
-    fillUpdateForm(data) {
-      this.vueCam.img = data.image ? data.image : 'default.gif'
-
-      this.form.employee = {
-        image: null,
-        firstname: data.fname,
-        middlename: data.mname,
-        lastname: data.lname,
-        suffix: data.suffix,
-        address: data.address,
-        contact_number: data.contact,
-        excel_hash: data.excel_hash,
-        status_date: moment().format('MM/DD/YYYY'),
-        birthdate: data.birthdate,
-        gender: data.gender,
-        benefits: [
-          data.benefits[0].id_number,
-          data.benefits[1].id_number,
-          data.benefits[2].id_number,
-          data.benefits[3].id_number
-        ],
-        access_id: data.access_id,
-        parent_id: data.parent_id,
-        email: data.email,
-        hired_date: data.hired_date,
-        company_id: data.company_id,
-        status_id: this.statusList.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,
-        status: data.status,
-        contract: data.contract,
-        type: data.type
-      }
+    fillUpdateForm(data){
+        this.vueCam.img = data.image? data.image: "default.gif";
+        
+        this.form.employee = {
+          image: null,
+          firstname: data.fname,
+          middlename: data.mname,
+          lastname: data.lname,
+          suffix: data.suffix,
+          address: data.address,
+          contact_number: data.contact,
+          excel_hash: data.excel_hash,
+          status_date: moment().format('MM/DD/YYYY'),
+          birthdate: data.birthdate,
+          gender: data.gender,
+          benefits: [
+            data.benefits[0].id_number,
+            data.benefits[1].id_number,
+            data.benefits[2].id_number,
+            data.benefits[3].id_number,
+          ],
+          access_id: data.access_id,
+          parent_id: data.parent_id,
+          email: data.email,
+          hired_date: data.hired_date,
+          company_id: data.company_id,
+          status_id: this.statusList.filter(i=> i.type.toLowerCase() == data.type.toLowerCase())[0].id,
+          status: data.status,
+          contract: data.contract,
+          type: data.type
+        }
+        if(this.form.employee.access_id == 1){
+          this.form.employee.parent_id = null
+        }
     },
     closeEmployeeModal() {
       this.clearFormErrors()
