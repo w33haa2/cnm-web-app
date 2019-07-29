@@ -57,9 +57,9 @@
         <template slot-scope="scope">
           <div class="td-image-name-container">
             <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
-            <div v-else class="td-name-avatar">
-              <span>{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</span>
-            </div>
+            <!--            <div v-else class="td-name-avatar">-->
+            <!--              <span>{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</span>-->
+            <!--            </div>-->
             <div class="td-name">{{ scope.row.issued_to.full_name }}</div>
           </div>
         </template>
@@ -102,7 +102,7 @@
       <label width="100%">To</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-select size="mini" v-model="form.user_reports_id" style="width:100%">
+          <el-select v-model="form.user_reports_id" size="mini" style="width:100%">
             <el-option
               v-for="(comrade,index) in comrades"
               :key="index"
@@ -207,6 +207,9 @@ export default {
     ])
   },
   watch: {
+    incidentReports(newData) {
+      console.log(newData)
+    },
     sanctionLevels(v) {
       this.form.sanction_level_id = v.options[0].id
     },
