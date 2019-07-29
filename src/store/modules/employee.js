@@ -402,8 +402,6 @@ const actions = {
       FETCH_EMPLOYEES.success,
       FETCH_EMPLOYEES.fail
     ])
-<<<<<<< HEAD
-=======
   },
 
   fetchRSEmployees({ commit }, params) {
@@ -414,7 +412,6 @@ const actions = {
       FETCH_EMPLOYEES_RSEARCH.success,
       FETCH_EMPLOYEES_RSEARCH.fail
     ])
->>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
   },
   /**
    * Action for fetching employees
@@ -443,7 +440,6 @@ const actions = {
       UPDATE_EMPLOYEES.success,
       UPDATE_EMPLOYEES.fail
     ])
-<<<<<<< HEAD
   },
   /**
    * Action for fetching employees
@@ -458,8 +454,6 @@ const actions = {
       ADD_EMPLOYEES.success,
       ADD_EMPLOYEES.fail
     ])
-=======
->>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
   },
   addUser({ commit }, employee) {
     const url = 'api/v1/users/create'
