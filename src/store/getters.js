@@ -23,6 +23,7 @@ const getters = {
   irErrors: state => state.incident_report.errors,
   // employee module
   employees: state => state.employee.employees,
+  rs_employees: state => state.employee.rs_employeesData,
   userDetails: state => state.user.userDetails,
   comrades: state => state.user.comrades,
   comradesTotal: state => state.user.comradesTotal,

@@ -3,9 +3,18 @@ import { STATE_API } from '@/utils/api/api-helper'
 import { generateMutationTypes } from '@/utils/api/state-mutation'
 
 const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
+<<<<<<< HEAD
 const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
 const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
 const ADD_EMPLOYEES = generateMutationTypes('employees', 'ADD_EMPLOYEES')
+=======
+const FETCH_EMPLOYEES_RSEARCH = generateMutationTypes(
+  'remote_search',
+  'FETCH_EMPLOYEES'
+)
+const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
+const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
+>>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
 const state = {
   employees: {
     data: [],
@@ -34,6 +43,28 @@ const state = {
     fail: false
   },
   employeesTotal: 0,
+  rs_employees: {
+    data: [],
+    rows: 0
+  },
+  rs_employeesData: [],
+  rs_employeeErrors: '',
+  rs_employeeFetchState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  rs_employeeDeleteState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  rs_employeeUpdateState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  rs_employeesTotal: 0,
   accesslevels: [
     {
       id: 1,
@@ -167,6 +198,45 @@ const mutations = {
   // CLEAR_ERROR_LOG: (state) => {
   //   state.logs.splice(0)
   // }
+
+  /**
+   * Commits initial state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES_RSEARCH.initial](state) {
+    state.rs_employeeFetchState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES_RSEARCH.success](state, payload) {
+    state.rs_employeeFetchState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+    state.rs_employeesData = payload.meta.metadata
+    state.rs_employeesTotal = payload.meta.count
+  },
+  /**
+   * Commits fail state for fetching employees
+   * @param state
+   */
+  [FETCH_EMPLOYEES_RSEARCH.fail](state, payload) {
+    state.rs_employeeFetchState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.rs_employeeErrors = payload.response.data.title
+    state.rs_employeesData = []
+    state.rs_employeesTotal = 0
+  },
   DEFINE_USERS: (state, employees) => {
     state.employees.data = employees.metadata
     state.employees.rows = employees.count
@@ -337,6 +407,19 @@ const actions = {
       FETCH_EMPLOYEES.success,
       FETCH_EMPLOYEES.fail
     ])
+<<<<<<< HEAD
+=======
+  },
+
+  fetchRSEmployees({ commit }, params) {
+    const slug = 'api.users.fetchAll'
+    params = params.data
+    STATE_API({ slug, params }, commit, [
+      FETCH_EMPLOYEES_RSEARCH.initial,
+      FETCH_EMPLOYEES_RSEARCH.success,
+      FETCH_EMPLOYEES_RSEARCH.fail
+    ])
+>>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
   },
   /**
    * Action for fetching employees
@@ -365,6 +448,7 @@ const actions = {
       UPDATE_EMPLOYEES.success,
       UPDATE_EMPLOYEES.fail
     ])
+<<<<<<< HEAD
   },
   /**
    * Action for fetching employees
@@ -379,6 +463,8 @@ const actions = {
       ADD_EMPLOYEES.success,
       ADD_EMPLOYEES.fail
     ])
+=======
+>>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
   },
   addUser({ commit }, employee) {
     const url = 'api/v1/users/create'
