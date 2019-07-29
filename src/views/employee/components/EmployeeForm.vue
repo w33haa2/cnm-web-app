@@ -347,10 +347,10 @@ export default {
         if (this.form.employee.access_id == 1) {
           this.disable.form_confirm = false
           this.form.employee.parent_id = null
-        }else{
+        } else {
           this.disable.form_confirm = true
         }
-        
+
         this.disable.parent_select = true
       }
     },
@@ -395,11 +395,9 @@ export default {
     'form.employee.lastname': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
     'form.employee.suffix': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
     formResponse: function() {
-      console.log(this.formResponse)
       const response = this.formResponse
       // if (response.status == 422) {
       //   const errors = Object.keys(response.data.errors)
-      //   console.log(errors)
       //   errors.forEach((v, i) => {
       //     this.form.required[v] = true
       //   })
@@ -442,8 +440,11 @@ export default {
           })
         }
       } else if (response.status == 200) {
+        this.$root.$emit('employee_table.refresh')
+        this.$emit('closeEmployeeModal', false)
+        this.disable.form_confirm = false
         this.$message({
-          message: 'You have succussfuly added an Employee',
+          message: 'You have succussfuly defined an Employee',
           type: 'success',
           duration: 1000 * 5
         })
@@ -466,40 +467,40 @@ export default {
     this.options.position = position
   },
   methods: {
-    fillUpdateForm(data){
-        this.vueCam.img = data.image? data.image: "default.gif";
-        
-        this.form.employee = {
-          image: null,
-          firstname: data.fname,
-          middlename: data.mname,
-          lastname: data.lname,
-          suffix: data.suffix,
-          address: data.address,
-          contact_number: data.contact,
-          excel_hash: data.excel_hash,
-          status_date: moment().format('MM/DD/YYYY'),
-          birthdate: data.birthdate,
-          gender: data.gender,
-          benefits: [
-            data.benefits[0].id_number,
-            data.benefits[1].id_number,
-            data.benefits[2].id_number,
-            data.benefits[3].id_number,
-          ],
-          access_id: data.access_id,
-          parent_id: data.parent_id,
-          email: data.email,
-          hired_date: data.hired_date,
-          company_id: data.company_id,
-          status_id: this.statusList.filter(i=> i.type.toLowerCase() == data.type.toLowerCase())[0].id,
-          status: data.status,
-          contract: data.contract,
-          type: data.type
-        }
-        if(this.form.employee.access_id == 1){
-          this.form.employee.parent_id = null
-        }
+    fillUpdateForm(data) {
+      this.vueCam.img = data.image ? data.image : 'default.gif'
+
+      this.form.employee = {
+        image: null,
+        firstname: data.fname,
+        middlename: data.mname,
+        lastname: data.lname,
+        suffix: data.suffix,
+        address: data.address,
+        contact_number: data.contact,
+        excel_hash: data.excel_hash,
+        status_date: moment().format('MM/DD/YYYY'),
+        birthdate: data.birthdate,
+        gender: data.gender,
+        benefits: [
+          data.benefits[0].id_number,
+          data.benefits[1].id_number,
+          data.benefits[2].id_number,
+          data.benefits[3].id_number
+        ],
+        access_id: data.access_id,
+        parent_id: data.parent_id,
+        email: data.email,
+        hired_date: data.hired_date,
+        company_id: data.company_id,
+        status_id: this.statusList.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,
+        status: data.status,
+        contract: data.contract,
+        type: data.type
+      }
+      if (this.form.employee.access_id == 1) {
+        this.form.employee.parent_id = null
+      }
     },
     closeEmployeeModal() {
       this.clearFormErrors()
@@ -535,16 +536,13 @@ export default {
       // call method that creates a blob from dataUri
       this.form.employee.image = new File([imageBlob], imageName, { type: conType })
       // this.$emit("image", imageFile);
-      console.log(this.form.employee.image)
     },
     onStarted(stream) {
-      console.log('On Started Event', stream)
       this.vueCam.autoplay = true
       this.vueCam.buttons.stop = false
       this.vueCam.buttons.capture = false
     },
     onStopped(stream) {
-      console.log('On Stopped Event', stream)
       // this.vueCam.autoplay = false;
       // this.vueCam.buttons.stop = false;
       this.camera_dialog = false
@@ -598,21 +596,31 @@ export default {
       console.log(blob)
       return blob
     },
-    ...mapActions(['fetchUsers', 'addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead']),
+    ...mapActions(['fetchUsers', 'addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee']),
     captured: function(value) {
       this.form.employee.image = value
       console.log(value)
     },
     storeEmployee: async function() {
-      this.clearFormErrors()
-      this.form.employee.id = this.data.data.id
-      const data = this.toFormData(this.form.employee)
+      if (this.data.action.toLowerCase() === 'create') {
+        this.clearFormErrors()
+        const data = this.toFormData(this.form.employee)
+        console.log(data)
+        this.addUser(data)
+      } else {
+        this.clearFormErrors()
+        this.form.employee.id = this.data.data.id
+        const data = this.toFormData(this.form.employee)
+        console.log(data)
+        this.updateUser(data)
+      }
+
       // console.log(data.values)
       // this.form.employee.firstname = 'Emman ' + Math.random().toString(36).substr(2, 5)
       // this.form.employee.email = 'jeng@ssws.' + Math.random().toString(36).substr(2, 5)
       // this.form.employee.excel_hash = 'jeng' + Math.random().toString(36).substr(2, 5)
       // this.form.employee.firstname = 'Emman '+Math.random().toString(36).substr(2, 5);
-      this.updateUser(data)
+      // this.updateUser(data)
     },
     cascadeSelectHead() {
       const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent
@@ -645,7 +653,6 @@ export default {
       // alert("form data created")
       const fd = new FormData()
       const tmp = Object.keys(obj)
-      console.log(tmp)
       tmp.forEach((v, i) => {
         if (obj[v]) {
           if (v != 'benefits') {
@@ -662,7 +669,7 @@ export default {
     device: function() {
       return this.vueCam.devices.find(n => n.deviceId === this.vueCam.deviceId)
     },
-    ...mapGetters(['potentialHead', 'allPosition', 'formResponse', 'fetchStateStatusList', 'statusList', 'fetchStatePotentialHead'])
+    ...mapGetters(['potentialHead', 'allPosition', 'formResponse', 'fetchStateStatusList', 'statusList', 'fetchStatePotentialHead', 'employeeCreateState'])
   },
   data() {
     return {
