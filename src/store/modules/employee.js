@@ -3,18 +3,13 @@ import { STATE_API } from '@/utils/api/api-helper'
 import { generateMutationTypes } from '@/utils/api/state-mutation'
 
 const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
-<<<<<<< HEAD
 const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
 const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
 const ADD_EMPLOYEES = generateMutationTypes('employees', 'ADD_EMPLOYEES')
-=======
 const FETCH_EMPLOYEES_RSEARCH = generateMutationTypes(
   'remote_search',
   'FETCH_EMPLOYEES'
 )
-const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
-const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
->>>>>>> 940f946ab4fe2c4897e34e7f6511044296fe2fce
 const state = {
   employees: {
     data: [],
