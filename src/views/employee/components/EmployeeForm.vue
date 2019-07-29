@@ -605,13 +605,11 @@ export default {
       if (this.data.action.toLowerCase() === 'create') {
         this.clearFormErrors()
         const data = this.toFormData(this.form.employee)
-        console.log(data)
         this.addUser(data)
       } else {
         this.clearFormErrors()
         this.form.employee.id = this.data.data.id
         const data = this.toFormData(this.form.employee)
-        console.log(data)
         this.updateUser(data)
       }
 
