@@ -23,9 +23,10 @@
               style="display:none"
               accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               @change="excelChanged"
-            />
+            >
             <el-button size="mini">Export</el-button>
           </el-button-group>
+          <el-button size="mini" @click="changeStatus">Change Status</el-button>
         </el-col>
       </el-row>
       <employee-form
@@ -101,18 +102,70 @@
         </el-col>
       </el-row>
     </div>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="change_status.dialog"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      title="Change Status"
+      width="40%"
+    >
+      <label width="100%">Employees</label>
+      <el-row style="margin-top: 5px; margin-bottom:3px;">
+        <el-col>
+          <el-select
+            v-model="change_status.employees"
+            size="mini"
+            style="width:100%"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Multiselect..."
+            :remote-method="remoteMethod"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in rs_employees"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-col>
+      </el-row>
+      <label>Status</label>
+      <el-row style="margin-top: 5px; margin-bottom:3px;">
+        <el-col>
+          <el-select v-model="change_status.form.status" size="mini" style="width:100%">
+            <el-option
+              v-for="(status,index) in statusList"
+              :key="status.id"
+              :value="status.id"
+              :label="status.type"
+            />
+          </el-select>
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="cancelForm">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import TransactionTable from "./components/TransactionTable";
-import SelectSearch from "./components/select_search";
-import EmployeeForm from "./components/EmployeeForm";
-import { mapGetters, mapActions } from "vuex";
-import { Message } from "element-ui";
-import excel from "xlsx";
+import TransactionTable from './components/TransactionTable'
+import SelectSearch from './components/select_search'
+import EmployeeForm from './components/EmployeeForm'
+import { mapGetters, mapActions } from 'vuex'
+import { Message } from 'element-ui'
+import excel from 'xlsx'
 export default {
-  name: "DashboardHR",
+  name: 'DashboardHR',
   components: {
     TransactionTable,
     SelectSearch,
@@ -120,20 +173,20 @@ export default {
   },
   data() {
     return {
-      searchQuery: "",
+      searchQuery: '',
       table_config: {
         searchable_fields: [
-          { value: "full_name", label: "Name" },
-          { value: "position", label: "Position" },
-          { value: "email", label: "Email" },
-          { value: "contract", label: "Contract" },
-          { value: "status", label: "Status" },
-          { value: "gender", label: "Gender" },
-          { value: "address", label: "Address" }
+          { value: 'full_name', label: 'Name' },
+          { value: 'position', label: 'Position' },
+          { value: 'email', label: 'Email' },
+          { value: 'contract', label: 'Contract' },
+          { value: 'status', label: 'Status' },
+          { value: 'gender', label: 'Gender' },
+          { value: 'address', label: 'Address' }
         ],
         query: {
           search: {
-            target: "full_name",
+            target: 'full_name',
             query: null
           },
           limit: 10,
@@ -151,108 +204,134 @@ export default {
       form: {
         toggle: false,
         action_data: {
-          action: "Create",
+          action: 'Create',
           data: null
         }
+      },
+      change_status: {
+        dialog: true,
+        form: {
+          employees: [],
+          status_id: 1
+        }
       }
-    };
+    }
   },
   mounted() {
     // fetch and commit table data via vuex action
-    const data = this.query;
-    this.fetchEmployees({ data });
-    this.$root.$on("employee_table.refresh", this.refreshTable);
+    const data = this.query
+    this.fetchEmployees({ data })
+    this.$root.$on('employee_table.refresh', this.refreshTable)
+    this.fetchStatusList()
+    this.fetchRSEmployees()
     // setup filter select
   },
   computed: {
     ...mapGetters([
-      "employees",
-      "employeeErrors",
-      "allPosition",
-      "employeesData",
-      "employeesTotal",
-      "employeeFetchState"
+      'employees',
+      'employeeErrors',
+      'allPosition',
+      'employeesData',
+      'employeesTotal',
+      'employeeFetchState',
+      'statusList',
+      'rs_employees'
     ])
   },
   watch: {
     employeeData: function(v) {
-      console.log(v);
+      console.log(v)
     },
     searchQuery: function(newData) {
-      if (newData !== "") {
-        this.query["target[]"] = this.table_config.query.search.target;
-        this.query.query = newData;
-        const data = this.query;
-        this.fetchEmployees({ data });
+      if (newData !== '') {
+        this.query['target[]'] = this.table_config.query.search.target
+        this.query.query = newData
+        const data = this.query
+        this.fetchEmployees({ data })
       } else {
-        this.query["target[]"] = "";
-        this.query.query = "";
-        const data = this.query;
-        this.fetchEmployees({ data });
+        this.query['target[]'] = ''
+        this.query.query = ''
+        const data = this.query
+        this.fetchEmployees({ data })
       }
     },
     employeesFetchState({ initial, success, fail }) {
       if (fail) {
-        Message.error({ message: this.irErrors, duration: "2500" });
+        Message.error({ message: this.irErrors, duration: '2500' })
       }
     }
   },
   methods: {
-    ...mapActions(["fetchUsers", "fetchPositions", "fetchEmployees"]),
+    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'fetchStatusList', 'fetchRSEmployees']),
+    changeStatus() {
+      this.change_status.dialog = true
+    },
+    remoteMethod(query) {
+      const data = {}
+      if (query !== '') {
+        data['target[]'] = 'full_name'
+        data.query = query
+        this.fetchRSEmployees({ data })
+      } else {
+        data['target[]'] = ''
+        data.query = ''
+        this.fetchRSEmployees({ data })
+      }
+    },
+    cancelForm() {
+      this.resetForm()
+      this.change_status.dialog = false
+    },
+    resetForm() {
+      this.change_status.form = {
+        employees: [],
+        status: 1
+      }
+    },
     dropdownCommand(v) {
       switch (v.action) {
-        case "edit":
-          this.form.toggle = true;
+        case 'edit':
+          this.form.toggle = true
           this.form.action_data = {
-            action: "Update",
+            action: 'Update',
             data: this.getUpdateData(v.id)
-          };
-          break;
+          }
+          break
       }
     },
     getUpdateData(id) {
-      console.log(this.employeesData.filter(i => i.id == id)[0]);
+      console.log(this.employeesData.filter(i => i.id == id)[0])
 
-      return this.employeesData.filter(i => i.id == id)[0];
+      return this.employeesData.filter(i => i.id == id)[0]
     },
     excelChanged(e) {
-      var files = e.target.files,
-        f = files[0];
-      var reader = new FileReader();
+      var files = e.target.files
+      var f = files[0]
+      var reader = new FileReader()
       reader.onload = function(e) {
-        var data = new Uint8Array(e.target.result);
-        var workbook = excel.read(data, { type: "array" });
+        var data = new Uint8Array(e.target.result)
+        var workbook = excel.read(data, { type: 'array' })
 
         /* DO SOMETHING WITH workbook HERE */
-      };
-      reader.readAsArrayBuffer(f);
-      console.log(reader);
+      }
+      reader.readAsArrayBuffer(f)
+      console.log(reader)
     },
     closeEmployeeModal(v) {
-      this.form.toggle = v;
+      this.form.toggle = v
     },
     refreshTable() {
-      const data = this.query;
-      this.fetchEmployees({ data });
-    },
-    tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      this.fetchEmployees({ data });
-    },
-    tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchEmployees({ data });
+      const data = this.query
+      this.fetchEmployees({ data })
     },
     onColumnSort(value) {
-      this.query.sort = value.sort;
-      this.query.order = value.order ? "asc" : "desc";
-      const data = this.query;
-      this.fetchEmployees({ data });
+      this.query.sort = value.sort
+      this.query.order = value.order ? 'asc' : 'desc'
+      const data = this.query
+      this.fetchEmployees({ data })
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
