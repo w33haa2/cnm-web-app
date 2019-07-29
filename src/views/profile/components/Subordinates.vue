@@ -1,52 +1,115 @@
 <template>
   <div class="user-activity">
-    <div>
-      <div class="td-image-name-container">
-        <div class="td-name-avatar-md">
-          <span>TD</span>
-        </div>
-        <div class="td-name">Tingzon, Diego</div>
-      </div>
-    </div>
-    <div>
-      <div class="td-image-name-container">
-        <div class="td-name-avatar-md">
-          <span>TD</span>
-        </div>
-        <div class="td-name">
-          <div>Tingzon, Diego</div>
-          <div>
-            <span class="text-muted" style="font-size:12px;">Positon</span> ||
-            <span class="text-muted" style="font-size:12px;">email@cnmsolutions.net</span>
+
+    <el-row>
+      <el-col :md="{span:12}">
+        <el-input size="mini" placeholder="Search..."/>
+      </el-col>
+      <el-col :md="{span:12}">
+      <el-pagination
+        style="float:right"
+        small
+        background
+        :page-sizes="[10, 25, 50]"
+        :current-page.sync="table_config.page"
+        :page-size="table_config.display_size"
+        layout="total, sizes, prev, next"
+        :total="table_config.total"
+        @size-change="tableSizeChange"
+        @current-change="tablePageChange"
+      />
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" style="width: 100%;margin-top:10px;">
+      <el-table-column label="Employee" min-width="450" prop="full_name" fixed>
+        <template slot="header">
+          <span style="float:left">
+            <h4 class="text-muted">Name</h4>
+          </span>
+        </template>
+        <template slot-scope="scope">
+          <div class="user-block">
+            <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+            <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
+              <div
+                style="align-self:center;width:100%;text-align:center;"
+                class="text-point-eight-em"
+              >{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</div>
+            </div>
+            <div style="float:left;height:100%;">
+              <div style="display:flex;height:100%;">
+                <router-link :to="'/profile/index/'+scope.row.id">
+                  <div style="align-self:center; margin-left:15px;font-size:14px;color:grey;font-weight:600;">{{ scope.row.full_name }}</div>
+                </router-link>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="Position" width="150" align="center">
+        <template slot-scope="{row}">
+          <span class>{{ row.position }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Status" width="200" align="center">
+        <template slot-scope="{row}">
+          <el-tag
+            :type="row.status == 'ACTIVE'?'success':'danger'"
+          >{{ row.status }}</el-tag>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
-const avatarPrefix = '?imageView2/1/w/80/h/80'
-const carouselPrefix = '?imageView2/2/h/440'
-
+import { mapActions, mapGetters } from "vuex";
+import axios from "axios"
 export default {
-  props: ['user'],
+  props: ["user"],
   data() {
     return {
-      carouselImages: [
-        'https://wpimg.wallstcn.com/9679ffb0-9e0b-4451-9916-e21992218054.jpg',
-        'https://wpimg.wallstcn.com/bcce3734-0837-4b9f-9261-351ef384f75a.jpg',
-        'https://wpimg.wallstcn.com/d1d7b033-d75e-4cd6-ae39-fcd5f1c0a7c5.jpg',
-        'https://wpimg.wallstcn.com/50530061-851b-4ca5-9dc5-2fead928a939.jpg'
-      ],
-      avatarPrefix,
-      carouselPrefix
+      tableData: [],
+      table_config:{
+        page:1,
+        display_size:10,
+        total:0,
+      },
+      query:{
+        id:this.$route.params.id,
+        limit:10,
+        offset:0,
+      }
+    };
+  },
+  watch:{
+    comrades(v){
+      this.tableData = v
+    },
+    comradesTotal(v){
+      this.table_config.total = v
     }
   },
-  created() {
-    console.log(this.user)
+  computed: {
+    ...mapGetters(["token","comrades","comradesTotal"])
+  },
+  mounted(){
+    this.fetchComrades({ id: this.$route.params.id })
+  },
+  methods:{
+    ...mapActions(["fetchComrades"]),
+    tableSizeChange(value) {
+      this.query.limit = value;
+      const data = this.query;
+      this.fetchComrades( data );
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit;
+      const data = this.query;
+      this.fetchComrades( data );
+    },
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

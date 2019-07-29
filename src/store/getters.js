@@ -40,6 +40,7 @@ const getters = {
   // list of state from store/modules/user
   // START
   // =============== start data
+  position: state => state.user.userDetails.position,
   statusList: state => state.user.data.statusList,
   statusListCount: state => state.user.count.statusList,
   potentialHead: state => state.user.data.potentialHead,
@@ -70,5 +71,5 @@ const getters = {
   // END
   // store/modules/sanction
   // =================================================================
-}
-export default getters
+};
+export default getters;

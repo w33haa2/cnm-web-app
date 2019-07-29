@@ -58,7 +58,7 @@
           <div class="td-image-name-container">
             <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
             <div v-else class="td-name-avatar">
-              <span>TD</span>
+              <span>{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</span>
             </div>
             <div class="td-name">{{ scope.row.issued_to.full_name }}</div>
           </div>

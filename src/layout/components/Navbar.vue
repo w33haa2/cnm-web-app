@@ -25,7 +25,7 @@
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img
-            :src="userDetails.image_url === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : userDetails.image_url"
+            :src="userDetails.image_url === null ? 'default.gif' : userDetails.image_url"
             class="user-avatar"
           />
           <i class="el-icon-caret-bottom" />

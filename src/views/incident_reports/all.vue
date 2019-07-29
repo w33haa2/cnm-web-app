@@ -27,14 +27,18 @@
     </el-row>
 
     <!-- Table -->
-    <br>
+    <br />
     <el-alert
       v-if="fetchingIncidentReports.fail"
       title="Error!"
       type="error"
       :description="irErrors"
     />
-    <el-table v-loading="fetchingIncidentReports.initial" :data="incidentReports" style="width: 100%;margin-top:30px;">
+    <el-table
+      v-loading="fetchingIncidentReports.initial"
+      :data="incidentReports"
+      style="width: 100%;margin-top:30px;"
+    >
       <el-table-column fixed type="selection" width="55" />
       <el-table-column align="center" label="Action" fixed>
         <template slot-scope="scope">
@@ -56,7 +60,7 @@
             <div v-if="false" class="td-name-avatar">
               <span>TD</span>
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image">
+            <img v-else :src="scope.row.issuedby.image" class="td-image" />
             <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
           </div>
         </template>
@@ -67,7 +71,7 @@
             <div v-if="false" class="td-name-avatar">
               <span>TD</span>
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image">
+            <img v-else :src="scope.row.issuedby.image" class="td-image" />
             <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
           </div>
         </template>
@@ -101,33 +105,33 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
-    return {}
+    return {};
   },
   computed: {
-    ...mapGetters(['fetchingIncidentReports', 'incidentReports', 'irErrors'])
+    ...mapGetters(["fetchingIncidentReports", "incidentReports", "irErrors"])
   },
   watch: {},
   mounted() {
-    this.fetchReports()
+    this.fetchReports();
   },
   methods: {
-    ...mapActions(['fetchReports']),
+    ...mapActions(["fetchReports"]),
     handleCommand(command) {
-      const id = command.split('||')[1]
-      const action = command.split('||')[0]
+      const id = command.split("||")[1];
+      const action = command.split("||")[0];
       switch (action) {
-        case 'update':
-          this.form.show = true
-          this.form.action = action
-          this.form.update_id = id
-          break
+        case "update":
+          this.form.show = true;
+          this.form.action = action;
+          this.form.update_id = id;
+          break;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

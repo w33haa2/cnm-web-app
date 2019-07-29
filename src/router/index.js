@@ -200,9 +200,9 @@ export const asyncRoutes = [
   //   children: [
   //     {
   //       path: "index",
-  //       component: () => import("@/views/icons/index"),
-  //       name: "Icons",
-  //       meta: { title: "Icons", icon: "icon", noCache: true }
+  //       component: () => import("@/views/agent_schedule/index"),
+  //       name: "Schedule",
+  //       meta: { title: "Icons", icon: "date" }
   //     }
   //   ]
   // },

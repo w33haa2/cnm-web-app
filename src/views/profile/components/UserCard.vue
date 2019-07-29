@@ -6,7 +6,7 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.image_url === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : user.image_url" :height="'100px'" :width="'100px'" :hoverable="false">
+        <pan-thumb :image="user.image === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : user.image" :height="'100px'" :width="'100px'" :hoverable="false">
 
           {{ user.position }}
         </pan-thumb>
