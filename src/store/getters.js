@@ -31,6 +31,7 @@ const getters = {
   employeesTotal: state => state.employee.employeesTotal,
   employeeErrors: state => state.employee.employeeErrors,
   employeeFetchState: state => state.employee.employeeFetchState,
+  employeeCreateState: state => state.employee.employeeCreateState,
   fetchingComradeState: state => state.employee.fetchingComradeState,
   employeeDeleteState: state => state.employee.employeeDeleteState,
   employeeUpdateState: state => state.employee.employeeUpdateState,

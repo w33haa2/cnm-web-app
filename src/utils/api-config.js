@@ -323,10 +323,10 @@ const api = {
             $url: 'status_list',
             $method: 'GET'
           },
-          // create: {
-          //   $url: 'create',
-          //   $method: 'POST'
-          // },
+          create: {
+            $url: 'create',
+            $method: 'POST'
+          },
           // update: {
           //   $url: 'update',
           //   $method: 'POST',

@@ -3,12 +3,13 @@ import { STATE_API } from '@/utils/api/api-helper'
 import { generateMutationTypes } from '@/utils/api/state-mutation'
 
 const FETCH_EMPLOYEES = generateMutationTypes('employees', 'FETCH_EMPLOYEES')
+const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
+const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
+const ADD_EMPLOYEES = generateMutationTypes('employees', 'ADD_EMPLOYEES')
 const FETCH_EMPLOYEES_RSEARCH = generateMutationTypes(
   'remote_search',
   'FETCH_EMPLOYEES'
 )
-const DELETE_EMPLOYEES = generateMutationTypes('employees', 'DELETE_EMPLOYEES')
-const UPDATE_EMPLOYEES = generateMutationTypes('employees', 'UPDATE_EMPLOYEES')
 const state = {
   employees: {
     data: [],
@@ -22,6 +23,11 @@ const state = {
     fail: false
   },
   employeeDeleteState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  employeeCreateState: {
     initial: false,
     success: false,
     fail: false
@@ -307,6 +313,40 @@ const mutations = {
     state.employeeErrors = payload.response.data.title
   },
   /**
+   * Commits initial state for creating employees
+   * @param state
+   */
+  [ADD_EMPLOYEES.initial](state) {
+    state.employeeCreateState = {
+      initial: true,
+      success: false,
+      fail: false
+    }
+  },
+  /**
+   * Commits success state for deleting employees
+   * @param state
+   */
+  [ADD_EMPLOYEES.success](state) {
+    state.employeeCreateState = {
+      initial: false,
+      success: true,
+      fail: false
+    }
+  },
+  /**
+   * Commits fail state for deleting employees
+   * @param state
+   */
+  [ADD_EMPLOYEES.fail](state, payload) {
+    state.employeeCreateState = {
+      initial: false,
+      success: false,
+      fail: true
+    }
+    state.employeeErrors = payload.response.data.title
+  },
+  /**
    * Commits initial state for deleting employees
    * @param state
    */
@@ -399,6 +439,20 @@ const actions = {
       UPDATE_EMPLOYEES.initial,
       UPDATE_EMPLOYEES.success,
       UPDATE_EMPLOYEES.fail
+    ])
+  },
+  /**
+   * Action for fetching employees
+   * @param commit
+   * @param params
+   */
+  addEmployee({ commit }, params) {
+    const slug = 'api.users.create'
+    console.log(params)
+    STATE_API({ slug, params }, commit, [
+      ADD_EMPLOYEES.initial,
+      ADD_EMPLOYEES.success,
+      ADD_EMPLOYEES.fail
     ])
   },
   addUser({ commit }, employee) {
