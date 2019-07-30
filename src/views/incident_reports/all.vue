@@ -58,10 +58,10 @@
         <template slot-scope="scope">
           <div class="td-image-name-container">
             <div v-if="false" class="td-name-avatar">
-              <span>TD</span>
+              <!-- <span>{{ getAvatarLetters(scope.row.issued_to.fname, scope.row.issued_to.lname) }}</span> -->
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image" />
-            <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
+            <img v-else :src="scope.row.issued_to.image" class="td-image" />
+            <div class="td-name">{{ scope.row.issued_to.full_name }}</div>
           </div>
         </template>
       </el-table-column>
@@ -69,20 +69,20 @@
         <template slot-scope="scope">
           <div class="td-image-name-container">
             <div v-if="false" class="td-name-avatar">
-              <span>TD</span>
+              <!-- <span>{{ getAvatarLetters(scope.row.issued_by.fname, scope.row.issued_by.lname) }}</span> -->
             </div>
-            <img v-else :src="scope.row.issuedby.image" class="td-image" />
-            <div class="td-name">{{ scope.row.issuedby.full_name }}</div>
+            <img v-else :src="scope.row.issued_by.image" class="td-image" />
+            <div class="td-name">{{ scope.row.issued_by.full_name }}</div>
           </div>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Sanction Type" width="220">
-        <template slot-scope="scope">{{ scope.row.sanction.type }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.sanction_type.type_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Sanction Level" width="220">
-        <template slot-scope="scope">{{ scope.row.sanction.level }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Status" width="220">
+      <!-- <el-table-column align="center" label="Status" width="220">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.response" type="success">cleared</el-tag>
           <el-tag v-else type="danger">uncleared</el-tag>
@@ -99,7 +99,7 @@
       </el-table-column>
       <el-table-column align="center" label="Date Filed" width="220">
         <template slot-scope="scope">{{ scope.row.date_filed }}</template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
   </div>
 </template>
@@ -108,7 +108,12 @@
 import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
-    return {};
+    return {
+      query: {
+        offset: 0,
+        limit: 10
+      }
+    };
   },
   computed: {
     ...mapGetters(["fetchingIncidentReports", "incidentReports", "irErrors"])

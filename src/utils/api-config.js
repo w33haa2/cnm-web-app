@@ -260,6 +260,10 @@ const api = {
             $requires: ['id'],
             $format: Template(() => `all_users/${id}`)
           },
+          allReports: {
+            $url: 'IR',
+            $method: 'GET',
+          },
           create: {
             $url: 'create',
             $method: 'POST'

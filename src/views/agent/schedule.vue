@@ -1,6 +1,11 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Agent Schedule</h4>
+    <h4 style="color:#646464">
+      Agent Schedule
+      <small
+        style="font-weight:lighter"
+      >{{"("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
+    </h4>
 
     <!-- Search and Pagination -->
     <!-- <el-row>
@@ -31,8 +36,60 @@
       <el-radio-button type="primary" label="Delete" />
     </el-radio-group>-->
     <!-- <el-button :plain="true" size="mini">Schedule</el-button> -->
+    <el-row>
+      <el-col :md="{span:12}">
+        <el-date-picker
+          size="mini"
+          v-model="week.start"
+          type="week"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+          :picker-options="{firstDayOfWeek:1}"
+          @change="weekChange"
+          :clearable="false"
+        ></el-date-picker>
+      </el-col>
+      <el-col :md="{span:12}">
+        <div style="float:right">
+          <el-select size="mini" v-model="filter.by">
+            <el-option value="all" label="All" />
+            <el-option value="team_leader" label="Team Leader" />
+            <el-option value="operations_manager" label="Operations Manager" />
+          </el-select>
+          <el-select size="mini" :disabled="filter.by=='all'">
+            <el-option
+              v-for="(item,index) in filter.options"
+              :key="index"
+              :value="item.id"
+              :label="item.full_name"
+            />
+          </el-select>
+        </div>
+      </el-col>
+    </el-row>
 
-    <el-date-picker v-model="week" type="week" format="yyyy-MM-dd" value-format="yyyy-MM-dd" :picker-options="{firstDayOfWeek:1}"></el-date-picker>
+    <el-row style="margin-top:10px;">
+      <el-col :md="{span:12}">
+        <el-button size="mini">Add Schedule</el-button>
+      </el-col>
+      <el-col :md="{span:12}">
+        <!-- <div style="float:right">
+          <el-select size="mini" v-model="filter.by">
+            <el-option value="all" label="All" />
+            <el-option value="team_leader" label="Team Leader" />
+            <el-option value="operations_manager" label="Operations Manager" />
+          </el-select>
+          <el-select size="mini" :disabled="filter.by=='all'">
+            <el-option
+              v-for="(item,index) in filter.options"
+              :key="index"
+              :value="item.id"
+              :label="item.full_name"
+            />
+          </el-select>
+        </div>-->
+      </el-col>
+    </el-row>
 
     <el-row style="margin-top:10px;">
       <!-- CALENDAR VIEW -->
@@ -101,7 +158,7 @@
               <span>{{ tableHeader[0].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-                <el-tag type="success">PRESENT</el-tag>
+              <el-tag type="success">PRESENT</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center">
@@ -110,7 +167,7 @@
               <span>{{ tableHeader[1].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-                <el-tag type="danger">NCNS</el-tag>
+              <el-tag type="danger">NCNS</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center">
@@ -143,10 +200,10 @@
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
               <h4>{{ tableHeader[3].day }}</h4>
-                <span>{{ tableHeader[3].date1 }}</span>
+              <span>{{ tableHeader[3].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-                <el-tag type="info">ABSENT</el-tag>
+              <el-tag type="info" effect="dark">ABSENT</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center">
@@ -155,7 +212,7 @@
               <span>{{ tableHeader[4].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <span class></span>
+              <el-tag type="info">OFF</el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center">
@@ -179,12 +236,21 @@
         </el-table>
       </el-col>
     </el-row>
-  </div>
-</template>
-          </el-table-column>
-        </el-table>
-      </el-col>
-    </el-row>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="form.addSchedule.show"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      title="Add Schedule"
+      width="30%"
+    >
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -195,15 +261,31 @@ const moment = extendMoment(Moment);
 export default {
   components: {},
   mounted() {
-    this.week = moment()
-      .startOf("isoweek")
-      .format("YYYY-MM-DD");
-    this.generateHeader();
+    this.weekChange(
+      moment()
+        .startOf("isoweek")
+        .format("YYYY-MM-DD")
+    );
   },
   data() {
     return {
-      week: null,
-      fetchData:[],
+      form: {
+        addSchedule: {
+          show: true,
+          model:{
+
+          }
+        }
+      },
+      filter: {
+        by: "all",
+        options: []
+      },
+      week: {
+        start: null,
+        end: null
+      },
+      fetchData: [],
       tableHeader: [],
       tableData: [
         {
@@ -271,18 +353,21 @@ export default {
       }
     };
   },
-  watch: {
-    week(v) {
-      this.generateHeader();
-    }
-  },
+  watch: {},
   methods: {
-    generateHeader() {
-      let start = moment(this.week).startOf("isoweek").format("YYYY-MM-DD"),
-        end = moment(this.week)
-          .add(6, "days")
+    weekChange(e) {
+      let start = moment(e)
+          .startOf("isoweek")
           .format("YYYY-MM-DD"),
-        range = moment.range(start, end),
+        end = moment(e)
+          .endOf("isoweek")
+          .format("YYYY-MM-DD");
+      this.week.start = start;
+      this.week.end = end;
+      this.generateHeader(start, end);
+    },
+    generateHeader(start, end) {
+      let range = moment.range(start, end),
         dates = Array.from(range.by("day")).map(m => m.format("YYYY-MM-DD"));
 
       this.tableHeader = dates.map(d => ({
@@ -291,8 +376,8 @@ export default {
         date1: moment(d).format("MMM Do")
       }));
     },
-    plotSchedulePerDay(schedules,date){
-      let schedule = schedules.filter(i=> i.schedule.start_date == date);
+    plotSchedulePerDay(schedules, date) {
+      let schedule = schedules.filter(i => i.schedule.start_date == date);
       return schedule;
     }
   }
