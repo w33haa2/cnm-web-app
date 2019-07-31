@@ -1,9 +1,9 @@
-import { STATE_API } from "@/utils/api/api-helper";
-import { generateMutationTypes } from "@/utils/api/state-mutation";
+import { STATE_API } from '@/utils/api/api-helper'
+import { generateMutationTypes } from '@/utils/api/state-mutation'
 const FETCH_SANCTION_TYPES = generateMutationTypes(
-  "sanction_types",
-  "FETCH_SANCTION_TYPES"
-);
+  'sanction_types',
+  'FETCH_SANCTION_TYPES'
+)
 
 /**
  * State
@@ -16,8 +16,9 @@ const state = {
     fail: false
   },
   sanction_types: [],
+  sanctionTypeTotal: 0,
   errors: null
-};
+}
 
 /**
  * Mutators
@@ -32,7 +33,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    };
+    }
   },
   /**
    * Commits success state for fetching sanction types
@@ -43,8 +44,10 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    };
-    state.sanction_types = payload.meta;
+    }
+    state.sanction_types = payload.meta
+    console.log(state.sanction_types)
+    state.sanctionTypeTotal = payload.meta.count
   },
   /**
    * Commits fail state for fetching sanction types
@@ -55,10 +58,10 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    };
-    state.errors = payload.response.data.title;
+    }
+    state.errors = payload.response.data.title
   }
-};
+}
 
 const actions = {
   /**
@@ -67,17 +70,17 @@ const actions = {
    * @param params
    */
   fetchSanctionTypes({ commit }) {
-    const slug = "api.sanction_types.fetchAll";
+    const slug = 'api.sanction_types.fetchAll'
     STATE_API({ slug }, commit, [
       FETCH_SANCTION_TYPES.initial,
       FETCH_SANCTION_TYPES.success,
       FETCH_SANCTION_TYPES.fail
-    ]);
+    ])
   }
-};
+}
 
 export default {
   state,
   mutations,
   actions
-};
+}

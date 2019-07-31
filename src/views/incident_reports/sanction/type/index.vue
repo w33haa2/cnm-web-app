@@ -22,7 +22,7 @@
       </el-col>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-pagination
-          :page-sizes="[25, 50, 100]"
+          :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
           :total="25"
@@ -33,7 +33,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="sanctionTypes.options" style="width: 100%;margin-top:30px;">
+    <el-table v-loading="fetchSanctionTypeState.initial" :data="sanctionTypes.options" style="width: 100%;margin-top:30px;">
       <el-table-column align="center" label="Type Number">
         <template slot-scope="scope">{{ scope.row.type_number }}</template>
       </el-table-column>
@@ -82,61 +82,61 @@
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini">Confirm</el-button>
+        <el-button size="mini" @click="cancelForm">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from 'vuex'
 export default {
-  name: "Type",
+  name: 'Type',
   data() {
     return {
       modal_show: false,
       form: {
-        action: "Create",
+        action: 'Create',
         // input models
         level_number: null,
         level_description: null
       }
-    };
+    }
   },
   computed: {
-    ...mapGetters(["sanctionTypes"])
+    ...mapGetters(['sanctionTypes', 'fetchSanctionTypeState'])
   },
   mounted() {
-    this.fetchSanctionTypes();
+    this.fetchSanctionTypes()
   },
   methods: {
-    ...mapActions(["fetchSanctionTypes"]),
+    ...mapActions(['fetchSanctionTypes']),
     updateRow(row) {
-      this.form.action = "Update";
-      this.form.type_number = row.type_number;
-      this.form.type_description = row.type_description;
-      this.modal_show = true;
+      this.form.action = 'Update'
+      this.form.type_number = row.type_number
+      this.form.type_description = row.type_description
+      this.modal_show = true
     },
     resetForm() {
-      this.form.action = "Create";
-      this.form.type_number = null;
-      this.form.type_description = null;
+      this.form.action = 'Create'
+      this.form.type_number = null
+      this.form.type_description = null
     },
     cancelForm() {
-      this.resetForm();
-      this.modal_show = false;
+      this.resetForm()
+      this.modal_show = false
     },
     submitForm() {
       // submit action
-      if (this.form.action == "Create") {
+      if (this.form.action == 'Create') {
         // create
       } else {
         // update
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

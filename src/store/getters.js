@@ -66,8 +66,8 @@ const getters = {
   // =============== end data
 
   // =============== start state
-  fetchSanctionLevelState: state =>
-    state.sanction_level.fetchingSanctionLevelState,
+  fetchSanctionLevelState: state => state.sanction_level.fetchingSanctionLevelState,
+  sanctionTypeTotal: state => state.sanction_level.sanctionTypeTotal,
   fetchSanctionTypeState: state => state.sanction_type.fetchingSanctionTypeState
   // =============== end state
   // END
