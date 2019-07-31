@@ -123,7 +123,7 @@
             filterable
             remote
             reserve-keyword
-            placeholder="Multiselect..."
+            placeholder="Employees..."
             :remote-method="remoteMethod"
             :loading="loading"
           >
@@ -263,6 +263,19 @@ export default {
   },
   methods: {
     ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'fetchStatusList', 'fetchRSEmployees']),
+    tableSizeChange(value) {
+      this.query.limit = value
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
+    tablePageChange(value) {
+      this.query.offset = value - 1
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
+    submitForm() {
+      console.log(this.change_status.employees)
+    },
     changeStatus() {
       this.change_status.dialog = true
     },

@@ -63,12 +63,14 @@ const getters = {
   // =============== start data
   sanctionLevels: state => state.sanction_level.sanction_levels,
   sanctionTypes: state => state.sanction_type.sanction_types,
+  sanctionTypeErrors: state => state.sanction_type.sanctionTypeErrors,
   // =============== end data
 
   // =============== start state
   fetchSanctionLevelState: state => state.sanction_level.fetchingSanctionLevelState,
-  sanctionTypeTotal: state => state.sanction_level.sanctionTypeTotal,
-  fetchSanctionTypeState: state => state.sanction_type.fetchingSanctionTypeState
+  fetchSanctionTypeState: state => state.sanction_type.fetchingSanctionTypeState,
+  createSanctionTypeState: state => state.sanction_type.createSanctionTypeState,
+  updateSanctionTypeState: state => state.sanction_type.updateSanctionTypeState
   // =============== end state
   // END
   // store/modules/sanction

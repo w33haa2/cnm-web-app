@@ -262,7 +262,7 @@ const api = {
           },
           allReports: {
             $url: 'IR',
-            $method: 'GET',
+            $method: 'GET'
           },
           create: {
             $url: 'create',
@@ -325,6 +325,10 @@ const api = {
           },
           create: {
             $url: 'create',
+            $method: 'POST'
+          },
+          bulk_change_status: {
+            $url: 'bulk_change_status',
             $method: 'POST'
           },
           // update: {
@@ -409,22 +413,26 @@ const api = {
 
         // region sanction types
         sanction_types: {
-          $prefix: 'sanction_type/sanction_types',
+          $prefix: 'sanction_type',
 
           fetchAll: {
             $url: '',
             $method: 'GET'
+          },
+          fetch_sanction_types: {
+            $url: 'sanction_types',
+            $method: 'GET'
+          },
+          create: {
+            $url: 'create',
+            $method: 'POST'
+          },
+          update: {
+            $url: 'update',
+            $method: 'POST',
+            $requires: ['id'],
+            $format: Template(() => `update/${id}`)
           }
-          // create: {
-          //   $url: 'create',
-          //   $method: 'POST'
-          // },
-          // update: {
-          //   $url: 'update',
-          //   $method: 'POST',
-          //   $requires: ['request_schedule_id'],
-          //   $format: Template(() => `update/${request_schedule_id}`)
-          // },
           // delete: {
           //   $url: "delete",
           //   $method: "POST",
