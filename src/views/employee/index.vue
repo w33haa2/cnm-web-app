@@ -262,20 +262,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'fetchStatusList', 'fetchRSEmployees']),
-    tableSizeChange(value) {
-      this.query.limit = value
-      const data = this.query
-      this.fetchEmployees({ data })
-    },
-    tablePageChange(value) {
-      this.query.offset = value - 1
-      const data = this.query
-      this.fetchEmployees({ data })
-    },
-    submitForm() {
-      console.log(this.change_status.employees)
-    },
+    ...mapActions([
+      'fetchUsers',
+      'fetchPositions',
+      'fetchEmployees',
+      'fetchStatusList',
+      'fetchRSEmployees'
+    ]),
     changeStatus() {
       this.change_status.dialog = true
     },
@@ -334,6 +327,17 @@ export default {
       this.form.toggle = v
     },
     refreshTable() {
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
+    tableSizeChange(value) {
+      this.query.limit = value
+      this.query.offset = 0
+      const data = this.query
+      this.fetchEmployees({ data })
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit
       const data = this.query
       this.fetchEmployees({ data })
     },

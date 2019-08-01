@@ -262,7 +262,7 @@ const mutations = {
       fail: false
     }
     state.employeesData = payload.meta.metadata
-    state.employeesTotal = payload.meta.count
+    // state.employeesTotal = payload.meta.count
   },
   /**
    * Commits fail state for fetching employees

@@ -11,6 +11,7 @@ const getters = {
   roles: state => state.user.roles,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
+
   // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
   creatingIncidentReports: state => state.incident_report.creatingIRState,
@@ -21,6 +22,7 @@ const getters = {
   incidentReports: state => state.incident_report.reports,
   incidentReportsTotal: state => state.incident_report.reports_total,
   irErrors: state => state.incident_report.errors,
+
   // employee module
   employees: state => state.employee.employees,
   rs_employees: state => state.employee.rs_employeesData,
@@ -38,29 +40,16 @@ const getters = {
   allPosition: state => state.employee.accesslevels,
   formResponse: state => state.employee.form_request_response,
 
-  // ================================================================
-  // list of state from store/modules/user
-  // START
-  // =============== start data
+  // user module
   position: state => state.user.userDetails.position,
   statusList: state => state.user.data.statusList,
   statusListCount: state => state.user.count.statusList,
   potentialHead: state => state.user.data.potentialHead,
-  // =============== end data
-
-  // =============== start state
   loginState: state => state.user.loggingInState,
   fetchStateStatusList: state => state.user.fetchState.statusList,
   fetchStatePotentialHead: state => state.user.fetchState.potentialHead,
-  // =============== end state
-  // END
-  // store/modules/user
-  // =================================================================
 
-  // ================================================================
-  // list of state from store/modules/sanction
-  // START
-  // =============== start data
+  // sanction level module
   sanctionLevels: state => state.sanction_level.sanction_levels,
   sanctionTypes: state => state.sanction_type.sanction_types,
   sanctionTypeErrors: state => state.sanction_type.sanctionTypeErrors,
@@ -77,3 +66,14 @@ const getters = {
   // =================================================================
 }
 export default getters
+
+  // sanction type module
+  sanctionTypes: state => state.sanction_type.sanction_types,
+  fetchSanctionTypeState: state =>
+    state.sanction_type.fetchingSanctionTypeState,
+
+  // schedule_work_report module
+  agentsWorkReports: state => state.schedule_work_report.data,
+  agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState
+};
+export default getters;

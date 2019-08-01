@@ -1,5 +1,5 @@
 <template>
-  <el-table v-loading="employeeFetchState.initial" :data="tableData" style="width: 100%;">
+  <el-table :data="tableData" style="width: 100%;">
     <!-- <el-table-column type="selection" width="55" fixed /> -->
     <el-table-column label="CNM ID" fixed>
       <template slot-scope="{row}">
@@ -22,19 +22,17 @@
             <div
               style="align-self:center;width:100%;text-align:center;"
               class="text-point-eight-em"
-            >{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</div>
+            >{{ getAvatarLetters(scope.row.lastname,scope.row.firstname) }}</div>
           </div>
           <span>
-            <el-tag :type="scope.row.status=='ACTIVE'?'success':'danger'">
+            <el-tag :type="scope.row.status.toLowerCase()=='active'?'success':'danger'">
               <el-dropdown @command="handleCommand">
                 <span class="el-dropdown-link">
                   {{ scope.row.full_name }}
                   <i class="el-icon-arrow-down el-icon--right" />
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item
-                    :command="'edit:'+scope.row.id"
-                  >Update</el-dropdown-item>
+                  <el-dropdown-item :command="'edit:'+scope.row.id">Update</el-dropdown-item>
                   <!-- <el-dropdown-item>Delete</el-dropdown-item> -->
                 </el-dropdown-menu>
               </el-dropdown>
@@ -58,21 +56,16 @@
         <span class>{{ row.email }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Supervisor" width="200">
-      <template slot-scope="{row}">
-        <span class>{{ row.head_name }}</span>
-      </template>
-    </el-table-column>
     <el-table-column label="Status" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.status }}</span>
+        <span class>{{ row.status.toUpperCase() }}</span>
       </template>
     </el-table-column>
     <el-table-column label="type" width="200">
       <template slot-scope="{row}">
         <el-tag
-          :type="row.status=='ACTIVE'?'success':'danger'"
-        >{{ row.type != '' ? row.type : 'N/A' }}</el-tag>
+          :type="row.status.toLowerCase()=='active'?'success':'danger'"
+        >{{ row.type != '' ? row.type.toUpperCase() : 'N/A' }}</el-tag>
       </template>
     </el-table-column>
     <el-table-column label="Contract" width="200">
@@ -104,25 +97,25 @@
       <template slot-scope="{row}">
         <span class>{{ row.separation_date }}</span>
       </template>
-    </el-table-column>
+    </el-table-column>-->
     <el-table-column label="SSS #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits[0].id_number }}</span>
+        <span class>{{ row.benefits?row.benefits[0].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="Philhealth #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits[1].id_number }}</span>
+        <span class>{{ row.benefits?row.benefits[1].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="PagIbig #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits[2].id_number }}</span>
+        <span class>{{ row.benefits?row.benefits[2].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="TIN #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits[3].id_number }}</span>
+        <span class>{{ row.benefits?row.benefits[3].id_number:"" }}</span>
       </template>
     </el-table-column>
   </el-table>

@@ -1,7 +1,7 @@
 <template>
   <div class="user-activity">
 
-    <el-row>
+    <!-- <el-row>
       <el-col :md="{span:12}">
         <el-input size="mini" placeholder="Search..."/>
       </el-col>
@@ -19,7 +19,7 @@
         @current-change="tablePageChange"
       />
       </el-col>
-    </el-row>
+    </el-row> -->
     <el-table :data="tableData" style="width: 100%;margin-top:10px;">
       <el-table-column label="Employee" min-width="450" prop="full_name" fixed>
         <template slot="header">
@@ -29,7 +29,7 @@
         </template>
         <template slot-scope="scope">
           <div class="user-block">
-            <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+            <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
             <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
               <div
                 style="align-self:center;width:100%;text-align:center;"
@@ -63,53 +63,51 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-import axios from "axios"
+import { mapActions, mapGetters } from 'vuex'
+import axios from 'axios'
 export default {
-  props: ["user"],
+  props: ['user'],
   data() {
     return {
       tableData: [],
-      table_config:{
-        page:1,
-        display_size:10,
-        total:0,
+      table_config: {
+        page: 1,
+        display_size: 10,
+        total: 0
       },
-      query:{
-        id:this.$route.params.id,
-        limit:10,
-        offset:0,
+      query: {
+        id: this.$route.params.id
       }
-    };
+    }
   },
-  watch:{
-    comrades(v){
+  watch: {
+    comrades(v) {
       this.tableData = v
     },
-    comradesTotal(v){
+    comradesTotal(v) {
       this.table_config.total = v
     }
   },
   computed: {
-    ...mapGetters(["token","comrades","comradesTotal"])
+    ...mapGetters(['token', 'comrades', 'comradesTotal'])
   },
-  mounted(){
+  mounted() {
     this.fetchComrades({ id: this.$route.params.id })
   },
-  methods:{
-    ...mapActions(["fetchComrades"]),
+  methods: {
+    ...mapActions(['fetchComrades']),
     tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      this.fetchComrades( data );
+      this.query.limit = value
+      const data = this.query
+      this.fetchComrades(data)
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchComrades( data );
-    },
+      this.query.offset = (value - 1) * this.query.limit
+      const data = this.query
+      this.fetchComrades(data)
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -153,7 +153,7 @@ const actions = {
    * @param params
    */
   fetchSanctionTypes({ commit }, params) {
-    const slug = 'api.sanction_types.fetch_sanction_types'
+    const slug = 'api.sanction_types.fetchAll'
     STATE_API({ slug, params }, commit, [
       FETCH_SANCTION_TYPES.initial,
       FETCH_SANCTION_TYPES.success,

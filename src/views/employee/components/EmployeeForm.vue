@@ -127,6 +127,7 @@
                   type="date"
                   size="mini"
                   format="MM/dd/yyyy"
+                  value-format="MM/dd/yyyy"
                   style="width:100%;margin-top:3px;"
                   placeholder="Select date.."
                 />
@@ -209,6 +210,7 @@
                   v-model="form.employee.birthdate"
                   type="date"
                   format="MM/dd/yyyy"
+                  value-format="MM/dd/yyyy"
                   size="mini"
                   style="width:100%;margin-top:3px;"
                   placeholder="Select date.."
@@ -314,6 +316,8 @@ export default {
     data(v) {
       if (v.action == 'Update') {
         this.fillUpdateForm(v.data)
+      } else if (v.action == 'Create') {
+        this.clearForm()
       }
     },
     fetchStateStatusList({ initial, success, fail }) {
@@ -390,10 +394,10 @@ export default {
     //   this.form.employee.parent_id = null
     //   this.cascadeSelectHead()
     // },
-    'form.employee.firstname': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
-    'form.employee.middlename': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
-    'form.employee.lastname': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
-    'form.employee.suffix': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
+    'form.employee.firstname': function() { this.processExcelHash() },
+    'form.employee.middlename': function() { this.processExcelHash() },
+    'form.employee.lastname': function() { this.processExcelHash() },
+    'form.employee.suffix': function() { this.processExcelHash() },
     formResponse: function() {
       const response = this.formResponse
       // if (response.status == 422) {
@@ -415,6 +419,7 @@ export default {
       //   }
       // } else
       if (response.status == 500) {
+        console.log(response)
         if (response.data.title == 'Data Validation Error.') {
           const errors = Object.keys(response.data.meta.errors)
           errors.forEach((v, i) => {
@@ -467,6 +472,13 @@ export default {
     this.options.position = position
   },
   methods: {
+    processExcelHash() {
+      const fname = this.form.employee.firstname ? this.form.employee.firstname : ''
+      const mname = this.form.employee.middlename ? this.form.employee.middlename : ''
+      const lname = this.form.employee.lastname ? this.form.employee.lastname : ''
+      const sname = this.form.employee.suffix ? this.form.employee.suffix : ''
+      this.form.employee.excel_hash = (fname + mname + lname + sname).replace(' ', '').toLowerCase()
+    },
     fillUpdateForm(data) {
       this.vueCam.img = data.image ? data.image : 'default.gif'
 
@@ -535,7 +547,6 @@ export default {
       const imageName = date + '.' + text + '.' + ext
       // call method that creates a blob from dataUri
       this.form.employee.image = new File([imageBlob], imageName, { type: conType })
-      // this.$emit("image", imageFile);
     },
     onStarted(stream) {
       this.vueCam.autoplay = true
@@ -543,8 +554,6 @@ export default {
       this.vueCam.buttons.capture = false
     },
     onStopped(stream) {
-      // this.vueCam.autoplay = false;
-      // this.vueCam.buttons.stop = false;
       this.camera_dialog = false
     },
     onStop() {
@@ -608,7 +617,7 @@ export default {
         this.addUser(data)
       } else {
         this.clearFormErrors()
-        this.form.employee.id = this.data.data.id
+        this.form.employee.id = this.data.data.uid
         const data = this.toFormData(this.form.employee)
         this.updateUser(data)
       }
@@ -633,10 +642,12 @@ export default {
       keys.forEach((v, i) => {
         this.form.employee[v] = null
       })
+      const status = this.statusList.filter(i => i.id == 1)[0]
       this.form.employee.gender = 'Male'
       this.form.employee.status_id = 1
+      this.form.employee.status = status.status
+      this.form.employee.type = status.type
       this.form.employee.access_id = 1
-      this.form.employee.type = null
       this.form.employee.benefits = []
       this.form.employee.image = null
       this.vueCam.img = 'default.gif'

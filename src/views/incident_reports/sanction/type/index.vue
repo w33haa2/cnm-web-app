@@ -10,18 +10,18 @@
 
     <!-- Search and Pagination -->
     <el-row style="width: 100%;margin-top:30px;">
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
+      <el-col :md="{ span:8 }">
         <el-input v-model="searchQuery" placeholder="Search..." size="mini">
           <el-button slot="append">
             <i class="el-icon-search" />
           </el-button>
         </el-input>
       </el-col>
-
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
+      <el-col :md="{ span:16 }">
         <el-pagination
+          style="float:right"
           :page-sizes="[10, 25, 50]"
-          :page-size="100"
+          :page-size="query.limit"
           layout="total, sizes, prev, pager, next"
           :total="sanctionTypes.count"
           background
@@ -33,7 +33,11 @@
     </el-row>
 
     <!-- Table -->
-    <el-table v-loading="fetchSanctionTypeState.initial" :data="sanctionTypes.options" style="width: 100%;margin-top:30px;">
+    <el-table
+      v-loading="fetchSanctionTypeState.initial"
+      :data="sanctionTypes.options"
+      style="width: 100%;margin-top:30px;"
+    >
       <el-table-column align="center" label="Type Number">
         <template slot-scope="scope">{{ scope.row.type_number }}</template>
       </el-table-column>
@@ -83,7 +87,12 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini" :disabled="createSanctionTypeState.initial" @click="submitForm">Confirm</el-button>
+        <el-button
+          type="danger"
+          size="mini"
+          :disabled="createSanctionTypeState.initial"
+          @click="submitForm"
+        >Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -101,23 +110,36 @@ export default {
       form: {
         action: 'Create',
         // input models
-        level_number: null,
-        level_description: null
+        type_number: null,
+        type_description: null
       },
       query: {
         limit: 10,
         offset: 0
+      },
+      table_config: {
+        page: 1
       }
     }
   },
   computed: {
-    ...mapGetters(['sanctionTypes', 'fetchSanctionTypeState', 'sanctionTypeTotal', 'createSanctionTypeState', 'updateSanctionTypeState', 'sanctionTypeErrors'])
+    ...mapGetters([
+      'sanctionTypes',
+      'fetchSanctionTypeState',
+      'sanctionTypeTotal',
+      'createSanctionTypeState',
+      'updateSanctionTypeState',
+      'sanctionTypeErrors'
+    ])
   },
   watch: {
     createSanctionTypeState({ initial, success, fail }) {
       if (success) {
         this.fetchSanctionTypes(this.query)
-        Message.success({ message: 'Successfully defined Sanction Type', duration: '2500' })
+        Message.success({
+          message: 'Successfully defined Sanction Type',
+          duration: '2500'
+        })
         this.resetForm()
         this.modal_show = false
       } else if (fail) {
@@ -127,7 +149,10 @@ export default {
     updateSanctionTypeState({ initial, success, fail }) {
       if (success) {
         this.fetchSanctionTypes(this.query)
-        Message.success({ message: 'Successfully updated Sanction Type', duration: '2500' })
+        Message.success({
+          message: 'Successfully updated Sanction Type',
+          duration: '2500'
+        })
         this.resetForm()
         this.modal_show = false
       } else if (fail) {
@@ -150,13 +175,19 @@ export default {
     this.fetchSanctionTypes(this.query)
   },
   methods: {
-    ...mapActions(['fetchSanctionTypes', 'createSanctionTypes', 'updateSanctionTypes']),
+    ...mapActions([
+      'fetchSanctionTypes',
+      'createSanctionTypes',
+      'updateSanctionTypes'
+    ]),
     tableSizeChange(value) {
       this.query.limit = value
+      this.query.offset = 0
       this.fetchSanctionTypes(this.query)
     },
     tablePageChange(value) {
-      this.query.offset = value - 1
+      this.query.offset = (value - 1) * this.query.limit
+      const data = this.query
       this.fetchSanctionTypes(this.query)
     },
     updateRow(row) {

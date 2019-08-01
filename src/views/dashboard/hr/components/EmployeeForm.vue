@@ -276,13 +276,14 @@ export default {
     },
     storeEmployee: async function() {
       this.clearFormErrors()
-      const data = this.toFormData(this.form.employee)
-      // console.log(data.values)
-      this.form.employee.firstname = 'Emman ' + Math.random().toString(36).substr(2, 5)
-      this.form.employee.email = 'jeng@ssws.' + Math.random().toString(36).substr(2, 5)
-      this.form.employee.excel_hash = 'jeng' + Math.random().toString(36).substr(2, 5)
-      // this.form.employee.firstname = 'Emman '+Math.random().toString(36).substr(2, 5);
-      this.addUser(data)
+      if (this.data.action.toLowerCase() === 'create') {
+        const data = this.toFormData(this.form.employee)
+        this.addUser(data)
+      } else {
+        this.form.employee.id = this.data.data.id
+        const data = this.toFormData(this.form.employee)
+        this.updateUser(data)
+      }
     },
     cascadeSelectHead() {
       const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent

@@ -4,51 +4,11 @@
       Agent Schedule
       <small
         style="font-weight:lighter"
-      >{{"("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
+      >{{ "("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
     </h4>
 
-    <!-- Search and Pagination -->
     <!-- <el-row>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-pagination
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next"
-          :total="400"
-          background
-          small
-        ></el-pagination>
-      </el-col>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>
-    </el-row>-->
-    <!-- <el-radio-group v-model="action.type" size="mini">
-      <el-radio-button type="primary" label="Create" />
-      <el-radio-button type="primary" label="Update" />
-      <el-radio-button type="primary" label="Delete" />
-    </el-radio-group>-->
-    <!-- <el-button :plain="true" size="mini">Schedule</el-button> -->
-    <el-row>
-      <el-col :md="{span:12}">
-        <el-date-picker
-          size="mini"
-          v-model="week.start"
-          type="week"
-          format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
-          :picker-options="{firstDayOfWeek:1}"
-          @change="weekChange"
-          :clearable="false"
-        ></el-date-picker>
-      </el-col>
+      <el-col :md="{span:12}"></el-col>
       <el-col :md="{span:12}">
         <div style="float:right">
           <el-select size="mini" v-model="filter.by">
@@ -66,13 +26,36 @@
           </el-select>
         </div>
       </el-col>
-    </el-row>
+    </el-row>-->
 
     <el-row style="margin-top:10px;">
       <el-col :md="{span:12}">
-        <el-button size="mini">Add Schedule</el-button>
+        <el-date-picker
+          v-model="week.start"
+          size="mini"
+          type="week"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+          :picker-options="{firstDayOfWeek:1}"
+          :clearable="false"
+          @change="weekChange"
+        />
       </el-col>
       <el-col :md="{span:12}">
+        <el-button size="mini">Add Schedule</el-button>
+        <el-button size="mini">Add Leave</el-button>
+        <el-dropdown>
+          <el-button type="success" :plain="true" size="mini">
+            Excel<i class="el-icon-arrow-down el-icon--right" />
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>Import Schedule</el-dropdown-item>
+            <el-dropdown-item>Export Week Report</el-dropdown-item>
+            <el-dropdown-item>Export Month Report</el-dropdown-item>
+            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
+            <el-dropdown-item>Action 4</el-dropdown-item>-->
+          </el-dropdown-menu>
+        </el-dropdown>
         <!-- <div style="float:right">
           <el-select size="mini" v-model="filter.by">
             <el-option value="all" label="All" />
@@ -91,6 +74,25 @@
       </el-col>
     </el-row>
 
+    <el-row>
+      <el-col :md="{span:8}" style="margin-top:20px;">
+        <el-input v-model="agent_search" size="mini" placeholder="Agent Search" />
+      </el-col>
+      <el-col :md="{span:16}" style="margin-top:20px;">
+        <el-pagination
+          style="float:right"
+          :page-sizes="[10, 25, 50]"
+          :page-size="query.limit"
+          :current-page.sync="table_config.page"
+          layout="total, sizes, prev, pager, next"
+          :total="agentsWorkReports.count"
+          background
+          small
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
+        />
+      </el-col>
+    </el-row>
     <el-row style="margin-top:10px;">
       <!-- CALENDAR VIEW -->
 
@@ -126,7 +128,7 @@
       </el-col>-->
 
       <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
-        <el-table :data="tableData">
+        <el-table v-loading="agentsWorkReportsfetchState.initial" :data="tableData">
           <el-table-column label="Employee" min-width="300" prop="full_name" fixed>
             <template slot="header">
               <span style="float:left">
@@ -135,7 +137,7 @@
             </template>
             <template slot-scope="scope">
               <div class="user-block">
-                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
                 <div
                   v-else
                   class="img-circle text-muted"
@@ -144,7 +146,7 @@
                   <div
                     style="align-self:center;width:100%;text-align:center;"
                     class="text-point-eight-em"
-                  >{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</div>
+                  >{{ getAvatarLetters(scope.row.info.firstname,scope.row.info.lastname) }}</div>
                 </div>
                 <span>
                   <span class="el-dropdown-link" style="font-weight:600">{{ scope.row.full_name }}</span>
@@ -154,83 +156,121 @@
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[0].day }}</h4>
-              <span>{{ tableHeader[0].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[0].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+              >{{ tableHeader[0].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <el-tag type="success">PRESENT</el-tag>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)"
+                :date="tableHeader[0].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[1].day }}</h4>
-              <span>{{ tableHeader[1].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[1].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[1].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[1].date)?'today-header':'']"
+              >{{ tableHeader[1].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <el-tag type="danger">NCNS</el-tag>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)"
+                :date="tableHeader[1].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[2].day }}</h4>
-              <span>{{ tableHeader[2].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[2].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[2].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[2].date)?'today-header':'']"
+              >{{ tableHeader[2].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <el-popover width="300" trigger="click">
-                <el-row style="padding:3px;">
-                  <el-col :md="{span:8}" style="font-weight:600">Name</el-col>
-                  <el-col :md="{span:16}">Emmanuel JamesLajom</el-col>
-                </el-row>
-                <el-row style="padding:3px;">
-                  <el-col :md="{span:8}" style="font-weight:600">Schedule</el-col>
-                  <el-col :md="{span:16}">10:00AM to 10:00PM</el-col>
-                </el-row>
-                <el-row style="padding:3px;">
-                  <el-col :md="{span:8}" style="font-weight:600">Log</el-col>
-                  <el-col :md="{span:16}">10:00AM to 10:00PM</el-col>
-                </el-row>
-                <el-row style="padding:3px;">
-                  <el-col :md="{span:8}" style="font-weight:600">Attendance</el-col>
-                  <el-col :md="{span:16}">On Leave</el-col>
-                </el-row>
-                <el-tag type="warning" slot="reference">LEAVE</el-tag>
-              </el-popover>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)"
+                :date="tableHeader[2].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[3].day }}</h4>
-              <span>{{ tableHeader[3].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[3].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[3].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[3].date)?'today-header':'']"
+              >{{ tableHeader[3].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <el-tag type="info" effect="dark">ABSENT</el-tag>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)"
+                :date="tableHeader[3].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[4].day }}</h4>
-              <span>{{ tableHeader[4].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[4].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[4].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[4].date)?'today-header':'']"
+              >{{ tableHeader[4].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <el-tag type="info">OFF</el-tag>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)"
+                :date="tableHeader[4].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[5].day }}</h4>
-              <span>{{ tableHeader[5].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[5].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[5].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[5].date)?'today-header':'']"
+              >{{ tableHeader[5].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <span class></span>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)"
+                :date="tableHeader[5].date"
+              />
             </template>
           </el-table-column>
           <el-table-column align="center">
             <template slot="header" slot-scope="scope">
-              <h4>{{ tableHeader[6].day }}</h4>
-              <span>{{ tableHeader[6].date1 }}</span>
+              <h4
+                :class="[dateToday(tableHeader[6].date)?'today-header':'']"
+                style="margin-bottom:5px"
+              >{{ tableHeader[6].day }}</h4>
+              <span
+                :class="[dateToday(tableHeader[6].date)?'today-header':'']"
+              >{{ tableHeader[6].date1 }}</span>
             </template>
             <template slot-scope="{row}">
-              <span class></span>
+              <cell-content
+                :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)"
+                :date="tableHeader[6].date"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -255,30 +295,45 @@
 </template>
 
 <script>
-import Moment from "moment/moment";
-import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment);
+import { mapActions, mapGetters } from 'vuex'
+import Moment from 'moment/moment'
+import { extendMoment } from 'moment-range'
+const moment = extendMoment(Moment)
+// components
+import cellContent from './components/cellContent'
 export default {
-  components: {},
+  components: { cellContent },
+  computed: {
+    ...mapGetters(['agentsWorkReports', 'agentsWorkReportsfetchState'])
+  },
+  watch: {
+    agentsWorkReportsfetchState({ initial, success, fail }) {
+      if (success) {
+        this.tableData = this.agentsWorkReports.agent_schedules
+      }
+      if (fail) {
+        this.tableData = []
+      }
+    }
+  },
   mounted() {
     this.weekChange(
       moment()
-        .startOf("isoweek")
-        .format("YYYY-MM-DD")
-    );
+        // .subtract(7, "days")
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
+    )
   },
   data() {
     return {
       form: {
         addSchedule: {
-          show: true,
-          model:{
-
-          }
+          show: false,
+          model: {}
         }
       },
       filter: {
-        by: "all",
+        by: 'all',
         options: []
       },
       week: {
@@ -287,101 +342,90 @@ export default {
       },
       fetchData: [],
       tableHeader: [],
-      tableData: [
-        {
-          id: 1,
-          image: null,
-          full_name: "Emmanuel James Lajom",
-          fname: "Emmanuel",
-          lname: "Lajom",
-          schedule: [
-            {
-              id: 1,
-              title: "regularWork",
-              startDate: moment(),
-              endDate: moment().add(1, "days")
-            }
-          ]
-        },
-        {
-          id: 1,
-          image: null,
-          full_name: "Emmanuel James Lajom",
-          fname: "Emmanuel",
-          lname: "Lajom",
-          schedule: [
-            {
-              id: 1,
-              title: "regularWork",
-              startDate: moment(),
-              endDate: moment().add(1, "days")
-            }
-          ]
-        }
-      ],
-      // showDate: new Date(),
-      // radio1: null,
-      // value: new Date(),
-      // calendar: {
-      //   data: [
-      //     {
-      //       id: 1,
-      //       startDate: "2019-07-27 10:10:00",
-      //       endDate: "2019-07-28 10:10:00",
-      //       title: "regularWork",
-      //       classes: "regularWork"
-      //     },
-      //     {
-      //       id: 2,
-      //       startDate: "2019-07-27 10:10:00",
-      //       endDate: "2019-07-28 10:10:00",
-      //       title: "overTimeWork",
-      //       classes: "overTimeWork"
-      //     },
-      //     {
-      //       id: 3,
-      //       startDate: "2019-07-28 10:10:00",
-      //       endDate: "2019-07-29 10:10:00",
-      //       title: "overTimeWork",
-      //       classes: "overTimeWork"
-      //     }
-      //   ]
-      // },
+      tableData: [],
+      query: {
+        offset: 0,
+        limit: 10
+      },
+      table_config: {
+        page: 1
+      },
       action: {
-        type: "Create",
+        type: 'Create',
         selections: []
       }
-    };
+    }
   },
-  watch: {},
   methods: {
+    ...mapActions(['fetchAgentsWorkReports']),
     weekChange(e) {
-      let start = moment(e)
-          .startOf("isoweek")
-          .format("YYYY-MM-DD"),
-        end = moment(e)
-          .endOf("isoweek")
-          .format("YYYY-MM-DD");
-      this.week.start = start;
-      this.week.end = end;
-      this.generateHeader(start, end);
+      const start = moment(e)
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
+      const end = moment(e)
+        .endOf('isoweek')
+        .format('YYYY-MM-DD')
+      this.week.start = start
+      this.week.end = end
+      this.generateHeader(start, end)
     },
     generateHeader(start, end) {
-      let range = moment.range(start, end),
-        dates = Array.from(range.by("day")).map(m => m.format("YYYY-MM-DD"));
+      const range = moment.range(start, end)
+      const dates = Array.from(range.by('day')).map(m => m.format('YYYY-MM-DD'))
 
       this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
-      }));
+        day: moment(d).format('ddd'),
+        date: moment(d).format('YYYY-MM-DD'),
+        date1: moment(d).format('MMM Do')
+      }))
+      const data = {
+        limit: this.query.limit,
+        offset: this.query.offset,
+        start: this.week.start,
+        end: this.week.end
+      }
+      this.fetchAgentsWorkReports({ data })
+    },
+    tableSizeChange(value) {
+      this.query.limit = value
+      this.query.offset = 0
+      const data = {
+        limit: this.query.limit,
+        offset: this.query.offset,
+        start: this.week.start,
+        end: this.week.end
+      }
+      this.fetchAgentsWorkReports({ data })
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit
+      const data = {
+        limit: this.query.limit,
+        offset: this.query.offset,
+        start: this.week.start,
+        end: this.week.end
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     plotSchedulePerDay(schedules, date) {
-      let schedule = schedules.filter(i => i.schedule.start_date == date);
-      return schedule;
+      const schedule = schedules.filter(
+        i => moment(i.start_event).format('YYYY-MM-DD') == date
+      )[0]
+      // if (typeof schedule == "object") {
+      //   alert(schedule.start_event);
+      //   alert(date);
+      // }
+      return schedule
+    },
+    dateToday(date) {
+      if (moment(date).isSame(moment().format('YYYY-MM-DD'))) {
+        return true
+      } else {
+        return false
+      }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -450,5 +494,9 @@ export default {
     margin-left: 10px;
     // font-size: 0.8em;
   }
+}
+
+.today-header {
+  color: #86c5ff;
 }
 </style>

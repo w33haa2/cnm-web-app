@@ -10,25 +10,25 @@
 
     <!-- Search and Pagination -->
     <el-row style="width: 100%;margin-top:30px;">
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-pagination
-          :page-sizes="[25, 50, 100]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next"
-          :total="25"
-          background
-          small
-        />
-      </el-col>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>
+      <el-col :md="{ span:8 }">
+        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
           <el-button slot="append">
             <i class="el-icon-search" />
           </el-button>
         </el-input>
+      </el-col>
+      <el-col :md="{ span:16 }">
+        <el-pagination
+          style="float:right"
+          :page-sizes="[10, 25, 50]"
+          :page-size="query.limit"
+          layout="total, sizes, prev, pager, next"
+          :total="sanctionLevels.count"
+          background
+          small
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
+        />
       </el-col>
     </el-row>
 
@@ -82,61 +82,78 @@
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini">Confirm</el-button>
+        <el-button size="mini" @click="cancelForm">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from 'vuex'
 export default {
-  name: "Level",
+  name: 'Level',
   data() {
     return {
       modal_show: false,
       form: {
-        action: "Create",
+        action: 'Create',
         // input models
         level_number: null,
         level_description: null
+      },
+      query: {
+        offset: 0,
+        limit: 10
       }
-    };
+    }
   },
   mounted() {
-    this.fetchSanctionLevels();
+    const data = this.query
+    this.fetchSanctionLevels({ data })
   },
   computed: {
-    ...mapGetters(["sanctionLevels"])
+    ...mapGetters(['sanctionLevels'])
   },
   methods: {
-    ...mapActions(["fetchSanctionLevels"]),
+    ...mapActions(['fetchSanctionLevels']),
+
+    tableSizeChange(value) {
+      this.query.limit = value
+      this.query.offset = 0
+      const data = this.query
+      this.fetchSanctionLevels({ data })
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit
+      const data = this.query
+      this.fetchSanctionLevels({ data })
+    },
     updateRow(row) {
-      this.form.action = "Update";
-      this.form.level_number = row.level_number;
-      this.form.level_description = row.level_description;
-      this.modal_show = true;
+      this.form.action = 'Update'
+      this.form.level_number = row.level_number
+      this.form.level_description = row.level_description
+      this.modal_show = true
     },
     resetForm() {
-      this.form.action = "Create";
-      this.form.level_number = null;
-      this.form.level_description = null;
+      this.form.action = 'Create'
+      this.form.level_number = null
+      this.form.level_description = null
     },
     cancelForm() {
-      this.resetForm();
-      this.modal_show = false;
+      this.resetForm()
+      this.modal_show = false
     },
     submitForm() {
       // submit action
-      if (this.form.action == "Create") {
+      if (this.form.action == 'Create') {
         // create
       } else {
         // update
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
