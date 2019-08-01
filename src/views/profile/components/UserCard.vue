@@ -6,16 +6,16 @@
 
     <div class="user-profile">
       <div class="box-center">
-        <pan-thumb :image="user.image === null ? 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif' : user.image" :height="'100px'" :width="'100px'" :hoverable="false">
-
-          {{ user.position }}
-        </pan-thumb>
+        <pan-thumb
+          :image="user.image_url  ?  user.image_url : 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'"
+          :height="'100px'"
+          :width="'100px'"
+          :hoverable="false"
+        >{{ user.position }}</pan-thumb>
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.full_name }}</div>
-        <div
-          class="user-role text-center text-muted"
-        >{{ user.position | uppercaseFirst }}</div>
+        <div class="user-role text-center text-muted">{{ user.position | uppercaseFirst }}</div>
       </div>
     </div>
 
@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import PanThumb from '@/components/PanThumb'
+import PanThumb from "@/components/PanThumb";
 
 export default {
   components: { PanThumb },
@@ -64,15 +64,15 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: '',
-          email: '',
-          avatar: '',
-          roles: ''
-        }
+          name: "",
+          email: "",
+          avatar: "",
+          roles: ""
+        };
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

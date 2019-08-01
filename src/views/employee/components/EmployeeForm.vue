@@ -480,7 +480,7 @@ export default {
       this.form.employee.excel_hash = (fname + mname + lname + sname).replace(' ', '').toLowerCase()
     },
     fillUpdateForm(data) {
-      this.vueCam.img = data.image ? data.image : 'default.gif'
+      this.vueCam.img = data.image_url ? data.image_url : 'default.gif'
 
       this.form.employee = {
         image: null,
@@ -503,6 +503,7 @@ export default {
         access_id: data.access_id,
         parent_id: data.parent_id,
         email: data.email,
+        p_email: data.p_email,
         hired_date: data.hired_date,
         company_id: data.company_id,
         status_id: this.statusList.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,

@@ -1,6 +1,5 @@
 <template>
   <div class="user-activity">
-
     <!-- <el-row>
       <el-col :md="{span:12}">
         <el-input size="mini" placeholder="Search..."/>
@@ -19,7 +18,7 @@
         @current-change="tablePageChange"
       />
       </el-col>
-    </el-row> -->
+    </el-row>-->
     <el-table :data="tableData" style="width: 100%;margin-top:10px;">
       <el-table-column label="Employee" min-width="450" prop="full_name" fixed>
         <template slot="header">
@@ -29,17 +28,19 @@
         </template>
         <template slot-scope="scope">
           <div class="user-block">
-            <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
+            <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
             <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
               <div
                 style="align-self:center;width:100%;text-align:center;"
                 class="text-point-eight-em"
-              >{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</div>
+              >{{ getAvatarLetters(scope.row.firstname,scope.row.lastname) }}</div>
             </div>
             <div style="float:left;height:100%;">
               <div style="display:flex;height:100%;">
                 <router-link :to="'/profile/index/'+scope.row.id">
-                  <div style="align-self:center; margin-left:15px;font-size:14px;color:grey;font-weight:600;">{{ scope.row.full_name }}</div>
+                  <div
+                    style="align-self:center; margin-left:15px;font-size:14px;color:grey;font-weight:600;"
+                  >{{ scope.row.full_name }}</div>
                 </router-link>
               </div>
             </div>
@@ -54,8 +55,8 @@
       <el-table-column label="Status" width="200" align="center">
         <template slot-scope="{row}">
           <el-tag
-            :type="row.status == 'ACTIVE'?'success':'danger'"
-          >{{ row.status }}</el-tag>
+            :type="row.status.toLowerCase() == 'active'?'success':'danger'"
+          >{{ row.status.toUpperCase() }}</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -63,10 +64,10 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import axios from 'axios'
+import { mapActions, mapGetters } from "vuex";
+import axios from "axios";
 export default {
-  props: ['user'],
+  props: ["user"],
   data() {
     return {
       tableData: [],
@@ -78,36 +79,36 @@ export default {
       query: {
         id: this.$route.params.id
       }
-    }
+    };
   },
   watch: {
     comrades(v) {
-      this.tableData = v
+      this.tableData = v;
     },
     comradesTotal(v) {
-      this.table_config.total = v
+      this.table_config.total = v;
     }
   },
   computed: {
-    ...mapGetters(['token', 'comrades', 'comradesTotal'])
+    ...mapGetters(["token", "comrades", "comradesTotal"])
   },
   mounted() {
-    this.fetchComrades({ id: this.$route.params.id })
+    this.fetchComrades({ id: this.$route.params.id });
   },
   methods: {
-    ...mapActions(['fetchComrades']),
+    ...mapActions(["fetchComrades"]),
     tableSizeChange(value) {
-      this.query.limit = value
-      const data = this.query
-      this.fetchComrades(data)
+      this.query.limit = value;
+      const data = this.query;
+      this.fetchComrades(data);
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
-      const data = this.query
-      this.fetchComrades(data)
+      this.query.offset = (value - 1) * this.query.limit;
+      const data = this.query;
+      this.fetchComrades(data);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -4,13 +4,7 @@
     <div class="filter-container">
       <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col
-          :xs="{span: 24}"
-          :sm="{span: 24}"
-          :md="{span: 24}"
-          :lg="{span: 12}"
-          :xl="{span: 12}"
-        >
+        <el-col :md="{span: 24}">
           <el-button
             size="mini"
             @click="form.toggle = true, form.action_data={action:'Create',data:null}"
@@ -36,13 +30,7 @@
       />
       <!-- DISPLAY RECORDS & PAGINATION -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
-        <el-col
-          :xs="{span: 24}"
-          :sm="{span: 24}"
-          :md="{span: 12}"
-          :lg="{span: 12}"
-          :xl="{span: 12}"
-        >
+        <el-col :md="{span: 8}">
           <el-input v-model="searchQuery" placeholder="Search..." size="mini">
             <el-select
               slot="prepend"
@@ -62,13 +50,7 @@
             </el-button>
           </el-input>
         </el-col>
-        <el-col
-          :xs="{span: 24}"
-          :sm="{span: 24}"
-          :md="{span: 12}"
-          :lg="{span: 12}"
-          :xl="{span: 12}"
-        >
+        <el-col :md="{span: 16}">
           <el-pagination
             style="float:right"
             small
@@ -199,7 +181,7 @@ export default {
       },
       query: {
         limit: 10,
-        offset: 10
+        offset: 0
       },
       form: {
         toggle: false,
@@ -209,7 +191,7 @@ export default {
         }
       },
       change_status: {
-        dialog: true,
+        dialog: false,
         form: {
           employees: [],
           status_id: 1
