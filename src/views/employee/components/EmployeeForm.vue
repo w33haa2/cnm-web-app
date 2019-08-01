@@ -484,9 +484,9 @@ export default {
 
       this.form.employee = {
         image: null,
-        firstname: data.fname,
-        middlename: data.mname,
-        lastname: data.lname,
+        firstname: data.firstname,
+        middlename: data.middlename,
+        lastname: data.lastname,
         suffix: data.suffix,
         address: data.address,
         contact_number: data.contact,
@@ -617,7 +617,7 @@ export default {
         this.addUser(data)
       } else {
         this.clearFormErrors()
-        this.form.employee.id = this.data.data.uid
+        this.form.employee.id = this.data.data.id
         const data = this.toFormData(this.form.employee)
         this.updateUser(data)
       }

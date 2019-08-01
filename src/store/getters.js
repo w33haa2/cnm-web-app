@@ -56,21 +56,16 @@ const getters = {
   // =============== end data
 
   // =============== start state
-  fetchSanctionLevelState: state => state.sanction_level.fetchingSanctionLevelState,
-  fetchSanctionTypeState: state => state.sanction_type.fetchingSanctionTypeState,
+  fetchSanctionLevelState: state =>
+    state.sanction_level.fetchingSanctionLevelState,
+  fetchSanctionTypeState: state =>
+    state.sanction_type.fetchingSanctionTypeState,
   createSanctionTypeState: state => state.sanction_type.createSanctionTypeState,
-  updateSanctionTypeState: state => state.sanction_type.updateSanctionTypeState
+  updateSanctionTypeState: state => state.sanction_type.updateSanctionTypeState,
   // =============== end state
   // END
   // store/modules/sanction
   // =================================================================
-}
-export default getters
-
-  // sanction type module
-  sanctionTypes: state => state.sanction_type.sanction_types,
-  fetchSanctionTypeState: state =>
-    state.sanction_type.fetchingSanctionTypeState,
 
   // schedule_work_report module
   agentsWorkReports: state => state.schedule_work_report.data,

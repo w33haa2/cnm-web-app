@@ -260,8 +260,6 @@ const api = {
             $format: Template(() => `all_users/${id}`)
           },
           allReports: {
-            $url: 'IR',
-            $method: 'GET'
             $url: "IR",
             $method: "GET"
           },
@@ -329,8 +327,8 @@ const api = {
             $method: "POST"
           },
           bulk_change_status: {
-            $url: 'bulk_change_status',
-            $method: 'POST'
+            $url: "bulk_change_status",
+            $method: "POST"
           },
           // update: {
           //   $url: 'update',
@@ -377,7 +375,7 @@ const api = {
 
         // region sanction levels
         sanction_levels: {
-          $prefix: "sanction_level/sanction_levels",
+          $prefix: "sanction_level",
 
           fetchAll: {
             $url: "",
@@ -414,24 +412,24 @@ const api = {
 
         // region sanction types
         sanction_types: {
-          $prefix: 'sanction_type',
+          $prefix: "sanction_type",
 
           fetchAll: {
-            $url: '',
-            $method: 'GET'
+            $url: "",
+            $method: "GET"
           },
           fetch_sanction_types: {
-            $url: 'sanction_types',
-            $method: 'GET'
+            $url: "sanction_types",
+            $method: "GET"
           },
           create: {
-            $url: 'create',
-            $method: 'POST'
+            $url: "create",
+            $method: "POST"
           },
           update: {
-            $url: 'update',
-            $method: 'POST',
-            $requires: ['id'],
+            $url: "update",
+            $method: "POST",
+            $requires: ["id"],
             $format: Template(() => `update/${id}`)
           }
           // delete: {
