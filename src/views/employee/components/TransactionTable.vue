@@ -22,7 +22,7 @@
             <div
               style="align-self:center;width:100%;text-align:center;"
               class="text-point-eight-em"
-            >{{ getAvatarLetters(scope.row.lastname,scope.row.firstname) }}</div>
+            >{{ getAvatarLetters(scope.row.firstname,scope.row.lastname) }}</div>
           </div>
           <span>
             <el-tag :type="scope.row.status.toLowerCase()=='active'?'success':'danger'">

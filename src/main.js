@@ -47,7 +47,7 @@ Vue.config.productionTip = false;
 Vue.mixin({
   methods: {
     getAvatarLetters(fname, lname) {
-      return fname[0] + lname[0];
+      return fname[0].toUpperCase() + lname[0].toUpperCase();
     },
     formatDate(date, format, formatoutput) {
       return moment(date, format).format(formatoutput);

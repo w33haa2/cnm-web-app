@@ -237,19 +237,19 @@
             <el-row>
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:6}" :xl="{span:6}" style="padding:5px">
                 <span>SSS</span>
-                <el-input v-model="form.employee.benefits[0]" size="mini" style="width:100%;margin-top:3px;" placeholder="SSS..." />
+                <el-input v-model="form.employee.sss" size="mini" style="width:100%;margin-top:3px;" placeholder="SSS..." />
               </el-col>
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:6}" :xl="{span:6}" style="padding:5px">
                 <span>PhilHealth</span>
-                <el-input v-model="form.employee.benefits[1]" size="mini" style="width:100%;margin-top:3px;" placeholder="PhilHealth..." />
+                <el-input v-model="form.employee.philhealth" size="mini" style="width:100%;margin-top:3px;" placeholder="PhilHealth..." />
               </el-col>
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:6}" :xl="{span:6}" style="padding:5px">
                 <span>PagIbig</span>
-                <el-input v-model="form.employee.benefits[2]" size="mini" style="width:100%;margin-top:3px;" placeholder="PagIbig..." />
+                <el-input v-model="form.employee.pagibig" size="mini" style="width:100%;margin-top:3px;" placeholder="PagIbig..." />
               </el-col>
               <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:6}" :xl="{span:6}" style="padding:5px">
                 <span>TIN</span>
-                <el-input v-model="form.employee.benefits[3]" size="mini" style="width:100%;margin-top:3px;" placeholder="TIN..." />
+                <el-input v-model="form.employee.tin" size="mini" style="width:100%;margin-top:3px;" placeholder="TIN..." />
               </el-col>
             </el-row>
           </el-col>
@@ -398,6 +398,10 @@ export default {
     'form.employee.middlename': function() { this.processExcelHash() },
     'form.employee.lastname': function() { this.processExcelHash() },
     'form.employee.suffix': function() { this.processExcelHash() },
+    "form.employee.sss": function(){this.processBenefits()},
+    "form.employee.philhealth": function(){this.processBenefits()},
+    "form.employee.pagibig": function(){this.processBenefits()},
+    "form.employee.tin": function(){this.processBenefits()},
     formResponse: function() {
       const response = this.formResponse
       // if (response.status == 422) {
@@ -472,6 +476,14 @@ export default {
     this.options.position = position
   },
   methods: {
+    processBenefits(){
+      this.form.employee.benefits = [
+        this.form.employee.sss?this.form.employee.sss:"",
+        this.form.employee.philhealth?this.form.employee.philhealth:"",
+        this.form.employee.pagibig?this.form.employee.pagibig:"",
+        this.form.employee.tin?this.form.employee.tin:""
+         ];
+    },
     processExcelHash() {
       const fname = this.form.employee.firstname ? this.form.employee.firstname : ''
       const mname = this.form.employee.middlename ? this.form.employee.middlename : ''
@@ -494,12 +506,10 @@ export default {
         status_date: moment().format('MM/DD/YYYY'),
         birthdate: data.birthdate,
         gender: data.gender,
-        benefits: [
-          data.benefits[0].id_number,
-          data.benefits[1].id_number,
-          data.benefits[2].id_number,
-          data.benefits[3].id_number
-        ],
+        sss:data.benefits[0].id_number,
+        philhealth: data.benefits[1].id_number,
+        pagibig:data.benefits[2].id_number,
+        tin:data.benefits[3].id_number,
         access_id: data.access_id,
         parent_id: data.parent_id,
         email: data.email,
@@ -623,12 +633,6 @@ export default {
         this.updateUser(data)
       }
 
-      // console.log(data.values)
-      // this.form.employee.firstname = 'Emman ' + Math.random().toString(36).substr(2, 5)
-      // this.form.employee.email = 'jeng@ssws.' + Math.random().toString(36).substr(2, 5)
-      // this.form.employee.excel_hash = 'jeng' + Math.random().toString(36).substr(2, 5)
-      // this.form.employee.firstname = 'Emman '+Math.random().toString(36).substr(2, 5);
-      // this.updateUser(data)
     },
     cascadeSelectHead() {
       const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent
@@ -644,13 +648,18 @@ export default {
         this.form.employee[v] = null
       })
       const status = this.statusList.filter(i => i.id == 1)[0]
+      
       this.form.employee.gender = 'Male'
       this.form.employee.status_id = 1
       this.form.employee.status = status.status
       this.form.employee.type = status.type
       this.form.employee.access_id = 1
-      this.form.employee.benefits = []
       this.form.employee.image = null
+      this.form.employee.benefits=[4]
+      this.form.employee.benefits[0] = ""
+      this.form.employee.benefits[1] = ""
+      this.form.employee.benefits[2] = ""
+      this.form.employee.benefits[3] = ""
       this.vueCam.img = 'default.gif'
     },
     clearFormErrors() {
@@ -737,12 +746,10 @@ export default {
           status_date: moment().format('MM/DD/YYYY'),
           birthdate: '12/25/1991',
           gender: 'Male',
-          benefits: [
-            '099999902',
-            '099999902',
-            '099999902',
-            '099999902'
-          ],
+          sss:null,
+          pagibig:null,
+          philhealth:null,
+          tin:null,
           access_id: 2,
           parent_id: 1,
           email: 'jeng@ssws.dev' + Math.random().toString(36).substr(2, 5),
@@ -752,6 +759,7 @@ export default {
           status: null,
           contract: null,
           type: 'new',
+          benefits:[],
           // ----------------------------------
           // init data
           // ----------------------------------
