@@ -72,7 +72,8 @@ const mutations = {
       success: true,
       fail: false
     };
-    state.reports = payload.meta.all_reports;
+    state.reports = payload.meta.reports;
+    state.reports_total = payload.meta.count;
   },
   /**
    * Commits fail state for fetching incident reports

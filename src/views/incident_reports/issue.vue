@@ -4,8 +4,19 @@
     <el-button :plain="true" size="mini" @click="createForm">File a Report</el-button>
     <!-- Search and Pagination -->
     <el-row style="width: 100%;margin-top:30px;">
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
+      <el-col :md="{ span:8 }">
+        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
+          <el-select slot="prepend" placeholder="Select" style="width:150px;">
+            <el-option value="1" />
+          </el-select>
+          <el-button slot="append">
+            <i class="el-icon-search" />
+          </el-button>
+        </el-input>
+      </el-col>
+      <el-col :md="{ span:16 }">
         <el-pagination
+          style="float:right"
           :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
@@ -16,18 +27,8 @@
           @current-change="tablePageChange"
         />
       </el-col>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option value="1" />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>
     </el-row>
-    <br>
+    <br />
     <el-alert
       v-if="fetchingIssuedIncidentReports.fail"
       title="Error!"
@@ -56,10 +57,10 @@
       <el-table-column align="center" label="Issued To" width="220">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
-            <!--            <div v-else class="td-name-avatar">-->
-            <!--              <span>{{ getAvatarLetters(scope.row.fname,scope.row.lname) }}</span>-->
-            <!--            </div>-->
+            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image" />
+            <div v-else class="td-name-avatar">
+              <span>{{ getAvatarLetters(scope.row.issued_to.fname,scope.row.issued_to.lname) }}</span>
+            </div>
             <div class="td-name">{{ scope.row.issued_to.full_name }}</div>
           </div>
         </template>
@@ -158,24 +159,24 @@
 </template>
 
 <script>
-import path from 'path'
-import { Message } from 'element-ui'
-import { deepClone } from '@/utils'
-import { mapActions, mapGetters } from 'vuex'
+import path from "path";
+import { Message } from "element-ui";
+import { deepClone } from "@/utils";
+import { mapActions, mapGetters } from "vuex";
 const defaultRole = {
-  key: '',
-  name: '',
-  description: '',
+  key: "",
+  name: "",
+  description: "",
   routes: []
-}
+};
 
 export default {
   data() {
     return {
-      searchQuery: '',
+      searchQuery: "",
       form: {
         show: false,
-        action: 'Create',
+        action: "Create",
         update_id: null,
         sanction_type_id: null,
         sanction_level_id: null,
@@ -187,98 +188,105 @@ export default {
         limit: 10,
         offset: 0
       }
-    }
+    };
   },
   computed: {
     routesData() {
-      return this.routes
+      return this.routes;
     },
     ...mapGetters([
-      'fetchingIssuedIncidentReports',
-      'incidentReports',
-      'incidentReportsTotal',
-      'irErrors',
-      'comrades',
-      'userDetails',
-      'creatingIncidentReports',
-      'sanctionLevels',
-      'sanctionTypes',
-      'fetchingSanctionTypeState'
+      "fetchingIssuedIncidentReports",
+      "incidentReports",
+      "incidentReportsTotal",
+      "irErrors",
+      "comrades",
+      "userDetails",
+      "creatingIncidentReports",
+      "sanctionLevels",
+      "sanctionTypes",
+      "fetchingSanctionTypeState"
     ])
   },
   watch: {
     incidentReports(newData) {
-      console.log(newData)
+      console.log(newData);
     },
     sanctionLevels(v) {
-      this.form.sanction_level_id = v.options[0].id
+      this.form.sanction_level_id = v.options[0].id;
     },
     sanctionTypes(v) {
-      this.form.sanction_type_id = v.options[0].id
+      this.form.sanction_type_id = v.options[0].id;
     },
     searchQuery(newData) {
-      if (newData !== '') {
-        this.query['target[]'] = 'full_name'
-        this.query.query = newData
-        this.fetchIssuedReports(this.query)
+      if (newData !== "") {
+        this.query["target[]"] = "full_name";
+        this.query.query = newData;
+        this.fetchIssuedReports(this.query);
       } else {
-        delete this.query['target[]']
-        delete this.query.query
-        this.fetchIssuedReports(this.query)
+        delete this.query["target[]"];
+        delete this.query.query;
+        this.fetchIssuedReports(this.query);
       }
     },
     creatingIncidentReports({ initial, success, fail }) {
       if (success) {
-        this.fetchIssuedReports(this.query)
-        this.clearForm()
-        this.form.show = false
-        Message.success({ message: 'Successfully submitted report', duration: '2500' })
+        this.fetchIssuedReports(this.query);
+        this.clearForm();
+        this.form.show = false;
+        Message.success({
+          message: "Successfully submitted report",
+          duration: "2500"
+        });
       } else if (fail) {
-        Message.error({ message: this.irErrors, duration: '2500' })
+        Message.error({ message: this.irErrors, duration: "2500" });
       }
     }
   },
   mounted() {
-    this.query.id = this.userDetails.id
-    this.fetchIssuedReports(this.query)
-    this.fetchComrades({ id: this.userDetails.id })
-    this.fetchSanctionLevels()
-    this.fetchSanctionTypes()
+    this.query.id = this.userDetails.id;
+    this.fetchIssuedReports(this.query);
+    this.fetchComrades({ id: this.userDetails.id });
+    this.fetchSanctionLevels();
+    this.fetchSanctionTypes();
   },
   methods: {
     ...mapActions([
-      'fetchIssuedReports',
-      'fetchComrades',
-      'fetchSanctionLevels',
-      'fetchSanctionTypes',
-      'createReports'
+      "fetchIssuedReports",
+      "fetchComrades",
+      "fetchSanctionLevels",
+      "fetchSanctionTypes",
+      "createReports"
     ]),
     submitForm() {
-      if (this.form.action == 'Create') {
+      if (this.form.action == "Create") {
         // trigger create
-        console.log(this.form.sanction_type_id, this.form.description, this.form.sanction_level_id, this.userDetails.id)
+        console.log(
+          this.form.sanction_type_id,
+          this.form.description,
+          this.form.sanction_level_id,
+          this.userDetails.id
+        );
         const data = {
           sanction_type_id: this.form.sanction_type_id,
           sanction_level_id: this.form.sanction_level_id,
           description: this.form.description,
           user_reports_id: this.form.user_reports_id,
           filed_by: this.userDetails.id
-
-        }
-        this.createReports(data)
+        };
+        this.createReports(data);
       } else {
         // update
       }
     },
     handleCommand(command) {
-      const action = command.split(':')[0]
-      const id = command.split(':')[1]
+      const action = command.split(":")[0];
+      const id = command.split(":")[1];
 
       switch (action) {
-        case 'Update':
+        case "Update":
           const data = this.incidentReports.filter(
             i => i.report_details.id == id
-          )[0]
+          )[0];
           this.form = {
             show: true,
             action: action,
@@ -288,41 +296,41 @@ export default {
             description: data.report_details.description,
             user_reports_id: data.issued_to.id,
             filed_by: data.issued_by.id
-          }
-          break
+          };
+          break;
       }
     },
     createForm() {
-      this.clearForm()
-      this.form.show = true
-      this.form.sanction_level_id = this.sanctionLevels.options[0].id
-      this.form.sanction_type_id = this.sanctionTypes.options[0].id
+      this.clearForm();
+      this.form.show = true;
+      this.form.sanction_level_id = this.sanctionLevels.options[0].id;
+      this.form.sanction_type_id = this.sanctionTypes.options[0].id;
     },
     clearForm() {
       this.form = {
-        action: 'Create',
+        action: "Create",
         update_id: null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
         user_reports_id: null,
         filed_by: null
-      }
+      };
     },
     cancelForm() {
-      this.clearForm()
-      this.form.show = false
+      this.clearForm();
+      this.form.show = false;
     },
     tableSizeChange(value) {
-      this.query.limit = value
-      this.fetchIssuedReports(this.query)
+      this.query.limit = value;
+      this.fetchIssuedReports(this.query);
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
-      this.fetchIssuedReports(this.query)
+      this.query.offset = (value - 1) * this.query.limit;
+      this.fetchIssuedReports(this.query);
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

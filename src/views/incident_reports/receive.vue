@@ -4,8 +4,20 @@
 
     <!-- Search and Pagination -->
     <el-row>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
+      <el-col :md="{ span:8 }">
+        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
+          <el-select slot="prepend" placeholder="Select" style="width:150px;">
+            <el-option />
+          </el-select>
+          <el-button slot="append">
+            <i class="el-icon-search" />
+          </el-button>
+        </el-input>
+      </el-col>
+      <el-col :md="{ span:16 }">
         <el-pagination
+          style="float:right
+          "
           :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
@@ -15,16 +27,6 @@
           @size-change="tableSizeChange"
           @current-change="tablePageChange"
         />
-      </el-col>
-      <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
       </el-col>
     </el-row>
 
@@ -41,7 +43,7 @@
               <i class="el-icon-more" />
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item icon="el-icon-edit" :command="'update||'+scope.row.id">Update</el-dropdown-item>
+              <el-dropdown-item :command="'response||'+scope.row.report_details.id">Response</el-dropdown-item>
               <!-- <el-dropdown-item icon="el-icon-printer" divided>Print</el-dropdown-item> -->
             </el-dropdown-menu>
           </el-dropdown>
@@ -49,8 +51,8 @@
       </el-table-column>
       <el-table-column align="center" label="Status" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.response" type="success">cleared</el-tag>
-          <el-tag v-else type="danger">uncleared</el-tag>
+          <el-tag v-if="scope.row.report_details.status == 'close'" type="success">Closed</el-tag>
+          <el-tag v-else type="danger">Open</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Sanction Type" width="220">
@@ -61,7 +63,7 @@
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.response" type="success">Responded</el-tag>
+          <el-tag v-if="scope.row.report_details.agent_response" type="success">Responded</el-tag>
           <el-tag v-else type="danger">No Response</el-tag>
         </template>
       </el-table-column>
@@ -76,13 +78,48 @@
           <div class="td-image-name-container">
             <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image" />
             <div v-else class="td-name-avatar">
-              <span>TD</span>
+              <span>{{ getAvatarLetters(scope.row.issued_by.fname,scope.row.issued_by.lname) }}</span>
             </div>
             <div class="td-name">{{ scope.row.issued_by.full_name }}</div>
           </div>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="form.response.dialog"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :title="'Update Response'"
+      width="30%"
+    >
+      <el-row style="margin-bottom:10px;">
+        <el-col>
+          <el-tag>{{ form.response.content.sanction_type }}</el-tag>
+          <el-tag>{{form.response.content.sanction_level }}</el-tag>
+        </el-col>
+        <el-col style="margin-top:5px;padding:15px;">
+          <p style="color:grey;text-align:center">{{ form.response.content.description }}</p>
+        </el-col>
+      </el-row>
+      <label>Response</label>
+      <el-row style="margin-top: 5px; margin-bottom:3px;">
+        <el-col>
+          <el-input
+            v-model="form.response.data.commitment"
+            type="textarea"
+            placeholder="Response..."
+            size="mini"
+          />
+        </el-col>
+      </el-row>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="cancelFormResponse">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitFormResponse">Confirm</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -91,6 +128,24 @@ import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
+      form: {
+        response: {
+          dialog: true,
+          action: "Create",
+          update_id: null,
+          // user data directly to pass as params..
+          data: {
+            user_response_id: null,
+            status: null,
+            commitment: null
+          },
+          content: {
+            sanction_level: null,
+            sanction_type: null,
+            description: null
+          }
+        }
+      },
       query: {
         limit: 10,
         offset: 0
@@ -134,14 +189,32 @@ export default {
       this.query.offset = (value - 1) * this.query.limit;
       this.fetchReceivedReports(this.query);
     },
+    cancelFormResponse() {
+      this.form.response.dialog = false;
+    },
+    fillResponseForm(id) {
+      let ir = this.incidentReports.filter(i => i.report_details.id == id)[0];
+      if (ir.report_details.agent_response) {
+        this.form.response.action = "Update";
+        this.form.response.update_id = ir.report_details.agent_response.id;
+        this.form.response.data.commitment =
+          ir.report_details.agent_response.commitment;
+      } else {
+        this.form.response.action = "Create";
+      }
+      this.form.response.content = {
+        sanction_type: ir.report_details.sanction_type.type_description,
+        sanction_level: ir.report_details.sanction_level.level_description,
+        description: ir.report_details.description
+      };
+    },
     handleCommand(command) {
       const id = command.split("||")[1];
       const action = command.split("||")[0];
       switch (action) {
-        case "update":
-          this.form.show = true;
-          this.form.action = action;
-          this.form.update_id = id;
+        case "response":
+          this.form.response.dialog = true;
+          this.fillResponseForm(id);
           break;
       }
     }
