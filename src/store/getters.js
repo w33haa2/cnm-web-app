@@ -51,13 +51,15 @@ const getters = {
 
   // sanction level module
   sanctionLevels: state => state.sanction_level.sanction_levels,
+  sanctionLevelErrors: state => state.sanction_level.sanctionLevelErrors,
   sanctionTypes: state => state.sanction_type.sanction_types,
   sanctionTypeErrors: state => state.sanction_type.sanctionTypeErrors,
   // =============== end data
 
   // =============== start state
-  fetchSanctionLevelState: state =>
-    state.sanction_level.fetchingSanctionLevelState,
+  fetchSanctionLevelState: state => state.sanction_level.fetchingSanctionLevelState,
+  createSanctionLevelState: state => state.sanction_level.createSanctionLevelState,
+  updateSanctionLevelState: state => state.sanction_level.updateSanctionLevelState,
   fetchSanctionTypeState: state =>
     state.sanction_type.fetchingSanctionTypeState,
   createSanctionTypeState: state => state.sanction_type.createSanctionTypeState,
@@ -70,5 +72,5 @@ const getters = {
   // schedule_work_report module
   agentsWorkReports: state => state.schedule_work_report.data,
   agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState
-};
-export default getters;
+}
+export default getters

@@ -33,7 +33,7 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="sanctionLevels.options" style="width: 100%;margin-top:30px;">
+    <el-table v-loading="fetchSanctionLevelState.initial" :data="sanctionLevels.options" style="width: 100%;margin-top:30px;">
       <el-table-column align="center" label="Level Number">
         <template slot-scope="scope">{{ scope.row.level_number }}</template>
       </el-table-column>
@@ -83,7 +83,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+        <el-button type="danger" size="mini" :disabled="createSanctionLevelState.initial || updateSanctionLevelState.initial" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -91,10 +91,12 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { Message } from 'element-ui'
 export default {
   name: 'Level',
   data() {
     return {
+      searchQuery: '',
       modal_show: false,
       form: {
         action: 'Create',
@@ -113,10 +115,53 @@ export default {
     this.fetchSanctionLevels({ data })
   },
   computed: {
-    ...mapGetters(['sanctionLevels'])
+    ...mapGetters(['sanctionLevels', 'fetchSanctionLevelState', 'createSanctionLevelState', 'sanctionLevelErrors', 'updateSanctionLevelState'])
+  },
+  watch: {
+    searchQuery: function(newData) {
+      if (newData !== '') {
+        this.query['target[]'] = 'level_description'
+        this.query.query = newData
+        const data = this.query
+        this.fetchSanctionLevels({ data })
+      } else {
+        this.query['target[]'] = ''
+        this.query.query = ''
+        const data = this.query
+        this.fetchSanctionLevels({ data })
+      }
+    },
+    createSanctionLevelState({ initial, success, fail }) {
+      if (success) {
+        const data = this.query
+        this.fetchSanctionLevels({ data })
+        Message.success({
+          message: 'Successfully defined Sanction Level',
+          duration: '2500'
+        })
+        this.resetForm()
+        this.modal_show = false
+      } else if (fail) {
+        Message.error({ message: this.sanctionLevelErrors, duration: '2500' })
+      }
+    },
+    updateSanctionLevelState({ initial, success, fail }) {
+      if (success) {
+        const data = this.query
+        this.fetchSanctionLevels({ data })
+        Message.success({
+          message: 'Successfully updated Sanction Level',
+          duration: '2500'
+        })
+        this.resetForm()
+        this.modal_show = false
+      } else if (fail) {
+        Message.error({ message: this.sanctionLevelErrors, duration: '2500' })
+      }
+    }
   },
   methods: {
-    ...mapActions(['fetchSanctionLevels']),
+    ...mapActions(['fetchSanctionLevels', 'createSanctionLevels', 'updateSanctionLevels']),
 
     tableSizeChange(value) {
       this.query.limit = value
@@ -131,6 +176,7 @@ export default {
     },
     updateRow(row) {
       this.form.action = 'Update'
+      this.form.id = row.id
       this.form.level_number = row.level_number
       this.form.level_description = row.level_description
       this.modal_show = true
@@ -147,9 +193,19 @@ export default {
     submitForm() {
       // submit action
       if (this.form.action == 'Create') {
-        // create
+        const data = {
+          level_number: this.form.level_number,
+          level_description: this.form.level_description
+        }
+        this.createSanctionLevels(data)
       } else {
         // update
+        const data = {
+          id: this.form.id,
+          level_number: this.form.level_number,
+          level_description: this.form.level_description
+        }
+        this.updateSanctionLevels(data)
       }
     }
   }
