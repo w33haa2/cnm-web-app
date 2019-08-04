@@ -330,12 +330,18 @@ const api = {
             $url: 'bulk_change_status',
             $method: 'POST'
           },
-          // update: {
-          //   $url: 'update',
-          //   $method: 'POST',
-          //   $requires: ['request_schedule_id'],
-          //   $format: Template(() => `update/${request_schedule_id}`)
-          // },
+          update: {
+            $url: 'update',
+            $method: 'POST',
+            $requires: ['id'],
+            $format: Template(() => `update/${id}`)
+          },
+          change_pass: {
+            $url: 'change_pass',
+            $method: 'POST',
+            $requires: ['id'],
+            $format: Template(() => `change_pass/${id}`)
+          },
           delete: {
             $url: 'delete',
             $method: 'POST',

@@ -75,7 +75,7 @@
       <el-input v-model="newPassword2" type="password" style="margin-top:3px; margin-bottom:5px;" />
       <span slot="footer" class="dialog-footer">
         <el-button @click="logout">Cancel</el-button>
-        <el-button type="primary" @click="confirmChangePass">Confirm</el-button>
+        <el-button type="primary" :disabled="employeeUpdateState.initial" @click="confirmChangePass">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -127,7 +127,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['loginState'])
+    ...mapGetters(['loginState', 'userDetails', 'employeeUpdateState', 'employeeErrors'])
   },
   watch: {
     $route: {
@@ -140,12 +140,30 @@ export default {
       },
       immediate: true
     },
+    employeeUpdateState({ initial, success, fail }) {
+      if (success) {
+        this.$router.push({
+          path: '/dashboard'
+        })
+      } else if (fail) {
+        Message.error({
+          message: this.employeeErrors,
+          duration: '2500'
+        })
+      }
+    },
     loginState({ initial, success, fail }) {
       if (initial) {
         this.loading = true
       } else if (success) {
         this.loading = false
-        this.changePassDiag = true
+        if (this.userDetails.login_flag === 0) {
+          this.changePassDiag = true
+        } else {
+          this.$router.push({
+            path: '/dashboard'
+          })
+        }
       } else if (fail) {
         Message.error({
           message: 'Invalid username or password',
@@ -164,7 +182,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['authenticate', 'logout']),
+    ...mapActions(['authenticate', 'logout', 'changePassEmployee']),
     checkCapslock({ shiftKey, key } = {}) {
       if (key && key.length === 1) {
         if (
@@ -211,9 +229,23 @@ export default {
     },
     confirmChangePass() {
       // validate first
-      this.$router.push({
-        path: '/dashboard'
-      })
+      if (this.newPassword1 === this.newPassword2) {
+        const data = {
+          id: this.userDetails.id,
+          password: this.newPassword1
+        }
+        this.changePassEmployee(data)
+      } else if (this.newPassword1 !== this.newPassword2) {
+        Message.error({
+          message: 'Password does not match.',
+          duration: '2500'
+        })
+      } else {
+        Message.error({
+          message: 'Please fill in the fields correctly.',
+          duration: '2500'
+        })
+      }
     }
   }
 }

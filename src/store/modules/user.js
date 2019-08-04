@@ -38,6 +38,7 @@ const state = {
     company_id: ls.get('token_info').company_id,
     position: ls.get('token_info').position,
     image_url: ls.get('token_info').image_url,
+    login_flag: ls.get('token_info').login_flag,
     head: ls.get('token_info').head,
     hired_date: ls.get('token_info').hired_date,
     c_email: ls.get('token_info').c_email,
@@ -145,6 +146,7 @@ const mutations = {
     state.userDetails.contact_number = payload.meta.user.info.contact_number
     state.userDetails.company_id = payload.meta.user.company_id
     state.userDetails.position = payload.meta.user.access.name
+    state.userDetails.login_flag = payload.meta.user.loginFlag
     state.userDetails.head =
       payload.meta.user.access.parent !== null
         ? payload.meta.user.access.parent
@@ -175,6 +177,7 @@ const mutations = {
       firstname: state.userDetails.firstname,
       middlename: state.userDetails.middlename,
       lastname: state.userDetails.lastname,
+      login_flag: state.userDetails.login_flag,
       id: state.userDetails.id
     })
 
