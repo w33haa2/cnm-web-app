@@ -71,6 +71,11 @@ const getters = {
 
   // schedule_work_report module
   agentsWorkReports: state => state.schedule_work_report.data,
-  agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState
+  agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState,
+
+  //agent_list
+  agents: state => state.agent_list.data,
+  agentsfetchState: state => state.agent_list.fetchingState,
+
 }
 export default getters

@@ -7,27 +7,6 @@
       >{{ "("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
     </h4>
 
-    <!-- <el-row>
-      <el-col :md="{span:12}"></el-col>
-      <el-col :md="{span:12}">
-        <div style="float:right">
-          <el-select size="mini" v-model="filter.by">
-            <el-option value="all" label="All" />
-            <el-option value="team_leader" label="Team Leader" />
-            <el-option value="operations_manager" label="Operations Manager" />
-          </el-select>
-          <el-select size="mini" :disabled="filter.by=='all'">
-            <el-option
-              v-for="(item,index) in filter.options"
-              :key="index"
-              :value="item.id"
-              :label="item.full_name"
-            />
-          </el-select>
-        </div>
-      </el-col>
-    </el-row>-->
-
     <el-row style="margin-top:10px;">
       <el-col :md="{span:12}">
         <el-date-picker
@@ -42,8 +21,11 @@
         />
       </el-col>
       <el-col :md="{span:12}">
-        <el-button size="mini">Add Schedule</el-button>
-        <el-button size="mini">Add Leave</el-button>
+        <div style="float:right">
+          <el-button-group>
+          <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+          <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+        </el-button-group>
         <el-dropdown>
           <el-button type="success" :plain="true" size="mini">
             Excel<i class="el-icon-arrow-down el-icon--right" />
@@ -52,25 +34,9 @@
             <el-dropdown-item>Import Schedule</el-dropdown-item>
             <el-dropdown-item>Export Week Report</el-dropdown-item>
             <el-dropdown-item>Export Month Report</el-dropdown-item>
-            <!-- <el-dropdown-item>Action 3</el-dropdown-item>
-            <el-dropdown-item>Action 4</el-dropdown-item>-->
           </el-dropdown-menu>
         </el-dropdown>
-        <!-- <div style="float:right">
-          <el-select size="mini" v-model="filter.by">
-            <el-option value="all" label="All" />
-            <el-option value="team_leader" label="Team Leader" />
-            <el-option value="operations_manager" label="Operations Manager" />
-          </el-select>
-          <el-select size="mini" :disabled="filter.by=='all'">
-            <el-option
-              v-for="(item,index) in filter.options"
-              :key="index"
-              :value="item.id"
-              :label="item.full_name"
-            />
-          </el-select>
-        </div>-->
+        </div>
       </el-col>
     </el-row>
 
@@ -285,9 +251,224 @@
       :show-close="false"
       title="Add Schedule"
       width="30%"
+      top="5vh"
     >
+    <el-row>
+      <el-col>
+        <label for="dates">Dates</label>
+        <el-date-picker size="mini" type="dates" v-model="form.addSchedule.model.dates" style="width:100%;padding-bottom:2px" class="form-input"></el-date-picker>
+        <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span>
+      </el-col>
+      <el-col>
+        <label for="dates">Time in</label>
+        <el-time-picker size="mini" style="width:100%" class="form-input" v-model="form.addSchedule.model.time_in"></el-time-picker>
+      </el-col>
+      <el-col>
+        <label for="dates">Duration</label>
+        <el-time-picker size="mini" style="width:100%;padding-bottom:2px" v-model="form.addSchedule.model.duration" class="form-input"></el-time-picker>
+        <el-alert type="info" title="Time out will be automatically formulated based on the duration" style="margin-bottom:10px"></el-alert>
+      </el-col>
+      <el-col>
+        <label for="dates">Agents</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px"
+            v-model="form.addSchedule.model.agents"
+            size="mini"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Agents..."
+            :remote-method="remoteAgent"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+        <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;">count:   {{ form.addSchedule.model.agents.length}}</span>
+      </el-col>
+      <el-col>
+        <label for="dates">Team Leader</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+            v-model="form.addSchedule.model.teamleader"
+            size="mini"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Select"
+            :remote-method="remoteTeamLeader"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+      </el-col>
+      <el-col>
+        <label for="dates">Operations Manager</label>
+          <el-select
+            style="width:100%;padding-bottom:2px"
+            class="form-input"
+            v-model="form.addSchedule.model.teamleader"
+            size="mini"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Select"
+            :remote-method="remoteTeamLeader"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+      </el-col>
+    </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
+        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="form.addLeave.show"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      title="Add Leave"
+      width="30%"
+      top="5vh"
+    >
+    <el-row>
+      <el-col>
+      <el-col>
+        <label for="dates">Agent</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px;margin-bottom:10px"
+            v-model="form.addLeave.model.user_id"
+            size="mini"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Agent..."
+            :remote-method="remoteAgent"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+      </el-col>
+        <label for="dates">Dates</label>
+        <el-date-picker size="mini" type="daterange" v-model="form.addLeave.model.dates" style="width:100%;padding-bottom:2px;margin-bottom:10px;" class="form-input" placeholder="Range picker"></el-date-picker>
+        <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
+      </el-col>
+      <el-col>
+        <label for="dates">Leave Type</label>
+        <el-select v-model="form.addLeave.leave_type" size="mini" class="form-input" style="width:100%;margin-bottom:10px;">
+          <el-option value="maternity_leave" label="Maternity"/>
+          <el-option value="paternity_leave" label="Paternity"/>
+          <el-option value="bereavement_leave" label="Bereavement"/>
+          <el-option value="vawc" label="VAWC"/>
+          <!-- <el-option value="maternity_leave" label="Maternity"/>
+          <el-option value="maternity_leave" label="Maternity"/>
+          <el-option value="maternity_leave" label="Maternity"/> -->
+        </el-select>
+      </el-col>
+      <!-- <el-col>
+        <label for="dates">Duration</label>
+        <el-time-picker size="mini" style="width:100%;padding-bottom:2px" v-model="form.addSchedule.model.duration" class="form-input"></el-time-picker>
+        <el-alert type="info" title="Time out will be automatically formulated based on the duration" style="margin-bottom:10px"></el-alert>
+      </el-col>
+      <el-col>
+        <label for="dates">Agents</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px"
+            v-model="form.addSchedule.model.agents"
+            size="mini"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Agents..."
+            :remote-method="remoteAgent"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+        <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;">count:   {{ form.addSchedule.model.agents.length}}</span>
+      </el-col>
+      <el-col>
+        <label for="dates">Team Leader</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+            v-model="form.addSchedule.model.teamleader"
+            size="mini"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Select"
+            :remote-method="remoteTeamLeader"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+      </el-col>
+      <el-col>
+        <label for="dates">Operations Manager</label>
+          <el-select
+            style="width:100%;padding-bottom:2px"
+            class="form-input"
+            v-model="form.addSchedule.model.teamleader"
+            size="mini"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Select"
+            :remote-method="remoteTeamLeader"
+            :loading="loading"
+          >
+            <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            />
+          </el-select>
+      </el-col> -->
+    </el-row>
+      <span slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
         <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
@@ -304,7 +485,7 @@ import cellContent from './components/cellContent'
 export default {
   components: { cellContent },
   computed: {
-    ...mapGetters(['agentsWorkReports', 'agentsWorkReportsfetchState'])
+    ...mapGetters(['agentsWorkReports', 'agentsWorkReportsfetchState',"agents", "agentsfetchState"])
   },
   watch: {
     agentsWorkReportsfetchState({ initial, success, fail }) {
@@ -328,8 +509,25 @@ export default {
     return {
       form: {
         addSchedule: {
-          show: false,
-          model: {}
+          show: false, // temporary value
+          model: {
+            dates:[],
+            time_in:null,
+            duration:null,
+            agents:[],
+            teamleader:null,
+          }
+        },
+        addLeave: {
+          show: true, // temporary value
+          model: {
+            user_id:null,
+            dates:{},
+            leave_type:null,
+            status:null,
+            generated_by:null,
+            allowed_access:null
+          }
         }
       },
       filter: {
@@ -357,7 +555,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchAgentsWorkReports']),
+    ...mapActions(['fetchAgentsWorkReports',"fetchAgents"]),
+    showModal(type){
+      this.form[type].show = true
+    },
     weekChange(e) {
       const start = moment(e)
         .startOf('isoweek')
@@ -423,12 +624,28 @@ export default {
       } else {
         return false
       }
+    },
+    remoteAgent(query){
+      const data = {};
+      if (query !== "") {
+        data["target[]"] = "full_name";
+        data.query = query;
+        this.fetchAgents({ data });
+      } else {
+        data["target[]"] = "";
+        data.query = "";
+        this.fetchAgents({ data });
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.form-input{
+  padding-top:5px;
+  padding-bottom:10px;
+}
 .overTimeWork {
   background-color: rgb(209, 87, 209);
 }
