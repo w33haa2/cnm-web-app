@@ -29,11 +29,7 @@ Vue.use(Element, {
   locale
 });
 
-import VueI18n from "vue-i18n";
-Vue.use(VueI18n);
 Vue.use(VueSweetalert2);
-
-Vue.config.lang = "en";
 
 // register global utility filters
 Object.keys(filters).forEach(key => {
@@ -51,6 +47,39 @@ Vue.mixin({
     },
     formatDate(date, format, formatoutput) {
       return moment(date, format).format(formatoutput);
+    },
+    ucwords(str) {
+      str = str.toLowerCase();
+      return str.replace(/(^([a-zA-Z\p{M}]))|([ -][a-zA-Z\p{M}])/g, function(
+        e
+      ) {
+        return e.toUpperCase();
+      });
+    },
+    positionPageGroup(position) {
+      let group = "";
+      switch (position) {
+        case "Admin":
+          group = "admin";
+          break;
+        case "HR Manager":
+        case "HR Assistant":
+          group = "hr";
+          break;
+        case "Operations":
+        case "Team Leader":
+          group = "operations";
+          break;
+        case "Representative - Order Placer":
+          group = "agent";
+          break;
+        case "RTA Manager":
+        case "RTA Supervisor":
+        case "RTA Analyst":
+          group = "rta";
+          break;
+      }
+      return group;
     }
   }
 });

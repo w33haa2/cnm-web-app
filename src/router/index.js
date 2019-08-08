@@ -157,7 +157,7 @@ export const asyncRoutes = [
     children: [
       {
         path: "/agent/schedule",
-        component: () => import("@/views/agent/schedule"),
+        component: () => import("@/views/agent/schedule/index"),
         name: "Schedule",
         meta: {
           title: "Schedule"
@@ -166,10 +166,19 @@ export const asyncRoutes = [
       },
       {
         path: "/agent/leave",
-        component: () => import("@/views/agent/leave"),
+        component: () => import("@/views/agent/leave/index"),
         name: "Leave",
         meta: {
           title: "Leave"
+          // if do not set roles, means: this page does not requireincident_report
+        }
+      },
+      {
+        path: "/agent/work_reports",
+        component: () => import("@/views/agent/work_report/index"),
+        name: "Work Reports",
+        meta: {
+          title: "Work Reports"
           // if do not set roles, means: this page does not requireincident_report
         }
       }

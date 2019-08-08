@@ -23,19 +23,20 @@
       <el-col :md="{span:12}">
         <div style="float:right">
           <el-button-group>
-          <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
-          <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
-        </el-button-group>
-        <el-dropdown>
-          <el-button type="success" :plain="true" size="mini">
-            Excel<i class="el-icon-arrow-down el-icon--right" />
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>Import Schedule</el-dropdown-item>
-            <el-dropdown-item>Export Week Report</el-dropdown-item>
-            <el-dropdown-item>Export Month Report</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+            <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+            <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+          </el-button-group>
+          <el-dropdown>
+            <el-button type="success" :plain="true" size="mini">
+              Excel
+              <i class="el-icon-arrow-down el-icon--right" />
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item>Import Schedule</el-dropdown-item>
+              <el-dropdown-item>Export Week Report</el-dropdown-item>
+              <el-dropdown-item>Export Month Report</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </div>
       </el-col>
     </el-row>
@@ -103,7 +104,7 @@
             </template>
             <template slot-scope="scope">
               <div class="user-block">
-                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
+                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
                 <div
                   v-else
                   class="img-circle text-muted"
@@ -253,23 +254,45 @@
       width="30%"
       top="5vh"
     >
-    <el-row>
-      <el-col>
-        <label for="dates">Dates</label>
-        <el-date-picker size="mini" type="dates" v-model="form.addSchedule.model.dates" style="width:100%;padding-bottom:2px" class="form-input"></el-date-picker>
-        <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span>
-      </el-col>
-      <el-col>
-        <label for="dates">Time in</label>
-        <el-time-picker size="mini" style="width:100%" class="form-input" v-model="form.addSchedule.model.time_in"></el-time-picker>
-      </el-col>
-      <el-col>
-        <label for="dates">Duration</label>
-        <el-time-picker size="mini" style="width:100%;padding-bottom:2px" v-model="form.addSchedule.model.duration" class="form-input"></el-time-picker>
-        <el-alert type="info" title="Time out will be automatically formulated based on the duration" style="margin-bottom:10px"></el-alert>
-      </el-col>
-      <el-col>
-        <label for="dates">Agents</label>
+      <el-row>
+        <el-col>
+          <label for="dates">Dates</label>
+          <el-date-picker
+            size="mini"
+            type="dates"
+            v-model="form.addSchedule.model.dates"
+            style="width:100%;padding-bottom:2px"
+            class="form-input"
+          ></el-date-picker>
+          <span
+            style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px"
+          >count: {{ form.addSchedule.model.dates.length}}</span>
+        </el-col>
+        <el-col>
+          <label for="dates">Time in</label>
+          <el-time-picker
+            size="mini"
+            style="width:100%"
+            class="form-input"
+            v-model="form.addSchedule.model.time_in"
+          ></el-time-picker>
+        </el-col>
+        <el-col>
+          <label for="dates">Duration</label>
+          <el-time-picker
+            size="mini"
+            style="width:100%;padding-bottom:2px"
+            v-model="form.addSchedule.model.duration"
+            class="form-input"
+          ></el-time-picker>
+          <el-alert
+            type="info"
+            title="Time out will be automatically formulated based on the duration"
+            style="margin-bottom:10px"
+          ></el-alert>
+        </el-col>
+        <el-col>
+          <label for="dates">Agents</label>
           <el-select
             class="form-input"
             style="width:100%;padding-bottom:2px"
@@ -290,10 +313,12 @@
               :value="item.id"
             />
           </el-select>
-        <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;">count:   {{ form.addSchedule.model.agents.length}}</span>
-      </el-col>
-      <el-col>
-        <label for="dates">Team Leader</label>
+          <span
+            style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
+          >count: {{ form.addSchedule.model.agents.length}}</span>
+        </el-col>
+        <el-col>
+          <label for="dates">Team Leader</label>
           <el-select
             class="form-input"
             style="width:100%;padding-bottom:2px;margin-bottom:10px;"
@@ -303,8 +328,6 @@
             remote
             reserve-keyword
             placeholder="Select"
-            :remote-method="remoteTeamLeader"
-            :loading="loading"
           >
             <el-option
               v-for="item in agents.agents"
@@ -313,9 +336,9 @@
               :value="item.id"
             />
           </el-select>
-      </el-col>
-      <el-col>
-        <label for="dates">Operations Manager</label>
+        </el-col>
+        <el-col>
+          <label for="dates">Operations Manager</label>
           <el-select
             style="width:100%;padding-bottom:2px"
             class="form-input"
@@ -335,11 +358,11 @@
               :value="item.id"
             />
           </el-select>
-      </el-col>
-    </el-row>
+        </el-col>
+      </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
-        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+        <el-button type="danger" size="mini">Confirm</el-button>
       </span>
     </el-dialog>
 
@@ -353,47 +376,59 @@
       width="30%"
       top="5vh"
     >
-    <el-row>
-      <el-col>
-      <el-col>
-        <label for="dates">Agent</label>
-          <el-select
-            class="form-input"
-            style="width:100%;padding-bottom:2px;margin-bottom:10px"
-            v-model="form.addLeave.model.user_id"
+      <el-row>
+        <el-col>
+          <el-col>
+            <label for="dates">Agent</label>
+            <el-select
+              class="form-input"
+              style="width:100%;padding-bottom:2px;margin-bottom:10px"
+              v-model="form.addLeave.model.user_id"
+              size="mini"
+              filterable
+              remote
+              reserve-keyword
+              placeholder="Agent..."
+              :remote-method="remoteAgent"
+              :loading="loading"
+            >
+              <el-option
+                v-for="item in agents.agents"
+                :key="item.id"
+                :label="item.full_name"
+                :value="item.id"
+              />
+            </el-select>
+          </el-col>
+          <label for="dates">Dates</label>
+          <el-date-picker
             size="mini"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="Agent..."
-            :remote-method="remoteAgent"
-            :loading="loading"
+            type="daterange"
+            v-model="form.addLeave.model.dates"
+            style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+            class="form-input"
+            placeholder="Range picker"
+          ></el-date-picker>
+          <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
+        </el-col>
+        <el-col>
+          <label for="dates">Leave Type</label>
+          <el-select
+            v-model="form.addLeave.leave_type"
+            size="mini"
+            class="form-input"
+            style="width:100%;margin-bottom:10px;"
           >
-            <el-option
-              v-for="item in agents.agents"
-              :key="item.id"
-              :label="item.full_name"
-              :value="item.id"
-            />
+            <el-option value="maternity_leave" label="Maternity" />
+            <el-option value="paternity_leave" label="Paternity" />
+            <el-option value="bereavement_leave" label="Bereavement" />
+            <el-option value="vawc" label="VAWC" />
+            <!-- <el-option value="maternity_leave" label="Maternity"/>
+          <el-option value="maternity_leave" label="Maternity"/>
+            <el-option value="maternity_leave" label="Maternity"/>-->
           </el-select>
-      </el-col>
-        <label for="dates">Dates</label>
-        <el-date-picker size="mini" type="daterange" v-model="form.addLeave.model.dates" style="width:100%;padding-bottom:2px;margin-bottom:10px;" class="form-input" placeholder="Range picker"></el-date-picker>
-        <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
-      </el-col>
-      <el-col>
-        <label for="dates">Leave Type</label>
-        <el-select v-model="form.addLeave.leave_type" size="mini" class="form-input" style="width:100%;margin-bottom:10px;">
-          <el-option value="maternity_leave" label="Maternity"/>
-          <el-option value="paternity_leave" label="Paternity"/>
-          <el-option value="bereavement_leave" label="Bereavement"/>
-          <el-option value="vawc" label="VAWC"/>
-          <!-- <el-option value="maternity_leave" label="Maternity"/>
-          <el-option value="maternity_leave" label="Maternity"/>
-          <el-option value="maternity_leave" label="Maternity"/> -->
-        </el-select>
-      </el-col>
-      <!-- <el-col>
+        </el-col>
+        <!-- <el-col>
         <label for="dates">Duration</label>
         <el-time-picker size="mini" style="width:100%;padding-bottom:2px" v-model="form.addSchedule.model.duration" class="form-input"></el-time-picker>
         <el-alert type="info" title="Time out will be automatically formulated based on the duration" style="margin-bottom:10px"></el-alert>
@@ -465,35 +500,40 @@
               :value="item.id"
             />
           </el-select>
-      </el-col> -->
-    </el-row>
+        </el-col>-->
+      </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+        <el-button type="danger" size="mini">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import Moment from 'moment/moment'
-import { extendMoment } from 'moment-range'
-const moment = extendMoment(Moment)
+import { mapActions, mapGetters } from "vuex";
+import Moment from "moment/moment";
+import { extendMoment } from "moment-range";
+const moment = extendMoment(Moment);
 // components
-import cellContent from './components/cellContent'
+import cellContent from "./components/cellContent";
 export default {
   components: { cellContent },
   computed: {
-    ...mapGetters(['agentsWorkReports', 'agentsWorkReportsfetchState',"agents", "agentsfetchState"])
+    ...mapGetters([
+      "agentsWorkReports",
+      "agentsWorkReportsfetchState",
+      "agents",
+      "agentsfetchState"
+    ])
   },
   watch: {
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
-        this.tableData = this.agentsWorkReports.agent_schedules
+        this.tableData = this.agentsWorkReports.agent_schedules;
       }
       if (fail) {
-        this.tableData = []
+        this.tableData = [];
       }
     }
   },
@@ -501,9 +541,9 @@ export default {
     this.weekChange(
       moment()
         // .subtract(7, "days")
-        .startOf('isoweek')
-        .format('YYYY-MM-DD')
-    )
+        .startOf("isoweek")
+        .format("YYYY-MM-DD")
+    );
   },
   data() {
     return {
@@ -511,27 +551,27 @@ export default {
         addSchedule: {
           show: false, // temporary value
           model: {
-            dates:[],
-            time_in:null,
-            duration:null,
-            agents:[],
-            teamleader:null,
+            dates: [],
+            time_in: null,
+            duration: null,
+            agents: [],
+            teamleader: null
           }
         },
         addLeave: {
           show: true, // temporary value
           model: {
-            user_id:null,
-            dates:{},
-            leave_type:null,
-            status:null,
-            generated_by:null,
-            allowed_access:null
+            user_id: null,
+            dates: {},
+            leave_type: null,
+            status: null,
+            generated_by: null,
+            allowed_access: null
           }
         }
       },
       filter: {
-        by: 'all',
+        by: "all",
         options: []
       },
       week: {
@@ -549,83 +589,87 @@ export default {
         page: 1
       },
       action: {
-        type: 'Create',
+        type: "Create",
         selections: []
       }
-    }
+    };
   },
   methods: {
-    ...mapActions(['fetchAgentsWorkReports',"fetchAgents"]),
-    showModal(type){
-      this.form[type].show = true
+    ...mapActions(["fetchAgentsWorkReports", "fetchAgents"]),
+    showModal(type) {
+      this.form[type].show = true;
     },
     weekChange(e) {
       const start = moment(e)
-        .startOf('isoweek')
-        .format('YYYY-MM-DD')
+        .startOf("isoweek")
+        .format("YYYY-MM-DD");
       const end = moment(e)
-        .endOf('isoweek')
-        .format('YYYY-MM-DD')
-      this.week.start = start
-      this.week.end = end
-      this.generateHeader(start, end)
+        .endOf("isoweek")
+        .format("YYYY-MM-DD");
+      this.week.start = start;
+      this.week.end = end;
+      this.generateHeader(start, end);
     },
     generateHeader(start, end) {
-      const range = moment.range(start, end)
-      const dates = Array.from(range.by('day')).map(m => m.format('YYYY-MM-DD'))
+      const range = moment.range(start, end);
+      const dates = Array.from(range.by("day")).map(m =>
+        m.format("YYYY-MM-DD")
+      );
 
       this.tableHeader = dates.map(d => ({
-        day: moment(d).format('ddd'),
-        date: moment(d).format('YYYY-MM-DD'),
-        date1: moment(d).format('MMM Do')
-      }))
+        day: moment(d).format("ddd"),
+        date: moment(d).format("YYYY-MM-DD"),
+        date1: moment(d).format("MMM Do")
+      }));
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      this.fetchAgentsWorkReports({ data })
+      };
+      this.fetchAgentsWorkReports({ data });
     },
     tableSizeChange(value) {
-      this.query.limit = value
-      this.query.offset = 0
+      this.query.limit = value;
+      this.query.offset = 0;
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      this.fetchAgentsWorkReports({ data })
+      };
+      this.fetchAgentsWorkReports({ data });
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
+      this.query.offset = (value - 1) * this.query.limit;
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      this.fetchAgentsWorkReports({ data })
+      };
+      this.fetchAgentsWorkReports({ data });
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
-        i => moment(i.start_event).format('YYYY-MM-DD') == date
-      )[0]
+        i => moment(i.start_event.date).format("YYYY-MM-DD") == date
+      )[0];
       // if (typeof schedule == "object") {
       //   alert(schedule.start_event);
       //   alert(date);
       // }
-      return schedule
+      // alert("console");
+      // console.log(schedule);
+      return schedule;
     },
     dateToday(date) {
-      if (moment(date).isSame(moment().format('YYYY-MM-DD'))) {
-        return true
+      if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
+        return true;
       } else {
-        return false
+        return false;
       }
     },
-    remoteAgent(query){
+    remoteAgent(query) {
       const data = {};
       if (query !== "") {
         data["target[]"] = "full_name";
@@ -638,13 +682,13 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-.form-input{
-  padding-top:5px;
-  padding-bottom:10px;
+.form-input {
+  padding-top: 5px;
+  padding-bottom: 10px;
 }
 .overTimeWork {
   background-color: rgb(209, 87, 209);

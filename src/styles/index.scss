@@ -142,10 +142,13 @@ aside {
   line-height: 50px;
   position: relative;
   width: 100%;
-  text-align: right;
+  // text-align: right;
   padding-right: 20px;
+  padding-left: 20px;
   transition: 600ms ease position;
-  background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  // background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
+  background: white;
+  box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.2); // 0 20px 0 0 rgba(0, 0, 0, 0.19);
 
   .subtitle {
     font-size: 20px;

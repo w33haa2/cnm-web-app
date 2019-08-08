@@ -58,9 +58,12 @@ const getters = {
   // =============== end data
 
   // =============== start state
-  fetchSanctionLevelState: state => state.sanction_level.fetchingSanctionLevelState,
-  createSanctionLevelState: state => state.sanction_level.createSanctionLevelState,
-  updateSanctionLevelState: state => state.sanction_level.updateSanctionLevelState,
+  fetchSanctionLevelState: state =>
+    state.sanction_level.fetchingSanctionLevelState,
+  createSanctionLevelState: state =>
+    state.sanction_level.createSanctionLevelState,
+  updateSanctionLevelState: state =>
+    state.sanction_level.updateSanctionLevelState,
   fetchSanctionTypeState: state =>
     state.sanction_type.fetchingSanctionTypeState,
   createSanctionTypeState: state => state.sanction_type.createSanctionTypeState,
@@ -72,11 +75,21 @@ const getters = {
 
   // schedule_work_report module
   agentsWorkReports: state => state.schedule_work_report.data,
-  agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState,
+  agentsWorkReportsfetchState: state =>
+    state.schedule_work_report.fetchingState,
 
   // agent_list
   agents: state => state.agent_list.data,
   agentsfetchState: state => state.agent_list.fetchingState
 
-}
-export default getters
+  // fetch_leave
+  leaves: state => state.fetch_leave.data.all,
+  leavesfetchState: state => state.fetch_leave.fetchingState.all,
+  leavesPending: state => state.fetch_leave.data.pending,
+  leavesPendingfetchState: state => state.fetch_leave.fetchingState.pending,
+  leavesApproved: state => state.fetch_leave.data.approved,
+  leavesApprovedfetchState: state => state.fetch_leave.fetchingState.approved,
+  leavesDenied: state => state.fetch_leave.data.denied,
+  leavesDeniedfetchState: state => state.fetch_leave.fetchingState.denied
+};
+export default getters;

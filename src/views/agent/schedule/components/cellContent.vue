@@ -59,11 +59,8 @@
                   style="width:100%;text-align:center
                 "
                 >HAS VTO</el-tag>
-                <el-tag
-                  v-else
-                  style="width:100%;text-align:center
-                "
-                >ADD VTO</el-tag>
+                <el-tag v-else style="width:100%;text-align:center
+                ">ADD VTO</el-tag>
               </el-col>
             </template>
           </el-row>
@@ -87,9 +84,9 @@
 </template>
 
 <script>
-import moment from 'moment'
+import moment from "moment";
 export default {
-  props: ['schedule', 'date'],
+  props: ["schedule", "date"],
   data() {
     return {
       with_schedule: false,
@@ -118,67 +115,75 @@ export default {
           }
         }
       }
-    }
+    };
   },
   watch: {
     schedule(v) {
-      this.evaluateSchedule()
+      this.evaluateSchedule();
     }
   },
   mounted() {
-    this.evaluateSchedule()
+    this.evaluateSchedule();
   },
   methods: {
     evaluateSchedule() {
-      const schedule = this.schedule
-      if (typeof schedule === 'object') {
-        this.with_schedule = true
+      const schedule = this.schedule;
+      if (typeof schedule === "object") {
+        this.with_schedule = true;
         this.popup.data.schedule = {
-          in: schedule.start_event,
-          out: schedule.end_event
-        }
-        if (moment(schedule.start_event).isBefore(moment())) {
-          if (schedule.is_present == 1) {
+          in: schedule.start_event.date,
+          out: schedule.end_event.date
+        };
+        if (moment(schedule.start_event.date).isBefore(moment())) {
+          if (schedule.time_in) {
             this.tag = {
-              type: 'success',
-              effect: '',
-              label: 'PRESENT'
-            }
+              type: "success",
+              effect: "",
+              label: "PRESENT"
+            };
           } else {
             // ?leave?absent
             if (schedule.leave_id) {
               this.tag = {
-                type: 'warning',
-                effect: '',
-                label: 'LEAVE'
-              }
+                type: "warning",
+                effect: "",
+                label: "LEAVE"
+              };
             } else {
-              this.tag = {
-                type: 'danger',
-                effect: '',
-                label: 'NCNS'
+              if (schedule.remarks == "NCNS") {
+                this.tag = {
+                  type: "danger",
+                  effect: "",
+                  label: "NCNS"
+                };
+              } else {
+                this.tag = {
+                  type: "info",
+                  effect: "dark",
+                  label: "ABSENT"
+                };
               }
             }
           }
         } else {
           this.tag = {
-            type: '',
-            effect: '',
-            label: 'WORK'
-          }
+            type: "",
+            effect: "",
+            label: "WORK"
+          };
         }
       } else {
         // no schedule
-        this.with_schedule = false
+        this.with_schedule = false;
         this.tag = {
-          type: 'info',
-          effect: '',
-          label: 'OFF'
-        }
+          type: "info",
+          effect: "",
+          label: "OFF"
+        };
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
