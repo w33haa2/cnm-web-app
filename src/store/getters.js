@@ -14,6 +14,7 @@ const getters = {
 
   // incident reports
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
+  fetchingAllIncidentReports: state => state.incident_report.fetchingAllIRState,
   creatingIncidentReports: state => state.incident_report.creatingIRState,
   fetchingIssuedIncidentReports: state =>
     state.incident_report.fetchingIssuedIRState,
@@ -73,9 +74,9 @@ const getters = {
   agentsWorkReports: state => state.schedule_work_report.data,
   agentsWorkReportsfetchState: state => state.schedule_work_report.fetchingState,
 
-  //agent_list
+  // agent_list
   agents: state => state.agent_list.data,
-  agentsfetchState: state => state.agent_list.fetchingState,
+  agentsfetchState: state => state.agent_list.fetchingState
 
 }
 export default getters

@@ -241,6 +241,10 @@ const api = {
             $url: '',
             $method: 'GET'
           },
+          IR: {
+            $url: 'IR',
+            $method: 'GET'
+          },
           issuedTo: {
             $url: 'issued_to',
             $method: 'GET',

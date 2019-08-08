@@ -31,15 +31,15 @@
     </el-row>
 
     <!-- Table -->
-    <br />
+    <br>
     <el-alert
-      v-if="fetchingIncidentReports.fail"
+      v-if="fetchingAllIncidentReports.fail"
       title="Error!"
       type="error"
       :description="irErrors"
     />
     <el-table
-      v-loading="fetchingIncidentReports.initial"
+      v-loading="fetchingAllIncidentReports.initial"
       :data="incidentReports"
       style="margin-top:30px;"
     >
@@ -60,7 +60,7 @@
       <el-table-column align="center" label="Issued To">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image" />
+            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
             <div v-else class="td-name-avatar">
               <span>{{ getAvatarLetters(scope.row.issued_to.fname,scope.row.issued_to.lname) }}</span>
             </div>
@@ -71,7 +71,7 @@
       <el-table-column align="center" label="Issued By">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image" />
+            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image">
             <div v-else class="td-name-avatar">
               <span>{{ getAvatarLetters(scope.row.issued_by.fname,scope.row.issued_by.lname) }}</span>
             </div>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -117,44 +117,44 @@ export default {
         limit: 10
       },
       searchQuery: null
-    };
+    }
   },
   computed: {
     ...mapGetters([
-      "fetchingIncidentReports",
-      "incidentReports",
-      "irErrors",
-      "incidentReportsTotal"
+      'fetchingAllIncidentReports',
+      'incidentReports',
+      'irErrors',
+      'incidentReportsTotal'
     ])
   },
   watch: {},
   mounted() {
-    this.fetchReports();
+    this.fetchAllReports(this.query)
   },
   methods: {
-    ...mapActions(["fetchReports"]),
+    ...mapActions(['fetchAllReports']),
 
     tableSizeChange(value) {
-      this.query.limit = value;
-      this.fetchReceivedReports(this.query);
+      this.query.limit = value
+      this.fetchAllReports(this.query)
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      this.fetchReceivedReports(this.query);
+      this.query.offset = (value - 1) * this.query.limit
+      this.fetchAllReports(this.query)
     },
     handleCommand(command) {
-      const id = command.split("||")[1];
-      const action = command.split("||")[0];
+      const id = command.split('||')[1]
+      const action = command.split('||')[0]
       switch (action) {
-        case "update":
-          this.form.show = true;
-          this.form.action = action;
-          this.form.update_id = id;
-          break;
+        case 'update':
+          this.form.show = true
+          this.form.action = action
+          this.form.update_id = id
+          break
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
