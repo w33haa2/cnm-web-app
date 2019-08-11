@@ -80,7 +80,7 @@ const getters = {
 
   // agent_list
   agents: state => state.agent_list.data,
-  agentsfetchState: state => state.agent_list.fetchingState
+  agentsfetchState: state => state.agent_list.fetchingState,
 
   // fetch_leave
   leaves: state => state.fetch_leave.data.all,

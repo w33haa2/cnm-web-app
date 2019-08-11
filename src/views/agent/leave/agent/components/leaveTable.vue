@@ -33,9 +33,8 @@
             </template>
           </el-table-column>
           <el-table-column align="center" label="Leave Type">
-            <template slot-scope="scope">{{ ucwords(scope.row.leave_type) }}</template>
+            <template slot-scope="scope">{{ remUnderscore(ucwords(scope.row.leave_type)) }}</template>
           </el-table-column>
-          <template v-if="status == 'pending'">
             <el-table-column align="center" label="Edit">
               <template slot-scope="scope">
                 <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
@@ -43,7 +42,6 @@
                 </el-button>
               </template>
             </el-table-column>
-          </template>
         </el-table>
       </el-col>
     </el-row>
@@ -64,7 +62,8 @@ export default {
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
         user_id: 7, // temporary data
-        status: null
+        order:"desc",
+        sort:"created_at",
       }
     };
   },
@@ -72,19 +71,9 @@ export default {
     ...mapGetters(["userDetails", "leaves", "leavesfetchState"])
   },
   mounted() {
-    if (this.activeTab == this.status) {
-      this.query.status = this.activeTab;
       this.fetchLeave(this.query);
-    }
   },
   watch: {
-    activeTab(v) {
-      this.tableData = {};
-      if (v == this.status) {
-        this.query.status = v;
-        this.fetchLeave(this.query);
-      }
-    },
     leavesfetchState({ initial, success, fail }) {
       if (success) {
         this.tableData = this.leaves;
@@ -125,8 +114,11 @@ export default {
         case "approved":
           type = "success";
           break;
-        case "denied":
+        case "rejected":
           type = "danger";
+          break;
+        case "cancelled":
+          type = "info";
           break;
       }
       return type;

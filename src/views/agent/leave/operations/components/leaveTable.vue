@@ -24,33 +24,57 @@
           style="margin-top:10px;"
           v-loading="leavesfetchState.initial"
         >
-          <el-table-column align="center" label="Status">
+          <el-table-column label="Employee" min-width="100" prop="full_name" fixed>
+            <template slot="header">
+              <span style="float:left">
+                <h4 class="text-muted">Employee</h4>
+              </span>
+              <!-- <span style="float:left;padding:15px;">
+                <i class="el-icon-sort text-point-eight-em cur-p" @click="columnSort('email')" />
+              </span>-->
+            </template>
             <template slot-scope="scope">
-              <el-tag :type="tagType(scope.row.status)">{{ scope.row.status.toUpperCase() }}</el-tag>
+              <div class="user-block">
+                <img v-if="scope.row.user.info.image_url" class="img-circle" :src="scope.row.user.info.image_url">
+                <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
+                  <div
+                    style="align-self:center;width:100%;text-align:center;"
+                    class="text-point-eight-em"
+                  >{{ getAvatarLetters(scope.row.user.info.firstname,scope.row.user.info.lastname) }}</div>
+                </div>
+                <span>
+                  {{ scope.row.user.full_name }}
+                </span>
+              </div>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Dates">
+          <el-table-column align="center" label="Dates"  width="150">
             <template slot-scope="scope">
               <span>{{ formatDate(scope.row.start_event,"","MMM Do") }}</span> -
               <span>{{ formatDate(scope.row.end_event,"","MMM Do") }}</span>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Leave Type">
+          <el-table-column align="center" label="Leave Type"  width="150">
             <template slot-scope="scope">{{ remUnderscore(ucwords(scope.row.leave_type)) }}</template>
           </el-table-column>
-          <el-table-column align="center" label="History">
+          <el-table-column align="center" label="History" width="150">
+            <template slot-scope="scope">
+              <span style="color:grey">DATE HERE</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="Credits" width="150">
             <template slot-scope="scope">
               <span style="color:grey">DATE HERE</span>
             </template>
           </el-table-column>
           <template v-if="status == 'pending'">
-            <el-table-column align="center" label="Action">
+            <el-table-column align="center" label="Action" width="100">
               <template slot-scope="scope">
                 <el-row>
                   <el-col>
                     <el-button
                       size="mini"
-                      @click="updateRow(scope.row)"
+                      @click="approveLeave({id: scope.row.id})"
                       type="info"
                       style="margin-bottom:3px;width:100%"
                     >Approve</el-button>
@@ -59,10 +83,27 @@
                     <el-button
                       :plain="true"
                       size="mini"
-                      @click="updateRow(scope.row)"
+                      @click="rejectLeave({id: scope.row.id})"
                       type="info"
                       style="width:100%"
                     >Decline</el-button>
+                  </el-col>
+                </el-row>
+              </template>
+            </el-table-column>
+          </template>
+          <template v-if="status == 'approved'">
+            <el-table-column align="center" label="Action" width="100">
+              <template slot-scope="scope">
+                <el-row>
+                  <el-col>
+                    <el-button
+                      :plain="true"
+                      size="mini"
+                      @click="cancelLeave({id: scope.row.id, cancel_event: scope.row.start_event})"
+                      type="info"
+                      style="width:100%"
+                    >Cancel</el-button>
                   </el-col>
                 </el-row>
               </template>
@@ -124,7 +165,7 @@ export default {
               label: v.toUpperCase()
             };
             break;
-          case "denied":
+          case "rejected":
             this.tag = {
               type: "danger",
               label: v.toUpperCase()
@@ -150,9 +191,9 @@ export default {
   methods: {
     ...mapActions([
       "fetchLeave",
-      "fetchPendingLeave",
-      "fetchApprovedLeave",
-      "fetchDeniedLeave"
+      "approveLeave",
+      "cancelLeave",
+      "rejectLeave"
     ]),
     updateRow(data) {
       data.action = "update";
@@ -204,5 +245,31 @@ export default {
 }
 .c-grey {
   color: grey;
+}
+.user-block {
+  .username,
+  .description {
+    display: block;
+    margin-left: 50px;
+    padding: 2px 0;
+  }
+  .username {
+    // font-size: 0.8em;
+    color: #777;
+  }
+  :after {
+    clear: both;
+  }
+  .img-circle {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    float: left;
+  }
+  span {
+    font-weight: 500;
+    margin-left: 10px;
+    // font-size: 0.8em;
+  }
 }
 </style>

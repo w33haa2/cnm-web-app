@@ -2,23 +2,26 @@
   <div class="app-container">
     <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
-      <el-col :md="{span:24}">
+      <el-col style="margin-bottom:10px;" :md="{span:24}">
         <el-button
           size="mini"
           @click="leaveForm({action:'create'})"
           style="float:right"
         >Create Request</el-button>
       </el-col>
-      <el-col :md="{span:10}">
+      <el-col style="margin-bottom:10px;" :md="{span:24}">
+        <div style="float:right">
+
+        <span style="font-weight:900">CREDITS</span>
+        <span>VL: 100</span>
+        <span>SL: 100</span>
+        </div>
+      </el-col>
+      <el-col :md="{span:6}">
         <el-calendar v-model="calendar.today"></el-calendar>
       </el-col>
-      <el-col :md="{span:14}" style="padding-left: 20px">
-        <!-- <el-calendar v-model="calendar.today"></el-calendar> -->
-        <el-tabs style="padding-left:5px;padding-right:5px;" v-model="activeTab">
-          <el-tab-pane :label="tab.label" :name="tab.name" v-for="(tab,index) in tabs" :key="index">
-            <leave-table :status="tab.name" @on-update="leaveForm" :active-tab="activeTab" />
-          </el-tab-pane>
-        </el-tabs>
+      <el-col :md="{span:18}" style="padding-left: 20px">
+        <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
       </el-col>
     </el-row>
 
@@ -130,7 +133,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.el-calendar-day{
+  padding:8px !important;
+  height: auto !important;
+  width:auto !important;
+}
 .hide-picker-input {
 }
 .app-container {

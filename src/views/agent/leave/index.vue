@@ -36,7 +36,7 @@ export default {
         this.currentRole = agentView;
         break;
       default:
-        this.currentRole = operationsView;
+        this.currentRole = agentView;
         break;
     }
   }

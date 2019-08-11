@@ -374,6 +374,24 @@ const api = {
             $method: "GET",
             $requires: ["id"],
             $format: Template(() => `fetch/${id}`)
+          },
+          approve: {
+            $url:"approve",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `approve/${id}`)
+          },
+          reject: {
+            $url:"reject",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `reject/${id}`)
+          },
+          cancel: {
+            $url:"cancel",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `cancel/${id}`)
           }
         },
         // endregion leave
