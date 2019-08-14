@@ -1,8 +1,8 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const ALL_AGENTS_REPORTS = generateMutationTypes(
-  "all_agents_work_reports",
-  "ALL_AGENTS_REPORTS"
+const AGENTS_DAILY_REPORT = generateMutationTypes(
+  "today's work",
+  "AGENTS_DAILY_REPORT"
 );
 
 /**
@@ -27,7 +27,7 @@ const mutations = {
    * Commits initial state for fetching ALL AGENTS WORK REPORTS
    * @param state
    */
-  [ALL_AGENTS_REPORTS.initial](state) {
+  [AGENTS_DAILY_REPORT.initial](state) {
     state.fetchingState = {
       initial: true,
       success: false,
@@ -38,7 +38,7 @@ const mutations = {
    * Commits success state for fetching ALL AGENTS WORK REPORTS
    * @param state
    */
-  [ALL_AGENTS_REPORTS.success](state, payload) {
+  [AGENTS_DAILY_REPORT.success](state, payload) {
     state.fetchingState = {
       initial: false,
       success: true,
@@ -51,7 +51,7 @@ const mutations = {
    * Commits fail state for fetching ALL AGENTS WORK REPORTS
    * @param state
    */
-  [ALL_AGENTS_REPORTS.fail](state, payload) {
+  [AGENTS_DAILY_REPORT.fail](state, payload) {
     state.fetchingState = {
       initial: false,
       success: false,
@@ -67,13 +67,12 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchAgentsWorkReports({ commit }, params) {
+  fetchAgentsTodayWork({ commit }, params) {
     const slug = "api.schedules.work";
-    params = params.data;
     STATE_API({ slug, params }, commit, [
-      ALL_AGENTS_REPORTS.initial,
-      ALL_AGENTS_REPORTS.success,
-      ALL_AGENTS_REPORTS.fail
+      AGENTS_DAILY_REPORT.initial,
+      AGENTS_DAILY_REPORT.success,
+      AGENTS_DAILY_REPORT.fail
     ]);
   }
 };

@@ -90,6 +90,16 @@ const getters = {
   leavesApproved: state => state.fetch_leave.data.approved,
   leavesApprovedfetchState: state => state.fetch_leave.fetchingState.approved,
   leavesDenied: state => state.fetch_leave.data.denied,
-  leavesDeniedfetchState: state => state.fetch_leave.fetchingState.denied
+  leavesDeniedfetchState: state => state.fetch_leave.fetchingState.denied,
+
+  // delete_leave
+  deleteLeaveData: state => state.delete_leave.data,
+  deleteLeaveState: state => state.delete_leave.state,
+  //create_leave
+  createLeaveData: state => state.create_leave.data,
+  createLeaveState: state => state.create_leave.state,
+  //update_leave
+  updateLeaveData: state => state.update_leave.data,
+  updateLeaveState: state => state.update_leave.state
 };
 export default getters;

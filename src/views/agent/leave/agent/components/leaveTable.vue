@@ -35,13 +35,19 @@
           <el-table-column align="center" label="Leave Type">
             <template slot-scope="scope">{{ remUnderscore(ucwords(scope.row.leave_type)) }}</template>
           </el-table-column>
-            <el-table-column align="center" label="Edit">
-              <template slot-scope="scope">
-                <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
-                  <i class="el-icon-edit-outline" />
-                </el-button>
-              </template>
-            </el-table-column>
+          <el-table-column align="center" label="Request Date">
+            <template slot-scope="scope">{{ fromNow(scope.row.created_at) }}</template>
+          </el-table-column>
+          <el-table-column align="center" label="Action">
+            <template slot-scope="scope">
+              <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
+                <i class="el-icon-edit-outline" />
+              </el-button>
+              <el-button :plain="true" size="mini" type="danger" @click="deleteRow(scope.row)">
+                <i class="el-icon-delete" />
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </el-col>
     </el-row>
@@ -50,7 +56,8 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-
+// import { Message } from "element-ui"
+import moment from "moment";
 export default {
   name: "Leave_Tables",
   props: ["status", "activeTab"],
@@ -62,16 +69,21 @@ export default {
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
         user_id: 7, // temporary data
-        order:"desc",
-        sort:"created_at",
+        order: "desc",
+        sort: "created_at"
       }
     };
   },
   computed: {
-    ...mapGetters(["userDetails", "leaves", "leavesfetchState"])
+    ...mapGetters([
+      "userDetails",
+      "leaves",
+      "leavesfetchState",
+      "deleteLeaveState"
+    ])
   },
   mounted() {
-      this.fetchLeave(this.query);
+    this.fetchLeave(this.query);
   },
   watch: {
     leavesfetchState({ initial, success, fail }) {
@@ -84,6 +96,23 @@ export default {
           count: 0
         };
       }
+    },
+    deleteLeaveState({ initial, success, fail }) {
+      if (success) {
+        this.$message({
+          message: "You have successfully deleted your request.",
+          type: "success",
+          duration: 1000 * 5
+        });
+        this.fetchLeave(this.query);
+      }
+      if (fail) {
+        this.$message({
+          message: "Oops! There's a problem processing your request.",
+          type: "error",
+          duration: 1000 * 5
+        });
+      }
     }
   },
   methods: {
@@ -91,19 +120,49 @@ export default {
       "fetchLeave",
       "fetchPendingLeave",
       "fetchApprovedLeave",
-      "fetchDeniedLeave"
+      "fetchDeniedLeave",
+      "deleteLeave"
     ]),
     updateRow(data) {
-      data.action = "update";
-      this.$emit("on-update", data);
+      let isBefore = moment(data.start_event, "YYYY-MM-DD").isBefore(
+        moment().format("YYYY-MM-DD")
+      );
+      if (isBefore) {
+        this.$message({
+          message: "Oops! Updates for this request is not allowed.",
+          type: "warning",
+          duration: 1000 * 5
+        });
+      } else {
+        data.action = "update";
+        this.$emit("on-update", data);
+      }
+    },
+    deleteRow(data) {
+      let isBefore = moment(data.start_event, "YYYY-MM-DD").isBefore(
+        moment().format("YYYY-MM-DD")
+      );
+      if (isBefore) {
+        this.$message({
+          message: "Oops! Deletion of this request is not allowed.",
+          type: "warning",
+          duration: 1000 * 5
+        });
+      } else {
+        if (confirm("Are you sure you want to delete?")) {
+          this.deleteLeave({ id: data.id });
+        } else {
+          alert("not deleted"); //temporary
+        }
+      }
     },
     tableSizeChange(value) {
       this.query.limit = value;
-      // this.fetchIssuedReports(this.query);
+      this.fetchLeave(this.query);
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      // this.fetchIssuedReports(this.query);
+      this.fetchLeave(this.query);
     },
     tagType(status) {
       let type = "warning";

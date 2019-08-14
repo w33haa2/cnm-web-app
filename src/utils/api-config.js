@@ -242,8 +242,8 @@ const api = {
             $method: "GET"
           },
           IR: {
-            $url: 'IR',
-            $method: 'GET'
+            $url: "IR",
+            $method: "GET"
           },
           issuedTo: {
             $url: "issued_to",
@@ -375,20 +375,36 @@ const api = {
             $requires: ["id"],
             $format: Template(() => `fetch/${id}`)
           },
+          create: {
+            $url: "create",
+            $method: "POST"
+          },
+          update: {
+            $url: "update",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update/${id}`)
+          },
+          delete: {
+            $url: "delete",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete/${id}`)
+          },
           approve: {
-            $url:"approve",
+            $url: "approve",
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `approve/${id}`)
           },
           reject: {
-            $url:"reject",
+            $url: "reject",
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `reject/${id}`)
           },
           cancel: {
-            $url:"cancel",
+            $url: "cancel",
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `cancel/${id}`)

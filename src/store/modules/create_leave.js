@@ -1,16 +1,13 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const ALL_AGENTS_REPORTS = generateMutationTypes(
-  "all_agents_work_reports",
-  "ALL_AGENTS_REPORTS"
-);
+const CREATE_LEAVE = generateMutationTypes("leaves", "CREATE_LEAVE");
 
 /**
- * State
+ * state
  */
 
 const state = {
-  fetchingState: {
+  state: {
     initial: false,
     success: false,
     fail: false
@@ -24,35 +21,34 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for fetching ALL AGENTS WORK REPORTS
+   * Commits initial state for  CREATE LEAVE
    * @param state
    */
-  [ALL_AGENTS_REPORTS.initial](state) {
-    state.fetchingState = {
+  [CREATE_LEAVE.initial](state) {
+    state.state = {
       initial: true,
       success: false,
       fail: false
     };
   },
   /**
-   * Commits success state for fetching ALL AGENTS WORK REPORTS
+   * Commits success state for  CREATE LEAVE
    * @param state
    */
-  [ALL_AGENTS_REPORTS.success](state, payload) {
-    state.fetchingState = {
+  [CREATE_LEAVE.success](state, payload) {
+    state.state = {
       initial: false,
       success: true,
       fail: false
     };
     state.data = payload.meta;
-    // console.log(payload.meta)
   },
   /**
-   * Commits fail state for fetching ALL AGENTS WORK REPORTS
+   * Commits fail state for  CREATE LEAVE
    * @param state
    */
-  [ALL_AGENTS_REPORTS.fail](state, payload) {
-    state.fetchingState = {
+  [CREATE_LEAVE.fail](state, payload) {
+    state.state = {
       initial: false,
       success: false,
       fail: true
@@ -63,17 +59,16 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for fetching AGENTS WORK REPORTS
+   * Action for  CREATE LEAVE
    * @param commit
    * @param params
    */
-  fetchAgentsWorkReports({ commit }, params) {
-    const slug = "api.schedules.work";
-    params = params.data;
+  createLeave({ commit }, params) {
+    const slug = "api.leaves.create";
     STATE_API({ slug, params }, commit, [
-      ALL_AGENTS_REPORTS.initial,
-      ALL_AGENTS_REPORTS.success,
-      ALL_AGENTS_REPORTS.fail
+      CREATE_LEAVE.initial,
+      CREATE_LEAVE.success,
+      CREATE_LEAVE.fail
     ]);
   }
 };

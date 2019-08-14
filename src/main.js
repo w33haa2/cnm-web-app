@@ -80,6 +80,9 @@ Vue.mixin({
           break;
       }
       return group;
+    },
+    fromNow(date) {
+      return moment(date).fromNow();
     }
   }
 });

@@ -144,7 +144,7 @@ export const asyncRoutes = [
   },
   IrRouter,
   {
-    path: "agent",
+    path: "/agent",
     component: Layout,
     // redirect: "/agent",
     //  alwaysShow: true, // will always show the root menu
@@ -156,8 +156,12 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: "/agent/schedule",
-        component: () => import("@/views/agent/schedule/index"),
+        path: "index/:page*",
+        component: () => import("@/views/agent/index")
+      },
+      {
+        path: "/agent/index/schedule",
+        component: () => import("@/views/agent/index"),
         name: "Schedule",
         meta: {
           title: "Schedule"
@@ -165,8 +169,8 @@ export const asyncRoutes = [
         }
       },
       {
-        path: "/agent/leave",
-        component: () => import("@/views/agent/leave/index"),
+        path: "/agent/index/leave",
+        component: () => import("@/views/agent/index"),
         name: "Leave",
         meta: {
           title: "Leave"
@@ -174,14 +178,50 @@ export const asyncRoutes = [
         }
       },
       {
-        path: "/agent/work_reports",
-        component: () => import("@/views/agent/work_report/index"),
+        path: "/agent/index/work_reports",
+        component: () => import("@/views/agent/index"),
         name: "Work Reports",
         meta: {
           title: "Work Reports"
           // if do not set roles, means: this page does not requireincident_report
         }
+      },
+      {
+        path: "/agent/index/incident_reports",
+        component: () => import("@/views/agent/index"),
+        name: "Incident Reports",
+        meta: {
+          title: "Incident Reports"
+          // if do not set roles, means: this page does not requireincident_report
+        }
       }
+      //   // {
+      //   //   path: "/agent/schedule",
+      //   //   component: () => import("@/views/agent/schedule/index"),
+      //   //   name: "Schedule",
+      //   //   meta: {
+      //   //     title: "Schedule"
+      //   //     //  roles: ["admin"] // or you can only set roles in sub nav
+      //   //   }
+      //   // },
+      //   // {
+      //   //   path: "/agent/leave",
+      //   //   component: () => import("@/views/agent/leave/index"),
+      //   //   name: "Leave",
+      //   //   meta: {
+      //   //     title: "Leave"
+      //   //     // if do not set roles, means: this page does not requireincident_report
+      //   //   }
+      //   // },
+      //   // {
+      //   //   path: "/agent/work_reports",
+      //   //   component: () => import("@/views/agent/work_report/index"),
+      //   //   name: "Work Reports",
+      //   //   meta: {
+      //   //     title: "Work Reports"
+      //   //     // if do not set roles, means: this page does not requireincident_report
+      //   //   }
+      // }
     ]
   },
   {
