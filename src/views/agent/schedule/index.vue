@@ -104,7 +104,7 @@
             </template>
             <template slot-scope="scope">
               <div class="user-block">
-                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+                <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
                 <div
                   v-else
                   class="img-circle text-muted"
@@ -258,45 +258,45 @@
         <el-col>
           <label for="dates">Dates</label>
           <el-date-picker
+            v-model="form.addSchedule.model.dates"
             size="mini"
             type="dates"
-            v-model="form.addSchedule.model.dates"
             style="width:100%;padding-bottom:2px"
             class="form-input"
-          ></el-date-picker>
+          />
           <span
             style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px"
-          >count: {{ form.addSchedule.model.dates.length}}</span>
+          >count: {{ form.addSchedule.model.dates.length }}</span>
         </el-col>
         <el-col>
           <label for="dates">Time in</label>
           <el-time-picker
+            v-model="form.addSchedule.model.time_in"
             size="mini"
             style="width:100%"
             class="form-input"
-            v-model="form.addSchedule.model.time_in"
-          ></el-time-picker>
+          />
         </el-col>
         <el-col>
           <label for="dates">Duration</label>
           <el-time-picker
+            v-model="form.addSchedule.model.duration"
             size="mini"
             style="width:100%;padding-bottom:2px"
-            v-model="form.addSchedule.model.duration"
             class="form-input"
-          ></el-time-picker>
+          />
           <el-alert
             type="info"
             title="Time out will be automatically formulated based on the duration"
             style="margin-bottom:10px"
-          ></el-alert>
+          />
         </el-col>
         <el-col>
           <label for="dates">Agents</label>
           <el-select
+            v-model="form.addSchedule.model.agents"
             class="form-input"
             style="width:100%;padding-bottom:2px"
-            v-model="form.addSchedule.model.agents"
             size="mini"
             multiple
             filterable
@@ -315,14 +315,14 @@
           </el-select>
           <span
             style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
-          >count: {{ form.addSchedule.model.agents.length}}</span>
+          >count: {{ form.addSchedule.model.agents.length }}</span>
         </el-col>
         <el-col>
           <label for="dates">Team Leader</label>
           <el-select
+            v-model="form.addSchedule.model.teamleader"
             class="form-input"
             style="width:100%;padding-bottom:2px;margin-bottom:10px;"
-            v-model="form.addSchedule.model.teamleader"
             size="mini"
             filterable
             remote
@@ -340,9 +340,9 @@
         <el-col>
           <label for="dates">Operations Manager</label>
           <el-select
+            v-model="form.addSchedule.model.teamleader"
             style="width:100%;padding-bottom:2px"
             class="form-input"
-            v-model="form.addSchedule.model.teamleader"
             size="mini"
             filterable
             remote
@@ -362,7 +362,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
-        <el-button type="danger" size="mini">Confirm</el-button>
+        <el-button type="danger" size="mini" @click="onSubmit">Confirm</el-button>
       </span>
     </el-dialog>
 
@@ -381,9 +381,9 @@
           <el-col>
             <label for="dates">Agent</label>
             <el-select
+              v-model="form.addLeave.model.user_id"
               class="form-input"
               style="width:100%;padding-bottom:2px;margin-bottom:10px"
-              v-model="form.addLeave.model.user_id"
               size="mini"
               filterable
               remote
@@ -402,13 +402,13 @@
           </el-col>
           <label for="dates">Dates</label>
           <el-date-picker
+            v-model="form.addLeave.model.dates"
             size="mini"
             type="daterange"
-            v-model="form.addLeave.model.dates"
             style="width:100%;padding-bottom:2px;margin-bottom:10px;"
             class="form-input"
             placeholder="Range picker"
-          ></el-date-picker>
+          />
           <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
         </el-col>
         <el-col>
@@ -504,36 +504,36 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-        <el-button type="danger" size="mini">Confirm</el-button>
+        <el-button type="danger" size="mini" @click="onSubmit">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-import Moment from "moment/moment";
-import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment);
+import { mapActions, mapGetters } from 'vuex'
+import Moment from 'moment/moment'
+import { extendMoment } from 'moment-range'
+const moment = extendMoment(Moment)
 // components
-import cellContent from "./components/cellContent";
+import cellContent from './components/cellContent'
 export default {
   components: { cellContent },
   computed: {
     ...mapGetters([
-      "agentsWorkReports",
-      "agentsWorkReportsfetchState",
-      "agents",
-      "agentsfetchState"
+      'agentsWorkReports',
+      'agentsWorkReportsfetchState',
+      'agents',
+      'agentsfetchState'
     ])
   },
   watch: {
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
-        this.tableData = this.agentsWorkReports.agent_schedules;
+        this.tableData = this.agentsWorkReports.agent_schedules
       }
       if (fail) {
-        this.tableData = [];
+        this.tableData = []
       }
     }
   },
@@ -541,9 +541,9 @@ export default {
     this.weekChange(
       moment()
         // .subtract(7, "days")
-        .startOf("isoweek")
-        .format("YYYY-MM-DD")
-    );
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
+    )
   },
   data() {
     return {
@@ -571,7 +571,7 @@ export default {
         }
       },
       filter: {
-        by: "all",
+        by: 'all',
         options: []
       },
       week: {
@@ -589,100 +589,103 @@ export default {
         page: 1
       },
       action: {
-        type: "Create",
+        type: 'Create',
         selections: []
       }
-    };
+    }
   },
   methods: {
-    ...mapActions(["fetchAgentsWorkReports", "fetchAgents"]),
+    ...mapActions(['fetchAgentsWorkReports', 'fetchAgents', 'createBulkSchedule']),
     showModal(type) {
-      this.form[type].show = true;
+      this.form[type].show = true
     },
     weekChange(e) {
       const start = moment(e)
-        .startOf("isoweek")
-        .format("YYYY-MM-DD");
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
       const end = moment(e)
-        .endOf("isoweek")
-        .format("YYYY-MM-DD");
-      this.week.start = start;
-      this.week.end = end;
-      this.generateHeader(start, end);
+        .endOf('isoweek')
+        .format('YYYY-MM-DD')
+      this.week.start = start
+      this.week.end = end
+      this.generateHeader(start, end)
     },
     generateHeader(start, end) {
-      const range = moment.range(start, end);
-      const dates = Array.from(range.by("day")).map(m =>
-        m.format("YYYY-MM-DD")
-      );
+      const range = moment.range(start, end)
+      const dates = Array.from(range.by('day')).map(m =>
+        m.format('YYYY-MM-DD')
+      )
 
       this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
-      }));
+        day: moment(d).format('ddd'),
+        date: moment(d).format('YYYY-MM-DD'),
+        date1: moment(d).format('MMM Do')
+      }))
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
-      this.fetchAgentsWorkReports({ data });
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     tableSizeChange(value) {
-      this.query.limit = value;
-      this.query.offset = 0;
+      this.query.limit = value
+      this.query.offset = 0
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
-      this.fetchAgentsWorkReports({ data });
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
+      this.query.offset = (value - 1) * this.query.limit
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
-      this.fetchAgentsWorkReports({ data });
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
-        i => moment(i.start_event.date).format("YYYY-MM-DD") == date
-      )[0];
+        i => moment(i.start_event.date).format('YYYY-MM-DD') == date
+      )[0]
       // if (typeof schedule == "object") {
       //   alert(schedule.start_event);
       //   alert(date);
       // }
       // alert("console");
       // console.log(schedule);
-      return schedule;
+      return schedule
+    },
+    onSubmit() {
+      this.createBulkSchedule()
     },
     dateToday(date) {
-      if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
-        return true;
+      if (moment(date).isSame(moment().format('YYYY-MM-DD'))) {
+        return true
       } else {
-        return false;
+        return false
       }
     },
     remoteAgent(query) {
-      const data = {};
-      if (query !== "") {
-        data["target[]"] = "full_name";
-        data.query = query;
-        this.fetchAgents({ data });
+      const data = {}
+      if (query !== '') {
+        data['target[]'] = 'full_name'
+        data.query = query
+        this.fetchAgents({ data })
       } else {
-        data["target[]"] = "";
-        data.query = "";
-        this.fetchAgents({ data });
+        data['target[]'] = ''
+        data.query = ''
+        this.fetchAgents({ data })
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
