@@ -6,16 +6,18 @@
     <el-row style="width: 100%;margin-top:30px;">
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
         <el-pagination
-          :page-sizes="[25, 50, 100]"
+          :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
-          :total="25"
+          :total="logs.count"
           background
           small
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
         />
       </el-col>
       <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input placeholder="Search..." size="mini">
+        <el-input placeholder="Search..." v-model="searchQuery" size="mini">
           <el-select slot="prepend" placeholder="Select" style="width:150px;">
             <el-option />
           </el-select>
@@ -27,38 +29,66 @@
     </el-row>
 
     <!-- Table -->
-    <el-table :data="action_logs" style="width: 100%;margin-top:30px;">
+    <el-table :data="logs.metadata" v-loading="fetchingLogState.initial" style="width: 100%;margin-top:30px;">
       <el-table-column align="center" label="User">
-        <template slot-scope="scope">{{ scope.row.personnel }}</template>
+        <template slot-scope="scope">{{ scope.row.full_name }}</template>
       </el-table-column>
       <el-table-column align="center" label="Position">
-        <template slot-scope="scope">{{ scope.row.user_position }}</template>
+        <template slot-scope="scope">{{ scope.row.position }}</template>
       </el-table-column>
       <el-table-column align="center" label="Log">
         <template slot-scope="scope">{{ scope.row.affected_data }}</template>
       </el-table-column>
       <el-table-column align="center" label="Date">
-        <template slot-scope="scope">{{ scope.row.created_date }}</template>
+        <template slot-scope="scope">{{ formatDate(scope.row.created_at,"", "LL") }}</template>
       </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   name: "ActionLogs",
   mounted() {},
   data() {
     return {
-      action_logs: [
-        {
-          personnel: "Emman Lajom",
-          user_position: "RTA",
-          affected_data: "sadasd",
-          created_date: "dsadas"
-        }
-      ]
-    };
+      searchQuery: '',
+      query: {
+        offset: 0,
+        limit: 10
+      },
+    }
+  },
+  mounted() {
+    this.fetchLogs(this.query)
+  },
+  computed: {
+    ...mapGetters(['logs','fetchingLogState'])
+  },
+  watch: {
+    searchQuery(newData) {
+      if (newData !== "") {
+        this.query["target[]"] = 'full_name';
+        this.query.query = newData;
+        this.fetchLogs(this.query);
+      } else {
+        this.query["target[]"] = "";
+        this.query.query = "";
+        this.fetchLogs(this.query);
+      }
+    },
+  },
+  methods: {
+    ...mapActions(['fetchLogs']),
+    tableSizeChange(value) {
+      this.query.limit = value
+      this.fetchLogs(this.query)
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit
+      this.fetchLogs(this.query)
+    },
   }
 };
 </script>

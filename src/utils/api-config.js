@@ -224,6 +224,26 @@ const api = {
         // endregion access levels
 
         // region access levels
+        logs: {
+          $prefix: "logs",
+          create: {
+            $url: "create",
+            $method: "POST"
+          },
+          fetchAll: {
+            $url: "",
+            $method: "GET"
+          },
+          fetch: {
+            $url: "",
+            $method: "GET",
+            $requires: ["id"],
+            $format: Template(() => `fetch/${id}`)
+          },
+        },
+        // endregion access levels
+
+        // region access levels
         clusters: {
           $prefix: "clusters",
           create: {

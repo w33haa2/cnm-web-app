@@ -56,7 +56,11 @@ const getters = {
   sanctionTypes: state => state.sanction_type.sanction_types,
   sanctionTypeErrors: state => state.sanction_type.sanctionTypeErrors,
   // =============== end data
-
+  // region logs
+  logs: state => state.logs.logs,
+  fetchingLogState: state => state.logs.fetchingLogState,
+  logErrors: state => state.logs.errors,
+  // endregion logs
   // =============== start state
   fetchSanctionLevelState: state =>
     state.sanction_level.fetchingSanctionLevelState,
