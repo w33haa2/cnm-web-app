@@ -33,6 +33,7 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item :command="'edit:'+scope.row.id">Update</el-dropdown-item>
+                  <el-dropdown-item :command="'resetPass:'+scope.row.id">Reset Password</el-dropdown-item>
                   <!-- <el-dropdown-item>Delete</el-dropdown-item> -->
                 </el-dropdown-menu>
               </el-dropdown>

@@ -445,6 +445,19 @@ const actions = {
    * @param commit
    * @param params
    */
+  resetPassEmployee({ commit }, params) {
+    const slug = 'api.users.reset_pass'
+    STATE_API({ slug, params }, commit, [
+      UPDATE_EMPLOYEES.initial,
+      UPDATE_EMPLOYEES.success,
+      UPDATE_EMPLOYEES.fail
+    ])
+  },
+  /**
+   * Action for fetching employees
+   * @param commit
+   * @param params
+   */
   addEmployee({ commit }, params) {
     const slug = 'api.users.create'
     console.log(params)
