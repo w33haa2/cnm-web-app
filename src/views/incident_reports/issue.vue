@@ -67,7 +67,7 @@
       </el-table-column>
       <el-table-column align="center" label="Status" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.report_details.status == 'close'" type="success">Closed</el-tag>
+          <el-tag v-if="scope.row.report_details.status == '0'" type="success">Closed</el-tag>
           <el-tag v-else type="danger">Open</el-tag>
         </template>
       </el-table-column>
@@ -293,7 +293,7 @@ export default {
         };
         this.createReports(data);
       } else {
-        if (this.form.status == 1) {
+        if (this.form.status == 0) {
           Message.warning({
             message: "Updates on closed reports is not allowed.",
             duration: "2500"
