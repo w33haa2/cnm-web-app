@@ -69,6 +69,8 @@ const getters = {
   logs: state => state.logs.logs,
   fetchingLogState: state => state.logs.fetchingLogState,
   logErrors: state => state.logs.errors,
+  logsSearchData: state => state.search_action_log.data,
+  logsSearchState: state => state.search_action_log.state,
   // endregion logs
   // =============== start state
   fetchSanctionLevelState: state =>

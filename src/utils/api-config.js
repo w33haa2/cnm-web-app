@@ -234,6 +234,10 @@ const api = {
             $url: "create",
             $method: "POST"
           },
+          search: {
+            $url: "search",
+            $method: "GET"
+          },
           fetchAll: {
             $url: "",
             $method: "GET"
@@ -305,7 +309,7 @@ const api = {
             $url: "issuedto/search",
             $method: "GET"
           },
-          issued_by_search: {
+          issued_byf_search: {
             $url: "issuedby/search",
             $method: "GET"
           }
