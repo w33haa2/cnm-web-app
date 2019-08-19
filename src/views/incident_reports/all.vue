@@ -6,9 +6,15 @@
     <el-row>
       <el-col :md="{ span:8 }">
         <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <!-- <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>-->
+          <el-select
+            slot="prepend"
+            placeholder="Select"
+            v-model="searchTarget"
+            style="width:150px;"
+          >
+            <el-option value="issued_to" label="Issued To" selected />
+            <el-option value="issued_by" label="Issued By" />
+          </el-select>
           <el-button slot="append">
             <i class="el-icon-search" />
           </el-button>
@@ -21,7 +27,7 @@
           :page-sizes="[10, 25, 50]"
           :page-size="100"
           layout="total, sizes, prev, pager, next"
-          :total="incidentReportsTotal"
+          :total="table_config.count"
           background
           small
           @size-change="tableSizeChange"
@@ -38,11 +44,7 @@
       type="error"
       :description="irErrors"
     />
-    <el-table
-      v-loading="fetchingAllIncidentReports.initial"
-      :data="incidentReports"
-      style="margin-top:30px;"
-    >
+    <el-table v-loading="table_config.loader" :data="table_config.data" style="margin-top:30px;">
       <el-table-column align="center" label="Action">
         <template slot-scope="scope">
           <el-dropdown @command="handleCommand">
@@ -118,7 +120,13 @@ export default {
         sort: "created_at",
         order: "desc"
       },
-      searchQuery: null
+      searchQuery: null,
+      searchTarget: "issued_to",
+      table_config: {
+        data: [],
+        count: 0,
+        loader: false
+      }
     };
   },
   computed: {
@@ -127,10 +135,64 @@ export default {
       "incidentReports",
       "irErrors",
       "incidentReportsTotal",
-      "updateIncidentReportState"
+      "updateIncidentReportState",
+      "issuedToSearchData",
+      "issuedToSearchState",
+      "issuedBySearchData",
+      "issuedBySearchState"
     ])
   },
   watch: {
+    issuedBySearchState({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
+      }
+      if (success) {
+        this.table_config.loader = false;
+        this.table_config.data = this.issuedBySearchData.reports;
+        this.table_config.count = this.issuedBySearchData.count;
+      }
+      if (fail) {
+        this.table_config.loader = false;
+        this.table_config.data = [];
+      }
+    },
+    issuedToSearchState({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
+      }
+      if (success) {
+        this.table_config.loader = false;
+        this.table_config.data = this.issuedToSearchData.reports;
+        this.table_config.count = this.issuedToSearchData.count;
+      }
+      if (fail) {
+        this.table_config.loader = false;
+        this.table_config.data = [];
+      }
+    },
+    fetchingAllIncidentReports({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
+      }
+      if (success) {
+        this.table_config.loader = false;
+        this.table_config.data = this.incidentReports;
+        this.table_config.count = this.incidentReportsTotal;
+      }
+      if (fail) {
+        this.table_config.loader = false;
+        this.table_config.data = [];
+      }
+    },
+    searchQuery(v) {
+      this.tableSearch();
+    },
+    searchTarget(v) {
+      if (this.searchQuery) {
+        this.tableSearch();
+      }
+    },
     updateIncidentReportState({ initial, success, fail }) {
       if (success) {
         this.$message({
@@ -145,8 +207,32 @@ export default {
     this.fetchAllReports(this.query);
   },
   methods: {
-    ...mapActions(["fetchAllReports", "updateIncidentReport"]),
-
+    ...mapActions([
+      "fetchAllReports",
+      "updateIncidentReport",
+      "searchIssuedToIr",
+      "searchIssuedByIr"
+    ]),
+    tableSearch() {
+      if (this.searchQuery !== "") {
+        this.query.offset = 0;
+        this.query["target[]"] = "full_name";
+        this.query.query = this.searchQuery;
+        const data = this.query;
+        switch (this.searchTarget) {
+          case "issued_to":
+            this.searchIssuedToIr(data);
+            break;
+          case "issued_by":
+            this.searchIssuedByIr(data);
+            break;
+        }
+      } else {
+        this.query.offset = 0;
+        const data = this.query;
+        this.fetchAllReports(data);
+      }
+    },
     tableSizeChange(value) {
       this.query.limit = value;
       this.fetchAllReports(this.query);
@@ -159,7 +245,6 @@ export default {
       const id = command.split("||")[1];
       const action = command.split("||")[0];
       let status = 1;
-      alert(action);
       switch (action) {
         case "open":
           status = 1;

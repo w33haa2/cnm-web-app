@@ -24,6 +24,10 @@ const getters = {
   incidentReports: state => state.incident_report.reports,
   incidentReportsTotal: state => state.incident_report.reports_total,
   irErrors: state => state.incident_report.errors,
+  issuedToSearchData: state => state.search_issued_to_ir.data,
+  issuedToSearchState: state => state.search_issued_to_ir.state,
+  issuedBySearchData: state => state.search_issued_by_ir.data,
+  issuedBySearchState: state => state.search_issued_by_ir.state,
 
   // employee module
   employees: state => state.employee.employees,

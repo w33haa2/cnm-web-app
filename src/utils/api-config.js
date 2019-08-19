@@ -300,6 +300,14 @@ const api = {
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `update/${id}`)
+          },
+          issued_to_search: {
+            $url: "issuedto/search",
+            $method: "GET"
+          },
+          issued_by_search: {
+            $url: "issuedby/search",
+            $method: "GET"
           }
         },
         // endregion reports
