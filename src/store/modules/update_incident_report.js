@@ -1,7 +1,7 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
 const UPDATE_INCIDENT_REPORT = generateMutationTypes(
-  "leaves",
+  "Incident Reports",
   "UPDATE_INCIDENT_REPORT"
 );
 

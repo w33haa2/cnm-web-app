@@ -16,6 +16,7 @@ const getters = {
   fetchingIncidentReports: state => state.incident_report.fetchingIRState,
   fetchingAllIncidentReports: state => state.incident_report.fetchingAllIRState,
   creatingIncidentReports: state => state.incident_report.creatingIRState,
+  updateIncidentReportState: state => state.update_incident_report.state,
   fetchingIssuedIncidentReports: state =>
     state.incident_report.fetchingIssuedIRState,
   fetchingReceivedIncidentReports: state =>

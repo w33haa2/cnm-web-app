@@ -6,9 +6,9 @@
     <el-row style="width: 100%;margin-top:30px;">
       <el-col :md="{ span:8 }">
         <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option value="1" />
-          </el-select>
+          <!-- <el-select slot="prepend" placeholder="Select" style="width:150px;">
+            <el-option v-for="(option, index) in search.options" :key="index" value="full_name" />
+          </el-select>-->
           <el-button slot="append">
             <i class="el-icon-search" />
           </el-button>
@@ -152,7 +152,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+        <el-button type="danger" size="mini" @click="submitForm" :loading="confirm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -174,21 +174,23 @@ export default {
   data() {
     return {
       searchQuery: "",
+      confirm: false,
       form: {
         show: false,
         action: "Create",
-        update_id: null,
+        id: null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
         user_reports_id: null,
-        filed_by: null
+        filed_by: null,
+        status: 1
       },
       query: {
         limit: 10,
         offset: 0,
-        sort:"created_at",
-        order:"desc"
+        sort: "created_at",
+        order: "desc"
       }
     };
   },
@@ -206,10 +208,26 @@ export default {
       "creatingIncidentReports",
       "sanctionLevels",
       "sanctionTypes",
-      "fetchingSanctionTypeState"
+      "fetchingSanctionTypeState",
+      "updateIncidentReportState"
     ])
   },
   watch: {
+    updateIncidentReportState({ initial, success, fail }) {
+      if (success) {
+        this.fetchIssuedReports(this.query);
+        this.clearForm();
+        this.form.show = false;
+        this.confirm = false;
+        Message.success({
+          message: "Successfully updated report.",
+          duration: "2500"
+        });
+      } else if (fail) {
+        this.confirm = false;
+        Message.error({ message: this.irErrors, duration: "2500" });
+      }
+    },
     incidentReports(newData) {
       console.log(newData);
     },
@@ -235,11 +253,13 @@ export default {
         this.fetchIssuedReports(this.query);
         this.clearForm();
         this.form.show = false;
+        this.confirm = false;
         Message.success({
           message: "Successfully submitted report",
           duration: "2500"
         });
       } else if (fail) {
+        this.confirm = false;
         Message.error({ message: this.irErrors, duration: "2500" });
       }
     }
@@ -257,33 +277,42 @@ export default {
       "fetchComrades",
       "fetchSanctionLevels",
       "fetchSanctionTypes",
-      "createReports"
+      "createReports",
+      "updateIncidentReport"
     ]),
     submitForm() {
+      this.confirm = true;
       if (this.form.action == "Create") {
-        // trigger create
-        console.log(
-          this.form.sanction_type_id,
-          this.form.description,
-          this.form.sanction_level_id,
-          this.userDetails.id
-        );
         const data = {
           sanction_type_id: this.form.sanction_type_id,
           sanction_level_id: this.form.sanction_level_id,
           description: this.form.description,
           user_reports_id: this.form.user_reports_id,
-          filed_by: this.userDetails.id
+          filed_by: this.userDetails.id,
+          status: 1
         };
         this.createReports(data);
       } else {
-        // update
+        if (this.form.status == 1) {
+          Message.warning({
+            message: "Updates on closed reports is not allowed.",
+            duration: "2500"
+          });
+        } else {
+          const data = {
+            id: this.form.id,
+            sanction_type_id: this.form.sanction_type_id,
+            sanction_level_id: this.form.sanction_level_id,
+            description: this.form.description,
+            filed_by: this.userDetails.id
+          };
+          this.updateIncidentReport(data);
+        }
       }
     },
     handleCommand(command) {
       const action = command.split(":")[0];
       const id = command.split(":")[1];
-
       switch (action) {
         case "Update":
           const data = this.incidentReports.filter(
@@ -292,12 +321,13 @@ export default {
           this.form = {
             show: true,
             action: action,
-            update_id: data.report_details.id,
+            id: data.report_details.id,
             sanction_type_id: data.report_details.sanction_type.id,
             sanction_level_id: data.report_details.sanction_level.id,
             description: data.report_details.description,
             user_reports_id: data.issued_to.id,
-            filed_by: data.issued_by.id
+            filed_by: data.issued_by.id,
+            status: data.report_details.status
           };
           break;
       }
@@ -311,12 +341,13 @@ export default {
     clearForm() {
       this.form = {
         action: "Create",
-        update_id: null,
+        id: null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
         user_reports_id: null,
-        filed_by: null
+        filed_by: null,
+        status: 1
       };
     },
     cancelForm() {
