@@ -23,7 +23,7 @@
           :page-sizes="[10, 25, 50]"
           :page-size="query.limit"
           layout="total, sizes, prev, pager, next"
-          :total="sanctionTypes.count"
+          :total="table_config.count"
           background
           small
           @size-change="tableSizeChange"
@@ -34,8 +34,8 @@
 
     <!-- Table -->
     <el-table
-      v-loading="fetchSanctionTypeState.initial"
-      :data="sanctionTypes.options"
+      v-loading="table_config.loader"
+      :data="table_config.data"
       style="width: 100%;margin-top:30px;"
     >
       <el-table-column align="center" label="Type Number">
@@ -46,7 +46,7 @@
       </el-table-column>
       <el-table-column align="center" label="Edit">
         <template slot-scope="scope">
-          <el-button :plain="true" @click="updateRow(scope.row)">
+          <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
             <i class="el-icon-edit-outline" />
           </el-button>
         </template>
@@ -87,12 +87,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button
-          type="danger"
-          size="mini"
-          :disabled="createSanctionTypeState.initial"
-          @click="submitForm"
-        >Confirm</el-button>
+        <el-button type="danger" size="mini" :loading="form.confirm" @click="submitForm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -111,14 +106,20 @@ export default {
         action: "Create",
         // input models
         type_number: null,
-        type_description: null
+        type_description: null,
+        confirm: false
       },
       query: {
         limit: 10,
-        offset: 0
+        offset: 0,
+        order:"desc",
+        sort:"created_at"
       },
       table_config: {
-        page: 1
+        page: 1,
+        data: [],
+        count: 0,
+        loader: false
       }
     };
   },
@@ -128,12 +129,38 @@ export default {
       "fetchSanctionTypeState",
       "createSanctionTypeState",
       "updateSanctionTypeState",
-      "sanctionTypeErrors"
+      "sanctionTypeErrors",
+      "sanctionTypesSearch",
+      "sanctionTypesSearchState"
     ])
   },
   watch: {
-    createSanctionTypeState({ initial, success, fail }) {
+    fetchSanctionTypeState({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
+      }
       if (success) {
+        this.table_config.data = this.sanctionTypes.options;
+        this.table_config.count = this.sanctionTypes.count;
+        this.table_config.loader = false;
+      }
+    },
+    sanctionTypesSearchState({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
+      }
+      if (success) {
+        this.table_config.data = this.sanctionTypesSearch.sanction_types;
+        this.table_config.count = this.sanctionTypesSearch.count;
+        this.table_config.loader = false;
+      }
+    },
+    createSanctionTypeState({ initial, success, fail }) {
+      if (initial) {
+        this.form.confirm = true;
+      }
+      if (success) {
+        this.form.confirm = false;
         this.fetchSanctionTypes(this.query);
         Message.success({
           message: "Successfully defined Sanction Type",
@@ -142,11 +169,16 @@ export default {
         this.resetForm();
         this.modal_show = false;
       } else if (fail) {
+        this.form.confirm = false;
         Message.error({ message: this.sanctionTypeErrors, duration: "2500" });
       }
     },
     updateSanctionTypeState({ initial, success, fail }) {
+      if (initial) {
+        this.form.confirm = true;
+      }
       if (success) {
+        this.form.confirm = false;
         this.fetchSanctionTypes(this.query);
         Message.success({
           message: "Successfully updated Sanction Type",
@@ -155,14 +187,16 @@ export default {
         this.resetForm();
         this.modal_show = false;
       } else if (fail) {
+        this.form.confirm = false;
         Message.error({ message: this.sanctionTypeErrors, duration: "2500" });
       }
     },
     searchQuery(newData) {
       if (newData !== "") {
+        this.query.offset = 0;
         this.query["target[]"] = "type_description";
         this.query.query = newData;
-        this.fetchSanctionTypes(this.query);
+        this.searchSanctionTypes(this.query);
       } else {
         this.query["target[]"] = "";
         this.query.query = "";
@@ -177,7 +211,8 @@ export default {
     ...mapActions([
       "fetchSanctionTypes",
       "createSanctionTypes",
-      "updateSanctionTypes"
+      "updateSanctionTypes",
+      "searchSanctionTypes"
     ]),
     tableSizeChange(value) {
       this.query.limit = value;

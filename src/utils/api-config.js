@@ -359,6 +359,10 @@ const api = {
             $url: "",
             $method: "GET"
           },
+          search: {
+            $url: "search",
+            $method: "GET"
+          },
           create: {
             $url: "create",
             $method: "POST"
@@ -382,6 +386,10 @@ const api = {
           },
           fetch_sanction_types: {
             $url: "sanction_types",
+            $method: "GET"
+          },
+          search: {
+            $url: "search",
             $method: "GET"
           },
           create: {
