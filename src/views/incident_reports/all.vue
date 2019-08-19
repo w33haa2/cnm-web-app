@@ -6,9 +6,9 @@
     <el-row>
       <el-col :md="{ span:8 }">
         <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
+          <!-- <el-select slot="prepend" placeholder="Select" style="width:150px;">
             <el-option />
-          </el-select>
+          </el-select>-->
           <el-button slot="append">
             <i class="el-icon-search" />
           </el-button>
@@ -51,8 +51,8 @@
             </span>
             <el-dropdown-menu slot="dropdown">
               <!-- <el-dropdown-item icon="el-icon-edit" :command="'update||'+scope.row.id">Update</el-dropdown-item> -->
-              <el-dropdown-item :command="'clear||'+scope.row.report_details.id" divided>Close</el-dropdown-item>
-              <el-dropdown-item :command="'unclear||'+scope.row.report_details.id">Open</el-dropdown-item>
+              <el-dropdown-item :command="'close||'+scope.row.report_details.id">Close</el-dropdown-item>
+              <el-dropdown-item :command="'open||'+scope.row.report_details.id" divided>Open</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -87,8 +87,8 @@
       </el-table-column>
       <el-table-column align="center" label="Status" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.response" type="success">cleared</el-tag>
-          <el-tag v-else type="danger">uncleared</el-tag>
+          <el-tag v-if="scope.row.report_details.status=='0'" type="success">Closed</el-tag>
+          <el-tag v-else type="danger">Open</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="header-center" label="Description" width="350">
@@ -96,8 +96,8 @@
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.response" type="success">responded</el-tag>
-          <el-tag v-else type="danger">no response</el-tag>
+          <el-tag v-if="scope.row.response" type="success">Responded</el-tag>
+          <el-tag v-else type="danger">No Response</el-tag>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Date Filed" width="220">
@@ -114,7 +114,9 @@ export default {
     return {
       query: {
         offset: 0,
-        limit: 10
+        limit: 10,
+        sort: "created_at",
+        order: "desc"
       },
       searchQuery: null
     };
@@ -124,15 +126,26 @@ export default {
       "fetchingAllIncidentReports",
       "incidentReports",
       "irErrors",
-      "incidentReportsTotal"
+      "incidentReportsTotal",
+      "updateIncidentReportState"
     ])
   },
-  watch: {},
+  watch: {
+    updateIncidentReportState({ initial, success, fail }) {
+      if (success) {
+        this.$message({
+          type: "success",
+          message: "Successfuly changed report status."
+        });
+        this.fetchAllReports(this.query);
+      }
+    }
+  },
   mounted() {
     this.fetchAllReports(this.query);
   },
   methods: {
-    ...mapActions(["fetchAllReports"]),
+    ...mapActions(["fetchAllReports", "updateIncidentReport"]),
 
     tableSizeChange(value) {
       this.query.limit = value;
@@ -145,13 +158,20 @@ export default {
     handleCommand(command) {
       const id = command.split("||")[1];
       const action = command.split("||")[0];
+      let status = 1;
+      alert(action);
       switch (action) {
-        case "update":
-          this.form.show = true;
-          this.form.action = action;
-          this.form.update_id = id;
+        case "open":
+          status = 1;
+          break;
+        case "close":
+          status = 0;
           break;
       }
+      this.updateIncidentReport({
+        id: id,
+        status: status
+      });
     }
   }
 };
