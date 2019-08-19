@@ -1,16 +1,16 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const AGENTS_DAILY_REPORT = generateMutationTypes(
-  "today's work",
-  "AGENTS_DAILY_REPORT"
+const UPDATE_INCIDENT_REPORT = generateMutationTypes(
+  "leaves",
+  "UPDATE_INCIDENT_REPORT"
 );
 
 /**
- * State
+ * state
  */
 
 const state = {
-  fetchingState: {
+  state: {
     initial: false,
     success: false,
     fail: false
@@ -24,35 +24,34 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for fetching ALL AGENTS WORK REPORTS
+   * Commits initial state for  update incident report
    * @param state
    */
-  [AGENTS_DAILY_REPORT.initial](state) {
-    state.fetchingState = {
+  [UPDATE_INCIDENT_REPORT.initial](state) {
+    state.state = {
       initial: true,
       success: false,
       fail: false
     };
   },
   /**
-   * Commits success state for fetching ALL AGENTS WORK REPORTS
+   * Commits success state for  update incident report
    * @param state
    */
-  [AGENTS_DAILY_REPORT.success](state, payload) {
-    state.fetchingState = {
+  [UPDATE_INCIDENT_REPORT.success](state, payload) {
+    state.state = {
       initial: false,
       success: true,
       fail: false
     };
     state.data = payload.meta;
-    // console.log(payload.meta)
   },
   /**
-   * Commits fail state for fetching ALL AGENTS WORK REPORTS
+   * Commits fail state for  update incident report
    * @param state
    */
-  [AGENTS_DAILY_REPORT.fail](state, payload) {
-    state.fetchingState = {
+  [UPDATE_INCIDENT_REPORT.fail](state, payload) {
+    state.state = {
       initial: false,
       success: false,
       fail: true
@@ -63,16 +62,16 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for fetching AGENTS WORK REPORTS
+   * Action for  update incident report
    * @param commit
    * @param params
    */
-  fetchAgentsTodayWork({ commit }, params) {
-    const slug = "api.schedules.report";
+  updateIncidentReport({ commit }, params) {
+    const slug = "api.reports.update";
     STATE_API({ slug, params }, commit, [
-      AGENTS_DAILY_REPORT.initial,
-      AGENTS_DAILY_REPORT.success,
-      AGENTS_DAILY_REPORT.fail
+      UPDATE_INCIDENT_REPORT.initial,
+      UPDATE_INCIDENT_REPORT.success,
+      UPDATE_INCIDENT_REPORT.fail
     ]);
   }
 };

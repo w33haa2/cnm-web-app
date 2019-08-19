@@ -99,16 +99,16 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import { Message } from 'element-ui'
+import { mapActions, mapGetters } from "vuex";
+import { Message } from "element-ui";
 export default {
-  name: 'Type',
+  name: "Type",
   data() {
     return {
-      searchQuery: '',
+      searchQuery: "",
       modal_show: false,
       form: {
-        action: 'Create',
+        action: "Create",
         // input models
         type_number: null,
         type_description: null
@@ -120,113 +120,112 @@ export default {
       table_config: {
         page: 1
       }
-    }
+    };
   },
   computed: {
     ...mapGetters([
-      'sanctionTypes',
-      'fetchSanctionTypeState',
-      'sanctionTypeTotal',
-      'createSanctionTypeState',
-      'updateSanctionTypeState',
-      'sanctionTypeErrors'
+      "sanctionTypes",
+      "fetchSanctionTypeState",
+      "createSanctionTypeState",
+      "updateSanctionTypeState",
+      "sanctionTypeErrors"
     ])
   },
   watch: {
     createSanctionTypeState({ initial, success, fail }) {
       if (success) {
-        this.fetchSanctionTypes(this.query)
+        this.fetchSanctionTypes(this.query);
         Message.success({
-          message: 'Successfully defined Sanction Type',
-          duration: '2500'
-        })
-        this.resetForm()
-        this.modal_show = false
+          message: "Successfully defined Sanction Type",
+          duration: "2500"
+        });
+        this.resetForm();
+        this.modal_show = false;
       } else if (fail) {
-        Message.error({ message: this.sanctionTypeErrors, duration: '2500' })
+        Message.error({ message: this.sanctionTypeErrors, duration: "2500" });
       }
     },
     updateSanctionTypeState({ initial, success, fail }) {
       if (success) {
-        this.fetchSanctionTypes(this.query)
+        this.fetchSanctionTypes(this.query);
         Message.success({
-          message: 'Successfully updated Sanction Type',
-          duration: '2500'
-        })
-        this.resetForm()
-        this.modal_show = false
+          message: "Successfully updated Sanction Type",
+          duration: "2500"
+        });
+        this.resetForm();
+        this.modal_show = false;
       } else if (fail) {
-        Message.error({ message: this.sanctionTypeErrors, duration: '2500' })
+        Message.error({ message: this.sanctionTypeErrors, duration: "2500" });
       }
     },
     searchQuery(newData) {
-      if (newData !== '') {
-        this.query['target[]'] = 'type_description'
-        this.query.query = newData
-        this.fetchSanctionTypes(this.query)
+      if (newData !== "") {
+        this.query["target[]"] = "type_description";
+        this.query.query = newData;
+        this.fetchSanctionTypes(this.query);
       } else {
-        this.query['target[]'] = ''
-        this.query.query = ''
-        this.fetchSanctionTypes(this.query)
+        this.query["target[]"] = "";
+        this.query.query = "";
+        this.fetchSanctionTypes(this.query);
       }
     }
   },
   mounted() {
-    this.fetchSanctionTypes(this.query)
+    this.fetchSanctionTypes(this.query);
   },
   methods: {
     ...mapActions([
-      'fetchSanctionTypes',
-      'createSanctionTypes',
-      'updateSanctionTypes'
+      "fetchSanctionTypes",
+      "createSanctionTypes",
+      "updateSanctionTypes"
     ]),
     tableSizeChange(value) {
-      this.query.limit = value
-      this.query.offset = 0
-      this.fetchSanctionTypes(this.query)
+      this.query.limit = value;
+      this.query.offset = 0;
+      this.fetchSanctionTypes(this.query);
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
-      const data = this.query
-      this.fetchSanctionTypes(this.query)
+      this.query.offset = (value - 1) * this.query.limit;
+      const data = this.query;
+      this.fetchSanctionTypes(this.query);
     },
     updateRow(row) {
-      this.form.action = 'Update'
-      this.form.id = row.id
-      this.form.type_number = row.type_number
-      this.form.type_description = row.type_description
-      this.modal_show = true
+      this.form.action = "Update";
+      this.form.id = row.id;
+      this.form.type_number = row.type_number;
+      this.form.type_description = row.type_description;
+      this.modal_show = true;
     },
     resetForm() {
-      this.form.action = 'Create'
-      this.form.type_number = null
-      this.form.type_description = null
+      this.form.action = "Create";
+      this.form.type_number = null;
+      this.form.type_description = null;
     },
     cancelForm() {
-      this.resetForm()
-      this.modal_show = false
+      this.resetForm();
+      this.modal_show = false;
     },
     submitForm() {
       // submit action
-      if (this.form.action == 'Create') {
+      if (this.form.action == "Create") {
         // create
         const data = {
           type_number: this.form.type_number,
           type_description: this.form.type_description
-        }
-        this.createSanctionTypes(data)
+        };
+        this.createSanctionTypes(data);
       } else {
         // update
         const data = {
           id: this.form.id,
           type_number: this.form.type_number,
           type_description: this.form.type_description
-        }
-        this.updateSanctionTypes(data)
+        };
+        this.updateSanctionTypes(data);
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

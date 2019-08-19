@@ -104,6 +104,15 @@ const getters = {
   createLeaveState: state => state.create_leave.state,
   //update_leave
   updateLeaveData: state => state.update_leave.data,
-  updateLeaveState: state => state.update_leave.state
+  updateLeaveState: state => state.update_leave.state,
+  // agent daily work
+  todaysWork: state => state.agent_daily_work.data,
+  todaysWorkfetchState: state => state.agent_daily_work.fetchingState,
+  // agent_start_work
+  agentStartWorkData: state => state.agent_start_work.data,
+  agentStartWorkfetchState: state => state.agent_start_work.fetchingState,
+  // agent_end_work
+  agentEndWorkData: state => state.agent_start_work.data,
+  agentEndWorkfetchState: state => state.agent_start_work.fetchingState
 };
 export default getters;

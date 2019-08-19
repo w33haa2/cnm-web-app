@@ -47,12 +47,17 @@
                   <div class="label">
                     <small>ATTENDANCE</small>
                   </div>
-                  <div
-                    class="text"
-                    v-if="datum.remarks == 'present'"
-                  >{{ formatDate(datum.time_in.date,"","HH:mm a") + " - " + formatDate(datum.time_out.date,"","HH:mm a") }}</div>
-
-                  <div class="text" style="color:grey" v-else>NO LOGS</div>
+                  <div class="text" v-if="datum.remarks == 'Present'">
+                    {{ formatDate(datum.time_in.date,"","HH:mm a") + " - " }}
+                    <span
+                      v-if="datum.time_out"
+                    >{{ formatDate(datum.time_out.date,"","HH:mm a") }}</span>
+                    <span v-else>
+                      <span v-if="laterDate(datum.end_event.date)" style="color:#409EFF">ongoing..</span>
+                      <span v-else style="color:#F56C6C">no timeout</span>
+                    </span>
+                  </div>
+                  <div v-else class="text" style="color:grey">NO LOGS</div>
                 </el-col>
                 <el-col :md="{span:2}">
                   <div class="label">
@@ -65,7 +70,7 @@
                     <small>CONFORMANCE</small>
                   </div>
                   <div>
-                    <el-progress :percentage="datum.conformance" color="#6f7ad3"></el-progress>
+                    <el-progress :percentage="datum.conformance | toFix" color="#6f7ad3"></el-progress>
                   </div>
                 </el-col>
                 <el-col :md="{span:6}">
@@ -73,7 +78,8 @@
                     <small>STATUS</small>
                   </div>
                   <div>
-                    <el-tag :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
+                    <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
+                    <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
                   </div>
                 </el-col>
               </el-row>
@@ -188,6 +194,24 @@ export default {
     joinOt() {},
     displayMonth() {
       return this.formatDate(this.work_report.month, "", "MMMM").toUpperCase();
+    },
+    laterDate(date) {
+      let result = false;
+      if (moment().isBefore(moment(date).format("YYYY-MM-DD HH:mm:ss"))) {
+        result = true;
+      } else {
+        result = false;
+      }
+      return result;
+    },
+    pastDate(date) {
+      let result = false;
+      if (moment().isAfter(moment(date).format("YYYY-MM-DD HH:mm:ss"))) {
+        result = true;
+      } else {
+        result = false;
+      }
+      return result;
     },
     tagType(remarks) {
       let tag = "danger";

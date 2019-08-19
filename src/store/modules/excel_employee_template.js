@@ -1,8 +1,8 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const AGENTS_DAILY_REPORT = generateMutationTypes(
-  "today's work",
-  "AGENTS_DAILY_REPORT"
+const EMPLOYEE_TEMPLATE = generateMutationTypes(
+  "export excel",
+  "EMPLOYEE_TEMPLATE"
 );
 
 /**
@@ -24,10 +24,10 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for fetching ALL AGENTS WORK REPORTS
+   * Commits initial state for fetching EXCEL EMPLOYEE TEMPLATE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.initial](state) {
+  [EMPLOYEE_TEMPLATE.initial](state) {
     state.fetchingState = {
       initial: true,
       success: false,
@@ -35,23 +35,21 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for fetching ALL AGENTS WORK REPORTS
+   * Commits success state for fetching EXCEL EMPLOYEE TEMPLATE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.success](state, payload) {
+  [EMPLOYEE_TEMPLATE.success](state, payload) {
     state.fetchingState = {
       initial: false,
       success: true,
       fail: false
     };
-    state.data = payload.meta;
-    // console.log(payload.meta)
   },
   /**
-   * Commits fail state for fetching ALL AGENTS WORK REPORTS
+   * Commits fail state for fetching EXCEL EMPLOYEE TEMPLATE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.fail](state, payload) {
+  [EMPLOYEE_TEMPLATE.fail](state, payload) {
     state.fetchingState = {
       initial: false,
       success: false,
@@ -67,12 +65,12 @@ const actions = {
    * @param commit
    * @param params
    */
-  fetchAgentsTodayWork({ commit }, params) {
-    const slug = "api.schedules.report";
+  exportEmployeeTemplate({ commit }, params) {
+    const slug = "api.excel.employeeTemplate";
     STATE_API({ slug, params }, commit, [
-      AGENTS_DAILY_REPORT.initial,
-      AGENTS_DAILY_REPORT.success,
-      AGENTS_DAILY_REPORT.fail
+      EMPLOYEE_TEMPLATE.initial,
+      EMPLOYEE_TEMPLATE.success,
+      EMPLOYEE_TEMPLATE.fail
     ]);
   }
 };

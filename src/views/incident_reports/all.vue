@@ -31,7 +31,7 @@
     </el-row>
 
     <!-- Table -->
-    <br>
+    <br />
     <el-alert
       v-if="fetchingAllIncidentReports.fail"
       title="Error!"
@@ -57,10 +57,10 @@
           </el-dropdown>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Issued To">
+      <el-table-column align="center" label="Issued To" width="300">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image">
+            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image" />
             <div v-else class="td-name-avatar">
               <span>{{ getAvatarLetters(scope.row.issued_to.fname,scope.row.issued_to.lname) }}</span>
             </div>
@@ -68,10 +68,10 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Issued By">
+      <el-table-column align="center" label="Issued By" width="300">
         <template slot-scope="scope">
           <div class="td-image-name-container">
-            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image">
+            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image" />
             <div v-else class="td-name-avatar">
               <span>{{ getAvatarLetters(scope.row.issued_by.fname,scope.row.issued_by.lname) }}</span>
             </div>
@@ -79,10 +79,10 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Sanction Type">
+      <el-table-column align="center" label="Sanction Type" width="150">
         <template slot-scope="scope">{{ scope.row.report_details.sanction_type.type_description }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Sanction Level">
+      <el-table-column align="center" label="Sanction Level" width="150">
         <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Status" width="220">
@@ -92,7 +92,7 @@
         </template>
       </el-table-column>
       <el-table-column align="header-center" label="Description" width="350">
-        <template slot-scope="scope">{{ scope.row.description }}</template>
+        <template slot-scope="scope">{{ scope.row.report_details.description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
@@ -101,14 +101,14 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="Date Filed" width="220">
-        <template slot-scope="scope">{{ scope.row.date_filed }}</template>
+        <template slot-scope="scope">{{ fromNow(scope.row.report_details.created_at.date) }}</template>
       </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -117,44 +117,44 @@ export default {
         limit: 10
       },
       searchQuery: null
-    }
+    };
   },
   computed: {
     ...mapGetters([
-      'fetchingAllIncidentReports',
-      'incidentReports',
-      'irErrors',
-      'incidentReportsTotal'
+      "fetchingAllIncidentReports",
+      "incidentReports",
+      "irErrors",
+      "incidentReportsTotal"
     ])
   },
   watch: {},
   mounted() {
-    this.fetchAllReports(this.query)
+    this.fetchAllReports(this.query);
   },
   methods: {
-    ...mapActions(['fetchAllReports']),
+    ...mapActions(["fetchAllReports"]),
 
     tableSizeChange(value) {
-      this.query.limit = value
-      this.fetchAllReports(this.query)
+      this.query.limit = value;
+      this.fetchAllReports(this.query);
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
-      this.fetchAllReports(this.query)
+      this.query.offset = (value - 1) * this.query.limit;
+      this.fetchAllReports(this.query);
     },
     handleCommand(command) {
-      const id = command.split('||')[1]
-      const action = command.split('||')[0]
+      const id = command.split("||")[1];
+      const action = command.split("||")[0];
       switch (action) {
-        case 'update':
-          this.form.show = true
-          this.form.action = action
-          this.form.update_id = id
-          break
+        case "update":
+          this.form.show = true;
+          this.form.action = action;
+          this.form.update_id = id;
+          break;
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

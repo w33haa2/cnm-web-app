@@ -1,9 +1,9 @@
-import { STATE_API } from '@/utils/api/api-helper'
-import { generateMutationTypes } from '@/utils/api/state-mutation'
+import { STATE_API } from "@/utils/api/api-helper";
+import { generateMutationTypes } from "@/utils/api/state-mutation";
 const FETCH_AGENTS = generateMutationTypes(
-  'for_remote_funtion',
-  'FETCH_AGENTS'
-)
+  "for_remote_funtion",
+  "FETCH_AGENTS"
+);
 /**
  * State
  */
@@ -15,8 +15,8 @@ const state = {
     fail: false
   },
   data: [],
-  errors:[]
-}
+  errors: []
+};
 
 /**
  * Mutators
@@ -31,7 +31,7 @@ const mutations = {
       initial: true,
       success: false,
       fail: false
-    }
+    };
   },
   /**
    * Commits success state for fetching agent list
@@ -42,8 +42,8 @@ const mutations = {
       initial: false,
       success: true,
       fail: false
-    }
-    state.data = payload.meta
+    };
+    state.data = payload.meta;
   },
   /**
    * Commits fail state for fetching agent list
@@ -54,10 +54,10 @@ const mutations = {
       initial: false,
       success: false,
       fail: true
-    }
-    state.errors = payload.response.data.title
-  },
-}
+    };
+    state.errors = payload.response.data.title;
+  }
+};
 
 const actions = {
   /**
@@ -66,18 +66,18 @@ const actions = {
    * @param params
    */
   fetchAgents({ commit }, params) {
-    const slug = 'api.schedules.agents'
-    params = params.data
+    const slug = "api.schedules.agents";
+    params = params.data;
     STATE_API({ slug, params }, commit, [
       FETCH_AGENTS.initial,
       FETCH_AGENTS.success,
       FETCH_AGENTS.fail
-    ])
-  },
-}
+    ]);
+  }
+};
 
 export default {
   state,
   mutations,
   actions
-}
+};

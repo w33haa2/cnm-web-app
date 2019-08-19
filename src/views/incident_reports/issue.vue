@@ -84,7 +84,7 @@
         <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
       </el-table-column>
       <el-table-column align="center" label="Date Filed" width="220">
-        <template slot-scope="scope">{{ scope.row.report_details.created_at.date }}</template>
+        <template slot-scope="scope">{{ fromNow(scope.row.report_details.created_at.date) }}</template>
       </el-table-column>
       <el-table-column align="header-center" label="Description" width="350">
         <template slot-scope="scope">{{ scope.row.report_details.description }}</template>
@@ -186,7 +186,9 @@ export default {
       },
       query: {
         limit: 10,
-        offset: 0
+        offset: 0,
+        sort:"created_at",
+        order:"desc"
       }
     };
   },

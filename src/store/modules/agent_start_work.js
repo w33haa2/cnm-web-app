@@ -1,8 +1,8 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const AGENTS_DAILY_REPORT = generateMutationTypes(
-  "today's work",
-  "AGENTS_DAILY_REPORT"
+const CREATE_ATTENDANCE = generateMutationTypes(
+  "start_work",
+  "CREATE_ATTENDANCE"
 );
 
 /**
@@ -24,10 +24,10 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for fetching ALL AGENTS WORK REPORTS
+   * Commits initial state for CREATE ATTENDANCE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.initial](state) {
+  [CREATE_ATTENDANCE.initial](state) {
     state.fetchingState = {
       initial: true,
       success: false,
@@ -35,23 +35,22 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for fetching ALL AGENTS WORK REPORTS
+   * Commits success state for CREATE ATTENDANCE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.success](state, payload) {
+  [CREATE_ATTENDANCE.success](state, payload) {
     state.fetchingState = {
       initial: false,
       success: true,
       fail: false
     };
     state.data = payload.meta;
-    // console.log(payload.meta)
   },
   /**
-   * Commits fail state for fetching ALL AGENTS WORK REPORTS
+   * Commits fail state for CREATE ATTENDANCE
    * @param state
    */
-  [AGENTS_DAILY_REPORT.fail](state, payload) {
+  [CREATE_ATTENDANCE.fail](state, payload) {
     state.fetchingState = {
       initial: false,
       success: false,
@@ -63,16 +62,16 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for fetching AGENTS WORK REPORTS
+   * Action for CREATE ATTENDANCE
    * @param commit
    * @param params
    */
-  fetchAgentsTodayWork({ commit }, params) {
-    const slug = "api.schedules.report";
+  agentStartWork({ commit }, params) {
+    const slug = "api.attendance.create.single";
     STATE_API({ slug, params }, commit, [
-      AGENTS_DAILY_REPORT.initial,
-      AGENTS_DAILY_REPORT.success,
-      AGENTS_DAILY_REPORT.fail
+      CREATE_ATTENDANCE.initial,
+      CREATE_ATTENDANCE.success,
+      CREATE_ATTENDANCE.fail
     ]);
   }
 };
