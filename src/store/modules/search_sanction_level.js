@@ -24,7 +24,7 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for search sanction type
+   * Commits initial state for search sanction levels
    * @param state
    */
   [SEARCH_SANCTION_LEVELS.initial](state) {
@@ -35,7 +35,7 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for search sanction type
+   * Commits success state for search sanction levels
    * @param state
    */
   [SEARCH_SANCTION_LEVELS.success](state, payload) {
@@ -47,7 +47,7 @@ const mutations = {
     state.data = payload.meta;
   },
   /**
-   * Commits fail state for search sanction type
+   * Commits fail state for search sanction levels
    * @param state
    */
   [SEARCH_SANCTION_LEVELS.fail](state, payload) {
@@ -62,11 +62,11 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for search ir
+   * Action for search sanction levels
    * @param commit
    * @param params
    */
-  searchSanctionTypes({ commit }, params) {
+  searchSanctionLevels({ commit }, params) {
     const slug = "api.sanction_levels.search";
     STATE_API({ slug, params }, commit, [
       SEARCH_SANCTION_LEVELS.initial,
