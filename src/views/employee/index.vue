@@ -34,8 +34,9 @@
                 Excel
                 <i class="el-icon-arrow-down el-icon--right" />
               </el-button>
+              <input type="file" ref="importEmployeeInput" accept=".xlsx" style="display:none" @change="importEmployeeFileChange">
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>Import Employee</el-dropdown-item>
+                <el-dropdown-item command="importEmployee">Import Employee</el-dropdown-item>
                 <el-dropdown-item command="downloadEmployeeTemplate">Export Employee Template</el-dropdown-item>
                 <el-dropdown-item command="downloadEmployeeList">Export Employee List</el-dropdown-item>
               </el-dropdown-menu>
@@ -314,6 +315,27 @@ export default {
       "fetchRSEmployees",
       "resetPassEmployee"
     ]),
+    excelAddUser(arr){
+      let count = arr.length;
+      var i = 0;
+      for(i in arr){
+        console.log(arr[i])
+        axios.post('api/v1/users/import_user',arr[i],{
+          headers:{
+            Authorization:"Bearer "+ this.token
+          }
+        }).then(res=>console.log(res)).catch(err=>console.log(err))
+      }
+    },
+    importEmployeeFileChange(e){
+      let file = e.target.files[0],formData = new FormData, options= {
+        headers:{
+          Authorizaion:"Bearer "+this.token,
+        }
+      };
+      formData.append('file',e.target.files[0])
+      axios.post('api/v1/users/excel_to_array',formData,options).then(res => this.excelAddUser(res.data.meta.user)).catch(err=>console.log(err))
+    },
     exportEmployeeList() {
       let url = "api/v1/excel/export_report",
         options = {
@@ -373,6 +395,9 @@ export default {
           break;
         case "downloadEmployeeList":
           this.exportEmployeeList();
+          break;
+          case "importEmployee":
+          this.$refs.importEmployeeInput.click()
           break;
       }
     },

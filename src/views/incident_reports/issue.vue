@@ -71,6 +71,9 @@
           <el-tag v-else type="danger">Open</el-tag>
         </template>
       </el-table-column>
+      <el-table-column align="header-center" label="Incident date" width="150">
+        <template slot-scope="scope">{{ fromNow(scope.row.report_details.incident_date) }}</template>
+      </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.report_details.agent_response" type="success">Responded</el-tag>
@@ -111,6 +114,12 @@
               :label="comrade.full_name"
             />
           </el-select>
+        </el-col>
+      </el-row>
+      <label>Incident Date</label>
+      <el-row style="margin-top: 5px; margin-bottom:3px;">
+        <el-col>
+          <el-date-picker size="mini" type="date" placeholder="Select date..." v-model="form.incident_date" style="width:100%"></el-date-picker>
         </el-col>
       </el-row>
       <label>Sanction Type</label>
@@ -163,6 +172,7 @@ import path from "path";
 import { Message } from "element-ui";
 import { deepClone } from "@/utils";
 import { mapActions, mapGetters } from "vuex";
+import moment from "moment";
 const defaultRole = {
   key: "",
   name: "",
@@ -179,6 +189,7 @@ export default {
         show: false,
         action: "Create",
         id: null,
+        incident_date:null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
@@ -284,6 +295,7 @@ export default {
       this.confirm = true;
       if (this.form.action == "Create") {
         const data = {
+          incident_date: moment(this.form.incident_date).format("YYYY-MM-DD"),
           sanction_type_id: this.form.sanction_type_id,
           sanction_level_id: this.form.sanction_level_id,
           description: this.form.description,
@@ -301,6 +313,7 @@ export default {
         } else {
           const data = {
             id: this.form.id,
+            incident_date: moment(this.form.incident_date).format("YYYY-MM-DD"),
             sanction_type_id: this.form.sanction_type_id,
             sanction_level_id: this.form.sanction_level_id,
             description: this.form.description,
@@ -322,6 +335,7 @@ export default {
             show: true,
             action: action,
             id: data.report_details.id,
+            incident_date:data.report_details.incident_date,
             sanction_type_id: data.report_details.sanction_type.id,
             sanction_level_id: data.report_details.sanction_level.id,
             description: data.report_details.description,

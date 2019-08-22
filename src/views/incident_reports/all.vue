@@ -87,6 +87,11 @@
       <el-table-column align="center" label="Sanction Level" width="150">
         <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
       </el-table-column>
+      <el-table-column align="center" label="Incident Date" width="150">
+        <template slot-scope="scope">
+          {{ fromNow(scope.row.report_details.incident_date) }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="Status" width="220">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.report_details.status=='0'" type="success">Closed</el-tag>

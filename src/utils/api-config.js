@@ -312,6 +312,17 @@ const api = {
           issued_byf_search: {
             $url: "issuedby/search",
             $method: "GET"
+          },
+          create_response:{
+            $url: "user_response",
+            $method: "POST"
+          },
+          update_response:{
+            $url: "update_response",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update_response/${id}`)
+
           }
         },
         // endregion reports

@@ -87,16 +87,13 @@ const getters = {
   // END
   // store/modules/sanction
   // =================================================================
-
   // schedule_work_report module
   agentsWorkReports: state => state.schedule_work_report.data,
   agentsWorkReportsfetchState: state =>
     state.schedule_work_report.fetchingState,
-
   // agent_list
   agents: state => state.agent_list.data,
   agentsfetchState: state => state.agent_list.fetchingState,
-
   // fetch_leave
   leaves: state => state.fetch_leave.data.all,
   leavesfetchState: state => state.fetch_leave.fetchingState.all,
@@ -106,7 +103,6 @@ const getters = {
   leavesApprovedfetchState: state => state.fetch_leave.fetchingState.approved,
   leavesDenied: state => state.fetch_leave.data.denied,
   leavesDeniedfetchState: state => state.fetch_leave.fetchingState.denied,
-
   // delete_leave
   deleteLeaveData: state => state.delete_leave.data,
   deleteLeaveState: state => state.delete_leave.state,
@@ -124,6 +120,13 @@ const getters = {
   agentStartWorkfetchState: state => state.agent_start_work.fetchingState,
   // agent_end_work
   agentEndWorkData: state => state.agent_start_work.data,
-  agentEndWorkfetchState: state => state.agent_start_work.fetchingState
+  agentEndWorkfetchState: state => state.agent_start_work.fetchingState,
+  // create report response
+  createReportResponseState: state => state.create_report_response.state,
+  createReportResponseData: state => state.create_report_response.data,
+  // update report response
+  updateReportResponseState: state => state.update_report_response.state,
+  updateReportResponseData: state => state.update_report_response.data,
+
 };
 export default getters;
