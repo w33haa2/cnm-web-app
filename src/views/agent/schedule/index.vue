@@ -43,7 +43,7 @@
 
     <el-row>
       <el-col :md="{span:8}" style="margin-top:20px;">
-        <el-input v-model="agent_search" size="mini" placeholder="Agent Search" />
+        <el-input v-model="searchQuery" size="mini" placeholder="Agent Search" />
       </el-col>
       <el-col :md="{span:16}" style="margin-top:20px;">
         <el-pagination
@@ -528,6 +528,27 @@ export default {
     ])
   },
   watch: {
+    searchQuery(v){
+      if(v!=""){
+        this.query['target[]'] = 'full_name';
+        this.query.query = v;
+        this.weekChange(
+          moment()
+            // .subtract(7, "days")
+            .startOf('isoweek')
+            .format('YYYY-MM-DD')
+        )
+      }else{
+        delete this.query['target[]'];
+        delete this.query.query;
+        this.weekChange(
+          moment()
+            // .subtract(7, "days")
+            .startOf('isoweek')
+            .format('YYYY-MM-DD')
+        )
+      }
+    },
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
         this.tableData = this.agentsWorkReports.agent_schedules
@@ -547,6 +568,7 @@ export default {
   },
   data() {
     return {
+      searchQuery:"",
       form: {
         addSchedule: {
           show: false, // temporary value
@@ -559,7 +581,7 @@ export default {
           }
         },
         addLeave: {
-          show: true, // temporary value
+          show: false, // temporary value
           model: {
             user_id: null,
             dates: {},
@@ -626,6 +648,10 @@ export default {
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
+      }
+      if(this.searchQuery!=""){
+        data['target[]']="full_name";
+        data.query=this.searchQuery;
       }
       this.fetchAgentsWorkReports({ data })
     },
