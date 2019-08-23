@@ -306,7 +306,6 @@ const actions = {
   // fetch user_status_list
   fetchStatusList({ commit }, params) {
     const slug = 'api.users.statusList'
-    params = params.data
     STATE_API({ slug, params }, commit, [
       FETCH_USER_STATUS_LIST.initial,
       FETCH_USER_STATUS_LIST.success,

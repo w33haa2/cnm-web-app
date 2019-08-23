@@ -281,6 +281,7 @@ export default {
     this.fetchComrades({ id: this.userDetails.id });
     this.fetchSanctionLevels();
     this.fetchSanctionTypes();
+    window.addEventListener('beforeunload',this.beforeUnload)
   },
   methods: {
     ...mapActions([
@@ -291,6 +292,9 @@ export default {
       "createReports",
       "updateIncidentReport"
     ]),
+    beforeUnload(e){
+      alert("UNLOADING")
+    },
     submitForm() {
       this.confirm = true;
       if (this.form.action == "Create") {

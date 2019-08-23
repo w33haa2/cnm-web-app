@@ -269,7 +269,7 @@ export default {
     this.cascadeSelectHead()
   },
   methods: {
-    ...mapActions(['fetchUsers', 'addUser']),
+    ...mapActions(['addUser']),
     captured: function(value) {
       this.form.employee.image = value
       console.log(value)

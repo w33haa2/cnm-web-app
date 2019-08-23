@@ -189,7 +189,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchUsers', 'fetchPositions', 'fetchEmployees', 'deleteEmployee']),
+    ...mapActions(['fetchPositions', 'fetchEmployees', 'deleteEmployee']),
     refreshTable() {
       const data = this.query
       this.fetchEmployees({ data })
@@ -218,18 +218,15 @@ export default {
     tableSizeChange(value) {
       this.table_config.query.limit = value
       // alert('size changed: '+ value)
-      this.fetchUsers(this.table_config.query)
     },
     tablePageChange(value) {
       this.table_config.query.offset = value - 1
       // alert('page changed: '+ value)
-      this.fetchUsers(this.table_config.query)
     },
     onColumnSort(value) {
       // alert('deym')
       this.table_config.query.sort = value.sort
       this.table_config.query.order = value.order
-      this.fetchUsers(this.table_config.query)
     }
   }
 }

@@ -151,11 +151,9 @@ export default {
     }
   },
   created() {
-    this.fetchUsers()
-    // this.fetchAccessLevels();
   },
   methods: {
-    ...mapActions(['fetchAccessLevels', 'fetchUsers']),
+    ...mapActions(['fetchAccessLevels']),
     // local component functions
     fetchData() {
       transactionList().then(response => {

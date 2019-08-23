@@ -490,7 +490,6 @@ const actions = {
     axios
       .post(url, employee)
       .then(res => {
-        this.dispatch('fetchUsers')
         console.log(res.status)
         commit('FORM_RESPONSE', res)
       })

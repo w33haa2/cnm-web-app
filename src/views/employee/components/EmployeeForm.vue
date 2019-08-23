@@ -386,8 +386,9 @@ export default {
         this.vueCam.deviceId = first.deviceId
       }
     },
-    allPosition: function() {
-      this.options.position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
+    allPosition: function(v) {
+      this.options.position = v.map(function(pos) { return { value: pos.id, label: pos.name } })
+      this.form.employee.access_id = this.options.position.filter(i => i.value == 16)[0].value
       this.cascadeSelectHead()
     },
     // 'form.employee.access_id': function() {
@@ -467,8 +468,7 @@ export default {
       query: this.allPosition.filter(i => i.id === this.form.employee.access_id)[0].parent
     }
     this.fetchPotentialHead({ data })
-    const status_query = {}
-    this.fetchStatusList({ status_query })
+      this.fetchStatusList()
   },
   created() {
     var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
@@ -616,29 +616,36 @@ export default {
       console.log(blob)
       return blob
     },
-    ...mapActions(['fetchUsers', 'addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee']),
+    ...mapActions(['addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee']),
     captured: function(value) {
       this.form.employee.image = value
       console.log(value)
     },
     storeEmployee: async function() {
-      if (this.data.action.toLowerCase() === 'create') {
-        this.clearFormErrors()
-        const data = this.toFormData(this.form.employee)
-        this.addUser(data)
-      } else {
-        this.clearFormErrors()
-        this.form.employee.id = this.data.data.id
-        const data = this.toFormData(this.form.employee)
-        this.updateUser(data)
+      if(this.data.data.id == this.form.employee.parent_id){
+        this.$message({
+          type:"warning",
+          message:"You can't assign an employee to itself.",
+          duration:5000
+        });
+      }else{
+        if (this.data.action.toLowerCase() === 'create') {
+          this.clearFormErrors()
+          const data = this.toFormData(this.form.employee)
+          this.addUser(data)
+        } else {
+          this.clearFormErrors()
+          this.form.employee.id = this.data.data.id
+          const data = this.toFormData(this.form.employee)
+          this.updateUser(data)
+        }
       }
-
     },
-    cascadeSelectHead() {
-      const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent
-      this.options.head = this.allUser.filter(function(i) { return i.access_id == parent }).map(function(i) { return { value: i.id, label: i.full_name } })
-      this.form.employee.parent_id = this.options.head[0].value
-    },
+    // cascadeSelectHead() {
+    //   const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent
+    //   this.options.head = this.allUser.filter(function(i) { return i.access_id == parent }).map(function(i) { return { value: i.id, label: i.full_name } })
+    //   this.form.employee.parent_id = this.options.head[0].value
+    // },
     isHR(access_id) {
       return !!((access_id == 2 || access_id == 3))
     },
@@ -648,7 +655,7 @@ export default {
         this.form.employee[v] = null
       })
       const status = this.statusList.filter(i => i.id == 1)[0]
-      
+
       this.form.employee.gender = 'Male'
       this.form.employee.status_id = 1
       this.form.employee.status = status.status

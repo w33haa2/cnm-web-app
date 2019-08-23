@@ -128,7 +128,6 @@
             reserve-keyword
             placeholder="Employees..."
             :remote-method="remoteMethod"
-            :loading="loading"
           >
             <el-option
               v-for="item in rs_employees"
@@ -154,7 +153,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini" @click="submitForm">Confirm</el-button>
+        <el-button type="danger" size="mini">Confirm</el-button>
       </span>
     </el-dialog>
 
@@ -180,6 +179,83 @@
         >Confirm</el-button>
       </span>
     </el-dialog>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="excel.import.dialog"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      title="Importing Employee..."
+      width="50%"
+      top="5vh"
+    >
+
+  <el-alert
+    title="Import Report"
+    type="info"
+    description="This report will only be displayed once every import. Please review results to reupload unimported data."
+    show-icon>
+  </el-alert>
+
+    <div style="width:100%;margin-bottom:20px;margin-top:15px;">Progress <span>( {{ excel.import.loop_index }}</span>/<span>{{ excel.import.arr_length }} )</span>
+    </div>
+    <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+    <div style="padding-bottom:15px;  ">
+
+  <el-tabs v-model="excel.import.report.active_tab" type="border-card" style="margin-top:15px;margin-bottom:10px;">
+    <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
+      <el-table :data="excel.import.report.data.all.list" height="350px">
+        <el-table-column label="CID" width="100">
+          <template scope="scope">
+            {{scope.row.company_id}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Full Name" width="350">
+          <template scope="scope">
+{{scope.row.full_name}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Status">
+          <template scope="scope">
+            <template v-if="scope.row.status_code==200">
+              <el-tag size="mini" type="success">UPLOADED</el-tag>
+            </template>
+            <template v-else>
+              <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+    <el-tab-pane :label="'Errors: ' +excel.import.report.data.errors.list.length " name="errors">
+      <el-table :data="excel.import.report.data.errors.list" height="350px">
+        <el-table-column label="CID" width="100">
+          <template scope="scope">
+            {{scope.row.company_id}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Full Name" width="350">
+          <template scope="scope">
+{{scope.row.full_name}}
+          </template>
+        </el-table-column>
+        <el-table-column label="Status">
+          <template scope="scope">
+            <template v-if="scope.row.status_code==200">
+              <el-tag size="mini" type="success">UPLOADED</el-tag>
+            </template>
+            <template v-else>
+              <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-tab-pane>
+  </el-tabs>
+      <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+    </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -201,6 +277,30 @@ export default {
   },
   data() {
     return {
+      excel:{
+        import:{
+          status:null,
+          progress:0,
+          dialog:false,
+          loop_index:0,
+          arr_length:100,
+          data:[],
+          importing:false,
+          report:{
+            active_tab:'all',
+            data:{
+              all:{
+                count:0,
+                list:[]
+              },
+              errors:{
+                count:0,
+                list:[]
+              },
+            },
+          }
+        }
+      },
       searchQuery: "",
       table_config: {
         searchable_fields: [
@@ -227,7 +327,9 @@ export default {
       },
       query: {
         limit: 10,
-        offset: 0
+        offset: 0,
+        // order:"desc",
+        // sort:"user.created_at"
       },
       reset: {
         toggle: false,
@@ -256,8 +358,25 @@ export default {
     this.$root.$on("employee_table.refresh", this.refreshTable);
     this.fetchStatusList();
     this.fetchRSEmployees();
+
+
     // setup filter select
   },
+  beforeRouteLeave (to, from, next) {
+    if(this.excel.import.importing){
+      if(confirm("Are you sure you want to leave?")){
+        next()
+      }else{
+        next(false)
+      }
+    }else{
+      next()
+    }
+    // if(from==to){
+    //   next(false)
+    // }
+  },
+
   computed: {
     ...mapGetters([
       "employees",
@@ -308,23 +427,77 @@ export default {
   },
   methods: {
     ...mapActions([
-      "fetchUsers",
       "fetchPositions",
       "fetchEmployees",
       "fetchStatusList",
       "fetchRSEmployees",
       "resetPassEmployee"
     ]),
+    closeImportReport(e){
+      if(this.excel.import.importing){
+        this.$message({
+          type:"warning",
+          message: "You are not allowed to close this dialog until the process is done. If you want to checkout something on other pages, Please open another browser tab.",
+          duration:10000
+        })
+      }else{
+        if(confirm("Are you sure you already reviewed the import report?")){
+          this.excel.import.dialog = false;
+          this.excel.import.report.data.all.list=[];
+          this.excel.import.report.data.errors.list=[];
+          //   all:{list:[],count:0},
+          //   errors:{list:[],count:0}
+          // }
+          this.excel.import.loop_index = 0;
+          this.excel.import.arr_length = 0;
+        }
+      }
+    },
     excelAddUser(arr){
       let count = arr.length;
+      this.excel.import.arr_length = arr.length;
+      this.excel.import.dialog = true;
+      this.excel.import.importing = true;
+      let tmp_arr=[];
+
       var i = 0;
       for(i in arr){
-        console.log(arr[i])
+      let suffix =arr[i].suffix?" "+arr[i].suffix:"";
+        let tmp_data = {company_id:arr[i].company_id, full_name: arr[i].firstname+" "+arr[i].middlename+" "+arr[i].lastname+ suffix};
+        console.log(tmp_data)
         axios.post('api/v1/users/import_user',arr[i],{
           headers:{
             Authorization:"Bearer "+ this.token
           }
-        }).then(res=>console.log(res)).catch(err=>console.log(err))
+        }).then(res=>{
+          console.log(res)
+          this.excel.import.loop_index = parseInt(i)+1;
+          this.excel.import.progress = this.excel.import.loop_index/this.excel.import.arr_length * 100;
+          tmp_data.status_code = res.status;
+          tmp_data.title = res.data.title;
+          tmp_arr.push(tmp_data)
+          this.excel.import.report.data.all.list = tmp_arr;
+          this.excel.import.report.data.errors.list = tmp_arr.filter(i=> i.status_code != 200);
+          if(this.excel.import.loop_index == this.excel.import.arr_length){
+            this.excel.import.importing = false;
+            this.query.offset = 0;
+            this.fetchEmployees(this.query);
+          }
+        }).catch(err=>{
+          console.log(err.response.data);
+          this.excel.import.loop_index = parseInt(i)+1;
+          this.excel.import.progress = this.excel.import.loop_index/this.excel.import.arr_length * 100;
+          tmp_data.status_code = err.response.data.code;
+          tmp_data.title = err.response.data.title;
+          tmp_arr.push(tmp_data)
+          this.excel.import.report.data.all.list = tmp_arr;
+          this.excel.import.report.data.errors.list = tmp_arr.filter(i=> i.status_code != 200);
+          if(this.excel.import.loop_index == this.excel.import.arr_length){
+            this.excel.import.importing = false;
+            this.query.offset = 0;
+            this.fetchEmployees(this.query);
+          }
+        })
       }
     },
     importEmployeeFileChange(e){
@@ -334,7 +507,10 @@ export default {
         }
       };
       formData.append('file',e.target.files[0])
-      axios.post('api/v1/users/excel_to_array',formData,options).then(res => this.excelAddUser(res.data.meta.user)).catch(err=>console.log(err))
+      axios.post('api/v1/users/excel_to_array',formData,options).then(res => {
+        console.log(res.data.meta.user)
+        this.excelAddUser(res.data.meta.user)
+      }).catch(err=>console.log(err))
     },
     exportEmployeeList() {
       let url = "api/v1/excel/export_report",
@@ -440,6 +616,7 @@ export default {
             action: "Update",
             data: this.getUpdateData(v.id)
           };
+          break;
         case "resetPass":
           this.reset.toggle = true;
           this.reset.id = v.id;
