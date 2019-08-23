@@ -463,12 +463,12 @@ export default {
     // captured:
   },
   mounted() {
+    this.fetchStatusList()
     const data = {
       'target[]': 'access_id',
       query: this.allPosition.filter(i => i.id === this.form.employee.access_id)[0].parent
     }
     this.fetchPotentialHead({ data })
-      this.fetchStatusList()
   },
   created() {
     var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
@@ -622,24 +622,25 @@ export default {
       console.log(value)
     },
     storeEmployee: async function() {
-      if(this.data.data.id == this.form.employee.parent_id){
-        this.$message({
-          type:"warning",
-          message:"You can't assign an employee to itself.",
-          duration:5000
-        });
-      }else{
+
         if (this.data.action.toLowerCase() === 'create') {
           this.clearFormErrors()
           const data = this.toFormData(this.form.employee)
           this.addUser(data)
         } else {
-          this.clearFormErrors()
-          this.form.employee.id = this.data.data.id
-          const data = this.toFormData(this.form.employee)
-          this.updateUser(data)
+          if(this.data.data.id == this.form.employee.parent_id){
+            this.$message({
+              type:"warning",
+              message:"You can't assign an employee to itself.",
+              duration:5000
+            });
+          }else{
+            this.clearFormErrors()
+            this.form.employee.id = this.data.data.id
+            const data = this.toFormData(this.form.employee)
+            this.updateUser(data)
+          }
         }
-      }
     },
     // cascadeSelectHead() {
     //   const parent = this.allPosition.filter(function(i) { return i.id == this.form.employee.access_id }.bind(this))[0].parent
