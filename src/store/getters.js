@@ -50,6 +50,7 @@ const getters = {
   position: state => state.user.userDetails.position,
   statusList: state => state.user.data.statusList,
   statusListCount: state => state.user.count.statusList,
+  statusListState: state => state.user.fetchState.statusList,
   potentialHead: state => state.user.data.potentialHead,
   loginState: state => state.user.loggingInState,
   fetchStateStatusList: state => state.user.fetchState.statusList,
@@ -127,6 +128,18 @@ const getters = {
   // update report response
   updateReportResponseState: state => state.update_report_response.state,
   updateReportResponseData: state => state.update_report_response.data,
+  // create_user_status
+  createUserStatusState: state => state.create_user_status.state,
+  createUserStatusData: state => state.create_user_status.data,
+  createUserStatusError: state =>  state.create_user_status.errors,
+  // update_user_status
+  updateUserStatusState: state => state.update_user_status.state,
+  updateUserStatusData: state => state.update_user_status.data,
+  updateUserStatusError: state =>  state.update_user_status.errors,
+  // delete_user_status
+  deleteUserStatusState: state => state.delete_user_status.state,
+  deleteUserStatusData: state => state.delete_user_status.data,
+  deleteUserStatusError: state =>  state.delete_user_status.errors
 
 };
 export default getters;

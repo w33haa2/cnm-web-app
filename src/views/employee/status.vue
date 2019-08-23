@@ -1,20 +1,21 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Status</h4>
+    <h4 style="color:#646464">User Status</h4>
 
-    <el-row style="padding-right:8px;margin-bottom:30px;">
-      <el-col>
-        <el-button :plain="true" size="mini" @click="createForm">Create Status</el-button>
-      </el-col>
-    </el-row>
+    <!-- <el-row style="padding-right:8px;margin-bottom:30px;">
+    </el-row> -->
     <!-- Search and Pagination -->
     <el-row>
-      <el-col>
+      <el-col :md="{span:8}">
+        <el-button :plain="true" size="mini" @click="createForm">Create Status</el-button>
+      </el-col>
+      <el-col :md="{span:16}">
         <el-pagination
+        style="float:right"
           :page-sizes="[10,25,50]"
           :page-size="table_config.display_size"
           layout="total, sizes, prev, pager, next"
-          :total="statusListCount"
+          :total="table_config.count"
           :current-page.sync="table_config.page"
           @size-change="tableSizeChange"
           @current-change="tablePageChange"
@@ -22,20 +23,10 @@
           small
         />
       </el-col>
-      <!-- <el-col :xs="{ span:12 }" :sm="{ span:24 }" :md="{ span:12 }">
-        <el-input placeholder="Search..." size="mini">
-          <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>-->
     </el-row>
 
     <!-- Table -->
-    <el-table :data="statusList" style="width: 100%;margin-top:30px;">
+    <el-table :data="table_config.data" style="width: 100%;margin-top:30px;" v-loading="table_config.loader">
       <el-table-column align="center" label="Type">
         <template slot-scope="scope">{{ scope.row.type }}</template>
       </el-table-column>
@@ -44,10 +35,13 @@
           <el-tag :type="scope.row.status=='active'? 'success':'danger'">{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Edit">
+      <el-table-column align="center" label="Action">
         <template slot-scope="scope">
-          <el-button :plain="true" @click="updateRow(scope.row)">
+          <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
             <i class="el-icon-edit-outline" />
+          </el-button>
+          <el-button :plain="true" size="mini" type="danger" @click="deleteRow({id:scope.row.id})">
+            <i class="el-icon-delete" />
           </el-button>
         </template>
       </el-table-column>
@@ -83,7 +77,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini">Confirm</el-button>
+        <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -96,37 +90,150 @@ export default {
     return {
       table_config: {
         display_size: 10,
-        page: 1
+        page: 1,
+        loader:false,
+        data:[],
+        count:0,
       },
       query: {
         offset: 0,
-        limit: 10
+        limit: 10,
+        order:"desc",
+        sort:"created_at"
       },
       form: {
         show: false,
         action: "Create",
+        update_id:null,
         type: null,
-        status: "active"
+        status: "active",
+        confirm:false,
       }
     };
   },
   computed: {
-    ...mapGetters(["statusList", "statusListCount"])
+    ...mapGetters(["statusList", "statusListCount","statusListState", "createUserStatusState", "updateUserStatusState", "deleteUserStatusState", "createUserStatusError", "updateUserStatusError", "deleteUserStatusError"])
   },
   created() {
     const data = this.query;
-    this.fetchStatusList({ data });
+    this.fetchStatusList(data);
+  },
+  watch:{
+    statusListState({initial,success,fail}){
+      if(initial){
+        this.table_config.loader = true
+        this.table_config.data = []
+      }
+      if(success){
+        this.table_config.loader = false
+        this.table_config.data = this.statusList
+        this.table_config.count = this.statusListCount
+      }
+      if(fail){
+        this.table_config.loader = false
+        this.table_config.data = []
+      }
+    },
+    createUserStatusState({initial,success,fail}){
+      if(initial){
+        this.table_config.loader = true;
+        this.form.confirm = true;
+      }
+      if(success){
+        this.table_config.loader = false;
+        this.form.confirm = false;
+        this.query.offset = 0;
+        this.form.show = false;
+        this.resetForm();
+        this.fetchStatusList(this.query);
+        this.$message({
+          type:"success",
+          message: "You have successfully created a status."
+        });
+      }
+      if(fail){
+        this.table_config.loader = false;
+        this.form.confirm = false;
+
+        this.$message({
+          type:"error",
+          message: "There is a problem in creating the status."
+        });
+      }
+    },
+    updateUserStatusState({initial,success,fail}){
+      if(initial){
+        this.table_config.loader = true;
+        this.form.confirm = true;
+      }
+      if(success){
+        this.table_config.loader = false;
+        this.form.confirm = false;
+        this.query.offset = 0;
+        this.form.show = false;
+        this.resetForm();
+        this.fetchStatusList(this.query);
+        this.$message({
+          type:"success",
+          message: "You have successfully updated a status."
+        });
+      }
+      if(fail){
+        this.table_config.loader = false;
+        this.form.confirm = false;
+
+        this.$message({
+          type:"error",
+          message: "There is a problem in updating the status."
+        });
+      }
+    },
+    deleteUserStatusState({initial,success,fail}){
+      if(initial){
+        this.table_config.loader = true;
+      }
+      if(success){
+        this.table_config.loader = false;
+        this.query.offset = 0;
+        this.fetchStatusList(this.query);
+        this.$message({
+          type:"success",
+          message: "You have successfully deleted a status."
+        });
+      }
+      if(fail){
+        this.table_config.loader = false;
+
+        this.$message({
+          type:"error",
+          message: "There is a problem in deleting the status."
+        });
+      }
+    }
   },
   methods: {
-    ...mapActions(["fetchStatusList"]),
+    ...mapActions(["fetchStatusList","createUserStatus","updateUserStatus","deleteUserStatus"]),
+    deleteRow(data){
+      if(confirm("This may affect other data in your system. Do you want to proceed?")){
+        this.deleteUserStatus(data);
+      }
+    },
     submitForm() {
+      const data = {
+        type: this.form.type,
+        status: this.form.status
+      }
+
       if (this.form.action == "Create") {
-        alert("ADD");
+        this.createUserStatus(data)
       } else {
-        alert("UPDATE");
+        data.id = this.form.update_id;
+        this.updateUserStatus(data)
       }
     },
     updateRow(row) {
+      this.form.action = "Update"
+      this.form.update_id = row.id;
       this.form.show = true;
       this.form.status = row.status.toLowerCase();
       this.form.type = row.type.toLowerCase();
@@ -149,12 +256,12 @@ export default {
     tableSizeChange(value) {
       this.query.limit = value;
       const data = this.query;
-      this.fetchStatusList({ data });
+      this.fetchStatusList(data) ;
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
       const data = this.query;
-      this.fetchStatusList({ data });
+      this.fetchStatusList(data);
     }
   }
 };

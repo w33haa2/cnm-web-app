@@ -370,9 +370,33 @@ const api = {
             $method: "POST",
             $requires: ["user_id"],
             $format: Template(() => `delete/${user_id}`)
-          }
+          },
         },
         // endregion users
+
+        // startregion user status
+        user_status:{
+          $prefix: "users",
+          create: {
+            $url: "add_user_status",
+            $method: "POST"
+          },
+          update: {
+            $url: "update_user_status",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update_user_status/${id}`)
+          },
+          delete: {
+            $url: "delete_user_status",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete_user_status/${id}`)
+          },
+        },
+        // endregion user status
+
+
 
         // region sanction levels
         sanction_levels: {
