@@ -142,7 +142,7 @@ export default {
       form: {
         response: {
           editable:true,
-          dialog: true,
+          dialog: false,
           action: "Create",
           report_id: null,
           response_id:null,
