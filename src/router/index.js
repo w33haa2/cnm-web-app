@@ -110,7 +110,7 @@ export const asyncRoutes = [
     meta: {
       title: "Employee",
       icon: "user",
-      roles: ["Admin"]
+      roles: ["Admin","HR Manager", "HR Assistant"]
     },
     children: [
       {
@@ -151,8 +151,8 @@ export const asyncRoutes = [
     name: "Agent",
     meta: {
       title: "Agent",
-      icon: "agent-headset"
-      //  roles: ["admin", "editor"] // you can set roles in root nav
+      icon: "agent-headset",
+       roles: ["Admin", "Representative - Order Placer"] // you can set roles in root nav
     },
     children: [
       {
@@ -236,8 +236,26 @@ export const asyncRoutes = [
         name: "Action Logs",
         meta: {
           title: "Action Logs",
-          icon: "form"
-          //  roles: ["admin"] // or you can only set roles in sub nav
+          icon: "form",
+           roles: ["Admin", "HR Manager"]
+        }
+      }
+    ]
+  },
+  {
+    path: "overtime_schedules",
+    component: Layout,
+    redirect: "/overtime_schedules",
+    //  alwaysShow: true, // will always show the root menu
+    children: [
+      {
+        path: "/overtime_schedules",
+        component: () => import("@/views/ot_schedule"),
+        name: "Overtime Schedules",
+        meta: {
+          title: "Overtime Schedules",
+          icon: "clock",
+           roles: ["Admin", "HR Manager"]
         }
       }
     ]

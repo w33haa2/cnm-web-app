@@ -68,7 +68,7 @@ export default {
         limit: 10,
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
-        user_id: 7, // temporary data
+        user_id: 186, // temporary data
         order: "desc",
         sort: "created_at"
       }

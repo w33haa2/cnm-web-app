@@ -4,7 +4,8 @@
     <el-row>
       <el-col :md="{span:12}">
         <div>
-          <span style="font-weight:900">VL CREDITS:</span>
+          <el-tag size="mini" type="success">VL Credits: {{vl_credits}}</el-tag>
+          <el-tag size="mini" type="warning">SL Credits: {{sl_credits}}</el-tag>
         </div>
       </el-col>
       <el-col style="margin-bottom:20px;" :md="{span:12}">
@@ -55,8 +56,7 @@
         </el-row>
         <calendar
           ref="tuiCalendar"
-          style="height:50vh"
-          :calendars="calendarList"
+          style="height:300px;"
           :schedules="scheduleList"
           :view="view"
           :taskView="taskView"
@@ -65,9 +65,9 @@
           :week="week"
           :month="month"
           :timezones="timezones"
-          :disableDblClick="disableDblClick"
-          :isReadOnly="isReadOnly"
-          :useCreationPopup="useCreationPopup"
+          :disableDblClick="true"
+          :isReadOnly="true"
+          :useCreationPopup="false"
           :useDetailPopup="useDetailPopup"
         />
         <!-- <calendar :view="'month'" style="height:800px"/> -->
@@ -136,42 +136,16 @@ export default {
   components: { leaveTable, Calendar },
   data() {
     return {
+      vl_credits:0,
+      sl_credits:0,
       calendar_date: null,
-      calendarList: [
-        // {
-        //   id: "0",
-        //   name: "home"
-        // },
-        // {
-        //   id: "1",
-        //   name: "office"
-        // }
-      ],
-      scheduleList: [
-        {
-          id: "1",
-          calendarId: "1",
-          title: "my schedule",
-          category: "time",
-          dueDateClass: "",
-          start: "2019-08-18T22:30:00+09:00",
-          end: "2019-08-19T02:30:00+09:00"
-        },
-        {
-          id: "2",
-          calendarId: "1",
-          title: "second schedule",
-          category: "time",
-          dueDateClass: "",
-          start: "2019-08-18T17:30:00+09:00",
-          end: "2019-08-19T17:31:00+09:00"
-        }
-      ],
+      calendarList: [],
+      scheduleList: [],
       view: "month",
       taskView: false,
       theme: {
         "month.dayname.height": "30px",
-        "month.dayname.borderLeft": "1px solid #ff0000",
+        "month.dayname.border": "1px solid grey",
         "month.dayname.textAlign": "center",
         "week.today.color": "#333",
         "week.daygridLeft.width": "100px",
@@ -206,7 +180,7 @@ export default {
         limit: 10,
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
-        user_id: 7, // temporary data
+        user_id: 249, // temporary data
         order: "desc",
         sort: "created_at"
       },
@@ -240,11 +214,29 @@ export default {
   },
   mounted() {
     this.getDate();
+    this.fetchAgentCalendar({userid:249,start:moment(this.calendar_date).startOf("month").format("YYYY-MM-DD"),end:moment(this.calendar_date).endOf("month").format("YYYY-MM-DD")});
   },
   computed: {
-    ...mapGetters(["createLeaveState", "updateLeaveState", "userDetails"])
+    ...mapGetters(["createLeaveState", "updateLeaveState", "userDetails","fetchAgentCalendarState", "fetchAgentCalendarData", "fetchAgentCalendarError"])
   },
   watch: {
+    calendar_date(v){
+      this.fetchAgentCalendar({userid:249,start:moment(v).startOf("month").format("YYYY-MM-DD"),end:moment(v).endOf("month").format("YYYY-MM-DD")})
+    },
+    fetchAgentCalendarState({initial, success, fail}){
+      if(initial){
+        // alert("initializing..")
+        // this.$refs.tuiCalendar.invoke('clear');
+      }
+      if(success){
+        console.log()
+        let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
+        this.scheduleList = schedules.map(i => ( { body: "something", id:i.id,title: i.title.title+'('+moment(i.start_event.date).format('HH:mm')+' - '+moment(i.end_event.date).format('HH:mm')+')',start:moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss"),end:moment(i.end_event.date).format("YYYY-MM-DD HH:mm:ss"),category:"time",bgColor:i.title.color }))
+        this.$refs.tuiCalendar.invoke('createSchedules',[this.scheduleList,true]);
+        this.$refs.tuiCalendar.invoke('render');
+
+      }
+    },
     createLeaveState({ initial, success, fail }) {
       if (success) {
         this.form.leave.loading.confirm = false;
@@ -287,7 +279,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["createLeave", "updateLeave", "fetchLeave"]),
+    ...mapActions(["createLeave", "updateLeave", "fetchLeave","fetchAgentCalendar"]),
     getDate() {
       this.calendar_date = this.formatDate(
         this.$refs.tuiCalendar.invoke("getDate")._date,
@@ -312,7 +304,7 @@ export default {
       if (this.form.leave.action == "create") {
         if (this.checkFields() && this.checkIfDateIsBefore()) {
           const data = {
-            user_id: 7,
+            user_id: 249,
             start_event: moment(this.form.leave.model.dates[0])
               .startOf("day")
               .format("YYYY-MM-DD HH:mm:ss"),
@@ -428,6 +420,9 @@ export default {
 </script>
 
 <style lang="scss">
+.tui-full-calendar-month-week-item{
+  height:60px !important;
+}
 .is-today {
   font-weight: 600;
 }

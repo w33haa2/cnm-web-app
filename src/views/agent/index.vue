@@ -95,7 +95,7 @@ export default {
           end: moment()
             .add(1, "day")
             .format("YYYY-MM-DD"),
-          userid: 7
+          userid: 249
         },
         has_schedule: false,
         schedule: null,
@@ -156,9 +156,14 @@ export default {
             this.today.schedule = unfinished_work[0];
           } else {
             // incoming work
-            this.today.ot.can_join = false;
-            this.today.has_schedule = true;
-            this.today.schedule = incoming_work[0];
+            // let time_in_buffer = moment(incoming_work[0].start_event.date).subtract(15,"minute").format("YYYY-MM-DD HH:mm:ss")
+            // alert(time_in_buffer);
+            // alert(incoming_work[0].start_event.date)
+            // if(moment(moment(time_in_buffer).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
+              this.today.ot.can_join = false;
+              this.today.has_schedule = true;
+              this.today.schedule = incoming_work[0];
+            // }
           }
           // let now = moment().format("YYYY-MM-DD HH:mm:ss"),
           //   end_schedule = moment(schedule[0].end_event.date).format(
@@ -179,9 +184,10 @@ export default {
   mounted() {
     this.renderPage();
     this.fetchAgentsTodayWork(this.today.query);
+    this.fetchOvertimeSchedules();
   },
   methods: {
-    ...mapActions(["fetchAgentsTodayWork", "agentStartWork", "agentEndWork"]),
+    ...mapActions(["fetchAgentsTodayWork", "agentStartWork", "agentEndWork","fetchOvertimeSchedules"]),
     renderPage() {
       switch (this.$route.params.page) {
         case "schedule":

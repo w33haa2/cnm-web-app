@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <div class="app-container">
@@ -150,7 +151,7 @@ export default {
       end: moment()
         .endOf("month")
         .format("YYYY-MM-DD"),
-      userid: 7
+      userid: 249
     };
     const data = this.query;
     this.fetchAgentsWorkReports({ data });
@@ -169,7 +170,7 @@ export default {
         end: moment(v)
           .endOf("month")
           .format("YYYY-MM-DD"),
-        userid: 7
+        userid: 249
       };
       const data = this.query;
       this.fetchAgentsWorkReports({ data });
@@ -287,4 +288,4 @@ export default {
   }
 }
 </style>
-                    
+

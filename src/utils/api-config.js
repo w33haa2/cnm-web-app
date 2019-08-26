@@ -227,6 +227,36 @@ const api = {
         },
         // endregion access levels
 
+        // region overtime
+        overtime: {
+          $prefix: "overtime",
+          fetch: {
+            $url: "/",
+            $method: "GET"
+          },
+          search: {
+            $url: "search",
+            $method: "GET"
+          },
+          create: {
+            $url: "create",
+            $method: "POST"
+          },
+          update: {
+            $url: "update",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update/${id}`)
+          },
+          delete: {
+            $url: "delete",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete/${id}`)
+          },
+        },
+        // endregion overtime
+
         // region access levels
         logs: {
           $prefix: "logs",
