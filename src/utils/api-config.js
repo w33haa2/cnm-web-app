@@ -231,7 +231,7 @@ const api = {
         overtime: {
           $prefix: "overtime",
           fetch: {
-            $url: "/",
+            $url: "",
             $method: "GET"
           },
           search: {

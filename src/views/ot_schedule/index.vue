@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column align="center" label="View" width="100">
         <template slot-scope="scope">
-          <el-button :plain="true" size="mini">
+          <el-button :plain="true" size="mini" @click="previewSched(scope.row)">
             <i class="el-icon-view" />
           </el-button>
         </template>
@@ -136,7 +136,7 @@ export default {
       }
       if(success){
         this.table_config.loader = false
-        this.table_config.data = this.fetchOvertimeScheduleData.overtime
+        this.table_config.data = this.fetchOvertimeScheduleData.overtimes
         this.table_config.count = this.fetchOvertimeScheduleData.count
       }
       if(fail){
@@ -260,6 +260,10 @@ export default {
   },
   methods: {
     ...mapActions(["fetchOvertimeSchedule","searchOvertimeSchedule","createOvertimeSchedule","updateOvertimeSchedule","deleteOvertimeSchedule"]),
+    previewSched(data){
+      const otId = data.id
+      this.$router.push({path:`/overtime_agents/${otId}`})
+    },
     ongoing(start,end){
       return moment().isBetween(moment(start).format("YYYY-MM-DD HH:mm:ss"),moment(end).format("YYYY-MM-DD HH:mm:ss"))
     },
