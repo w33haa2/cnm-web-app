@@ -8,9 +8,22 @@
               size="mini"
               style="margin-right:10px"
               type="danger"
-              @click="drawer=true"
+              @click="joinOvertime"
             >Join OT</el-button>
-            <span class="fw-400" style="color:grey">11:00AM to 05:00PM</span>
+            <span class="fw-400" style="color:grey">{{ fromNow(today.ot.schedule.start_event) }}</span>
+            <el-divider direction="vertical"></el-divider>
+            <!-- <span class="c-grey fw-400">TIME IN</span> -->
+            <span
+              class="fw-400"
+              style="color:grey"
+            >{{ formatDate(today.ot.schedule.start_event,"","hh:mm a") }}</span>
+
+            <span class="c-grey fw-400">-</span>
+            <!-- <span class="c-grey fw-400">TIME OUT</span> -->
+            <span
+              class="fw-400"
+              style="color:grey"
+            >{{ formatDate(today.ot.schedule.end_event,"","hh:mm a") }}</span>
           </template>
           <template v-else>
             <span style="color:#ccc;font-weight:600;cursor:default">No scheduled overtime.</span>
@@ -99,8 +112,11 @@ export default {
         has_schedule: false,
         schedule: null,
         ot: {
-          can_join: false,
-          has_schedule: false
+          joined: false,
+          allowed:false,
+          has_schedule: false,
+          schedule:null,
+
         }
       }
     };
@@ -112,10 +128,62 @@ export default {
       "agentStartWorkfetchState",
       "agentStartWorkData",
       "agentEndWorkfetchState",
-      "agentEndWorkData"
+      "agentEndWorkData",
+      "fetchTodaysOvertimeScheduleState",
+      "fetchTodaysOvertimeScheduleData",
+      "fetchTodaysOvertimeScheduleError",
+      "joinOvertimeScheduleState",
+      "joinOvertimeScheduleData",
+      "joinOvertimeScheduleError",
     ])
   },
   watch: {
+    joinOvertimeScheduleState({initial,success,fail}){
+      if(success){
+        alert("YEYE")
+      }
+    },
+    fetchTodaysOvertimeScheduleState({initial,success,fail}){
+      if(success){
+        let schedule = this.fetchTodaysOvertimeScheduleData.overtime;
+        let ongoing = schedule.filter(i => this.ongoing(i.start_event,i.end_event));
+        ongoing.sort((a,b)=>{
+          let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
+            v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
+          let compare = 0;
+          if (v1 > v2) {
+            compare = 1;
+          } else if (v1 < v2) {
+            compare = -1;
+          }
+          return compare;
+        });
+        if(schedule.length > 0){
+          if(ongoing.length > 0){
+            console.log(ongoing)
+            this.today.ot.has_schedule = true;
+            this.today.ot.schedule = ongoing[0]
+            if(ongoing[0].id == this.today.schedule.overtime_id){
+              this.today.ot.joined = true
+            }
+          }else{
+            let incoming = schedule.filter(i => moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(moment(i.start_event).format("YYYY-MM-DD HH:mm:ss")));
+            // console.log(incoming)
+            if(incoming.length>0){
+              incoming.sort(this.sortIncomingWork);
+              this.today.ot.has_schedule = true
+              this.today.ot.schedule = incoming[0]
+            }else{
+              this.today.ot.has_schedule = false;
+              this.today.ot.schedule = null;
+            }
+          }
+        }else{
+          this.today.ot.has_schedule = false;
+          this.today.ot.schedule = null;
+        }
+      }
+    },
     agentStartWorkfetchState({ initial, success, fail }) {
       if (success) {
         alert("Successfully timed in");
@@ -127,69 +195,78 @@ export default {
     },
     todaysWorkfetchState({ initial, success, fail }) {
       if (success) {
-        // alert("DEYMSOGOOOD!");
         let schedule = this.todaysWork.agent_schedules[0].schedule;
-        if (schedule.length > 0) {
-          // filter regular work
-          let regular_work = schedule.filter(i => i.overtime_id == null);
-          let unfinished_work = regular_work.filter(
+        if (schedule.length > 0)
+        {
+          let unfinished_work = schedule.filter(
             (
               i //1
             ) =>
-              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
-                moment(i.end_event.date).format("YYYY-MM-DD HH:mm:ss")
-              ) &&
-              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isAfter(
-                moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss")
-              )
+              this.ongoing(i.start_event.date,i.end_event.date)
           );
-          let incoming_work = regular_work.filter(i =>
-            moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
-              moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss")
-            )
-          );
-          console.log(incoming_work);
-          if (unfinished_work.length == 1) {
-            this.today.ot.can_join = false;
+          if (unfinished_work.length > 0) {
+            this.today.ot.allowed = false;
             this.today.has_schedule = true;
             this.today.schedule = unfinished_work[0];
+            if(this.today.ot.schedule){
+              if(unfinished_work[0].overtime_id == this.today.ot.schedule.id){
+                this.today.ot.join = true
+              }
+            }
           } else {
-            // incoming work
-            // let time_in_buffer = moment(incoming_work[0].start_event.date).subtract(15,"minute").format("YYYY-MM-DD HH:mm:ss")
-            // alert(time_in_buffer);
-            // alert(incoming_work[0].start_event.date)
-            // if(moment(moment(time_in_buffer).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
-              this.today.ot.can_join = false;
+            let incoming_work = schedule.filter(i =>
+              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
+                moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss")
+              )
+            );
+            if(incoming_work.length>0){
+              incoming_work.sort(this.sortIncomingWork);
               this.today.has_schedule = true;
               this.today.schedule = incoming_work[0];
-            // }
+            }else {
+              this.today.has_schedule = false;
+              this.today.schedule = null;
+            }
           }
-          // let now = moment().format("YYYY-MM-DD HH:mm:ss"),
-          //   end_schedule = moment(schedule[0].end_event.date).format(
-          //     "YYYY-MM-DD HH:mm:ss"
-          //   );
-          // alert(end_schedule + " VS " + now);
-          // if (moment().isBefore(end_schedule)) {
-          //   this.today.has_schedule = true;
-          // } else {
-          //   this.today.has_schedule = false;
-          // }
         } else {
           this.today.has_schedule = false;
+          this.today.schedule = null;
         }
       }
     }
   },
   mounted() {
     this.fetchAgentsTodayWork(this.today.query);
-    this.fetchOvertimeSchedules();
+    let data = {
+      'target[]': 'start_event',
+      query: moment().format("YYYY-MM-DD")
+    }
+    this.fetchTodaysOvertimeSchedule(data)
   },
   methods: {
-    ...mapActions(["fetchAgentsTodayWork", "agentStartWork", "agentEndWork","fetchOvertimeSchedules"]),
+    ...mapActions(["fetchAgentsTodayWork", "agentStartWork", "agentEndWork","fetchTodaysOvertimeSchedule","joinOvertimeSchedule"]),
+    sortIncomingWork(a,b){
+      // ascending
+      let v1 = moment(a.start_event.date).format("YYYY-MM-DD HH:mm:ss"),
+        v2 = moment(b.start_event.date).format("YYYY-MM-DD HH:mm:ss");
+      let compare = 0;
+      if (v1 > v2) {
+        compare = 1;
+      } else if (v1 < v2) {
+        compare = -1;
+      }
+      return compare;
+    },
     getTodaySchedule() {
       this.getchAgentsTodayWork();
     },
-    getOTSchedule() {},
+    joinOvertime() {
+      if(today.ot.allowed){
+        this.joinOvertimeSchedule()
+      }else{
+
+      }
+    },
     endWork() {
       if (confirm("Do you really want to end work?")) {
         // log timeout

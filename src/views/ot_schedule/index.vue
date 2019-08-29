@@ -264,9 +264,7 @@ export default {
       const otId = data.id
       this.$router.push({path:`/overtime_agents/${otId}`})
     },
-    ongoing(start,end){
-      return moment().isBetween(moment(start).format("YYYY-MM-DD HH:mm:ss"),moment(end).format("YYYY-MM-DD HH:mm:ss"))
-    },
+
     deleteRow(data){
       if(this.ongoing(data.start_event,data.end_event) || moment(moment(data.end_event).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
         this.$message({

@@ -158,7 +158,11 @@ const api = {
           today: {
             $url: "work/today",
             $method: "GET"
-          }
+          },
+          join_ot: {
+            $url: "overtime/join",
+            $method: "POST",
+          },
         },
         // endregion schedules
 

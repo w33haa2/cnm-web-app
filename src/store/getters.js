@@ -164,5 +164,13 @@ const getters = {
   deleteOvertimeScheduleState: state => state.delete_overtime_schedule.state,
   deleteOvertimeScheduleData: state => state.delete_overtime_schedule.data,
   deleteOvertimeScheduleError: state => state.delete_overtime_schedule.errors,
+  // fetch_todays_overtime_schedule
+  fetchTodaysOvertimeScheduleState: state => state.fetch_todays_overtime_schedule.state,
+  fetchTodaysOvertimeScheduleData: state => state.fetch_todays_overtime_schedule.data,
+  fetchTodaysOvertimeScheduleError: state => state.fetch_todays_overtime_schedule.errors,
+  // join_overtime_schedule
+  joinOvertimeScheduleState: state => state.join_overtime_schedule.state,
+  joinOvertimeScheduleData: state => state.join_overtime_schedule.data,
+  joinOvertimeScheduleError: state => state.join_overtime_schedule.errors,
 };
 export default getters;

@@ -42,6 +42,9 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    ongoing(start,end){
+      return moment().isBetween(moment(start).format("YYYY-MM-DD HH:mm:ss"),moment(end).format("YYYY-MM-DD HH:mm:ss"))
+    },
     getAvatarLetters(fname, lname) {
       return fname[0].toUpperCase() + lname[0].toUpperCase();
     },
