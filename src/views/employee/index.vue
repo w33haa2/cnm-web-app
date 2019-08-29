@@ -153,7 +153,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini">Confirm</el-button>
+        <el-button type="danger" @click="confirmChangeStatus" :disabled="employeeUpdateState.initial" size="mini">Confirm</el-button>
       </span>
     </el-dialog>
 
@@ -418,7 +418,7 @@ export default {
         Message.error({ message: this.employeeErrors, duration: "2500" });
       } else if (success) {
         Message.success({
-          message: "Successfully reset user's password.",
+          message: "Successfully updated user details.",
           duration: "2500"
         });
         this.reset.toggle = false;
@@ -427,12 +427,21 @@ export default {
   },
   methods: {
     ...mapActions([
+      "changeStatusEmployee",
       "fetchPositions",
       "fetchEmployees",
       "fetchStatusList",
       "fetchRSEmployees",
       "resetPassEmployee"
     ]),
+    confirmChangeStatus() {
+      let data = {}
+      data.user_id = this.change_status.employees
+      data.status = this.change_status.form.status
+      data.reason = "bulk change"
+      data.type = this.change_status.form.status
+      this.changeStatusEmployee(data)
+    },
     closeImportReport(e){
       if(this.excel.import.importing){
         this.$message({
