@@ -110,7 +110,7 @@ export const asyncRoutes = [
     meta: {
       title: "Employee",
       icon: "user",
-      roles: ["Admin"]
+      roles: ["Admin","HR Manager", "HR Assistant"]
     },
     children: [
       {
@@ -151,77 +151,37 @@ export const asyncRoutes = [
     name: "Agent",
     meta: {
       title: "Agent",
-      icon: "agent-headset"
-      //  roles: ["admin", "editor"] // you can set roles in root nav
+      icon: "agent-headset",
+       roles: ["Admin", "Representative - Order Placer"] // you can set roles in root nav
     },
     children: [
-      {
-        path: "index/:page*",
-        component: () => import("@/views/agent/index")
-      },
-      {
-        path: "/agent/index/schedule",
-        component: () => import("@/views/agent/index"),
-        name: "Schedule",
-        meta: {
-          title: "Schedule"
-          //  roles: ["admin"] // or you can only set roles in sub nav
+        {
+          path: "/agent/schedule",
+          component: () => import("@/views/schedule/index"),
+          name: "Agent Schedules",
+          meta: {
+            title: "Agent Schedules"
+            //  roles: ["admin"] // or you can only set roles in sub nav
+          }
+        },
+        {
+          path: "/agent/leave",
+          component: () => import("@/views/leave/index"),
+          name: "Agent Leave",
+          meta: {
+            title: "Agent Leave"
+            // if do not set roles, means: this page does not requireincident_report
+          }
+        },
+        {
+          path: "/agent/work_reports",
+          component: () => import("@/views/work_report/index"),
+          name: "Agent Work Reports",
+          meta: {
+            title: "Agent Work Reports"
+            // if do not set roles, means: this page does not requireincident_report
+          }
         }
-      },
-      {
-        path: "/agent/index/leave",
-        component: () => import("@/views/agent/index"),
-        name: "Leave",
-        meta: {
-          title: "Leave"
-          // if do not set roles, means: this page does not requireincident_report
-        }
-      },
-      {
-        path: "/agent/index/work_reports",
-        component: () => import("@/views/agent/index"),
-        name: "Work Reports",
-        meta: {
-          title: "Work Reports"
-          // if do not set roles, means: this page does not requireincident_report
-        }
-      },
-      {
-        path: "/agent/index/incident_reports",
-        component: () => import("@/views/agent/index"),
-        name: "Incident Reports",
-        meta: {
-          title: "Incident Reports"
-          // if do not set roles, means: this page does not requireincident_report
-        }
-      }
-      //   // {
-      //   //   path: "/agent/schedule",
-      //   //   component: () => import("@/views/agent/schedule/index"),
-      //   //   name: "Schedule",
-      //   //   meta: {
-      //   //     title: "Schedule"
-      //   //     //  roles: ["admin"] // or you can only set roles in sub nav
-      //   //   }
-      //   // },
-      //   // {
-      //   //   path: "/agent/leave",
-      //   //   component: () => import("@/views/agent/leave/index"),
-      //   //   name: "Leave",
-      //   //   meta: {
-      //   //     title: "Leave"
-      //   //     // if do not set roles, means: this page does not requireincident_report
-      //   //   }
-      //   // },
-      //   // {
-      //   //   path: "/agent/work_reports",
-      //   //   component: () => import("@/views/agent/work_report/index"),
-      //   //   name: "Work Reports",
-      //   //   meta: {
-      //   //     title: "Work Reports"
-      //   //     // if do not set roles, means: this page does not requireincident_report
-      //   //   }
-      // }
     ]
   },
   {
@@ -236,8 +196,41 @@ export const asyncRoutes = [
         name: "Action Logs",
         meta: {
           title: "Action Logs",
-          icon: "form"
-          //  roles: ["admin"] // or you can only set roles in sub nav
+          icon: "form",
+           roles: ["Admin", "HR Manager"]
+        }
+      }
+    ]
+  },
+  {
+    path: "overtime_schedules",
+    component: Layout,
+    redirect: "/overtime_schedules",
+    //  alwaysShow: true, // will always show the root menu
+    children: [
+      {
+        path: "/overtime_schedules",
+        component: () => import("@/views/ot_schedule"),
+        name: "Overtime Schedules",
+        meta: {
+          title: "Overtime Schedules",
+          icon: "overtime-clock",
+           roles: ["Admin", "HR Manager"]
+        }
+      }
+    ]
+  },
+  {
+    path: "overtime_agents",
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: "/overtime_agents/:id*",
+        component: () => import("@/views/ot_agents/index"),
+        meta: {
+          noCache: false
+          //  roles: ["Admin", "HR Manager"]
         }
       }
     ]

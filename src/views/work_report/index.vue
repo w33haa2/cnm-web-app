@@ -1,6 +1,8 @@
 
 <template>
   <div>
+    <!-- <logger v-if="position == 'Representative - Order Placer'"></logger> -->
+    <logger></logger>
     <div class="app-container">
       <el-row>
         <el-col>
@@ -93,13 +95,14 @@
 </template>
 
 <script>
-import Sticky from "@/components/Sticky";
+// import Sticky from "@/components/Sticky";
 import agentCard from "./components/AgentCard";
+import logger from "../time_logger"
 import moment from "moment";
 import { mapActions, mapGetters } from "vuex";
 export default {
-  name: "StickyDemo",
-  components: { Sticky, agentCard },
+  name: "AgentWorkReports",
+  components: { agentCard, logger },
   data() {
     return {
       sample_user: {

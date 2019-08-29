@@ -1,4 +1,7 @@
 <template>
+<div>
+  <logger></logger>
+
   <div class="app-container">
     <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
@@ -53,23 +56,27 @@
               <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
             </div>
           </el-col>
+          <el-col>
+            <div style="border-bottom:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;height:395px">
+              <calendar
+              ref="tuiCalendar"
+              style="height:375px;"
+              :schedules="scheduleList"
+              :view="view"
+              :taskView="taskView"
+              :scheduleView="scheduleView"
+              :theme="theme"
+              :week="week"
+              :month="month"
+              :timezones="timezones"
+              :disableDblClick="true"
+              :isReadOnly="true"
+              :useCreationPopup="false"
+              :useDetailPopup="useDetailPopup"
+            />
+            </div>
+          </el-col>
         </el-row>
-        <calendar
-          ref="tuiCalendar"
-          style="height:300px;"
-          :schedules="scheduleList"
-          :view="view"
-          :taskView="taskView"
-          :scheduleView="scheduleView"
-          :theme="theme"
-          :week="week"
-          :month="month"
-          :timezones="timezones"
-          :disableDblClick="true"
-          :isReadOnly="true"
-          :useCreationPopup="false"
-          :useDetailPopup="useDetailPopup"
-        />
         <!-- <calendar :view="'month'" style="height:800px"/> -->
       </el-col>
       <el-col :md="{span:18}" style="padding-left: 20px">
@@ -124,16 +131,18 @@
       </span>
     </el-dialog>
   </div>
+</div>
 </template>
 
 <script>
+import logger from "../../time_logger"
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 import leaveTable from "./components/leaveTable";
 import "tui-calendar/dist/tui-calendar.css";
 import { Calendar } from "@toast-ui/vue-calendar";
 export default {
-  components: { leaveTable, Calendar },
+  components: { leaveTable, Calendar, logger },
   data() {
     return {
       vl_credits:0,
@@ -144,12 +153,12 @@ export default {
       view: "month",
       taskView: false,
       theme: {
-        "month.dayname.height": "30px",
-        "month.dayname.border": "1px solid grey",
-        "month.dayname.textAlign": "center",
-        "week.today.color": "#333",
-        "week.daygridLeft.width": "100px",
-        "week.timegridLeft.width": "100px"
+        // "month.dayname.height": "30px",
+        // "month.dayname.border": "1px solid grey",
+        // "month.dayname.textAlign": "center",
+        // "week.today.color": "#333",
+        // "week.daygridLeft.width": "100px",
+        // "week.timegridLeft.width": "100px"
       },
       week: {
         narrowWeekend: true,

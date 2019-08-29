@@ -139,7 +139,38 @@ const getters = {
   // delete_user_status
   deleteUserStatusState: state => state.delete_user_status.state,
   deleteUserStatusData: state => state.delete_user_status.data,
-  deleteUserStatusError: state =>  state.delete_user_status.errors
-
+  deleteUserStatusError: state =>  state.delete_user_status.errors,
+  // agent_calendar
+  fetchAgentCalendarState: state => state.agent_calendar.state,
+  fetchAgentCalendarData: state => state.agent_calendar.data,
+  fetchAgentCalendarError: state => state.agent_calendar.errors,
+  // fecth_overtime_schedule
+  fetchOvertimeScheduleState: state => state.fetch_overtime_schedule.state,
+  fetchOvertimeScheduleData: state => state.fetch_overtime_schedule.data,
+  fetchOvertimeScheduleError: state => state.fetch_overtime_schedule.errors,
+  // search_overtime_schedule
+  searchOvertimeScheduleState: state => state.search_overtime_schedule.state,
+  searchOvertimeScheduleData: state => state.search_overtime_schedule.data,
+  searchOvertimeScheduleError: state => state.search_overtime_schedule.errors,
+  // create_overtime_schedule
+  createOvertimeScheduleState: state => state.create_overtime_schedule.state,
+  createOvertimeScheduleData: state => state.create_overtime_schedule.data,
+  createOvertimeScheduleError: state => state.create_overtime_schedule.errors,
+  // update_overtime_schedule
+  updateOvertimeScheduleState: state => state.update_overtime_schedule.state,
+  updateOvertimeScheduleData: state => state.update_overtime_schedule.data,
+  updateOvertimeScheduleError: state => state.update_overtime_schedule.errors,
+  // delete_overtime_schedule
+  deleteOvertimeScheduleState: state => state.delete_overtime_schedule.state,
+  deleteOvertimeScheduleData: state => state.delete_overtime_schedule.data,
+  deleteOvertimeScheduleError: state => state.delete_overtime_schedule.errors,
+  // fetch_todays_overtime_schedule
+  fetchTodaysOvertimeScheduleState: state => state.fetch_todays_overtime_schedule.state,
+  fetchTodaysOvertimeScheduleData: state => state.fetch_todays_overtime_schedule.data,
+  fetchTodaysOvertimeScheduleError: state => state.fetch_todays_overtime_schedule.errors,
+  // join_overtime_schedule
+  joinOvertimeScheduleState: state => state.join_overtime_schedule.state,
+  joinOvertimeScheduleData: state => state.join_overtime_schedule.data,
+  joinOvertimeScheduleError: state => state.join_overtime_schedule.errors,
 };
 export default getters;
