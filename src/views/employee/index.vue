@@ -34,7 +34,13 @@
                 Excel
                 <i class="el-icon-arrow-down el-icon--right" />
               </el-button>
-              <input type="file" ref="importEmployeeInput" accept=".xlsx" style="display:none" @change="importEmployeeFileChange">
+              <input
+                type="file"
+                ref="importEmployeeInput"
+                accept=".xlsx"
+                style="display:none"
+                @change="importEmployeeFileChange"
+              />
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="importEmployee">Import Employee</el-dropdown-item>
                 <el-dropdown-item command="downloadEmployeeTemplate">Export Employee Template</el-dropdown-item>
@@ -119,7 +125,7 @@
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
           <el-select
-            v-model="change_status.employees"
+            v-model="change_status.form.employees"
             size="mini"
             style="width:100%"
             multiple
@@ -141,7 +147,7 @@
       <label>Status</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-select v-model="change_status.form.status" size="mini" style="width:100%">
+          <el-select v-model="change_status.form.status_id" size="mini" style="width:100%">
             <el-option
               v-for="(status,index) in statusList"
               :key="status.id"
@@ -153,7 +159,12 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" @click="confirmChangeStatus" :disabled="employeeUpdateState.initial" size="mini">Confirm</el-button>
+        <el-button
+          type="danger"
+          @click="confirmChangeStatus"
+          :loading="change_status.confirm"
+          size="mini"
+        >Confirm</el-button>
       </span>
     </el-dialog>
 
@@ -174,7 +185,7 @@
         <el-button
           type="danger"
           size="mini"
-          :disabled="employeeUpdateState.initial"
+          :loading="employeeUpdateState.initial"
           @click="resetPassword"
         >Confirm</el-button>
       </span>
@@ -190,71 +201,71 @@
       width="50%"
       top="5vh"
     >
+      <el-alert
+        title="Import Report"
+        type="info"
+        description="This report will only be displayed once every import. Please review results to reupload unimported data."
+        show-icon
+      ></el-alert>
 
-  <el-alert
-    title="Import Report"
-    type="info"
-    description="This report will only be displayed once every import. Please review results to reupload unimported data."
-    show-icon>
-  </el-alert>
-
-    <div style="width:100%;margin-bottom:20px;margin-top:15px;">Progress <span>( {{ excel.import.loop_index }}</span>/<span>{{ excel.import.arr_length }} )</span>
-    </div>
-    <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
-    <div style="padding-bottom:15px;  ">
-
-  <el-tabs v-model="excel.import.report.active_tab" type="border-card" style="margin-top:15px;margin-bottom:10px;">
-    <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
-      <el-table :data="excel.import.report.data.all.list" height="350px">
-        <el-table-column label="CID" width="100">
-          <template scope="scope">
-            {{scope.row.company_id}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Full Name" width="350">
-          <template scope="scope">
-{{scope.row.full_name}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Status">
-          <template scope="scope">
-            <template v-if="scope.row.status_code==200">
-              <el-tag size="mini" type="success">UPLOADED</el-tag>
-            </template>
-            <template v-else>
-              <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
-            </template>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-tab-pane>
-    <el-tab-pane :label="'Errors: ' +excel.import.report.data.errors.list.length " name="errors">
-      <el-table :data="excel.import.report.data.errors.list" height="350px">
-        <el-table-column label="CID" width="100">
-          <template scope="scope">
-            {{scope.row.company_id}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Full Name" width="350">
-          <template scope="scope">
-{{scope.row.full_name}}
-          </template>
-        </el-table-column>
-        <el-table-column label="Status">
-          <template scope="scope">
-            <template v-if="scope.row.status_code==200">
-              <el-tag size="mini" type="success">UPLOADED</el-tag>
-            </template>
-            <template v-else>
-              <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
-            </template>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-tab-pane>
-  </el-tabs>
-      <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
-    </div>
+      <div style="width:100%;margin-bottom:20px;margin-top:15px;">
+        Progress
+        <span>( {{ excel.import.loop_index }}</span>/
+        <span>{{ excel.import.arr_length }} )</span>
+      </div>
+      <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+      <div style="padding-bottom:15px;  ">
+        <el-tabs
+          v-model="excel.import.report.active_tab"
+          type="border-card"
+          style="margin-top:15px;margin-bottom:10px;"
+        >
+          <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
+            <el-table :data="excel.import.report.data.all.list" height="350px">
+              <el-table-column label="CID" width="100">
+                <template scope="scope">{{scope.row.company_id}}</template>
+              </el-table-column>
+              <el-table-column label="Full Name" width="350">
+                <template scope="scope">{{scope.row.full_name}}</template>
+              </el-table-column>
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane
+            :label="'Errors: ' +excel.import.report.data.errors.list.length "
+            name="errors"
+          >
+            <el-table :data="excel.import.report.data.errors.list" height="350px">
+              <el-table-column label="CID" width="100">
+                <template scope="scope">{{scope.row.company_id}}</template>
+              </el-table-column>
+              <el-table-column label="Full Name" width="350">
+                <template scope="scope">{{scope.row.full_name}}</template>
+              </el-table-column>
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+        <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -277,27 +288,27 @@ export default {
   },
   data() {
     return {
-      excel:{
-        import:{
-          status:null,
-          progress:0,
-          dialog:false,
-          loop_index:0,
-          arr_length:100,
-          data:[],
-          importing:false,
-          report:{
-            active_tab:'all',
-            data:{
-              all:{
-                count:0,
-                list:[]
+      excel: {
+        import: {
+          status: null,
+          progress: 0,
+          dialog: false,
+          loop_index: 0,
+          arr_length: 100,
+          data: [],
+          importing: false,
+          report: {
+            active_tab: "all",
+            data: {
+              all: {
+                count: 0,
+                list: []
               },
-              errors:{
-                count:0,
-                list:[]
-              },
-            },
+              errors: {
+                count: 0,
+                list: []
+              }
+            }
           }
         }
       },
@@ -327,7 +338,7 @@ export default {
       },
       query: {
         limit: 10,
-        offset: 0,
+        offset: 0
         // order:"desc",
         // sort:"user.created_at"
       },
@@ -347,7 +358,14 @@ export default {
         form: {
           employees: [],
           status_id: 1
-        }
+        },
+        model: {
+          user_id: null,
+          status: null,
+          type: null,
+          status_reason: null
+        },
+        confirm: false
       }
     };
   },
@@ -359,18 +377,17 @@ export default {
     this.fetchStatusList();
     this.fetchRSEmployees();
 
-
     // setup filter select
   },
-  beforeRouteLeave (to, from, next) {
-    if(this.excel.import.importing){
-      if(confirm("Are you sure you want to leave?")){
-        next()
-      }else{
-        next(false)
+  beforeRouteLeave(to, from, next) {
+    if (this.excel.import.importing) {
+      if (confirm("Are you sure you want to leave?")) {
+        next();
+      } else {
+        next(false);
       }
-    }else{
-      next()
+    } else {
+      next();
     }
     // if(from==to){
     //   next(false)
@@ -388,10 +405,34 @@ export default {
       "employeeUpdateState",
       "statusList",
       "rs_employees",
-      "token"
+      "token",
+      "changeStatusState"
     ])
   },
   watch: {
+    changeStatusState({ initial, success, fail }) {
+      if (initial) {
+        this.change_status.confirm = true;
+      }
+      if (success) {
+        this.change_status.confirm = false;
+        this.query.offset = 0;
+        this.fetchEmployees(this.query);
+        this.$message({
+          type: "success",
+          message: "You have successfully changed status of chosen employee/s.",
+          duration: 5000
+        });
+      }
+      if (fail) {
+        this.change_status.confirm = false;
+        this.$message({
+          type: "error",
+          message: "There's an error processing your request.",
+          duration: 5000
+        });
+      }
+    },
     employeeData: function(v) {
       console.log(v);
     },
@@ -423,6 +464,21 @@ export default {
         });
         this.reset.toggle = false;
       }
+    },
+    statusList(v) {
+      let row = v[0];
+      this.change_status.model.status = row.status;
+      this.change_status.model.type = row.type;
+      this.change_status.model.reason = row.type;
+    },
+    "change_status.form.status_id": function(v) {
+      let row = this.statusList.filter(i => i.id == v)[0];
+      this.change_status.model.status = row.status;
+      this.change_status.model.type = row.type;
+      this.change_status.model.reason = row.type;
+    },
+    "change_status.form.employees": function(v) {
+      this.change_status.model.user_id = v;
     }
   },
   methods: {
@@ -435,25 +491,25 @@ export default {
       "resetPassEmployee"
     ]),
     confirmChangeStatus() {
-      let data = {}
-      data.user_id = this.change_status.employees
-      data.status = this.change_status.form.status
-      data.reason = "bulk change"
-      data.type = this.change_status.form.status
-      this.changeStatusEmployee(data)
+      // let data = {};
+      // data.user_id = this.change_status.employees;
+      // data.status = this.change_status.form.status;
+      // data.type = this.change_status.form.status;
+      this.changeStatusEmployee(this.change_status.model);
     },
-    closeImportReport(e){
-      if(this.excel.import.importing){
+    closeImportReport(e) {
+      if (this.excel.import.importing) {
         this.$message({
-          type:"warning",
-          message: "You are not allowed to close this dialog until the process is done. If you want to checkout something on other pages, Please open another browser tab.",
-          duration:10000
-        })
-      }else{
-        if(confirm("Are you sure you already reviewed the import report?")){
+          type: "warning",
+          message:
+            "You are not allowed to close this dialog until the process is done. If you want to checkout something on other pages, Please open another browser tab.",
+          duration: 10000
+        });
+      } else {
+        if (confirm("Are you sure you already reviewed the import report?")) {
           this.excel.import.dialog = false;
-          this.excel.import.report.data.all.list=[];
-          this.excel.import.report.data.errors.list=[];
+          this.excel.import.report.data.all.list = [];
+          this.excel.import.report.data.errors.list = [];
           //   all:{list:[],count:0},
           //   errors:{list:[],count:0}
           // }
@@ -462,64 +518,89 @@ export default {
         }
       }
     },
-    excelAddUser(arr){
+    excelAddUser(arr) {
       let count = arr.length;
       this.excel.import.arr_length = arr.length;
       this.excel.import.dialog = true;
       this.excel.import.importing = true;
-      let tmp_arr=[];
+      let tmp_arr = [];
 
       var i = 0;
-      for(i in arr){
-      let suffix =arr[i].suffix?" "+arr[i].suffix:"";
-        let tmp_data = {company_id:arr[i].company_id, full_name: arr[i].firstname+" "+arr[i].middlename+" "+arr[i].lastname+ suffix};
-        console.log(tmp_data)
-        axios.post('api/v1/users/import_user',arr[i],{
-          headers:{
-            Authorization:"Bearer "+ this.token
-          }
-        }).then(res=>{
-          console.log(res)
-          this.excel.import.loop_index = parseInt(i)+1;
-          this.excel.import.progress = this.excel.import.loop_index/this.excel.import.arr_length * 100;
-          tmp_data.status_code = res.status;
-          tmp_data.title = res.data.title;
-          tmp_arr.push(tmp_data)
-          this.excel.import.report.data.all.list = tmp_arr;
-          this.excel.import.report.data.errors.list = tmp_arr.filter(i=> i.status_code != 200);
-          if(this.excel.import.loop_index == this.excel.import.arr_length){
-            this.excel.import.importing = false;
-            this.query.offset = 0;
-            this.fetchEmployees(this.query);
-          }
-        }).catch(err=>{
-          console.log(err.response.data);
-          this.excel.import.loop_index = parseInt(i)+1;
-          this.excel.import.progress = this.excel.import.loop_index/this.excel.import.arr_length * 100;
-          tmp_data.status_code = err.response.data.code;
-          tmp_data.title = err.response.data.title;
-          tmp_arr.push(tmp_data)
-          this.excel.import.report.data.all.list = tmp_arr;
-          this.excel.import.report.data.errors.list = tmp_arr.filter(i=> i.status_code != 200);
-          if(this.excel.import.loop_index == this.excel.import.arr_length){
-            this.excel.import.importing = false;
-            this.query.offset = 0;
-            this.fetchEmployees(this.query);
-          }
-        })
+      for (i in arr) {
+        let suffix = arr[i].suffix ? " " + arr[i].suffix : "";
+        let tmp_data = {
+          company_id: arr[i].company_id,
+          full_name:
+            arr[i].firstname +
+            " " +
+            arr[i].middlename +
+            " " +
+            arr[i].lastname +
+            suffix
+        };
+        console.log(tmp_data);
+        axios
+          .post("api/v1/users/import_user", arr[i], {
+            headers: {
+              Authorization: "Bearer " + this.token
+            }
+          })
+          .then(res => {
+            console.log(res);
+            this.excel.import.loop_index = parseInt(i) + 1;
+            this.excel.import.progress =
+              (this.excel.import.loop_index / this.excel.import.arr_length) *
+              100;
+            tmp_data.status_code = res.status;
+            tmp_data.title = res.data.title;
+            tmp_arr.push(tmp_data);
+            this.excel.import.report.data.all.list = tmp_arr;
+            this.excel.import.report.data.errors.list = tmp_arr.filter(
+              i => i.status_code != 200
+            );
+            if (this.excel.import.loop_index == this.excel.import.arr_length) {
+              this.excel.import.importing = false;
+              this.query.offset = 0;
+              this.fetchEmployees(this.query);
+            }
+          })
+          .catch(err => {
+            console.log(err.response.data);
+            this.excel.import.loop_index = parseInt(i) + 1;
+            this.excel.import.progress =
+              (this.excel.import.loop_index / this.excel.import.arr_length) *
+              100;
+            tmp_data.status_code = err.response.data.code;
+            tmp_data.title = err.response.data.title;
+            tmp_arr.push(tmp_data);
+            this.excel.import.report.data.all.list = tmp_arr;
+            this.excel.import.report.data.errors.list = tmp_arr.filter(
+              i => i.status_code != 200
+            );
+            if (this.excel.import.loop_index == this.excel.import.arr_length) {
+              this.excel.import.importing = false;
+              this.query.offset = 0;
+              this.fetchEmployees(this.query);
+            }
+          });
       }
     },
-    importEmployeeFileChange(e){
-      let file = e.target.files[0],formData = new FormData, options= {
-        headers:{
-          Authorizaion:"Bearer "+this.token,
-        }
-      };
-      formData.append('file',e.target.files[0])
-      axios.post('api/v1/users/excel_to_array',formData,options).then(res => {
-        console.log(res.data.meta.user)
-        this.excelAddUser(res.data.meta.user)
-      }).catch(err=>console.log(err))
+    importEmployeeFileChange(e) {
+      let file = e.target.files[0],
+        formData = new FormData(),
+        options = {
+          headers: {
+            Authorizaion: "Bearer " + this.token
+          }
+        };
+      formData.append("file", e.target.files[0]);
+      axios
+        .post("api/v1/users/excel_to_array", formData, options)
+        .then(res => {
+          console.log(res.data.meta.user);
+          this.excelAddUser(res.data.meta.user);
+        })
+        .catch(err => console.log(err));
     },
     exportEmployeeList() {
       let url = "api/v1/excel/export_report",
@@ -581,8 +662,8 @@ export default {
         case "downloadEmployeeList":
           this.exportEmployeeList();
           break;
-          case "importEmployee":
-          this.$refs.importEmployeeInput.click()
+        case "importEmployee":
+          this.$refs.importEmployeeInput.click();
           break;
       }
     },

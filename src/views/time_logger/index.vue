@@ -113,10 +113,10 @@ export default {
         schedule: null,
         ot: {
           joined: false,
-          allowed:false,
+          show: false,
+          allowed: false,
           has_schedule: false,
-          schedule:null,
-
+          schedule: null
         }
       }
     };
@@ -134,20 +134,22 @@ export default {
       "fetchTodaysOvertimeScheduleError",
       "joinOvertimeScheduleState",
       "joinOvertimeScheduleData",
-      "joinOvertimeScheduleError",
+      "joinOvertimeScheduleError"
     ])
   },
   watch: {
-    joinOvertimeScheduleState({initial,success,fail}){
-      if(success){
-        alert("YEYE")
+    joinOvertimeScheduleState({ initial, success, fail }) {
+      if (success) {
+        alert("YEYE");
       }
     },
-    fetchTodaysOvertimeScheduleState({initial,success,fail}){
-      if(success){
+    fetchTodaysOvertimeScheduleState({ initial, success, fail }) {
+      if (success) {
         let schedule = this.fetchTodaysOvertimeScheduleData.overtime;
-        let ongoing = schedule.filter(i => this.ongoing(i.start_event,i.end_event));
-        ongoing.sort((a,b)=>{
+        let ongoing = schedule.filter(i =>
+          this.ongoing(i.start_event, i.end_event)
+        );
+        ongoing.sort((a, b) => {
           let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
             v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
           let compare = 0;
@@ -158,27 +160,82 @@ export default {
           }
           return compare;
         });
-        if(schedule.length > 0){
-          if(ongoing.length > 0){
-            console.log(ongoing)
+        if (schedule.length > 0) {
+          if (ongoing.length > 0) {
+            console.log(ongoing);
             this.today.ot.has_schedule = true;
-            this.today.ot.schedule = ongoing[0]
-            if(ongoing[0].id == this.today.schedule.overtime_id){
-              this.today.ot.joined = true
+            this.today.ot.schedule = ongoing[0];
+            if (ongoing[0].id == this.today.schedule.overtime_id) {
+              this.today.ot.joined = true;
+            } else {
+              this.today.ot.joined = false;
             }
-          }else{
-            let incoming = schedule.filter(i => moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(moment(i.start_event).format("YYYY-MM-DD HH:mm:ss")));
+
+            if (this.today.schedule) {
+              // if (this.today.schedule.start_event) {
+              // you left here
+              let isSameStart = moment(
+                moment(this.today.ot.schedule.start_event).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                )
+              ).isSame(
+                moment(this.today.schedule.start_event.date).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                )
+              );
+              if (
+                this.conflictDates(
+                  this.today.ot.schedule,
+                  this.today.schedule
+                ) ||
+                isSameStart
+              ) {
+                alert("not allowed");
+              }
+              // }
+            } else {
+              this.today.ot.allowed = true;
+            }
+          } else {
+            let incoming = schedule.filter(i =>
+              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
+                moment(i.start_event).format("YYYY-MM-DD HH:mm:ss")
+              )
+            );
             // console.log(incoming)
-            if(incoming.length>0){
+            if (incoming.length > 0) {
               incoming.sort(this.sortIncomingWork);
-              this.today.ot.has_schedule = true
-              this.today.ot.schedule = incoming[0]
-            }else{
+              this.today.ot.has_schedule = true;
+              this.today.ot.schedule = incoming[0];
+              if (this.today.schedule) {
+                let isSameStart = moment(
+                  moment(this.today.ot.schedule.start_event).format(
+                    "YYYY-MM-DD HH:mm:ss"
+                  )
+                ).isSame(
+                  moment(this.today.schedule.start_event.date).format(
+                    "YYYY-MM-DD HH:mm:ss"
+                  )
+                );
+                if (
+                  this.conflictDates(
+                    this.today.ot.schedule,
+                    this.today.schedule
+                  ) ||
+                  isSameStart
+                ) {
+                  this.today.ot.allowed = false;
+                }
+                // }
+              } else {
+                this.today.ot.allowed = true;
+              }
+            } else {
               this.today.ot.has_schedule = false;
               this.today.ot.schedule = null;
             }
           }
-        }else{
+        } else {
           this.today.ot.has_schedule = false;
           this.today.ot.schedule = null;
         }
@@ -196,21 +253,17 @@ export default {
     todaysWorkfetchState({ initial, success, fail }) {
       if (success) {
         let schedule = this.todaysWork.agent_schedules[0].schedule;
-        if (schedule.length > 0)
-        {
-          let unfinished_work = schedule.filter(
-            (
-              i //1
-            ) =>
-              this.ongoing(i.start_event.date,i.end_event.date)
-          );
+        if (schedule.length > 0) {
+          let unfinished_work = schedule.filter((
+            i //1
+          ) => this.ongoing(i.start_event.date, i.end_event.date));
           if (unfinished_work.length > 0) {
             this.today.ot.allowed = false;
             this.today.has_schedule = true;
             this.today.schedule = unfinished_work[0];
-            if(this.today.ot.schedule){
-              if(unfinished_work[0].overtime_id == this.today.ot.schedule.id){
-                this.today.ot.join = true
+            if (this.today.ot.schedule) {
+              if (unfinished_work[0].overtime_id == this.today.ot.schedule.id) {
+                this.today.ot.join = true;
               }
             }
           } else {
@@ -219,11 +272,11 @@ export default {
                 moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss")
               )
             );
-            if(incoming_work.length>0){
+            if (incoming_work.length > 0) {
               incoming_work.sort(this.sortIncomingWork);
               this.today.has_schedule = true;
               this.today.schedule = incoming_work[0];
-            }else {
+            } else {
               this.today.has_schedule = false;
               this.today.schedule = null;
             }
@@ -238,14 +291,20 @@ export default {
   mounted() {
     this.fetchAgentsTodayWork(this.today.query);
     let data = {
-      'target[]': 'start_event',
+      "target[]": "start_event",
       query: moment().format("YYYY-MM-DD")
-    }
-    this.fetchTodaysOvertimeSchedule(data)
+    };
+    this.fetchTodaysOvertimeSchedule(data);
   },
   methods: {
-    ...mapActions(["fetchAgentsTodayWork", "agentStartWork", "agentEndWork","fetchTodaysOvertimeSchedule","joinOvertimeSchedule"]),
-    sortIncomingWork(a,b){
+    ...mapActions([
+      "fetchAgentsTodayWork",
+      "agentStartWork",
+      "agentEndWork",
+      "fetchTodaysOvertimeSchedule",
+      "joinOvertimeSchedule"
+    ]),
+    sortIncomingWork(a, b) {
       // ascending
       let v1 = moment(a.start_event.date).format("YYYY-MM-DD HH:mm:ss"),
         v2 = moment(b.start_event.date).format("YYYY-MM-DD HH:mm:ss");
@@ -261,10 +320,14 @@ export default {
       this.getchAgentsTodayWork();
     },
     joinOvertime() {
-      if(today.ot.allowed){
-        this.joinOvertimeSchedule()
-      }else{
-
+      if (today.ot.allowed) {
+        this.joinOvertimeSchedule();
+      } else {
+        this.$message({
+          type: "warning",
+          message: "You have existing regular work schedule.",
+          duration: "5000"
+        });
       }
     },
     endWork() {

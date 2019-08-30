@@ -42,8 +42,34 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
-    ongoing(start,end){
-      return moment().isBetween(moment(start).format("YYYY-MM-DD HH:mm:ss"),moment(end).format("YYYY-MM-DD HH:mm:ss"))
+    conflictDates(ot_schedule, reg_schedule) {
+      let f = "YYYY-MM-DD HH:mm:ss",
+        result = true,
+        ot_start_conflict = moment(
+          moment(ot_schedule.start_event).format(f)
+        ).isBetween(
+          moment(reg_schedule.start_event.date).format(f),
+          moment(reg_schedule.end_event.date).format(f)
+        ),
+        ot_end_conflict = moment(
+          moment(ot_schedule.end_event).format(f)
+        ).isBetween(
+          moment(reg_schedule.start_event.date).format(f),
+          moment(reg_schedule.end_event.date).format(f)
+        );
+      // alert(ot_start_conflict + " " + ot_end_conflict);
+      if (ot_start_conflict || ot_end_conflict) {
+        result = true;
+      } else {
+        result = false;
+      }
+      return result;
+    },
+    ongoing(start, end) {
+      return moment().isBetween(
+        moment(start).format("YYYY-MM-DD HH:mm:ss"),
+        moment(end).format("YYYY-MM-DD HH:mm:ss")
+      );
     },
     getAvatarLetters(fname, lname) {
       return fname[0].toUpperCase() + lname[0].toUpperCase();
