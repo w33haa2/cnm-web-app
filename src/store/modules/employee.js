@@ -14,6 +14,10 @@ const CHANGE_STATUS_EMPLOYEES = generateMutationTypes(
   "employees",
   "CHANGE_STATUS_EMPLOYEES"
 );
+const RESET_PASS_EMPLOYEES = generateMutationTypes(
+  "employees",
+  "RESET_PASS_EMPLOYEES"
+);
 
 const state = {
   employees: {
@@ -43,6 +47,11 @@ const state = {
     fail: false
   },
   employeeChangeStatusState: {
+    initial: false,
+    success: false,
+    fail: false
+  },
+  employeeResetPassState: {
     initial: false,
     success: false,
     fail: false
@@ -422,6 +431,39 @@ const mutations = {
       success: false,
       fail: true
     };
+  },
+  /**
+   * Commits fail state for reset pass employees
+   * @param state
+   */
+  [RESET_PASS_EMPLOYEES.initial](state) {
+    state.employeeResetPassState = {
+      initial: true,
+      success: false,
+      fail: false
+    };
+  },
+  /**
+   * Commits fail state for reset pass employees
+   * @param state
+   */
+  [RESET_PASS_EMPLOYEES.success](state) {
+    state.employeeResetPassState = {
+      initial: false,
+      success: true,
+      fail: false
+    };
+  },
+  /**
+   * Commits fail state for reset pass employees
+   * @param state
+   */
+  [RESET_PASS_EMPLOYEES.fail](state) {
+    state.employeeResetPassState = {
+      initial: false,
+      success: false,
+      fail: true
+    };
   }
 };
 
@@ -504,9 +546,9 @@ const actions = {
   resetPassEmployee({ commit }, params) {
     const slug = "api.users.reset_pass";
     STATE_API({ slug, params }, commit, [
-      UPDATE_EMPLOYEES.initial,
-      UPDATE_EMPLOYEES.success,
-      UPDATE_EMPLOYEES.fail
+      RESET_PASS_EMPLOYEES.initial,
+      RESET_PASS_EMPLOYEES.success,
+      RESET_PASS_EMPLOYEES.fail
     ]);
   },
   /**

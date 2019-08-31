@@ -168,7 +168,7 @@
       </span>
     </el-dialog>
 
-    <!-- Create and Update Dialog -->
+    <!-- Create and Update Dialog
     <el-dialog
       :visible.sync="reset.toggle"
       :close-on-click-modal="false"
@@ -189,7 +189,7 @@
           @click="resetPassword"
         >Confirm</el-button>
       </span>
-    </el-dialog>
+    </el-dialog>-->
 
     <!-- Create and Update Dialog -->
     <el-dialog
@@ -406,10 +406,28 @@ export default {
       "statusList",
       "rs_employees",
       "token",
-      "changeStatusState"
+      "changeStatusState",
+      "resetPassState"
     ])
   },
   watch: {
+    resetPassState({ initial, success, fail }) {
+      if (success) {
+        this.$message({
+          type: "success",
+          message:
+            "You have successfully reset employees password, NEW PASSWORD HINT: firstname+lastname *small-caps *no-spaces.",
+          duration: 8000
+        });
+      }
+      if (fail) {
+        this.$message({
+          type: "error",
+          message: "There's a problem processing your request.",
+          duration: 5000
+        });
+      }
+    },
     changeStatusState({ initial, success, fail }) {
       if (initial) {
         this.change_status.confirm = true;
@@ -670,9 +688,6 @@ export default {
     changeStatus() {
       this.change_status.dialog = true;
     },
-    resetPassword() {
-      this.resetPassEmployee({ id: this.reset.id });
-    },
     remoteMethod(query) {
       const data = {};
       if (query !== "") {
@@ -708,8 +723,11 @@ export default {
           };
           break;
         case "resetPass":
-          this.reset.toggle = true;
-          this.reset.id = v.id;
+          // this.reset.toggle = true;
+          // this.reset.id = v.id;
+          if (confirm("Are you sure? It cannot be reverted back.")) {
+            this.resetPassEmployee({ id: v.id });
+          }
           break;
       }
     },

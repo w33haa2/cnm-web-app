@@ -46,6 +46,7 @@ const getters = {
   allPosition: state => state.employee.accesslevels,
   formResponse: state => state.employee.form_request_response,
   changeStatusState: state => state.employee.employeeChangeStatusState,
+  resetPassState: state => state.employee.employeeResetPassState,
 
   // user module
   position: state => state.user.userDetails.position,
