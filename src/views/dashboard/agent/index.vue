@@ -30,12 +30,21 @@ export default {
   components: { PanThumb, logger },
   data() {
     return {
-      emptyGif: "tmp-img.gif",
-      bgColor: "#e3e3e3"
+      emptyGif: null,
+      bgColor: null
     };
   },
   computed: {
     ...mapGetters(["name", "avatar", "roles", "position", "gender"])
+  },
+  created() {
+    if (this.gender.toLowerCase() == "male") {
+      this.emptyGif = "tmp-img-male-young.gif";
+      this.bgColor = "#ffffff";
+    } else {
+      this.emptyGif = "tmp-img-female-young.gif";
+      this.bgColor = "#ffffff";
+    }
   }
 };
 </script>
@@ -43,7 +52,7 @@ export default {
 <style lang="scss" scoped>
 .emptyGif {
   display: block;
-  width: 50%;
+  width: 300px;
   margin: 0 auto;
 }
 

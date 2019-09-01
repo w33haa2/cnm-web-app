@@ -1,7 +1,7 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
 const FECTH_LEAVE_CREDITS = generateMutationTypes(
-  "CREDITS",
+  "BY ID",
   "FECTH_LEAVE_CREDITS"
 );
 
@@ -66,8 +66,8 @@ const actions = {
    * @param commit
    * @param params
    */
-  FECTH_LEAVE_CREDITS({ commit }, params) {
-    const slug = "api.leave_credits.fetch";
+  fetchLeaveCredits({ commit }, params) {
+    const slug = "api.leave_credits.fetchAll";
     STATE_API({ slug, params }, commit, [
       FECTH_LEAVE_CREDITS.initial,
       FECTH_LEAVE_CREDITS.success,

@@ -1,141 +1,142 @@
 <template>
-<div>
-  <logger></logger>
-
-  <div class="app-container">
-    <h4 style="color:#646464">Agent Leave</h4>
-    <el-row>
-      <el-col :md="{span:12}">
-        <div>
-          <el-tag size="mini" type="success">VL Credits: {{vl_credits}}</el-tag>
-          <el-tag size="mini" type="warning">SL Credits: {{sl_credits}}</el-tag>
-        </div>
-      </el-col>
-      <el-col style="margin-bottom:20px;" :md="{span:12}">
-        <el-button
-          size="mini"
-          @click="leaveForm({action:'create'})"
-          style="float:right"
-        >Create Request</el-button>
-      </el-col>
-      <!-- <el-col :md="{span:6}">
-        <el-calendar v-model="calendar.today"></el-calendar>
-      </el-col>-->
-      <el-col :md="{span:6}">
-        <el-row>
-          <el-col>
-            <div style="margin-bottom:10px;">
-              <el-button
-                size="mini"
-                type="danger"
-                round
-                :plain="true"
-                @click="today()"
-                style="margin:0px;"
-              >Today</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                circle
-                :plain="true"
-                @click="prev()"
-                style="margin:0px;"
-              >
-                <i class="el-icon-arrow-left" />
-              </el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                circle
-                :plain="true"
-                @click="next()"
-                style="margin:0px;"
-              >
-                <i class="el-icon-arrow-right" />
-              </el-button>
-              <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
-            </div>
-          </el-col>
-          <el-col>
-            <div style="border-bottom:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;height:395px">
-              <calendar
-              ref="tuiCalendar"
-              style="height:375px;"
-              :schedules="scheduleList"
-              :view="view"
-              :taskView="taskView"
-              :scheduleView="scheduleView"
-              :theme="theme"
-              :week="week"
-              :month="month"
-              :timezones="timezones"
-              :disableDblClick="true"
-              :isReadOnly="true"
-              :useCreationPopup="false"
-              :useDetailPopup="useDetailPopup"
-            />
-            </div>
-          </el-col>
-        </el-row>
-        <!-- <calendar :view="'month'" style="height:800px"/> -->
-      </el-col>
-      <el-col :md="{span:18}" style="padding-left: 20px">
-        <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
-      </el-col>
-    </el-row>
-
-    <!-- Create and Update Dialog -->
-    <el-dialog
-      :visible.sync="form.leave.show"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      title="Add Leave"
-      width="30%"
-      top="5vh"
-    >
+  <div>
+    <logger v-if="position == 'Representative - Order Placer'"></logger>
+    <div class="app-container">
+      <h4 style="color:#646464">Agent Leave</h4>
       <el-row>
-        <el-col>
-          <label for="dates">Dates</label>
-          <el-date-picker
-            size="mini"
-            type="daterange"
-            v-model="form.leave.model.dates"
-            style="width:100%;margin-top:4px;margin-bottom:10px;"
-            class="form-input"
-            placeholder="Range picker"
-          ></el-date-picker>
-          <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
+        <el-col :md="{span:12}">
+          <div>
+            <el-tag size="mini" type="success">VL Credits: {{vl_credits}}</el-tag>
+            <el-tag size="mini" type="warning">SL Credits: {{sl_credits}}</el-tag>
+          </div>
         </el-col>
-        <el-col>
-          <label for="dates">Leave Type</label>
-          <el-select
-            v-model="form.leave.model.leave_type"
+        <el-col style="margin-bottom:20px;" :md="{span:12}">
+          <el-button
             size="mini"
-            class="form-input"
-            style="width:100%;margin-top:4px;margin-bottom:10px;"
-          >
-            <el-option value="vacation_leave" label="Vacation leave" />
-            <el-option value="leave_of_absence" label="Leave of absence" />
-          </el-select>
+            @click="leaveForm({action:'create'})"
+            style="float:right"
+          >Create Request</el-button>
+        </el-col>
+        <!-- <el-col :md="{span:6}">
+        <el-calendar v-model="calendar.today"></el-calendar>
+        </el-col>-->
+        <el-col :md="{span:6}">
+          <el-row>
+            <el-col>
+              <div style="margin-bottom:10px;">
+                <el-button
+                  size="mini"
+                  type="danger"
+                  round
+                  :plain="true"
+                  @click="today()"
+                  style="margin:0px;"
+                >Today</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  circle
+                  :plain="true"
+                  @click="prev()"
+                  style="margin:0px;"
+                >
+                  <i class="el-icon-arrow-left" />
+                </el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  circle
+                  :plain="true"
+                  @click="next()"
+                  style="margin:0px;"
+                >
+                  <i class="el-icon-arrow-right" />
+                </el-button>
+                <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
+              </div>
+            </el-col>
+            <el-col>
+              <div
+                style="border-bottom:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;height:395px"
+              >
+                <calendar
+                  ref="tuiCalendar"
+                  style="height:375px;"
+                  :schedules="scheduleList"
+                  :view="view"
+                  :taskView="taskView"
+                  :scheduleView="scheduleView"
+                  :theme="theme"
+                  :week="week"
+                  :month="month"
+                  :timezones="timezones"
+                  :disableDblClick="true"
+                  :isReadOnly="true"
+                  :useCreationPopup="false"
+                  :useDetailPopup="useDetailPopup"
+                />
+              </div>
+            </el-col>
+          </el-row>
+          <!-- <calendar :view="'month'" style="height:800px"/> -->
+        </el-col>
+        <el-col :md="{span:18}" style="padding-left: 20px">
+          <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
         </el-col>
       </el-row>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="form.leave.show=false">Cancel</el-button>
-        <el-button
-          type="danger"
-          size="mini"
-          :loading="form.leave.loading.confirm"
-          @click="submitLeave"
-        >Confirm</el-button>
-      </span>
-    </el-dialog>
+
+      <!-- Create and Update Dialog -->
+      <el-dialog
+        :visible.sync="form.leave.show"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        title="Add Leave"
+        width="30%"
+        top="5vh"
+      >
+        <el-row>
+          <el-col>
+            <label for="dates">Dates</label>
+            <el-date-picker
+              size="mini"
+              type="daterange"
+              v-model="form.leave.model.dates"
+              style="width:100%;margin-top:4px;margin-bottom:10px;"
+              class="form-input"
+              placeholder="Range picker"
+            ></el-date-picker>
+            <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
+          </el-col>
+          <el-col>
+            <label for="dates">Leave Type</label>
+            <el-select
+              v-model="form.leave.model.leave_type"
+              size="mini"
+              class="form-input"
+              style="width:100%;margin-top:4px;margin-bottom:10px;"
+            >
+              <el-option value="vacation_leave" label="Vacation leave" />
+              <el-option value="leave_of_absence" label="Leave of absence" />
+            </el-select>
+          </el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+          <el-button size="mini" @click="form.leave.show=false">Cancel</el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            :loading="form.leave.loading.confirm"
+            @click="submitLeave"
+          >Confirm</el-button>
+        </span>
+      </el-dialog>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import logger from "../../time_logger"
+import logger from "../../time_logger";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 import leaveTable from "./components/leaveTable";
@@ -145,21 +146,14 @@ export default {
   components: { leaveTable, Calendar, logger },
   data() {
     return {
-      vl_credits:0,
-      sl_credits:0,
+      vl_credits: 0,
+      sl_credits: 0,
       calendar_date: null,
       calendarList: [],
       scheduleList: [],
       view: "month",
       taskView: false,
-      theme: {
-        // "month.dayname.height": "30px",
-        // "month.dayname.border": "1px solid grey",
-        // "month.dayname.textAlign": "center",
-        // "week.today.color": "#333",
-        // "week.daygridLeft.width": "100px",
-        // "week.timegridLeft.width": "100px"
-      },
+      theme: {},
       week: {
         narrowWeekend: true,
         showTimezoneCollapseButton: true,
@@ -189,7 +183,7 @@ export default {
         limit: 10,
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
-        user_id: 249, // temporary data
+        user_id: this.user_id, // temporary data
         order: "desc",
         sort: "created_at"
       },
@@ -221,29 +215,73 @@ export default {
       }
     };
   },
-  mounted() {
-    this.getDate();
-    this.fetchAgentCalendar({userid:249,start:moment(this.calendar_date).startOf("month").format("YYYY-MM-DD"),end:moment(this.calendar_date).endOf("month").format("YYYY-MM-DD")});
-  },
   computed: {
-    ...mapGetters(["createLeaveState", "updateLeaveState", "userDetails","fetchAgentCalendarState", "fetchAgentCalendarData", "fetchAgentCalendarError"])
+    ...mapGetters([
+      "createLeaveState",
+      "updateLeaveState",
+      "userDetails",
+      "fetchAgentCalendarState",
+      "fetchAgentCalendarData",
+      "fetchAgentCalendarError",
+      "fetchLeaveCreditsState",
+      "fetchLeaveCreditsData",
+      "fetchLeaveCreditsError",
+      "user_id",
+      "position"
+    ])
   },
   watch: {
-    calendar_date(v){
-      this.fetchAgentCalendar({userid:249,start:moment(v).startOf("month").format("YYYY-MM-DD"),end:moment(v).endOf("month").format("YYYY-MM-DD")})
+    fetchLeaveCreditsState({ initial, success, fail }) {
+      if (success) {
+        console.log(this.fetchLeaveCreditsData);
+        let tmp = this.fetchLeaveCreditsData.leave_credits,
+          vl = tmp.filter(i => i.leave_type == "vacation_leave")[0].value,
+          sl = tmp.filter(i => i.leave_type == "sick_leave")[0].value;
+        this.vl_credits = vl;
+        this.sl_credits = sl;
+      }
+      if (fail) {
+      }
     },
-    fetchAgentCalendarState({initial, success, fail}){
-      if(initial){
+    calendar_date(v) {
+      this.fetchAgentCalendar({
+        userid: this.user_id,
+        start: moment(v)
+          .startOf("month")
+          .format("YYYY-MM-DD"),
+        end: moment(v)
+          .endOf("month")
+          .format("YYYY-MM-DD")
+      });
+    },
+    fetchAgentCalendarState({ initial, success, fail }) {
+      if (initial) {
         // alert("initializing..")
         // this.$refs.tuiCalendar.invoke('clear');
       }
-      if(success){
-        console.log()
+      if (success) {
+        console.log();
         let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
-        this.scheduleList = schedules.map(i => ( { body: "something", id:i.id,title: i.title.title+'('+moment(i.start_event.date).format('HH:mm')+' - '+moment(i.end_event.date).format('HH:mm')+')',start:moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss"),end:moment(i.end_event.date).format("YYYY-MM-DD HH:mm:ss"),category:"time",bgColor:i.title.color }))
-        this.$refs.tuiCalendar.invoke('createSchedules',[this.scheduleList,true]);
-        this.$refs.tuiCalendar.invoke('render');
-
+        this.scheduleList = schedules.map(i => ({
+          body: "something",
+          id: i.id,
+          title:
+            i.title.title +
+            "(" +
+            moment(i.start_event.date).format("HH:mm") +
+            " - " +
+            moment(i.end_event.date).format("HH:mm") +
+            ")",
+          start: moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss"),
+          end: moment(i.end_event.date).format("YYYY-MM-DD HH:mm:ss"),
+          category: "time",
+          bgColor: i.title.color
+        }));
+        this.$refs.tuiCalendar.invoke("createSchedules", [
+          this.scheduleList,
+          true
+        ]);
+        this.$refs.tuiCalendar.invoke("render");
       }
     },
     createLeaveState({ initial, success, fail }) {
@@ -287,8 +325,27 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getDate();
+    this.fetchAgentCalendar({
+      userid: this.user_id,
+      start: moment(this.calendar_date)
+        .startOf("month")
+        .format("YYYY-MM-DD"),
+      end: moment(this.calendar_date)
+        .endOf("month")
+        .format("YYYY-MM-DD")
+    });
+    this.fetchLeaveCredits({ user_id: this.user_id });
+  },
   methods: {
-    ...mapActions(["createLeave", "updateLeave", "fetchLeave","fetchAgentCalendar"]),
+    ...mapActions([
+      "createLeave",
+      "updateLeave",
+      "fetchLeave",
+      "fetchAgentCalendar",
+      "fetchLeaveCredits"
+    ]),
     getDate() {
       this.calendar_date = this.formatDate(
         this.$refs.tuiCalendar.invoke("getDate")._date,
@@ -313,7 +370,7 @@ export default {
       if (this.form.leave.action == "create") {
         if (this.checkFields() && this.checkIfDateIsBefore()) {
           const data = {
-            user_id: 249,
+            user_id: this.user_id,
             start_event: moment(this.form.leave.model.dates[0])
               .startOf("day")
               .format("YYYY-MM-DD HH:mm:ss"),
@@ -429,8 +486,8 @@ export default {
 </script>
 
 <style lang="scss">
-.tui-full-calendar-month-week-item{
-  height:60px !important;
+.tui-full-calendar-month-week-item {
+  height: 60px !important;
 }
 .is-today {
   font-weight: 600;

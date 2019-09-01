@@ -107,7 +107,7 @@ export default {
           end: moment()
             .add(1, "day")
             .format("YYYY-MM-DD"),
-          userid: 249
+          userid: null
         },
         has_schedule: false,
         schedule: null,
@@ -123,6 +123,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      "user_id",
       "todaysWork",
       "todaysWorkfetchState",
       "agentStartWorkfetchState",
@@ -289,11 +290,12 @@ export default {
     }
   },
   mounted() {
-    this.fetchAgentsTodayWork(this.today.query);
+    this.today.query.userid = this.user_id;
     let data = {
       "target[]": "start_event",
       query: moment().format("YYYY-MM-DD")
     };
+    this.fetchAgentsTodayWork(this.today.query);
     this.fetchTodaysOvertimeSchedule(data);
   },
   methods: {

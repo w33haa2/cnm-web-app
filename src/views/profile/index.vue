@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <div v-if="user">
+    <div v-if="show_profile">
       <el-row :gutter="20">
         <el-col :span="6" :xs="24">
           <user-card :user="userDetails" />
@@ -21,7 +21,7 @@
               </template>
               <!-- <el-tab-pane label="Timeline" name="timeline">
                 <timeline :timeline="user.status_logs" />
-              </el-tab-pane> -->
+              </el-tab-pane>-->
               <el-tab-pane label="Subordinates" name="subordinates">
                 <subordinates :user="userDetails" />
               </el-tab-pane>
@@ -64,7 +64,8 @@ export default {
       activeTab: "about",
       userDetails: {},
       token: store.state.user.token,
-      subordinates: []
+      subordinates: [],
+      show_profile: false
     };
   },
   computed: {
@@ -76,6 +77,12 @@ export default {
   methods: {
     getUser() {
       const token = this.token;
+      var loader = this.$loading({
+        lock: true,
+        text: "Loading",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
       axios
         .get("api/v1/users/fetch/" + this.$route.params.id, {
           headers: {
@@ -86,21 +93,32 @@ export default {
         })
         .then(res => {
           this.userDetails = res.data.meta.metadata[0];
+          this.show_profile = true;
+          loader.close();
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response.data.title);
+          loader.close();
+          this.$message({
+            type: "error",
+            message: err.response.data.title,
+            duration: 5000
+          });
         });
     },
-    permission(){
+    permission() {
       let result = false;
-      if(this.position == "Admin" || this.position == "HR Manager" || this.position == "HR Assistant"){
+      if (
+        this.position == "Admin" ||
+        this.position == "HR Manager" ||
+        this.position == "HR Assistant"
+      ) {
         result = true;
-      }else{
+      } else {
         result = false;
       }
       return result;
     }
-
   }
 };
 </script>

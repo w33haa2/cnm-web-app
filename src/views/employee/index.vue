@@ -723,11 +723,12 @@ export default {
           };
           break;
         case "resetPass":
-          // this.reset.toggle = true;
-          // this.reset.id = v.id;
           if (confirm("Are you sure? It cannot be reverted back.")) {
             this.resetPassEmployee({ id: v.id });
           }
+          break;
+        case "preview":
+          this.$router.push({ path: `/profile/index/${v.id}` });
           break;
       }
     },

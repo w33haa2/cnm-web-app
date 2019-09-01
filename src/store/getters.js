@@ -5,10 +5,12 @@ const getters = {
   visitedViews: state => state.tagsView.visitedViews,
   cachedViews: state => state.tagsView.cachedViews,
   token: state => state.user.token,
-  avatar: state => state.user.avatar,
-  name: state => state.user.name,
+  avatar: state => state.user.userDetails.image_url,
+  gender: state => state.user.userDetails.gender,
+  name: state => state.user.userDetails.full_name,
+  user_id: state => state.user.userDetails.id,
   introduction: state => state.user.introduction,
-  roles: state => state.user.roles,
+  roles: state => state.user.userDetails.position,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
 
@@ -176,6 +178,10 @@ const getters = {
   // join_overtime_schedule
   joinOvertimeScheduleState: state => state.join_overtime_schedule.state,
   joinOvertimeScheduleData: state => state.join_overtime_schedule.data,
-  joinOvertimeScheduleError: state => state.join_overtime_schedule.errors
+  joinOvertimeScheduleError: state => state.join_overtime_schedule.errors,
+  // fetch_leave_credits
+  fetchLeaveCreditsState: state => state.fetch_leave_credits.state,
+  fetchLeaveCreditsData: state => state.fetch_leave_credits.data,
+  fetchLeaveCreditsError: state => state.fetch_leave_credits.errors
 };
 export default getters;

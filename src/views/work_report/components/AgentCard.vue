@@ -7,15 +7,15 @@
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb
-          :image="user.image_url  ?  user.image_url : 'default.gif'"
+          :image="avatar  ?  avatar : 'default.gif'"
           :height="'100px'"
           :width="'100px'"
           :hoverable="false"
-        >{{ user.position }}</pan-thumb>
+        ></pan-thumb>
       </div>
       <div class="box-center">
-        <div class="user-name text-center">{{ user.full_name }}</div>
-        <div class="user-role text-center text-muted">{{ user.position | uppercaseFirst }}</div>
+        <div class="user-name text-center">{{ name }}</div>
+        <div class="user-role text-center text-muted">{{ position | uppercaseFirst }}</div>
       </div>
     </div>
 
@@ -37,17 +37,17 @@
         </div>
         <div class="user-bio-section-body">
           <div class="progress-item">
-            <span>{{ user.summary.monthly.month }}</span>
-            <el-progress :percentage="user.summary.monthly.conformance" />
+            <span>{{ formatDate(month,"","YYYY MMMM") }}</span>
+            <el-progress :percentage="stat.conformance.overall? stat.conformance.overall: '0'" />
           </div>
-          <div class="progress-item">
+          <!-- <div class="progress-item">
             <span>{{ user.summary.yearly.year }}</span>
             <el-progress :percentage="user.summary.yearly.conformance" />
           </div>
           <div class="progress-item">
             <span>Overall</span>
             <el-progress :percentage="user.summary.overall.conformance" />
-          </div>
+          </div>-->
           <!-- <div class="progress-item">
             <span>ESLint</span>
             <el-progress :percentage="100" status="success" />
@@ -60,21 +60,19 @@
         <div class="user-bio-section-body">
           <div style="margin-bottom:5px;">
             <span>Present</span>
-            <span
-              style="float:right"
-            >{{ user.summary.count.present?user.summary.count.present:"0" }}</span>
+            <span style="float:right">{{ stat.present?stat.present:"0" }}</span>
           </div>
           <div style="margin-bottom:5px;">
             <span>Absent</span>
-            <span style="float:right">{{ user.summary.count.absent?user.summary.count.absent:"0" }}</span>
+            <span style="float:right">{{ stat.absent?stat.absent:"0" }}</span>
           </div>
           <div style="margin-bottom:5px;">
             <span>Leave</span>
-            <span style="float:right">{{ user.summary.count.leave?user.summary.count.leave:"0" }}</span>
+            <span style="float:right">{{ stat.leave?stat.leave:"0" }}</span>
           </div>
           <div style="margin-bottom:5px;">
             <span>NCNS</span>
-            <span style="float:right">{{ user.summary.count.ncns?user.summary.count.ncns:"0" }}</span>
+            <span style="float:right">{{ stat.ncns?stat.ncns:"0" }}</span>
           </div>
           <!-- <div class="progress-item">
             <span>ESLint</span>
@@ -88,10 +86,21 @@
 
 <script>
 import PanThumb from "@/components/PanThumb";
-
+import { mapGetters } from "vuex";
 export default {
+  props: ["stat", "month"],
   components: { PanThumb },
-  props: ["user"]
+  computed: {
+    ...mapGetters(["name", "position", "avatar"])
+  }
+  // mounted(){
+  //   this.getDetails();
+  // },
+  // methods:{
+  //   getDetails(){
+
+  //   }
+  // }
 };
 </script>
 

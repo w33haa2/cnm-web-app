@@ -7,7 +7,7 @@
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb
-          :image="user.image_url  ?  user.image_url : 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'"
+          :image="user.image_url  ?  user.image_url : 'default.gif'"
           :height="'100px'"
           :width="'100px'"
           :hoverable="false"

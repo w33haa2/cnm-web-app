@@ -1,8 +1,7 @@
 
 <template>
   <div>
-    <!-- <logger v-if="position == 'Representative - Order Placer'"></logger> -->
-    <logger></logger>
+    <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div class="app-container">
       <el-row>
         <el-col>
@@ -11,7 +10,7 @@
       </el-row>
       <el-row>
         <el-col :md="{span:6}">
-          <agent-card :user="sample_user"></agent-card>
+          <agent-card :stat="summary" :month="work_report.month"></agent-card>
         </el-col>
         <el-col :md="{span:18}" style="padding-left:30px;">
           <el-row style="margin-bottom:10px;">
@@ -97,7 +96,7 @@
 <script>
 // import Sticky from "@/components/Sticky";
 import agentCard from "./components/AgentCard";
-import logger from "../time_logger"
+import logger from "../time_logger";
 import moment from "moment";
 import { mapActions, mapGetters } from "vuex";
 export default {
@@ -105,30 +104,7 @@ export default {
   components: { agentCard, logger },
   data() {
     return {
-      sample_user: {
-        full_name: "John Doe",
-        position: "Representative - Order Placer",
-        image_url: null,
-        summary: {
-          monthly: {
-            month: "August",
-            conformance: 12
-          },
-          yearly: {
-            year: "2019",
-            conformance: 99
-          },
-          overall: {
-            conformance: 99
-          },
-          count: {
-            ncns: 1,
-            absent: 2,
-            present: 15,
-            onleave: 0
-          }
-        }
-      },
+      summary: {},
       work_report: {
         month: moment().format("YYYY-MM"),
         query: {
@@ -143,7 +119,9 @@ export default {
     ...mapGetters([
       "userDetails",
       "agentsWorkReportsfetchState",
-      "agentsWorkReports"
+      "agentsWorkReports",
+      "position",
+      "user_id"
     ])
   },
   mounted() {
@@ -154,17 +132,19 @@ export default {
       end: moment()
         .endOf("month")
         .format("YYYY-MM-DD"),
-      userid: 249
+      userid: this.user_id
     };
     const data = this.query;
     this.fetchAgentsWorkReports({ data });
   },
   watch: {
-    agentsWorkReports(v) {
-      let tmp = v.agent_schedules[0].schedule;
-      this.work_report.grid_data = tmp.sort(this.descStartEvent);
+    agentsWorkReportsfetchState({ initial, success, fail }) {
+      if (success) {
+        let tmp = this.agentsWorkReports.agent_schedules[0].schedule;
+        this.work_report.grid_data = tmp.sort(this.descStartEvent);
+        this.summary = this.agentsWorkReports.agent_schedules[0].summary;
+      }
     },
-    agentsWorkReportsfetchState({ initial, success, fail }) {},
     "work_report.month": function(v) {
       this.query = {
         start: moment(v)
@@ -173,7 +153,7 @@ export default {
         end: moment(v)
           .endOf("month")
           .format("YYYY-MM-DD"),
-        userid: 249
+        userid: this.user_id
       };
       const data = this.query;
       this.fetchAgentsWorkReports({ data });

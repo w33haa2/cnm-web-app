@@ -68,7 +68,7 @@ export default {
         limit: 10,
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
-        user_id: 186, // temporary data
+        user_id: null, // temporary data
         order: "desc",
         sort: "created_at"
       }
@@ -79,10 +79,12 @@ export default {
       "userDetails",
       "leaves",
       "leavesfetchState",
-      "deleteLeaveState"
+      "deleteLeaveState",
+      "user_id"
     ])
   },
   mounted() {
+    this.query.user_id = this.user_id;
     this.fetchLeave(this.query);
   },
   watch: {

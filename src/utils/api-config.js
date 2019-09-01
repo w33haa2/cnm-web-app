@@ -161,8 +161,8 @@ const api = {
           },
           join_ot: {
             $url: "overtime/join",
-            $method: "POST",
-          },
+            $method: "POST"
+          }
         },
         // endregion schedules
 
@@ -257,7 +257,7 @@ const api = {
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `delete/${id}`)
-          },
+          }
         },
         // endregion overtime
 
@@ -347,16 +347,15 @@ const api = {
             $url: "issuedby/search",
             $method: "GET"
           },
-          create_response:{
+          create_response: {
             $url: "user_response",
             $method: "POST"
           },
-          update_response:{
+          update_response: {
             $url: "update_response",
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `update_response/${id}`)
-
           }
         },
         // endregion reports
@@ -404,12 +403,12 @@ const api = {
             $method: "POST",
             $requires: ["user_id"],
             $format: Template(() => `delete/${user_id}`)
-          },
+          }
         },
         // endregion users
 
         // startregion user status
-        user_status:{
+        user_status: {
           $prefix: "users",
           create: {
             $url: "add_user_status",
@@ -426,11 +425,9 @@ const api = {
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `delete_user_status/${id}`)
-          },
+          }
         },
         // endregion user status
-
-
 
         // region sanction levels
         sanction_levels: {
@@ -536,6 +533,43 @@ const api = {
           }
         },
         // endregion leave
+
+        // region leave credits
+        leave_credits: {
+          $prefix: "leaves/credits",
+
+          fetchAll: {
+            $url: "",
+            $method: "GET"
+          },
+          fetch: {
+            $url: "fetch",
+            $method: "GET",
+            $requires: ["id"],
+            $format: Template(() => `fetch/${id}`)
+          },
+          create: {
+            $url: "create",
+            $method: "POST"
+          },
+          update: {
+            $url: "update",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update/${id}`)
+          },
+          delete: {
+            $url: "delete",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete/${id}`)
+          },
+          search: {
+            $url: "search",
+            $method: "GET"
+          }
+        },
+        // endregion leave credits
 
         // region agents
         agents: {
