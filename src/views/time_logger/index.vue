@@ -4,26 +4,31 @@
       <el-row>
         <el-col :md="{span:12}">
           <template v-if="today.ot.has_schedule">
-            <el-button
-              size="mini"
-              style="margin-right:10px"
-              type="danger"
-              @click="joinOvertime"
-            >Join OT</el-button>
-            <span class="fw-400" style="color:grey">{{ fromNow(today.ot.schedule.start_event) }}</span>
-            <el-divider direction="vertical"></el-divider>
-            <!-- <span class="c-grey fw-400">TIME IN</span> -->
-            <span
-              class="fw-400"
-              style="color:grey"
-            >{{ formatDate(today.ot.schedule.start_event,"","hh:mm a") }}</span>
+            <template v-if="today.ot.joined">
+              <span style="color:#F56C6C;font-weight:600;cursor:default">Attending Overtime.</span>
+            </template>
+            <template v-else>
+              <el-button
+                size="mini"
+                style="margin-right:10px"
+                type="danger"
+                @click="joinOvertime"
+              >Join OT</el-button>
+              <span class="fw-400" style="color:grey">{{ fromNow(today.ot.schedule.start_event) }}</span>
+              <el-divider direction="vertical"></el-divider>
+              <!-- <span class="c-grey fw-400">TIME IN</span> -->
+              <span
+                class="fw-400"
+                style="color:grey"
+              >{{ formatDate(today.ot.schedule.start_event,"","hh:mm a") }}</span>
 
-            <span class="c-grey fw-400">-</span>
-            <!-- <span class="c-grey fw-400">TIME OUT</span> -->
-            <span
-              class="fw-400"
-              style="color:grey"
-            >{{ formatDate(today.ot.schedule.end_event,"","hh:mm a") }}</span>
+              <span class="c-grey fw-400">-</span>
+              <!-- <span class="c-grey fw-400">TIME OUT</span> -->
+              <span
+                class="fw-400"
+                style="color:grey"
+              >{{ formatDate(today.ot.schedule.end_event,"","hh:mm a") }}</span>
+            </template>
           </template>
           <template v-else>
             <span style="color:#ccc;font-weight:600;cursor:default">No scheduled overtime.</span>
@@ -49,32 +54,27 @@
 
             <el-divider direction="vertical"></el-divider>
             <!-- <span class="c-grey fw-400">DURATION</span> -->
-            <span
-              class="fw-400"
-              style="color:grey"
-            >{{ formatDate(today.schedule.rendered_hours.time,"HH:mm:ss", "HH:mm")}}</span>
 
-            <el-button
-              v-if="today.schedule.time_in != null && today.schedule.time_out == null"
-              style="margin-left: 10px;"
-              type="info"
-              size="mini"
-              @click="endWork"
-            >END</el-button>
-            <el-button
-              v-else-if="today.schedule.time_in == null && today.schedule.time_out == null"
-              style="margin-left: 10px;"
-              type="primary"
-              size="mini"
-              @click="startWork"
-            >START</el-button>
-            <el-button
-              v-if="today.schedule.time_in != null && today.schedule.time_out != null"
-              style="margin-left: 10px;"
-              type="info"
-              size="mini"
-              disabled
-            >ENDED</el-button>
+            <template v-if="today.schedule.time_in != null && today.schedule.time_out == null">
+              <span class="fw-400" style="color:grey">{{ secToHMS(today.rendered) }}</span>
+              <el-button style="margin-left: 10px;" type="info" size="mini" @click="endWork">END</el-button>
+            </template>
+            <template v-else-if="today.schedule.time_in == null && today.schedule.time_out == null">
+              <span class="fw-400" style="color:grey">00:00:00</span>
+              <el-button
+                style="margin-left: 10px;"
+                type="primary"
+                size="mini"
+                @click="startWork"
+              >START</el-button>
+            </template>
+            <template v-if="today.schedule.time_in != null && today.schedule.time_out != null">
+              <span
+                class="fw-400"
+                style="color:grey"
+              >{{ secToHMS(getDuration(today.schedule.time_in.date,today.schedule.time_out.date)) }}</span>
+              <el-button style="margin-left: 10px;" type="info" size="mini" disabled>ENDED</el-button>
+            </template>
           </template>
           <template v-else>
             <span style="color:#ccc;font-weight:600;cursor:default">No schedule for today.</span>
@@ -111,6 +111,7 @@ export default {
         },
         has_schedule: false,
         schedule: null,
+        rendered: null,
         ot: {
           joined: false,
           show: false,
@@ -141,105 +142,7 @@ export default {
   watch: {
     joinOvertimeScheduleState({ initial, success, fail }) {
       if (success) {
-        alert("YEYE");
-      }
-    },
-    fetchTodaysOvertimeScheduleState({ initial, success, fail }) {
-      if (success) {
-        let schedule = this.fetchTodaysOvertimeScheduleData.overtime;
-        let ongoing = schedule.filter(i =>
-          this.ongoing(i.start_event, i.end_event)
-        );
-        ongoing.sort((a, b) => {
-          let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
-            v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
-          let compare = 0;
-          if (v1 > v2) {
-            compare = 1;
-          } else if (v1 < v2) {
-            compare = -1;
-          }
-          return compare;
-        });
-        if (schedule.length > 0) {
-          if (ongoing.length > 0) {
-            console.log(ongoing);
-            this.today.ot.has_schedule = true;
-            this.today.ot.schedule = ongoing[0];
-            if (ongoing[0].id == this.today.schedule.overtime_id) {
-              this.today.ot.joined = true;
-            } else {
-              this.today.ot.joined = false;
-            }
-
-            if (this.today.schedule) {
-              // if (this.today.schedule.start_event) {
-              // you left here
-              let isSameStart = moment(
-                moment(this.today.ot.schedule.start_event).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                )
-              ).isSame(
-                moment(this.today.schedule.start_event.date).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                )
-              );
-              if (
-                this.conflictDates(
-                  this.today.ot.schedule,
-                  this.today.schedule
-                ) ||
-                isSameStart
-              ) {
-                alert("not allowed");
-              }
-              // }
-            } else {
-              this.today.ot.allowed = true;
-            }
-          } else {
-            let incoming = schedule.filter(i =>
-              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
-                moment(i.start_event).format("YYYY-MM-DD HH:mm:ss")
-              )
-            );
-            // console.log(incoming)
-            if (incoming.length > 0) {
-              incoming.sort(this.sortIncomingWork);
-              this.today.ot.has_schedule = true;
-              this.today.ot.schedule = incoming[0];
-              if (this.today.schedule) {
-                let isSameStart = moment(
-                  moment(this.today.ot.schedule.start_event).format(
-                    "YYYY-MM-DD HH:mm:ss"
-                  )
-                ).isSame(
-                  moment(this.today.schedule.start_event.date).format(
-                    "YYYY-MM-DD HH:mm:ss"
-                  )
-                );
-                if (
-                  this.conflictDates(
-                    this.today.ot.schedule,
-                    this.today.schedule
-                  ) ||
-                  isSameStart
-                ) {
-                  this.today.ot.allowed = false;
-                }
-                // }
-              } else {
-                this.today.ot.allowed = true;
-              }
-            } else {
-              this.today.ot.has_schedule = false;
-              this.today.ot.schedule = null;
-            }
-          }
-        } else {
-          this.today.ot.has_schedule = false;
-          this.today.ot.schedule = null;
-        }
+        this.fetchAgentsTodayWork(this.today.query);
       }
     },
     agentStartWorkfetchState({ initial, success, fail }) {
@@ -262,10 +165,17 @@ export default {
             this.today.ot.allowed = false;
             this.today.has_schedule = true;
             this.today.schedule = unfinished_work[0];
-            if (this.today.ot.schedule) {
-              if (unfinished_work[0].overtime_id == this.today.ot.schedule.id) {
-                this.today.ot.join = true;
-              }
+            this.today.rendered = moment
+              .duration(
+                moment(moment().format("YYYY-MM-DD HH:mm:ss")).diff(
+                  moment(this.today.schedule.time_in.date).format(
+                    "YYYY-MM-DD HH:mm:ss"
+                  )
+                )
+              )
+              .as("seconds");
+            if (this.today.schedule.time_out == null) {
+              this.renderedTick();
             }
           } else {
             let incoming_work = schedule.filter(i =>
@@ -277,6 +187,16 @@ export default {
               incoming_work.sort(this.sortIncomingWork);
               this.today.has_schedule = true;
               this.today.schedule = incoming_work[0];
+              this.today.rendered = moment
+                .duration(
+                  moment(moment().format("YYYY-MM-DD HH:mm:ss")).diff(
+                    moment(this.today.schedule.time_in.date).format(
+                      "YYYY-MM-DD HH:mm:ss"
+                    )
+                  )
+                )
+                .as("seconds");
+              this.renderedTick();
             } else {
               this.today.has_schedule = false;
               this.today.schedule = null;
@@ -287,16 +207,66 @@ export default {
           this.today.schedule = null;
         }
       }
+
+      let data = {
+        "target[]": "start_event",
+        query: moment().format("YYYY-MM-DD")
+      };
+      this.fetchTodaysOvertimeSchedule(data);
+    },
+    fetchTodaysOvertimeScheduleState({ initial, success, fail }) {
+      if (success) {
+        let schedule = this.fetchTodaysOvertimeScheduleData.overtime;
+        if (schedule.length > 0) {
+          let ongoing = schedule.filter(i =>
+            this.ongoing(i.start_event, i.end_event)
+          );
+          ongoing.sort((a, b) => {
+            let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
+              v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
+            let compare = 0;
+            if (v1 > v2) {
+              compare = 1;
+            } else if (v1 < v2) {
+              compare = -1;
+            }
+            return compare;
+          });
+          if (ongoing.length > 0) {
+            console.log(ongoing);
+            this.today.ot.has_schedule = true;
+            this.today.ot.schedule = ongoing[0];
+          } else {
+            let incoming = schedule.filter(i =>
+              moment(moment().format("YYYY-MM-DD HH:mm:ss")).isBefore(
+                moment(i.start_event).format("YYYY-MM-DD HH:mm:ss")
+              )
+            );
+            if (incoming.length > 0) {
+              incoming.sort(this.sortIncomingWork);
+              this.today.ot.has_schedule = true;
+              this.today.ot.schedule = incoming[0];
+            } else {
+              this.today.ot.has_schedule = false;
+              this.today.ot.schedule = null;
+            }
+          }
+        } else {
+          this.today.ot.has_schedule = false;
+          this.today.ot.schedule = null;
+        }
+      }
+      this.generateLogRestrictions();
     }
   },
   mounted() {
     this.today.query.userid = this.user_id;
-    let data = {
-      "target[]": "start_event",
-      query: moment().format("YYYY-MM-DD")
-    };
+
+    // let data = {
+    //   "target[]": "start_event",
+    //   query: moment().format("YYYY-MM-DD")
+    // };
     this.fetchAgentsTodayWork(this.today.query);
-    this.fetchTodaysOvertimeSchedule(data);
   },
   methods: {
     ...mapActions([
@@ -306,6 +276,56 @@ export default {
       "fetchTodaysOvertimeSchedule",
       "joinOvertimeSchedule"
     ]),
+    renderedTick() {
+      setInterval(() => {
+        this.today.rendered = parseInt(this.today.rendered) + 1;
+      }, 1000);
+    },
+    generateLogRestrictions() {
+      if (this.today.has_schedule) {
+        // check if ot has schedule
+        if (this.today.ot.schedule) {
+          // check if same with ot id
+          if (this.today.schedule.overtime_id == this.today.ot.schedule.id) {
+            this.today.ot.joined = true;
+          } else {
+            this.today.ot.joined = false;
+            // variable for the same start event
+            let isSameStart = moment(
+              moment(this.today.ot.schedule.start_event).format(
+                "YYYY-MM-DD HH:mm:ss"
+              )
+            ).isSame(
+              moment(this.today.schedule.start_event.date).format(
+                "YYYY-MM-DD HH:mm:ss"
+              )
+            );
+            // check if schedules are conflict
+            if (
+              this.conflictDates(this.today.ot.schedule, this.today.schedule) ||
+              isSameStart
+            ) {
+              this.today.ot.allowed = false;
+            } else {
+              this.today.ot.allowed = true;
+            }
+          }
+        } else {
+          this.today.ot.has_schedule = false;
+          this.today.ot.schedule = null;
+          this.today.ot.joined = false;
+          this.today.ot.allowed = false;
+        }
+      } else {
+        this.today.has_schedule = false;
+        this.today.schedule = null;
+        if (this.today.ot.has_schedule) {
+          this.today.ot.allowed = true;
+        } else {
+          this.today.ot.allowed = false;
+        }
+      }
+    },
     sortIncomingWork(a, b) {
       // ascending
       let v1 = moment(a.start_event.date).format("YYYY-MM-DD HH:mm:ss"),
@@ -322,7 +342,7 @@ export default {
       this.getchAgentsTodayWork();
     },
     joinOvertime() {
-      if (today.ot.allowed) {
+      if (this.today.ot.allowed) {
         this.joinOvertimeSchedule();
       } else {
         this.$message({

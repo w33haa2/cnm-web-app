@@ -26,7 +26,7 @@ import PanThumb from "@/components/PanThumb";
 import logger from "../../time_logger";
 
 export default {
-  name: "DashboardEditor",
+  name: "DashboardAgent",
   components: { PanThumb, logger },
   data() {
     return {

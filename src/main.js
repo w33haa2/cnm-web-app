@@ -65,6 +65,14 @@ Vue.mixin({
       }
       return result;
     },
+    getDuration(date1, date2) {
+      let d1 = moment(date1).format("YYYY-MM-DD HH:mm:ss"),
+        d2 = moment(date2).format("YYYY-MM-DD HH:mm:ss");
+      return moment.duration(moment(d2).diff(d1)).as("seconds");
+    },
+    secToHMS(seconds) {
+      return moment.utc(seconds * 1000).format("HH:mm:ss");
+    },
     ongoing(start, end) {
       return moment().isBetween(
         moment(start).format("YYYY-MM-DD HH:mm:ss"),

@@ -234,7 +234,7 @@ const api = {
         // region overtime
         overtime: {
           $prefix: "overtime",
-          fetch: {
+          fetchAll: {
             $url: "",
             $method: "GET"
           },
