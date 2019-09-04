@@ -33,22 +33,26 @@
         <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
       </div>
     </div>
-    <calendar
-      ref="tuiCalendar"
-      style="height:500px;"
-      :schedules="scheduleList"
-      :view="view"
-      :taskView="taskView"
-      :scheduleView="scheduleView"
-      :theme="theme"
-      :week="week"
-      :month="month"
-      :timezones="timezones"
-      :disableDblClick="true"
-      :isReadOnly="true"
-      :useCreationPopup="false"
-      :useDetailPopup="useDetailPopup"
-    />
+      <el-row>
+        <el-col v-loading="calendarLoader">
+          <calendar
+            ref="tuiCalendar"
+            style="height:800px;"
+            :schedules="scheduleList"
+            :view="view"
+            :taskView="taskView"
+            :scheduleView="scheduleView"
+            :theme="theme"
+            :week="week"
+            :month="month"
+            :timezones="timezones"
+            :disableDblClick="true"
+            :isReadOnly="true"
+            :useCreationPopup="false"
+            :useDetailPopup="useDetailPopup"
+          />
+        </el-col>
+      </el-row>
   </div>
 </template>
 
@@ -97,9 +101,11 @@ export default {
       if (initial) {
         // alert("initializing..")
         // this.$refs.tuiCalendar.invoke('clear');
+        this.calendarLoader = true;
       }
       if (success) {
         console.log();
+        this.calendarLoader = false;
         let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
         this.scheduleList = schedules.map(i => ({
           body: "something",
@@ -121,6 +127,15 @@ export default {
           true
         ]);
         this.$refs.tuiCalendar.invoke("render");
+      }
+      if(fail){
+        this.calendarLoader = false;
+        this.scheduleList = [];
+        this.$message({
+          type:"warning",
+          message: "There's a problem fetching your calendar events.",
+          duration: 5000
+        })
       }
     }
   },
@@ -148,6 +163,7 @@ export default {
   },
   data() {
     return {
+      calendarLoader:true,
       calendar_date: null,
       calendarList: [],
       scheduleList: [],
