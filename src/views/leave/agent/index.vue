@@ -65,11 +65,9 @@
                   :schedules="scheduleList"
                   :view="view"
                   :taskView="taskView"
-                  :scheduleView="scheduleView"
                   :theme="theme"
                   :week="week"
                   :month="month"
-                  :timezones="timezones"
                   :disableDblClick="true"
                   :isReadOnly="true"
                   :useCreationPopup="false"
@@ -147,7 +145,7 @@ export default {
   components: { leaveTable, Calendar, logger },
   data() {
     return {
-      calandarLoader:true,
+      calendarLoader:true,
       vl_credits: 0,
       sl_credits: 0,
       calendar_date: null,

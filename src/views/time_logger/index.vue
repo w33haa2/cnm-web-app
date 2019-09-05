@@ -288,6 +288,7 @@ export default {
           // check if same with ot id
           if (this.today.schedule.overtime_id == this.today.ot.schedule.id) {
             this.today.ot.joined = true;
+            this.today.duration = this.today.schedule.overtime.second
           } else {
             this.today.ot.joined = false;
             // variable for the same start event
