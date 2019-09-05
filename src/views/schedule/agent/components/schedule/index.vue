@@ -110,7 +110,12 @@ export default {
         this.scheduleList = schedules.map(i => ({
           body: "something",
           id: i.id,
-          title:
+          title: i.leave_id? "ON LEAVE *" + i.title.title +
+            "(" +
+            moment(i.start_event.date).format("HH:mm") +
+            " - " +
+            moment(i.end_event.date).format("HH:mm") +
+            ")" :
             i.title.title +
             "(" +
             moment(i.start_event.date).format("HH:mm") +

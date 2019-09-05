@@ -55,7 +55,7 @@
                 <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
               </div>
             </el-col>
-            <el-col>
+            <el-col v-loading="calendarLoader">
               <div
                 style="border-bottom:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;height:395px"
               >
@@ -142,10 +142,12 @@ import moment from "moment";
 import leaveTable from "./components/leaveTable";
 import "tui-calendar/dist/tui-calendar.css";
 import { Calendar } from "@toast-ui/vue-calendar";
+import { mkdir } from 'fs';
 export default {
   components: { leaveTable, Calendar, logger },
   data() {
     return {
+      calandarLoader:true,
       vl_credits: 0,
       sl_credits: 0,
       calendar_date: null,
@@ -241,6 +243,11 @@ export default {
         this.sl_credits = sl;
       }
       if (fail) {
+        this.$message({
+          type:"warning",
+          message: "There's a problem fetching your leave credits.",
+          duration: 5000
+        });
       }
     },
     calendar_date(v) {
@@ -258,14 +265,21 @@ export default {
       if (initial) {
         // alert("initializing..")
         // this.$refs.tuiCalendar.invoke('clear');
+        this.calendarLoader = true;
       }
       if (success) {
         console.log();
+        this.calendarLoader = false;
         let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
         this.scheduleList = schedules.map(i => ({
           body: "something",
           id: i.id,
-          title:
+          title: i.leave_id? "ON LEAVE *" + i.title.title +
+            "(" +
+            moment(i.start_event.date).format("HH:mm") +
+            " - " +
+            moment(i.end_event.date).format("HH:mm") +
+            ")" :
             i.title.title +
             "(" +
             moment(i.start_event.date).format("HH:mm") +
@@ -282,6 +296,15 @@ export default {
           true
         ]);
         this.$refs.tuiCalendar.invoke("render");
+      }
+      if(fail){
+        this.calendarLoader = false;
+        this.scheduleList = [];
+        this.$message({
+          type:"warning",
+          message:"There's a problem fetching your calendar events.",
+          duration: 5000
+        })
       }
     },
     createLeaveState({ initial, success, fail }) {
