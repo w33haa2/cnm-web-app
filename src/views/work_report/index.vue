@@ -2,7 +2,15 @@
 <template>
   <div>
     <logger v-if="position == 'Representative - Order Placer'"></logger>
-    <div class="app-container">
+    <div v-if="show_fetch_error" style="margin-top:25px;padding:20px;">
+      <el-alert
+        title="There is an error fetching your data."
+        type="error"
+        show-icon>
+      </el-alert>
+    </div>
+    <div style="height:75vh;" v-loading="true" v-if="containerLoader"></div>
+    <div v-if="show_fetch_error == false && containerLoader == false" class="app-container">
       <el-row>
         <el-col>
           <h4 style="color:#646464">Work Reports</h4>
@@ -25,8 +33,45 @@
             </el-col>
           </el-row>
           <el-card style="padding-bottom:15px;">
-            <el-col class="header">{{ formatDate(work_report.month,"", " MMMM YYYY") }}</el-col>
-            <el-col
+            <el-col class="header" :md="{span:12}">{{ formatDate(work_report.month,"", " MMMM YYYY") }}</el-col>
+            <el-col :md="{span:12}">
+              <span style="float:right">
+                <template v-if="work_report.grid_data.length>1">
+                  <small>
+                  {{ work_report.grid_data.length }}
+                    <small>SCHEDULES</small>
+                  </small>
+                </template>
+                <template v-if="work_report.grid_data.length==1">
+                  <small>
+                  {{ work_report.grid_data.length }}
+                    <small>SCHEDULE</small>
+                  </small>
+                </template>
+                <template v-if="work_report.grid_data.length==0">
+                  <small>
+                    <small>NO SCHEDULE</small>
+                  </small>
+                </template>
+              </span>
+            </el-col>
+            <el-col v-if="show_report_noschedule">
+              <el-divider style="padding:5px;"></el-divider>
+              <el-alert
+                title="There are no schedules found for this date."
+                type="info"
+                show-icon>
+              </el-alert>
+            </el-col>
+            <el-col v-if="show_report_error">
+              <el-divider style="padding:5px;"></el-divider>
+              <el-alert
+                title="There is an error fetching your schedules."
+                type="error"
+                show-icon>
+              </el-alert>
+            </el-col>
+            <el-col v-if="show_report"
               class="schedule-container"
               v-for="(datum,index) in work_report.grid_data"
               :key="index"
@@ -34,12 +79,16 @@
               <el-divider style="padding:5px;"></el-divider>
               <el-row>
                 <el-col :md="{span:2}">
-                  <div class="schedule-date">{{ formatDate(datum.start_event.date,"", "DD") }}</div>
+                  <div class="schedule-date">{{ formatDate(datum.start_event.date,"", "DD") }}
+                  </div>
                   <div class="schedule-day">{{ formatDate(datum.start_event.date,"","ddd") }}</div>
                 </el-col>
                 <el-col :md="{span:5}">
                   <div class="label">
-                    <small>SCHEDULE</small>
+                    <small>SCHEDULE
+                      <small v-if="datum.overtime_id" style="padding:2px;background-color:#F56C6C;color:white;">OVERTIME</small>
+                      <small v-else style="padding:2px;background-color:#409EFF;color:white;">REGULAR</small>
+                    </small>
                   </div>
                   <div
                     class="text"
@@ -47,7 +96,12 @@
                 </el-col>
                 <el-col :md="{span:5}">
                   <div class="label">
-                    <small>ATTENDANCE</small>
+                    <small>ATTENDANCE
+                      <template v-if="datum.overtime_id">
+                        <small v-if="datum.approved_by" style="padding:2px;background-color:#67C23A;color:white;">APPROVED</small>
+                        <small v-else style="padding:2px;background-color:#F56C6C;color:white;">NOT APPROVED</small>
+                      </template>
+                    </small>
                   </div>
                   <div class="text" v-if="datum.remarks == 'Present'">
                     {{ formatDate(datum.time_in.date,"","HH:mm a") + " - " }}
@@ -65,7 +119,8 @@
                   <div class="label">
                     <small>VTO</small>
                   </div>
-                  <el-tag type="primary" size="mini">YES</el-tag>
+                  <el-tag v-if="datum.vto_at" type="primary" size="mini">TRUE</el-tag>
+                  <el-tag v-else type="info" size="mini">FALSE</el-tag>
                 </el-col>
                 <el-col :md="{span:4}">
                   <div class="label">
@@ -80,8 +135,11 @@
                     <small>STATUS</small>
                   </div>
                   <div>
-                    <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
-                    <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
+                    <template v-if="datum.leave_id"><el-tag :type="tagType(datum.remarks)" size="mini">{{ remUnderscore(ucwords(datum.leave.leave_type)) }}</el-tag></template>
+                    <template v-else>
+                      <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
+                      <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
+                    </template>
                   </div>
                 </el-col>
               </el-row>
@@ -94,7 +152,6 @@
 </template>
 
 <script>
-// import Sticky from "@/components/Sticky";
 import agentCard from "./components/AgentCard";
 import logger from "../time_logger";
 import moment from "moment";
@@ -104,6 +161,11 @@ export default {
   components: { agentCard, logger },
   data() {
     return {
+      containerLoader: true,
+      show_fetch_error: false,
+      show_report: false,
+      show_report_error: false,
+      show_report_noschedule: false,
       summary: {},
       work_report: {
         month: moment().format("YYYY-MM"),
@@ -139,10 +201,31 @@ export default {
   },
   watch: {
     agentsWorkReportsfetchState({ initial, success, fail }) {
+      if(initial){
+        this.containerLoader = true;
+
+      }
       if (success) {
+        this.containerLoader = false
         let tmp = this.agentsWorkReports.agent_schedules[0].schedule;
+        if(tmp.length>0){
+          this.show_report = true;
+          this.show_report_error = false;
+          this.show_report_noschedule = false;
+        }else{
+          this.show_report = false;
+          this.show_report_error = false;
+          this.show_report_noschedule = true;
+        }
         this.work_report.grid_data = tmp.sort(this.descStartEvent);
         this.summary = this.agentsWorkReports.agent_schedules[0].summary;
+      }
+      if(fail){
+          this.containerLoader = false;
+          this.show_fetch_error = true;
+          this.show_report = false;
+          this.show_report_error = true;
+          this.show_report_noschedule = true;
       }
     },
     "work_report.month": function(v) {
@@ -153,7 +236,8 @@ export default {
         end: moment(v)
           .endOf("month")
           .format("YYYY-MM-DD"),
-        userid: this.user_id
+        userid: this.user_id,
+        "relations[]": "schedule.leave"
       };
       const data = this.query;
       this.fetchAgentsWorkReports({ data });
@@ -208,6 +292,9 @@ export default {
           break;
         case "absent":
           tag = "info";
+          break;
+        case "on-leave":
+          tag = "warning";
           break;
       }
       return tag;

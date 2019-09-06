@@ -42,6 +42,18 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    remUnderscore(string) {
+      let str = string.split("_");
+      let result = "";
+      str.forEach((v, i) => {
+        if (str.lenght - 1 != i) {
+          result += v + " ";
+        } else {
+          result += v;
+        }
+      });
+      return result;
+    },
     conflictDates(ot_schedule, reg_schedule) {
       let f = "YYYY-MM-DD HH:mm:ss",
         result = true,

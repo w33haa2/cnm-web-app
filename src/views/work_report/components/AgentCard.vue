@@ -37,8 +37,8 @@
         </div>
         <div class="user-bio-section-body">
           <div class="progress-item">
-            <span>{{ formatDate(month,"","YYYY MMMM") }}</span>
-            <el-progress :percentage="stat.conformance.overall? stat.conformance.overall: '0'" />
+            <!-- <span>{{ formatDate(month,"","YYYY MMMM") }}</span> -->
+            <el-progress :percentage="stat.conformance.overall" />
           </div>
           <!-- <div class="progress-item">
             <span>{{ user.summary.yearly.year }}</span>
@@ -70,7 +70,7 @@
             <span>Leave</span>
             <span style="float:right">{{ stat.leave?stat.leave:"0" }}</span>
           </div>
-          <div style="margin-bottom:5px;">
+          <div sotyle="margin-bottom:5px;">
             <span>NCNS</span>
             <span style="float:right">{{ stat.ncns?stat.ncns:"0" }}</span>
           </div>
