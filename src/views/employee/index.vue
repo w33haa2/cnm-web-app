@@ -122,7 +122,7 @@
       width="40%"
     >
       <label width="100%">Employees</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
+      <el-row style="margin-top: 7px; margin-bottom:5px;">
         <el-col>
           <el-select
             v-model="change_status.form.employees"
@@ -145,7 +145,7 @@
         </el-col>
       </el-row>
       <label>Status</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
+      <el-row style="margin-top: 7px; margin-bottom:5px;">
         <el-col>
           <el-select v-model="change_status.form.status_id" size="mini" style="width:100%">
             <el-option
@@ -155,6 +155,12 @@
               :label="status.type"
             />
           </el-select>
+        </el-col>
+      </el-row>
+      <label>Date</label>
+      <el-row style="margin-top: 7px; margin-bottom:5px;">
+        <el-col>
+          <el-date-picker size="mini" type="date" v-model="change_status.form.date" style="width:100%" placeholder="Select date..."></el-date-picker>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -357,13 +363,16 @@ export default {
         dialog: false,
         form: {
           employees: [],
-          status_id: 1
+          status_id: 1,
+          date:null
         },
         model: {
           user_id: null,
           status: null,
           type: null,
-          status_reason: null
+          status_reason: null,
+          hired_date:null,
+          separation_date:null
         },
         confirm: false
       }
@@ -494,6 +503,23 @@ export default {
       this.change_status.model.status = row.status;
       this.change_status.model.type = row.type;
       this.change_status.model.reason = row.type;
+
+      if(row.status == "active"){
+        this.change_status.model.hired_date = this.change_status.form.date
+        this.change_status.model.separation_date = null
+      }else{
+        this.change_status.model.hired_date = null
+        this.change_status.model.separation_date = this.change_status.form.date
+      }
+    },
+    "change_status.form.date":function(v){
+      if(this.change_status.model.status == "active"){
+        this.change_status.model.hired_date = moment(this.change_status.form.date).format("YYYY-MM-DD")
+        this.change_status.model.separation_date = null
+      }else{
+        this.change_status.model.hired_date = null
+        this.change_status.model.separation_date = this.change_status.form.date.format("YYYY-MM-DD")
+      }
     },
     "change_status.form.employees": function(v) {
       this.change_status.model.user_id = v;
