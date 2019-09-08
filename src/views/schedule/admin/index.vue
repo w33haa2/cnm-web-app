@@ -133,10 +133,15 @@
                 >{{ tableHeader[0].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[0].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)[index]"
                   :date="tableHeader[0].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -150,10 +155,15 @@
                 >{{ tableHeader[1].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[1].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)[index]"
                   :date="tableHeader[1].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -167,10 +177,15 @@
                 >{{ tableHeader[2].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[2].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)[index]"
                   :date="tableHeader[2].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -184,10 +199,15 @@
                 >{{ tableHeader[3].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[3].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)[index]"
                   :date="tableHeader[3].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -201,10 +221,15 @@
                 >{{ tableHeader[4].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[4].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)[index]"
                   :date="tableHeader[4].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -218,10 +243,15 @@
                 >{{ tableHeader[5].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[5].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)[index]"
                   :date="tableHeader[5].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
             <el-table-column align="center">
@@ -235,10 +265,15 @@
                 >{{ tableHeader[6].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-                <cell-content
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)"
+
+                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[6].date)">
+                  <cell-content
+                  :key="index"
+                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)[index]"
                   :date="tableHeader[6].date"
+                  :info="row.info"
                 />
+                </template>
               </template>
             </el-table-column>
           </el-table>
@@ -607,14 +642,31 @@ export default {
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
         i => moment(i.start_event.date).format("YYYY-MM-DD") == date
-      )[0];
+      );
+
+      // ..sort((a, b) => {
+      //       let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
+      //         v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
+      //       let compare = 0;
+      //       if (v1 > v2) {
+      //         compare = 1;
+      //       } else if (v1 < v2) {
+      //         compare = -1;
+      //       }
+      //       return compare;
+      //     });
+
       // if (typeof schedule == "object") {
       //   alert(schedule.start_event);
       //   alert(date);
       // }
       // alert("console");
       // console.log(schedule);
-      return schedule;
+      if(schedule.length==0){
+        return [{}];
+      }else{
+        return schedule;
+      }
     },
     onSubmit() {
       this.createBulkSchedule();

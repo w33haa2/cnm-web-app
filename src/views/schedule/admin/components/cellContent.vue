@@ -77,22 +77,45 @@
           </el-row>
         </el-col>
       </el-row>
-      <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag>
+      <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
+      <span slot="reference" :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">{{ tag.label }}</span>
     </el-popover>
-    <el-tag v-else :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag>
+    <span v-else :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">{{ tag.label }}</span>
+
+
+    <!-- <el-tag v-else :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
   </div>
 </template>
 
 <script>
 import moment from "moment";
+const tag  = {
+  "present":{
+    bc:"#67C23A",fc:"white",label:"PRESENT"
+  },
+  "on-leave":{
+    bc:"#E6A23C",fc:"white",label:"ON-LEAVE"
+  },
+  "off":{
+    bc:"#EBEEF5",fc:"#909399",label:"OFF"
+  },
+  "ncns":{
+    bc:"#F56C6C",fc:"white",label:"NCNS"
+  },
+  "absent":{
+    bc:"#909399",fc:"white",label:"ABSENT"
+  },
+  "inactive":{
+    bc:"#000000",fc:"white",label:"INACTIVE"
+  }
+}
 export default {
-  props: ["schedule", "date"],
+  props: ["schedule", "date", "info"],
   data() {
     return {
       with_schedule: false,
       tag: {
-        type: null,
-        label: null
+        bc:null,fc:null
       },
       popup: {
         width: 0,
@@ -128,58 +151,72 @@ export default {
   methods: {
     evaluateSchedule() {
       const schedule = this.schedule;
-      if (typeof schedule === "object") {
+      // alert(this.schedule)
+      if (Object.keys(schedule).length > 0) {
         this.with_schedule = true;
         this.popup.data.schedule = {
           in: schedule.start_event.date,
           out: schedule.end_event.date
         };
-        if (moment(schedule.start_event.date).isBefore(moment())) {
-          if (schedule.time_in) {
-            this.tag = {
-              type: "success",
-              effect: "",
-              label: "PRESENT"
-            };
-          } else {
-            // ?leave?absent
-            if (schedule.leave_id) {
-              this.tag = {
-                type: "warning",
-                effect: "",
-                label: "LEAVE"
-              };
-            } else {
-              if (schedule.remarks == "NCNS") {
-                this.tag = {
-                  type: "danger",
-                  effect: "",
-                  label: "NCNS"
-                };
-              } else {
-                this.tag = {
-                  type: "info",
-                  effect: "dark",
-                  label: "ABSENT"
-                };
-              }
-            }
+        // if (moment(schedule.start_event.date).isBefore(moment())) {
+        //   if (schedule.time_in) {
+        //     this.tag = colors["present"]
+        //   } else {
+        //     // ?leave?absent
+        //     if (schedule.leave_id) {
+        //       this.tag = {
+        //         type: "warning",
+        //         effect: "",
+        //         label: "LEAVE"
+        //       };
+        //     } else {
+        //       if (schedule.remarks == "NCNS") {
+        //         this.tag = colors["ncns"]
+        //       } else {
+        //         this.tag = {
+        //           type: "info",
+        //           effect: "dark",
+        //           label: "ABSENT"
+        //         };
+        //       }
+        //     }
+        //   }
+        // } else {
+        //   this.tag = {
+        //     type: "",
+        //     effect: "",
+        //     label: "WORK"
+        //   };
+        // }
+
+        // if active
+        if(this.info.status == "active"){
+          this.tag = tag[schedule.remarks.toLowerCase()]
+        }else{
+          let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
+          if(moment(now).isBetween(hired_date,separation_date)){
+            this.tag = tag[schedule.remarks.toLowerCase()]
           }
-        } else {
-          this.tag = {
-            type: "",
-            effect: "",
-            label: "WORK"
-          };
         }
+
       } else {
         // no schedule
         this.with_schedule = false;
-        this.tag = {
-          type: "info",
-          effect: "",
-          label: "OFF"
-        };
+        if(this.info.status == "active"){
+          this.tag = tag["off"]
+        }else{
+          let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
+          if(!moment(now).isBetween(hired_date,separation_date)){
+            this.tag = tag['inactive'];
+          }else{
+            this.tag = tag['off'];
+          }
+        }
+
       }
     }
   }
