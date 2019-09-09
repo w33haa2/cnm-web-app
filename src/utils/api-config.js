@@ -162,6 +162,10 @@ const api = {
           join_ot: {
             $url: "overtime/join",
             $method: "POST"
+          },
+          approve_ot:{
+            $url: "overtime/approve",
+            $method: "POST"
           }
         },
         // endregion schedules

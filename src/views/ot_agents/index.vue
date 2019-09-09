@@ -56,7 +56,7 @@
       </el-table-column>
       <el-table-column align="center" label="Status" width="100">
         <template slot-scope="scope">
-          <el-tag v-if="approved_by" type="success">Approved</el-tag>
+          <el-tag v-if="scope.row.approved_by" type="success">Approved</el-tag>
           <el-tag v-else type="warning">Pending</el-tag>
         </template>
       </el-table-column>
@@ -151,8 +151,13 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["approveOvertimeSchedules"]),
+    approveRow(data){
+      // console.log(data)
+      this.approveOvertimeSchedules({schedules:[data.id]})
+    },
     fetchOvertime(){
-      let url = "api/v1/schedules/search?target[]=ot_id&query="+ this.$route.params.id,
+      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id,
       options = {
         headers:{
           Authorization: "Bearer "+ this.token

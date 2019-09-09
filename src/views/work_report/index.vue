@@ -237,7 +237,6 @@ export default {
           .endOf("month")
           .format("YYYY-MM-DD"),
         userid: this.user_id,
-        "relations[]": "schedule.leave"
       };
       const data = this.query;
       this.fetchAgentsWorkReports({ data });

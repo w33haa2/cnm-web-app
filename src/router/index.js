@@ -257,7 +257,25 @@ export const asyncRoutes = [
                  title: "Agent Work Reports"
                  // if do not set roles, means: this page does not requireincident_report
                }
-             }
+             },
+             {
+               path: "/agent/vto",
+               component: () => import("@/views/vto"),
+               name: "Agent VTO",
+               meta: {
+                 title: "Agent VTO",
+                 noCache: false
+               }
+             },
+             {
+               path: "/agent/leave_slots",
+               component: () => import("@/views/leave/slots"),
+               name: "Agent Leave Slots",
+               meta: {
+                 title: "Agent Leave Slots",
+                 noCache: false
+               }
+            }
            ]
          },
          {
