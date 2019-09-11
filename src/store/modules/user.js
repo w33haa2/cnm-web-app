@@ -40,6 +40,7 @@ const state = {
     image_url: ls.get('token_info').image_url,
     login_flag: ls.get('token_info').login_flag,
     head: ls.get('token_info').head,
+    parent_id: ls.get('token_info').parent_id,
     hired_date: ls.get('token_info').hired_date,
     c_email: ls.get('token_info').c_email,
     contract: ls.get('token_info').contract
@@ -151,6 +152,10 @@ const mutations = {
       payload.meta.user.access.parent !== null
         ? payload.meta.user.access.parent
         : 'N/A'
+    state.userDetails.parent_id =
+      payload.meta.user.access.parent !== null
+        ? payload.meta.user.access_hierarchy.parent_id
+        : 'N/A'
     state.userDetails.hired_date = payload.meta.user.info.hired_date
     state.userDetails.c_email = payload.meta.user.email
     state.userDetails.image_url = payload.meta.user.info.image_url
@@ -170,6 +175,7 @@ const mutations = {
       company_id: state.userDetails.company_id,
       position: state.userDetails.position,
       head: state.userDetails.head,
+      parent_id: state.userDetails.parent_id,
       hired_date: state.userDetails.hired_date,
       c_email: state.userDetails.c_email,
       image_url: state.userDetails.image_url,

@@ -220,6 +220,26 @@ export const asyncRoutes = [
            ]
          },
          {
+           path: "/agent_schedules",
+           component: Layout,
+           name: "Agent Schedules",
+           meta: {
+             roles: ["Operations Manager", "Team Leader"]
+           },
+           children: [
+             {
+               path: "/agent_schedules",
+               component: () => import("@/views/schedule/admin"),
+               name: "Agent Schedules",
+               meta: {
+                 title: "Agent Schedules",
+                 icon: "calendar"
+               }
+             }
+           ]
+         },
+
+         {
            path: "/agent",
            component: Layout,
            // redirect: "/agent",
@@ -309,7 +329,7 @@ export const asyncRoutes = [
                meta: {
                  title: "Overtime Schedules",
                  icon: "overtime-clock",
-                 roles: ["Admin", "HR Manager"]
+                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager", "Team Leader"]
                }
              }
            ]
@@ -323,7 +343,8 @@ export const asyncRoutes = [
                path: "/overtime_agents/:id*",
                component: () => import("@/views/ot_agents/index"),
                meta: {
-                 noCache: false
+                 noCache: false,
+                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager", "Team Leader"]
                  //  roles: ["Admin", "HR Manager"]
                }
              }

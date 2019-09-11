@@ -1,96 +1,22 @@
 <template>
   <div class="app-container">
     <h4 style="color:#646464">Overtime Agents</h4>
-
-    <!-- Search and Pagination -->
     <el-row>
-      <el-col :md="{span:8}">
-        <el-input size="mini" v-model="searchQuery" placeholder="Search"></el-input>
+      <el-col v-if="position =='Admin' || position =='RTA Manager' || position =='RTA Supervisor' || position =='RTA Analyst'" :md="{span:4}">
+        <el-select v-model="select.operationsManager" placeholder="Operations Manager" size="mini" style="margin-bottom:20px;">
+          <el-option v-for="(item,index) in options.operationsManager" :key="index" :label="item.label" :value="item.value" />
+        </el-select>
       </el-col>
-      <el-col :md="{span:16}">
-        <el-pagination
-        style="float:right"
-          :page-sizes="[10,25,50]"
-          :page-size="table_config.display_size"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          :current-page.sync="table_config.page"
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-          background
-          small
-        />
+      <el-col v-if="position =='Operations Manager' || position =='Team Leader'" :md="{span:4}">
+        <el-select v-model="select.teamLeader" placeholder="Team Leader..." size="mini" style="margin-bottom:20px;" :disabled="disable_select.teamLeader">
+          <el-option v-for="(item,index) in options.teamLeader" :key="index" :label="item.label" :value="item.value" />
+        </el-select>
       </el-col>
     </el-row>
-
-    <!-- Table -->
-    <el-table :data="table_config.data" style="width: 100%;margin-top:30px;" v-loading="table_config.loader">
-      <el-table-column label="Agent">
-        <template slot-scope="scope">
-          <div class="user-block">
-          <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.user_info.image_url">
-          <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
-            <div
-              style="align-self:center;width:100%;text-align:center;"
-              class="text-point-eight-em"
-            >
-            {{ getAvatarLetters(scope.row.user_info.firstname,scope.row.user_info.lastname) }}
-
-            </div>
-          </div>
-          <span>
-              {{ scope.row.user_info.full_name }}
-          </span>
-        </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Log" width="300">
-        <template slot-scope="scope">
-          <span>{{ formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a") +" - " }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Conformance" width="200">
-        <template slot-scope="scope">
-          <el-progress :percentage="scope.row.conformance | toFix" color="#6f7ad3"></el-progress>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Status" width="100">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.approved_by" type="success">Approved</el-tag>
-          <el-tag v-else type="warning">Pending</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Approval" width="150">
-        <template slot-scope="scope">
-          <el-button icon="el-icon-check" :plain="true" size="mini" @click="approveRow(scope.row)">
-            Approve
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- Create and Update Dialog -->
-    <el-dialog
-      :visible.sync="form.show"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      :title="form.action + ' Overtime Schedule'"
-      width="40%"
-    >
-      <el-row>
-        <el-col style="margin-bottom:10px;">
-          <label width="100%" >Schedule</label>
-        </el-col>
-        <el-col>
-          <el-date-picker  style="width:100%" type="datetimerange" placeholder="Set schedule..." v-model="form.schedule" size="mini"></el-date-picker>
-        </el-col>
-      </el-row>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
-      </span>
-    </el-dialog>
+      <el-tabs type="border-card" v-model="activeTab" @tab-click="tabClick">
+        <el-tab-pane label="Approved" name="approved"><approved-tab :approved="tabApproved" :filter="{teamLeader:select.teamLeader,operationsManager:select.operationsManager}" :activeTab="activeTab"></approved-tab></el-tab-pane>
+        <el-tab-pane label="Not Approved" name="not_approved"><unapproved-tab :approved="tabApproved" :filter="{teamLeader:select.teamLeader,operationsManager:select.operationsManager}" :activeTab="activeTab"></unapproved-tab></el-tab-pane>
+      </el-tabs>
   </div>
 </template>
 
@@ -98,87 +24,82 @@
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment"
 import axios from "axios"
+import approvedTab from "./components/approvedTab"
+import unapprovedTab from "./components/unapprovedTab"
 export default {
+  components:{approvedTab, unapprovedTab},
   data() {
     return {
-      searchQuery:'',
-      table_config: {
-        display_size: 10,
-        page: 1,
-        loader:false,
-        data:[],
-        count:0,
+      activeTab:"approved",
+      options:{
+        teamLeader:[{value:"all",label:"All"}],
+        operationsManager:null
       },
-      query: {
-        offset: 0,
-        limit: 10,
-        order:"desc",
-        sort:"created_at"
+      select:{
+        teamLeader:"all",
+        operationsManager:null,
       },
-      form: {
-        show: false,
-        action: "Create",
-        update_id:null,
-        schedule:null,
-        model:{
-          start_event:null,
-          end_event:null,
-        }
-      }
+      disable_select:{
+        teamLeader:false,
+        operationsManager:false,
+      },
+      tabApproved:false,
     };
   },
   computed: {
-    ...mapGetters(["token"])
+    ...mapGetters(["token","position","user_id","head_id"])
   },
   created() {
-    this.fetchOvertime(this.query);
+    if(this.position == "Operations Manager" || this.position =='Team Leader'){
+      this.disable_select.teamLeader = false;
+      this.getUsersByPosition({query:"team leader", var:"teamLeader"})
+    }else{
+      this.disable_select.teamLeader = true;
+      this.getUsersByPosition({query:"operations manager",var:"operationsManager"})
+    }
   },
   watch:{
-    searchQuery(v){
-      this.query.offset=0;
-      if(v==null){
-        v=""
+    "select.operationsManager":function(v){
+      if(this.position != "Operations Manager" && this.position != "Team Leader"){
+          if(v=="all"){
+            this.disable_select.teamLeader = true;
+            this.select.teamLeader = "all";
+          }else{
+            this.disable_select.teamLeader = false;
+            this.getUsersByPosition({query:"team leader",var:"teamLeader"})
+          }
       }
-      if(v!=""){
-        this.query['target[]'] = 'full_name';
-        this.query.query = v;
-        this.searchOvertimeSchedule(this.query)
-      }else{
-        delete this.query['target[]'];
-        delete this.query.query;
-        this.fetchOvertimeSchedule(this.query)
-      }
-    },
+    }
   },
   methods: {
-    ...mapActions(["approveOvertimeSchedules"]),
-    approveRow(data){
-      // console.log(data)
-      this.approveOvertimeSchedules({schedules:[data.id]})
+    tabClick(tab,event){
+      // console.log(tab,event)
+      if(tab.name=="approved"){
+        this.tabApproved = true;
+      }else{
+        this.tabApproved = false;
+      }
     },
-    fetchOvertime(){
-      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id,
-      options = {
+    getUsersByPosition(query){
+      let url = "api/v1/users/search?target[]=position&query="+query.query,options = {
         headers:{
           Authorization: "Bearer "+ this.token
         }
       };
-      axios.get(url,options).then(res => {
-        console.log(res.data.meta.agent_schedules)
-        this.table_config.data = res.data.meta.agent_schedules
-        })
-      .catch(err=>console.log(err))
+      axios.get(
+        url, options
+      ).then(res => {
+        let filtered = res.data.meta.users;
+        if(query.query == "team leader"){
+          filtered = res.data.meta.users.filter(i => i.parent_id == this.head_id)
+        }
+        this.options[query.var] = filtered.map(function(v){
+          return {value:v.id, label:v.full_name}
+        });
+        this.options[query.var].unshift({value:"all",label:"All"})
+        this.select[query.var] = "all"
+      }).catch(err=>console.log(err.response.data))
     },
-    tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      this.fetchOvertimeSchedule(data) ;
-    },
-    tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchOvertimeSchedule(data);
-    }
   }
 };
 </script>
