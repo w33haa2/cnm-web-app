@@ -43,7 +43,7 @@ export default {
         teamLeader:false,
         operationsManager:false,
       },
-      tabApproved:false,
+      tabApproved:true,
     };
   },
   computed: {

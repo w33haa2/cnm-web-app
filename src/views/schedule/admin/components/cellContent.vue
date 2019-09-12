@@ -78,9 +78,16 @@
         </el-col>
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
-      <span slot="reference" :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">{{ tag.label }}</span>
+      <span slot="reference" style="width:100%;padding:0px;margin:0px">
+        <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
+        </span>
+        <span  :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">
+          <span>{{ tag.label }}</span>
+        </span>
+        <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span>
+      </span>
     </el-popover>
-    <span v-else :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">{{ tag.label }}</span>
+    <span v-else :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span>
 
 
     <!-- <el-tag v-else :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
@@ -97,6 +104,9 @@ const tag  = {
     bc:"#E6A23C",fc:"white",label:"ON-LEAVE"
   },
   "off":{
+    bc:"#EBEEF5",fc:"#909399",label:"OFF"
+  },
+  "upcoming":{
     bc:"#EBEEF5",fc:"#909399",label:"OFF"
   },
   "ncns":{
@@ -117,12 +127,15 @@ export default {
       tag: {
         bc:null,fc:null
       },
+
       popup: {
         width: 0,
         data: {
           schedule: {
             in: null,
-            out: null
+            out: null,
+            type: null,
+            vto: true
           },
           attendance: {
             in: {
@@ -134,7 +147,6 @@ export default {
               status: null
             },
             status: null,
-            has_vto: true
           }
         }
       }
@@ -156,7 +168,10 @@ export default {
         this.with_schedule = true;
         this.popup.data.schedule = {
           in: schedule.start_event.date,
-          out: schedule.end_event.date
+          out: schedule.end_event.date,
+          type: schedule.title_id,
+          // vto: schedule.vto_at
+          vto: true
         };
         // if (moment(schedule.start_event.date).isBefore(moment())) {
         //   if (schedule.time_in) {
@@ -190,8 +205,12 @@ export default {
         // }
 
         // if active
-        if(this.info.status == "active"){
+        if(schedule.user_status.status == "active"){
           this.tag = tag[schedule.remarks.toLowerCase()]
+          if(moment(moment(schedule.start_event.date).format("YYYY-MM-DD")).isBefore(moment(this.date).format("YYYY-MM-DD"))){
+            alert("UPCOMING")
+            this.tag = tag["upcoming"]
+          }
         }else{
           let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
           separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
@@ -204,18 +223,18 @@ export default {
       } else {
         // no schedule
         this.with_schedule = false;
-        if(this.info.status == "active"){
-          this.tag = tag["off"]
-        }else{
-          let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
-          if(!moment(now).isBetween(hired_date,separation_date)){
-            this.tag = tag['inactive'];
-          }else{
-            this.tag = tag['off'];
-          }
-        }
+        // if(this.info.status == "active"){
+        //   this.tag = tag["off"]
+        // }else{
+        //   let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+        //   separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+        //   now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
+        //   if(!moment(now).isBetween(hired_date,separation_date)){
+        //     this.tag = tag['inactive'];
+        //   }else{
+        //     this.tag = tag['off'];
+        //   }
+        // }
 
       }
     }

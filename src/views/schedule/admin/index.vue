@@ -9,7 +9,7 @@
       </h4>
 
       <el-row style="margin-top:10px;">
-        <el-col :md="{span:12}">
+        <el-col :md="{span:4}">
           <el-date-picker
             v-model="week.start"
             size="mini"
@@ -19,14 +19,30 @@
             :picker-options="{firstDayOfWeek:1}"
             :clearable="false"
             @change="weekChange"
+            style="width:100%"
           />
         </el-col>
-        <el-col :md="{span:12}">
+        <el-col :md="{span:20}">
           <div style="float:right">
+            <el-select size="mini" placeholder="Operations Manager" v-model="select.operationsManager" v-if="position != 'Operations Manager' && position != 'Team Leader'">
+              <el-option v-for="(option,index) in options.operationsManager" :key="index" :label="option.label" :value="option.value" />
+            </el-select>
+            <el-select size="mini" placeholder="Team Leader" v-model="select.teamLeader" :disabled="disable_select.teamLeader">
+              <el-option v-for="(option,index) in options.teamLeader" :key="index" :label="option.label" :value="option.value" />
+            </el-select>
+          </div>
+        </el-col>
+      </el-row>
+
+      <el-row>
+        <el-col :md="{span:12}" style="margin-top:10px">
             <el-button-group>
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
               <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
             </el-button-group>
+        </el-col>
+        <el-col  :md="{span:12}" style="margin-top:10px">
+          <div style="float:right">
             <el-dropdown>
               <el-button type="success" :plain="true" size="mini">
                 Excel
@@ -43,10 +59,10 @@
       </el-row>
 
       <el-row>
-        <el-col :md="{span:8}" style="margin-top:20px;">
+        <el-col :md="{span:4}" style="margin-top:10px;">
           <el-input v-model="searchQuery" size="mini" placeholder="Agent Search" />
         </el-col>
-        <el-col :md="{span:16}" style="margin-top:20px;">
+        <el-col :md="{span:20}" style="margin-top:10px;">
           <el-pagination
             style="float:right"
             :page-sizes="[10, 25, 50]"
@@ -62,42 +78,10 @@
         </el-col>
       </el-row>
       <el-row style="margin-top:10px;">
-        <!-- CALENDAR VIEW -->
-
-        <!-- <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:6}" :lg="{span:6}" :xl="{span:6}">
-        <el-row>
-          <el-col :md="{span:24}">
-            <div class="user-profile">
-              <div class="box-center">
-                <pan-thumb
-                  :image="'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'"
-                  :height="'100px'"
-                  :width="'100px'"
-                  :hoverable="false"
-                >{{ "POSITION" }}</pan-thumb>
-              </div>
-              <div class="box-center">
-                <div class="user-name text-center">{{ "FULLNAME" }}</div>
-                <div class="user-role text-center text-muted">{{ "POSITION" }}</div>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
-      </el-col>
-      <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:18}" :lg="{span:18}" :xl="{span:18}">
-       <calendar-view :show-date="showDate" :events="calendar.data">
-          <calendar-view-header
-            slot="header"
-            slot-scope="t"
-            :header-props="t.headerProps"
-            @input="setShowDate"
-          />
-        </calendar-view>
-        </el-col>-->
 
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
           <el-table v-loading="agentsWorkReportsfetchState.initial" :data="tableData">
-            <el-table-column label="Employee" min-width="300" prop="full_name" fixed>
+            <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
               <template slot="header">
                 <span style="float:left">
                   <h4 class="text-muted">Employee</h4>
@@ -472,6 +456,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import axios from "axios";
 import Moment from "moment/moment";
 import { extendMoment } from "moment-range";
 const moment = extendMoment(Moment);
@@ -483,7 +468,10 @@ export default {
       "agentsWorkReports",
       "agentsWorkReportsfetchState",
       "agents",
-      "agentsfetchState"
+      "agentsfetchState",
+      "position",
+      "token",
+      "head_id"
     ])
   },
   watch: {
@@ -492,18 +480,18 @@ export default {
         this.query["target[]"] = "full_name";
         this.query.query = v;
         this.weekChange(
-          moment()
+          moment(this.week.start)
             // .subtract(7, "days")
-            .startOf("isoweek")
+            // .startOf("isoweek")
             .format("YYYY-MM-DD")
         );
       } else {
         delete this.query["target[]"];
         delete this.query.query;
         this.weekChange(
-          moment()
+          moment(this.week.start)
             // .subtract(7, "days")
-            .startOf("isoweek")
+            // .startOf("isoweek")
             .format("YYYY-MM-DD")
         );
       }
@@ -515,9 +503,31 @@ export default {
       if (fail) {
         this.tableData = [];
       }
+    },
+    "select.operationsManager":function(v){
+      if(this.position != "Operations Manager" && this.position != "Team Leader"){
+        if(v=="all"){
+          this.disable_select.teamLeader = true;
+          this.select.teamLeader = "all";
+        }else{
+          this.disable_select.teamLeader = false;
+          this.getUsersByPosition({query:"team leader",var:"teamLeader"})
+        }
+      }
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"))
+    },
+    "select.teamLeader":function(v){
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"))
     }
   },
   mounted() {
+    if(this.position == "Admin" || this.position == "HR Manager" || this.position == "HR Assistant" || this.position == "RTA Manager" || this.position == "RTA Analyst"){
+      this.disable_select.teamLeader = true;
+      this.getUsersByPosition({query:"operations manager",var:"operationsManager"});
+    }else{
+      this.disable_select.teamLeader = false;
+      this.getUsersByPosition({query:"team leader",var:"teamLeader"});
+    }
     this.weekChange(
       moment()
         // .subtract(7, "days")
@@ -556,7 +566,10 @@ export default {
         options: []
       },
       week: {
-        start: null,
+        start:
+        moment()
+        .startOf("isoweek")
+        .format("YYYY-MM-DD"),
         end: null
       },
       fetchData: [],
@@ -572,6 +585,18 @@ export default {
       action: {
         type: "Create",
         selections: []
+      },
+      select: {
+        teamLeader:null,
+        operationsManager:null,
+      },
+      options: {
+        teamLeader:[],
+        operationsManager:[],
+      },
+      disable_select:{
+        teamLeader:false,
+        operationsManager:false,
       }
     };
   },
@@ -581,6 +606,37 @@ export default {
       "fetchAgents",
       "createBulkSchedule"
     ]),
+    getUsersByPosition(query){
+      let url = "api/v1/users/search?target[]=position&query="+query.query,options = {
+        headers:{
+          Authorization: "Bearer "+ this.token
+        }
+      };
+      axios.get(
+        url, options
+      ).then(res => {
+        let filtered = res.data.meta.users;
+        if(query.query == "team leader"){
+          if(this.position == "Team Leader"){
+            filtered = res.data.meta.users.filter(i => i.parent_id == this.head_id)
+          }else if(this.position == "Operations Manager"){
+            filtered = res.data.meta.users.filter(i => i.parent_id == this.user_id)
+          }else{
+            filtered = res.data.meta.users.filter(i => i.parent_id == this.select.operationsManager)
+            if(filtered.length>0){
+              this.disable_select.teamLeader = false;
+            }else{
+              this.disable_select.teamLeader = true;
+            }
+          }
+        }
+        this.options[query.var] = filtered.map(function(v){
+          return {value:v.id, label:v.full_name}
+        });
+        this.options[query.var].unshift({value:"all",label:"All"})
+        this.select[query.var] = "all"
+      }).catch(err=>console.log(err.response.data))
+    },
     showModal(type) {
       this.form[type].show = true;
     },
@@ -616,6 +672,25 @@ export default {
         data["target[]"] = "full_name";
         data.query = this.searchQuery;
       }
+
+      if(this.position != "Operations Manager" && this.position != "Team Leader"){
+        if(this.select.operationsManager!="all"){
+          data.om_id = this.select.operationsManager;
+        }
+        if(this.select.teamLeader!="all"){
+          data.tl_id = this.select.teamLeader;
+        }
+      }else{
+        if(this.select.teamLeader!="all"){
+          data.tl_id = this.select.teamLeader;
+        }else{
+          if(this.position == "Operations Manager"){
+            data.om_id=this.user_id;
+          }else{
+            data.om_id=this.head_id;
+          }
+        }
+      }
       this.fetchAgentsWorkReports({ data });
     },
     tableSizeChange(value) {
@@ -637,6 +712,34 @@ export default {
         start: this.week.start,
         end: this.week.end
       };
+
+      if (this.searchQuery != "") {
+        data["target[]"] = "full_name";
+        data.query = this.searchQuery;
+      }
+
+      if(this.position != "Operations Manager" && this.position != "Team Leader"){
+        if(this.select.operationsManager!="all"){
+          data.om_id = this.select.operationsManager;
+        }else{
+          data.om_id = null;
+        }
+        if(this.select.teamLeader!="all"){
+          data.tl_id = this.select.teamLeader;
+        }else{
+          data.tl_id = null;
+        }
+      }else{
+        if(this.select.teamLeader!="all"){
+          data.tl_id = this.select.teamLeader;
+        }else{
+          if(this.position == "operationsManager"){
+            url+="&om_id="+this.user_id;
+          }else{
+            url+="&om_id="+this.head_id;
+          }
+        }
+      }
       this.fetchAgentsWorkReports({ data });
     },
     plotSchedulePerDay(schedules, date) {

@@ -132,7 +132,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["token","position","head_id"])
+    ...mapGetters(["token","position","head_id","user_id"])
   },
   created() {
     console.log(this.token)
@@ -179,8 +179,15 @@ export default {
           url+="&tl_id="+this.filter.teamLeader;
         }
       }else{
+
         if(this.filter.teamLeader!="all"){
           url+="&tl_id="+this.filter.teamLeader;
+        }else{
+          if(this.position == "Operations Manager"){
+            url+="&om_id="+this.user_id;
+          }else{
+            url+="&om_id="+this.head_id;
+          }
         }
       }
       // if(this.filter == "all"){
