@@ -184,6 +184,10 @@ const getters = {
   // fetch_leave_credits
   fetchLeaveCreditsState: state => state.fetch_leave_credits.state,
   fetchLeaveCreditsData: state => state.fetch_leave_credits.data,
-  fetchLeaveCreditsError: state => state.fetch_leave_credits.errors
+  fetchLeaveCreditsError: state => state.fetch_leave_credits.errors,
+  // fetch_leave_slots
+  fetchLeaveSlotsState: state => state.fetch_leave_slots.state,
+  fetchLeaveSlotsData: state => state.fetch_leave_slots.data,
+  fetchLeaveSlotsError: state => state.fetch_leave_slots.errors
 };
 export default getters;

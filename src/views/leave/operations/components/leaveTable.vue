@@ -2,10 +2,10 @@
   <div>
     <el-row>
       <!-- pagination -->
-      <el-col :md="{span:8}">
-        <el-tag :type="tag.type">{{ tag.label }}</el-tag>
-      </el-col>
-      <el-col :md="{span:16}">
+      <!-- <el-col :md="{span:8}">
+        <!-- <el-tag :type="tag.type">{{ tag.label }}</el-tag>
+      </el-col> -->
+      <el-col :md="{span:24}">
         <el-pagination
           style="float:right"
           :page-sizes="[10, 25, 50]"
@@ -35,12 +35,12 @@
             </template>
             <template slot-scope="scope">
               <div class="user-block">
-                <img v-if="scope.row.user.info.image_url" class="img-circle" :src="scope.row.user.info.image_url">
+                <img v-if="scope.row.user.image_url" class="img-circle" :src="scope.row.user.image_url">
                 <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
                   <div
                     style="align-self:center;width:100%;text-align:center;"
                     class="text-point-eight-em"
-                  >{{ getAvatarLetters(scope.row.user.info.firstname,scope.row.user.info.lastname) }}</div>
+                  >{{ getAvatarLetters(scope.row.user.firstname,scope.row.user.lastname) }}</div>
                 </div>
                 <span>
                   {{ scope.row.user.full_name }}
@@ -57,14 +57,14 @@
           <el-table-column align="center" label="Leave Type"  width="150">
             <template slot-scope="scope">{{ remUnderscore(ucwords(scope.row.leave_type)) }}</template>
           </el-table-column>
-          <el-table-column align="center" label="History" width="150">
+          <!-- <el-table-column align="center" label="History" width="150">
             <template slot-scope="scope">
               <span style="color:grey">DATE HERE</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column align="center" label="Credits" width="150">
             <template slot-scope="scope">
-              <span style="color:grey">DATE HERE</span>
+              <span style="color:grey">{{ scope.row.leave_credits.filter(i=>i.leave_type == "vacation_leave")[0].value }}</span>
             </template>
           </el-table-column>
           <template v-if="status == 'pending'">
@@ -117,6 +117,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import moment from "moment";
 
 export default {
   name: "Leave_Tables",
@@ -127,7 +128,6 @@ export default {
       query: {
         limit: 10,
         offset: 0,
-        status: null
       },
       tag: {
         type: null,
@@ -136,9 +136,19 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userDetails", "leaves", "leavesfetchState"])
+    ...mapGetters(["userDetails", "leaves", "leavesfetchState","position","head_id","user_id"])
   },
   mounted() {
+    if(this.position.toLowerCase() == "operations manager"){
+      this.query.om_id = this.user_id
+      // this.query.start_date= moment().startOf("isoweek").format("YYYY-MM-DD");
+      // this.query.end_date= moment().format("YYYY-MM-DD");
+    }else if(this.position.toLowerCase() == "team leader"){
+      this.query.om_id = this.head_id
+      // this.query.start_date= moment().startOf("isoweek").format("YYYY-MM-DD");
+      // this.query.end_date= moment().format("YYYY-MM-DD");
+    }
+
     if (this.activeTab == this.status) {
       this.tag = {
         type: "warning",

@@ -575,6 +575,43 @@ const api = {
         },
         // endregion leave credits
 
+        // region leave slots
+        leave_slots: {
+          $prefix: "leaves/slots",
+
+          fetchAll: {
+            $url: "",
+            $method: "GET"
+          },
+          fetch: {
+            $url: "fetch",
+            $method: "GET",
+            $requires: ["id"],
+            $format: Template(() => `fetch/${id}`)
+          },
+          create: {
+            $url: "create",
+            $method: "POST"
+          },
+          update: {
+            $url: "update",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update/${id}`)
+          },
+          delete: {
+            $url: "delete",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete/${id}`)
+          },
+          search: {
+            $url: "search",
+            $method: "GET"
+          }
+        },
+        // endregion leave slots
+
         // region agents
         agents: {
           $prefix: "agents",

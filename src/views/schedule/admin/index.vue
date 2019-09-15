@@ -37,8 +37,12 @@
       <el-row>
         <el-col :md="{span:12}" style="margin-top:10px">
             <el-button-group>
-              <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
-              <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+              <template v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'">
+                <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+              </template>
+              <template v-if="position=='HR Manager' || position=='HR Assistant'">
+                <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+              </template>
             </el-button-group>
         </el-col>
         <el-col  :md="{span:12}" style="margin-top:10px">
@@ -438,10 +442,7 @@
               class="form-input"
               style="width:100%;margin-bottom:10px;"
             >
-              <el-option value="maternity_leave" label="Maternity" />
-              <el-option value="paternity_leave" label="Paternity" />
-              <el-option value="bereavement_leave" label="Bereavement" />
-              <el-option value="vawc" label="VAWC" />
+            <el-option v-for="(type, index) in options.leave_type.hr" :key="index" :value="type.value" :label="type.label" />
             </el-select>
           </el-col>
         </el-row>
@@ -561,6 +562,7 @@ export default {
           }
         }
       },
+
       filter: {
         by: "all",
         options: []
@@ -593,6 +595,14 @@ export default {
       options: {
         teamLeader:[],
         operationsManager:[],
+        leave_type:[
+          { value:"bereavement_leave", label:"Bereavement"},
+          { value:"leave_of_absence", label:"Leave of absence"},
+          { value:"maternity_leave", label:"Maternity"},
+          { value:"paternity_leave", label:"Paternity"},
+          { value:"solo_parent_leave", label:"Solo Parent"},
+          { value:"vawc", label:"Violence Againts Women and Children"},
+        ]
       },
       disable_select:{
         teamLeader:false,
@@ -644,6 +654,7 @@ export default {
       const start = moment(e)
         .startOf("isoweek")
         .format("YYYY-MM-DD");
+        alert(start)
       const end = moment(e)
         .endOf("isoweek")
         .format("YYYY-MM-DD");
@@ -746,33 +757,11 @@ export default {
       const schedule = schedules.filter(
         i => moment(i.start_event.date).format("YYYY-MM-DD") == date
       );
-
-      // ..sort((a, b) => {
-      //       let v1 = moment(a.start_event).format("YYYY-MM-DD HH:mm:ss"),
-      //         v2 = moment(b.start_event).format("YYYY-MM-DD HH:mm:ss");
-      //       let compare = 0;
-      //       if (v1 > v2) {
-      //         compare = 1;
-      //       } else if (v1 < v2) {
-      //         compare = -1;
-      //       }
-      //       return compare;
-      //     });
-
-      // if (typeof schedule == "object") {
-      //   alert(schedule.start_event);
-      //   alert(date);
-      // }
-      // alert("console");
-      // console.log(schedule);
       if(schedule.length==0){
         return [{}];
       }else{
         return schedule;
       }
-    },
-    onSubmit() {
-      this.createBulkSchedule();
     },
     dateToday(date) {
       if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
@@ -780,6 +769,9 @@ export default {
       } else {
         return false;
       }
+    },
+    onSubmit() {
+      this.createBulkSchedule();
     },
     remoteAgent(query) {
       const data = {};

@@ -14,29 +14,24 @@ export default {
   components: { agentView, operationsView },
   data() {
     return {
-      currentRole: "agentView"
+      currentRole: null
     };
   },
   computed: {
     ...mapGetters(["position"])
   },
-  created() {
-    let group = this.positionPageGroup(this.position);
-    // alert(group);
-    /**
-     * @mixin function
-     * positionPageGroup @ main.js
-     * @param position
-     */
-    switch (group) {
-      case "operations":
-        this.currentRole = operationsView;
+  mounted() {
+    // alert(this.position)
+    switch (this.position.toLowerCase()) {
+      case "operations manager":
+      case "team leader":
+        this.currentRole = "operationsView";
         break;
-      case "agent":
-        this.currentRole = agentView;
+      case "representative - order placer":
+        this.currentRole = "agentView";
         break;
-      default:
-        this.currentRole = agentView;
+      case "admin":
+        this.currentRole = "operationsView";
         break;
     }
   }

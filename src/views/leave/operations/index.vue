@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Agent Leave (Operations View)</h4>
+    <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
       <el-col :md="{span:24}">
         <!-- <el-button
@@ -13,7 +13,7 @@
         <el-calendar v-model="calendar.today"></el-calendar>
       </el-col> -->
       <el-col :md="{span:24}" style="padding-left: 20px">
-        <el-tabs style="padding-left:5px;padding-right:5px;" v-model="activeTab">
+        <el-tabs v-model="activeTab" type="border-card">
           <el-tab-pane :label="tab.label" :name="tab.name" v-for="(tab,index) in tabs" :key="index">
             <leave-table :status="tab.name" @on-update="leaveForm" :active-tab="activeTab" />
           </el-tab-pane>

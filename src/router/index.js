@@ -224,7 +224,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Agent Schedules",
            meta: {
-             roles: ["Operations Manager", "Team Leader"]
+             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
            children: [
              {
@@ -236,6 +236,50 @@ export const asyncRoutes = [
                  icon: "calendar"
                }
              }
+           ]
+         },
+         {
+           path: "/agent_leaves",
+           component: Layout,
+           name: "Agent Leave",
+           meta: {
+             roles: ["Operations Manager", "Team Leader"]
+           },
+           children: [
+            {
+              path: "/agent/leave",
+              component: () => import("@/views/leave/index"),
+              name: "Agent Leave",
+              meta: {
+                title: "Agent Leave",
+                noCache:false,
+                icon: "calendar-check"
+
+                // if do not set roles, means: this page does not requireincident_report
+              }
+            },
+           ]
+         },
+         {
+           path: "/agent_leave_slots",
+           component: Layout,
+           name: "Agent Leave Slots",
+           meta: {
+             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
+           },
+           children: [
+            {
+              path: "/agent/leave_slots",
+              component: () => import("@/views/leave/slots"),
+              name: "Agent Leave Slots",
+              meta: {
+                title: "Agent Leave Slots",
+                noCache:false,
+                icon: "calendar-slots"
+
+                // if do not set roles, means: this page does not requireincident_report
+              }
+            },
            ]
          },
 
@@ -257,18 +301,18 @@ export const asyncRoutes = [
                name: "Agent Schedules",
                meta: {
                  title: "Agent Schedules",
-                 roles: ["Admin", "Representative - Order Placer"] // you can set roles in root nav
                }
              },
-             {
-               path: "/agent/leave",
-               component: () => import("@/views/leave/index"),
-               name: "Agent Leave",
-               meta: {
-                 title: "Agent Leave"
-                 // if do not set roles, means: this page does not requireincident_report
-               }
-             },
+            //  {
+            //    path: "/agent/leave",
+            //    component: () => import("@/views/leave/index"),
+            //    name: "Agent Leave",
+            //    meta: {
+            //      title: "Agent Leave",
+            //      noCache:false
+            //      // if do not set roles, means: this page does not requireincident_report
+            //    }
+            //  },
              {
                path: "/agent/work_reports",
                component: () => import("@/views/work_report/index"),
@@ -278,24 +322,24 @@ export const asyncRoutes = [
                  // if do not set roles, means: this page does not requireincident_report
                }
              },
-             {
-               path: "/agent/vto",
-               component: () => import("@/views/vto"),
-               name: "Agent VTO",
-               meta: {
-                 title: "Agent VTO",
-                 noCache: false
-               }
-             },
-             {
-               path: "/agent/leave_slots",
-               component: () => import("@/views/leave/slots"),
-               name: "Agent Leave Slots",
-               meta: {
-                 title: "Agent Leave Slots",
-                 noCache: false
-               }
-            }
+            // //  {
+            // //    path: "/agent/vto",
+            // //    component: () => import("@/views/vto"),
+            // //    name: "Agent VTO",
+            // //    meta: {
+            // //      title: "Agent VTO",
+            // //      noCache: false
+            // //    }
+            // //  },
+            //  {
+            //    path: "/agent/leave_slots",
+            //    component: () => import("@/views/leave/slots"),
+            //    name: "Agent Leave Slots",
+            //    meta: {
+            //      title: "Agent Leave Slots",
+            //      noCache: false
+            //    }
+            // }
            ]
          },
          {

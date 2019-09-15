@@ -66,6 +66,7 @@
                 type="primary"
                 size="mini"
                 @click="startWork"
+                :loading="btn_loading.start_work"
               >START</el-button>
             </template>
             <template v-if="today.schedule.time_in != null && today.schedule.time_out != null">
@@ -119,6 +120,9 @@ export default {
           has_schedule: false,
           schedule: null
         }
+      },
+      btn_loading:{
+        start_work:false,
       }
     };
   },
@@ -146,11 +150,16 @@ export default {
       }
     },
     agentStartWorkfetchState({ initial, success, fail }) {
+      if(initial){
+        this.btn_loading.start_work = true;
+      }
       if (success) {
         alert("Successfully timed in");
-        this.today.schedule = this.agentStartWorkData;
+        this.btn_loading.start_work = false;
+        this.fetchAgentsTodayWork(this.today.query);
       }
       if (fail) {
+        this.btn_loading.start_work = false;
         alert("Oops! There's an error logging your time in.");
       }
     },
@@ -377,7 +386,18 @@ export default {
           schedule_id: this.today.schedule.id,
           time_in: moment().format("YYYY-MM-DD HH:mm:ss")
         };
-        this.agentStartWork(data);
+        if(this.today.schedule.leave==null){
+        }else{
+          if(this.today.schedule.leave.status=="approved"){
+            this.$message({
+              type:"warning",
+              message:'This schedule is under "ON-LEAVE" status. Please inform RTA group if you want start work.',
+              duration:"10000"
+            });
+          }else{
+            this.agentStartWork(data);
+          }
+        }
       }
     }
   }
