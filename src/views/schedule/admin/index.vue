@@ -64,7 +64,7 @@
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
             </template>
             <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
-            <template v-if="position=='HR Manager' || position=='HR Assistant">
+            <template v-if="position=='HR Manager' || position=='HR Assistant'">
               <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
             </template>
           </el-button-group>
