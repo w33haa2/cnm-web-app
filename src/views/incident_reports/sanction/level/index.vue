@@ -148,6 +148,9 @@ export default {
         this.table_config.count = this.sanctionLevels.count;
         this.table_config.loader = false;
       }
+      else if(fail) {
+        this.table_config.loader = false;
+      }
     },
     sanctionLevelsSearchState({ initial, success, fail }) {
       if (initial) {

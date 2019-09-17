@@ -144,6 +144,9 @@ export default {
         this.table_config.count = this.sanctionTypes.count;
         this.table_config.loader = false;
       }
+      else if (fail) {
+        this.table_config.loader = false;
+      }
     },
     sanctionTypesSearchState({ initial, success, fail }) {
       if (initial) {
