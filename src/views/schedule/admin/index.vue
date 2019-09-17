@@ -18,17 +18,17 @@
             value-format="yyyy-MM-dd"
             :picker-options="{firstDayOfWeek:1}"
             :clearable="false"
-            @change="weekChange"
             style="width:100%"
+            @change="weekChange"
           />
         </el-col>
         <el-col :md="{span:20}">
           <div style="float:right">
             <el-select
+              v-if="position != 'Operations Manager' && position != 'Team Leader'"
+              v-model="select.operationsManager"
               size="mini"
               placeholder="Operations Manager"
-              v-model="select.operationsManager"
-              v-if="position != 'Operations Manager' && position != 'Team Leader'"
             >
               <el-option
                 v-for="(option,index) in options.operationsManager"
@@ -38,9 +38,9 @@
               />
             </el-select>
             <el-select
+              v-model="select.teamLeader"
               size="mini"
               placeholder="Team Leader"
-              v-model="select.teamLeader"
               :disabled="disable_select.teamLeader"
             >
               <el-option
@@ -57,12 +57,14 @@
       <el-row>
         <el-col :md="{span:12}" style="margin-top:10px">
           <el-button-group>
+            <!--            v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"-->
             <template
               v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"
             >
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
             </template>
-            <template v-if="position=='HR Manager' || position=='HR Assistant'">
+            <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
+            <template v-if="position=='HR Manager' || position=='HR Assistant">
               <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
             </template>
           </el-button-group>
@@ -114,7 +116,7 @@
               </template>
               <template slot-scope="scope">
                 <div class="user-block">
-                  <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
+                  <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
                   <div
                     v-else
                     class="img-circle text-muted"
@@ -408,8 +410,8 @@
           <el-button
             type="danger"
             size="mini"
-            @click="submitAddSchedule"
             :loading="btn_loader"
+            @click="submitAddSchedule"
           >Confirm</el-button>
         </span>
       </el-dialog>
@@ -467,7 +469,7 @@
               style="width:100%;margin-bottom:10px;"
             >
               <el-option
-                v-for="(type, index) in options.leave_type.hr"
+                v-for="(type, index) in options.leave_type"
                 :key="index"
                 :value="type.value"
                 :label="type.label"
@@ -477,7 +479,7 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-          <el-button type="danger" size="mini" @click="onSubmit">Confirm</el-button>
+          <el-button type="danger" :disabled="createLeaveState.initial" size="mini" @click="onSubmit">Confirm</el-button>
         </span>
       </el-dialog>
     </div>
@@ -485,135 +487,153 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
-import axios from "axios";
-import Moment from "moment/moment";
-import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment);
-import cellContent from "./components/cellContent";
+import { mapActions, mapGetters } from 'vuex'
+import axios from 'axios'
+import Moment from 'moment/moment'
+import { extendMoment } from 'moment-range'
+const moment = extendMoment(Moment)
+import cellContent from './components/cellContent'
 export default {
   components: { cellContent },
   computed: {
     ...mapGetters([
-      "agentsWorkReports",
-      "agentsWorkReportsfetchState",
-      "agents",
-      "agentsfetchState",
-      "position",
-      "token",
-      "head_id",
-      "createScheduleBulkState",
-      "createScheduleBulkData",
-      "createScheduleBulkError"
+      'agentsWorkReports',
+      'agentsWorkReportsfetchState',
+      'agents',
+      'agentsfetchState',
+      'position',
+      'token',
+      'head_id',
+      'createScheduleBulkState',
+      'createScheduleBulkData',
+      'createLeaveState',
+      'createScheduleBulkError'
     ])
   },
   watch: {
+    createLeaveState({ initial, success, fail }) {
+      if (success) {
+        this.form.addLeave.show = false
+        this.$message({
+          type: 'success',
+          message: 'Leave successfully created!.',
+          duration: 5000
+        })
+      } else if (fail) {
+        this.$message({
+          type: 'danger',
+          message: 'Internal Server Error.',
+          duration: 5000
+        })
+      }
+    },
     createScheduleBulkState({ initial, success, fail }) {
       if (initial) {
-        this.form.addSchedule.btn_loader = true;
+        this.form.addSchedule.btn_loader = true
       }
 
       if (success) {
-        this.form.addSchedule.btn_loader = false;
-        this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+        this.form.addSchedule.btn_loader = false
+        this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
         this.$message({
-          type: "success",
-          message: "Schedules successfully created!.",
+          type: 'success',
+          message: 'Schedules successfully created!.',
           duration: 5000
-        });
+        })
       }
 
       if (fail) {
-        this.form.addSchedule.btn_loader = false;
+        this.form.addSchedule.btn_loader = false
         this.$message({
-          type: "warning",
+          type: 'warning',
           message: "There's a problem creating the schedules.",
           duration: 5000
-        });
+        })
       }
     },
-    "form.addSchedule.model.operationsManager": function() {
-      this.getFormOptions({ query: "team leader", var: "teamLeader" });
+    'form.addSchedule.model.operationsManager': function() {
+      this.getFormOptions({ query: 'team leader', var: 'teamLeader' })
     },
     searchQuery(v) {
-      if (v != "") {
-        this.query["target[]"] = "full_name";
-        this.query.query = v;
+      if (v != '') {
+        this.query['target[]'] = 'full_name'
+        this.query.query = v
         this.weekChange(
           moment(this.week.start)
             // .subtract(7, "days")
             // .startOf("isoweek")
-            .format("YYYY-MM-DD")
-        );
+            .format('YYYY-MM-DD')
+        )
       } else {
-        delete this.query["target[]"];
-        delete this.query.query;
+        delete this.query['target[]']
+        delete this.query.query
         this.weekChange(
           moment(this.week.start)
             // .subtract(7, "days")
             // .startOf("isoweek")
-            .format("YYYY-MM-DD")
-        );
+            .format('YYYY-MM-DD')
+        )
       }
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
-        this.tableData = this.agentsWorkReports.agent_schedules;
+        this.tableData = this.agentsWorkReports.agent_schedules
       }
       if (fail) {
-        this.tableData = [];
+        this.tableData = []
       }
     },
-    "select.operationsManager": function(v) {
+    'select.operationsManager': function(v) {
       if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
+        this.position != 'Operations Manager' &&
+        this.position != 'Team Leader'
       ) {
-        if (v == "all") {
-          this.disable_select.teamLeader = true;
-          this.select.teamLeader = "all";
+        if (v == 'all') {
+          this.disable_select.teamLeader = true
+          this.select.teamLeader = 'all'
         } else {
-          this.disable_select.teamLeader = false;
-          this.getUsersByPosition({ query: "team leader", var: "teamLeader" });
+          this.disable_select.teamLeader = false
+          this.getUsersByPosition({ query: 'team leader', var: 'teamLeader' })
         }
       }
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
     },
-    "select.teamLeader": function(v) {
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+    'select.teamLeader': function(v) {
+      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
     }
   },
   mounted() {
     if (
-      this.position == "Admin" ||
-      this.position == "HR Manager" ||
-      this.position == "HR Assistant" ||
-      this.position == "RTA Manager" ||
-      this.position == "RTA Analyst"
+      this.position == 'Admin' ||
+      this.position == 'HR Manager' ||
+      this.position == 'HR Assistant' ||
+      this.position == 'RTA Manager' ||
+      this.position == 'RTA Analyst'
     ) {
-      this.disable_select.teamLeader = true;
+      this.disable_select.teamLeader = true
       this.getUsersByPosition({
-        query: "operations manager",
-        var: "operationsManager"
-      });
+        query: 'operations manager',
+        var: 'operationsManager'
+      })
     } else {
-      this.disable_select.teamLeader = false;
-      this.getUsersByPosition({ query: "team leader", var: "teamLeader" });
+      this.disable_select.teamLeader = false
+      this.getUsersByPosition({ query: 'team leader', var: 'teamLeader' })
     }
     this.weekChange(
       moment()
         // .subtract(7, "days")
-        .startOf("isoweek")
-        .format("YYYY-MM-DD")
-    );
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
+    )
     this.getFormOptions({
-      query: "operations manager",
-      var: "operationsManager"
-    });
+      query: 'operations manager',
+      var: 'operationsManager'
+    })
   },
   data() {
     return {
-      searchQuery: "",
+      searchQuery: '',
+      creatingFlag: false,
       form: {
         addSchedule: {
           show: false, // temporary value
@@ -645,13 +665,13 @@ export default {
       },
 
       filter: {
-        by: "all",
+        by: 'all',
         options: []
       },
       week: {
         start: moment()
-          .startOf("isoweek")
-          .format("YYYY-MM-DD"),
+          .startOf('isoweek')
+          .format('YYYY-MM-DD'),
         end: null
       },
       fetchData: [],
@@ -665,7 +685,7 @@ export default {
         page: 1
       },
       action: {
-        type: "Create",
+        type: 'Create',
         selections: []
       },
       select: {
@@ -676,74 +696,75 @@ export default {
         teamLeader: [],
         operationsManager: [],
         leave_type: [
-          { value: "bereavement_leave", label: "Bereavement" },
-          { value: "leave_of_absence", label: "Leave of absence" },
-          { value: "maternity_leave", label: "Maternity" },
-          { value: "paternity_leave", label: "Paternity" },
-          { value: "solo_parent_leave", label: "Solo Parent" },
-          { value: "vawc", label: "Violence Againts Women and Children" }
+          { value: 'bereavement_leave', label: 'Bereavement' },
+          { value: 'leave_of_absence', label: 'Leave of absence' },
+          { value: 'maternity_leave', label: 'Maternity' },
+          { value: 'paternity_leave', label: 'Paternity' },
+          { value: 'solo_parent_leave', label: 'Solo Parent' },
+          { value: 'vawc', label: 'Violence Againts Women and Children' }
         ]
       },
       disable_select: {
         teamLeader: false,
         operationsManager: false
       }
-    };
+    }
   },
   methods: {
     ...mapActions([
-      "fetchAgentsWorkReports",
-      "fetchAgents",
-      "createBulkSchedule",
-      "createScheduleBulk"
+      'fetchAgentsWorkReports',
+      'fetchAgents',
+      'createBulkSchedule',
+      'createLeave',
+      'createScheduleBulk'
     ]),
     processAddScheduleData() {
-      let form = this.form.addSchedule.model,
-        data = [];
+      const form = this.form.addSchedule.model
+      const data = []
       form.agents.forEach(
-        ((v, i) => {
+        (v, i) => {
           form.dates.forEach(
-            ((v1, i1) => {
-              let start = moment(
-                  moment(v1).format("YYYY-MM-DD") +
-                    " " +
-                    moment(form.time_in).format("HH:mm:ss")
-                ).format("YYYY-MM-DD HH:mm:ss"),
-                duration = moment(
-                  moment(form.duration).format("HH:mm:ss"),
-                  "HH:mm:ss"
-                ).diff(moment().startOf("day"), "seconds");
+            (v1, i1) => {
+              const start = moment(
+                moment(v1).format('YYYY-MM-DD') +
+                    ' ' +
+                    moment(form.time_in).format('HH:mm:ss')
+              ).format('YYYY-MM-DD HH:mm:ss')
+              const duration = moment(
+                moment(form.duration).format('HH:mm:ss'),
+                'HH:mm:ss'
+              ).diff(moment().startOf('day'), 'seconds')
               // alert(v1+" "+start+" "+duration)
-              alert(start + " " + duration);
+              alert(start + ' ' + duration)
               data.push({
                 user_id: v,
                 tl_id: form.teamLeader,
                 om_id: form.operationsManager,
                 title_id: 1,
                 start_event: start,
-                end_event: moment(moment(start).add(duration, "s")).format(
-                  "YYYY-MM-DD HH:mm:ss"
+                end_event: moment(moment(start).add(duration, 's')).format(
+                  'YYYY-MM-DD HH:mm:ss'
                 )
-              });
-            }).bind(this)
-          );
-        }).bind(this)
-      );
-      return data;
+              })
+            }
+          )
+        }
+      )
+      return data
     },
     submitAddSchedule() {
       if (this.validateAddSchedule()) {
-        this.createScheduleBulk(this.processAddScheduleData());
+        this.createScheduleBulk(this.processAddScheduleData())
       } else {
         this.$message({
-          type: "warning",
-          message: "Please fillup all form fields.",
+          type: 'warning',
+          message: 'Please fillup all form fields.',
           duration: 5000
-        });
+        })
       }
     },
     validateAddSchedule() {
-      let form = this.form.addSchedule.model;
+      const form = this.form.addSchedule.model
       if (
         form.dates.length < 1 ||
         form.agents < 1 ||
@@ -752,233 +773,240 @@ export default {
         form.teamLeader == null ||
         form.operationsManager == null
       ) {
-        return false;
+        return false
       } else {
-        return true;
+        return true
       }
     },
     getFormOptions(query) {
-      let url = "api/v1/users/search?target[]=position&query=" + query.query,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
+      const url = 'api/v1/users/search?target[]=position&query=' + query.query
+      const options = {
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        }
+      }
       axios
         .get(url, options)
         .then(res => {
-          let result = res.data.meta.users;
-          if (query.query == "team leader") {
+          const result = res.data.meta.users
+          if (query.query == 'team leader') {
             this.form.addSchedule.options[query.var] = result.filter(
               i => i.parent_id == this.form.addSchedule.model.operationsManager
-            );
+            )
             if (this.form.addSchedule.options[query.var].length < 1) {
-              this.form.addSchedule.options[query.var] = [];
+              this.form.addSchedule.options[query.var] = []
             } else {
               this.form.addSchedule.model[
                 query.var
-              ] = this.form.addSchedule.options[query.var][0].id;
+              ] = this.form.addSchedule.options[query.var][0].id
             }
           } else {
-            this.form.addSchedule.options[query.var] = result;
+            this.form.addSchedule.options[query.var] = result
             this.form.addSchedule.model[
               query.var
-            ] = this.form.addSchedule.options[query.var][0].id;
+            ] = this.form.addSchedule.options[query.var][0].id
           }
         })
-        .catch(err => console.log(err.response.data));
+        .catch(err => console.log(err.response.data))
     },
     getUsersByPosition(query) {
-      let url = "api/v1/users/search?target[]=position&query=" + query.query,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
+      const url = 'api/v1/users/search?target[]=position&query=' + query.query
+      const options = {
+        headers: {
+          Authorization: 'Bearer ' + this.token
+        }
+      }
       axios
         .get(url, options)
         .then(res => {
-          let filtered = res.data.meta.users;
-          if (query.query == "team leader") {
-            if (this.position == "Team Leader") {
+          let filtered = res.data.meta.users
+          if (query.query == 'team leader') {
+            if (this.position == 'Team Leader') {
               filtered = res.data.meta.users.filter(
                 i => i.parent_id == this.head_id
-              );
-            } else if (this.position == "Operations Manager") {
+              )
+            } else if (this.position == 'Operations Manager') {
               filtered = res.data.meta.users.filter(
                 i => i.parent_id == this.user_id
-              );
+              )
             } else {
               filtered = res.data.meta.users.filter(
                 i => i.parent_id == this.select.operationsManager
-              );
+              )
               if (filtered.length > 0) {
-                this.disable_select.teamLeader = false;
+                this.disable_select.teamLeader = false
               } else {
-                this.disable_select.teamLeader = true;
+                this.disable_select.teamLeader = true
               }
             }
           }
           this.options[query.var] = filtered.map(function(v) {
-            return { value: v.id, label: v.full_name };
-          });
-          this.options[query.var].unshift({ value: "all", label: "All" });
-          this.select[query.var] = "all";
+            return { value: v.id, label: v.full_name }
+          })
+          this.options[query.var].unshift({ value: 'all', label: 'All' })
+          this.select[query.var] = 'all'
         })
-        .catch(err => console.log(err.response.data));
+        .catch(err => console.log(err.response.data))
     },
     showModal(type) {
-      this.form[type].show = true;
+      this.form[type].show = true
     },
     weekChange(e) {
       const start = moment(e)
-        .startOf("isoweek")
-        .format("YYYY-MM-DD");
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
       const end = moment(e)
-        .endOf("isoweek")
-        .format("YYYY-MM-DD");
-      this.week.start = start;
-      this.week.end = end;
-      this.generateHeader(start, end);
+        .endOf('isoweek')
+        .format('YYYY-MM-DD')
+      this.week.start = start
+      this.week.end = end
+      this.generateHeader(start, end)
     },
     generateHeader(start, end) {
-      const range = moment.range(start, end);
-      const dates = Array.from(range.by("day")).map(m =>
-        m.format("YYYY-MM-DD")
-      );
+      const range = moment.range(start, end)
+      const dates = Array.from(range.by('day')).map(m =>
+        m.format('YYYY-MM-DD')
+      )
 
       this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
-      }));
+        day: moment(d).format('ddd'),
+        date: moment(d).format('YYYY-MM-DD'),
+        date1: moment(d).format('MMM Do')
+      }))
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
-      if (this.searchQuery != "") {
-        data["target[]"] = "full_name";
-        data.query = this.searchQuery;
+      }
+      if (this.searchQuery != '') {
+        data['target[]'] = 'full_name'
+        data.query = this.searchQuery
       }
 
       if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
+        this.position != 'Operations Manager' &&
+        this.position != 'Team Leader'
       ) {
-        if (this.select.operationsManager != "all") {
-          data.om_id = this.select.operationsManager;
-        }else{
-          delete data.om_id;
-        }
-        if (this.select.teamLeader != "all") {
+        if (this.select.operationsManager != 'all') {
+          data.om_id = this.select.operationsManager
+        } else {
           delete data.om_id
-          data.tl_id = this.select.teamLeader;
-        }else{
-          delete data.tl_id;
+        }
+        if (this.select.teamLeader != 'all') {
+          delete data.om_id
+          data.tl_id = this.select.teamLeader
+        } else {
+          delete data.tl_id
         }
       } else {
-        if (this.select.teamLeader != "all") {
-          delete data.om_id;
-          data.tl_id = this.select.teamLeader;
+        if (this.select.teamLeader != 'all') {
+          delete data.om_id
+          data.tl_id = this.select.teamLeader
         } else {
-          if (this.position == "Operations Manager") {
-            data.om_id = this.user_id;
+          if (this.position == 'Operations Manager') {
+            data.om_id = this.user_id
           } else {
-            data.om_id = this.head_id;
+            data.om_id = this.head_id
           }
         }
       }
-      this.fetchAgentsWorkReports({ data });
+      this.fetchAgentsWorkReports({ data })
     },
     tableSizeChange(value) {
-      this.query.limit = value;
-      this.query.offset = 0;
+      this.query.limit = value
+      this.query.offset = 0
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
-      this.fetchAgentsWorkReports({ data });
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
+      this.query.offset = (value - 1) * this.query.limit
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      };
+      }
 
-      if (this.searchQuery != "") {
-        data["target[]"] = "full_name";
-        data.query = this.searchQuery;
+      if (this.searchQuery != '') {
+        data['target[]'] = 'full_name'
+        data.query = this.searchQuery
       }
 
       if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
+        this.position != 'Operations Manager' &&
+        this.position != 'Team Leader'
       ) {
-        if (this.select.operationsManager != "all") {
-          data.om_id = this.select.operationsManager;
+        if (this.select.operationsManager != 'all') {
+          data.om_id = this.select.operationsManager
         } else {
-          delete data.om_id;
+          delete data.om_id
         }
-        if (this.select.teamLeader != "all") {
-          data.tl_id = this.select.teamLeader;
+        if (this.select.teamLeader != 'all') {
+          data.tl_id = this.select.teamLeader
         } else {
-          delete data.tl_id;
+          delete data.tl_id
         }
       } else {
-        if (this.select.teamLeader != "all") {
-          delete data.om_id;
-          data.tl_id = this.select.teamLeader;
+        if (this.select.teamLeader != 'all') {
+          delete data.om_id
+          data.tl_id = this.select.teamLeader
         } else {
-          if (this.position == "operationsManager") {
-            data.om_id= this.user_id;
+          if (this.position == 'operationsManager') {
+            data.om_id = this.user_id
           } else {
-            data.om_id= this.head_id;
+            data.om_id = this.head_id
           }
         }
       }
-      this.fetchAgentsWorkReports({ data });
+      this.fetchAgentsWorkReports({ data })
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
-        i => moment(i.start_event.date).format("YYYY-MM-DD") == date
-      );
+        i => moment(i.start_event.date).format('YYYY-MM-DD') == date
+      )
       if (schedule.length == 0) {
-        return [{}];
+        return [{}]
       } else {
-        return schedule;
+        return schedule
       }
     },
     dateToday(date) {
-      if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
-        return true;
+      if (moment(date).isSame(moment().format('YYYY-MM-DD'))) {
+        return true
       } else {
-        return false;
+        return false
       }
     },
     onSubmit() {
-      this.createBulkSchedule();
+      const params = {
+        user_id: this.form.addLeave.model.user_id,
+        start_event: this.form.addLeave.model.dates[0],
+        end_event: this.form.addLeave.model.dates[0],
+        leave_type: this.form.addLeave.leave_type
+      }
+      console.log(params)
+      this.createLeave(params)
     },
     remoteAgent(query) {
-      const data = {};
-      if (query !== "") {
-        data["target[]"] = "full_name";
-        data.query = query;
-        this.fetchAgents({ data });
+      const data = {}
+      if (query !== '') {
+        data['target[]'] = 'full_name'
+        data.query = query
+        this.fetchAgents({ data })
       } else {
-        data["target[]"] = "";
-        data.query = "";
-        this.fetchAgents({ data });
+        data['target[]'] = ''
+        data.query = ''
+        this.fetchAgents({ data })
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
