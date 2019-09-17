@@ -1,5 +1,16 @@
 <template>
-  <div>{{slot.value}}</div>
+  <div>
+    <template v-if="Object.keys(slot).length>0">
+      <span>
+        {{slot.value+"/"+slot.original_value}}
+      </span>
+    </template>
+    <template v-else>
+      <span style="color:red">
+        NA
+      </span>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -8,7 +19,7 @@ export default {
   props: ["slot"],
   watch: {},
   mounted() {
-    alert(this.slot);
+    console.log(this.slot);
   },
   methods: {}
 };

@@ -192,6 +192,11 @@ const getters = {
   // create_schedule_bulk
   createScheduleBulkState: state => state.create_schedule_bulk.state,
   createScheduleBulkData: state => state.create_schedule_bulk.data,
-  createScheduleBulkError: state => state.create_schedule_bulk.errors
+  createScheduleBulkError: state => state.create_schedule_bulk.errors,
+  // employee
+  fetchEmployeesData: state => state.employee.employeesData,
+  fetchEmployeesTotal: state => state.employee.employeesTotal,
+  fetchEmployeesError: state => state.employee.employeeErrors,
+  fetchEmployeesState: state => state.employee.employeeFetchState,
 };
 export default getters;
