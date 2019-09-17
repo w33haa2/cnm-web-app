@@ -1,21 +1,16 @@
 <template>
-  <div>
-    {{slot.value}}
-  </div>
+  <div>{{slot.value}}</div>
 </template>
 
 <script>
 import moment from "moment";
 export default {
-  props: ["slot", "date", "info"],
-  watch: {
-  },
+  props: ["slot"],
+  watch: {},
   mounted() {
-    alert(this.slot)
+    alert(this.slot);
   },
-  methods: {
-
-  }
+  methods: {}
 };
 </script>
 

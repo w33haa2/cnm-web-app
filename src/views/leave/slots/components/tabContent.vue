@@ -21,54 +21,49 @@
       </el-col>
     </el-row>
 
-          <el-table v-loading="table_config.loader" :data="table_config.data">
-            <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
-              <template slot="header">
-                <span style="float:left">
-                  <h4 class="text-muted">Employee</h4>
-                </span>
-              </template>
-              <template slot-scope="scope">
-                <div class="user-block">
-                  <img v-if="scope.row.user.image_url" class="img-circle" :src="scope.row.user.image_url" />
-                  <div
-                    v-else
-                    class="img-circle text-muted"
-                    style="background-color:#d9d9d9;display:flex"
-                  >
-                    <div
-                      style="align-self:center;width:100%;text-align:center;"
-                      class="text-point-eight-em"
-                    >{{ getAvatarLetters(scope.row.user.firstname,scope.row.user.lastname) }}</div>
-                  </div>
-                  <span>
-                    <span class="el-dropdown-link" style="font-weight:600">{{ scope.row.user. full_name }}</span>
-                  </span>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column align="center">
-              <template slot="header" slot-scope="scope">
-                <h4
-                  :class="[dateToday(tableHeader[0].date)?'today-header':'']"
-                  style="margin-bottom:5px"
-                >{{ tableHeader[0].day }}</h4>
-                <span
-                  :class="[dateToday(tableHeader[0].date)?'today-header':'']"
-                >{{ tableHeader[0].date1 }}</span>
-              </template>
-              <template slot-scope="{row}">
-
-                <template v-for="(slot,index) in plotLeaveSlotsPerDay(row,tableHeader[0].date)">
-                  <cell-content
-                  :key="index"
-                  :slot="plotLeaveSlotsPerDay(row,tableHeader[0].date)[index]"
-                  :date="tableHeader[0].date"
-                />
-                </template>
-              </template>
-            </el-table-column>
-            <!-- <el-table-column align="center">
+    <el-table v-loading="table_config.loader" :data="table_config.data">
+      <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
+        <template slot="header">
+          <span style="float:left">
+            <h4 class="text-muted">Employee</h4>
+          </span>
+        </template>
+        <template slot-scope="scope">
+          <div class="user-block">
+            <img v-if="scope.row.user.image_url" class="img-circle" :src="scope.row.user.image_url" />
+            <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
+              <div
+                style="align-self:center;width:100%;text-align:center;"
+                class="text-point-eight-em"
+              >{{ getAvatarLetters(scope.row.user.firstname,scope.row.user.lastname) }}</div>
+            </div>
+            <span>
+              <span class="el-dropdown-link" style="font-weight:600">{{ scope.row.user.full_name }}</span>
+            </span>
+          </div>
+        </template>
+      </el-table-column>
+      <!-- <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+          <h4
+            :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+            style="margin-bottom:5px"
+          >{{ tableHeader[0].day }}</h4>
+          <span
+            :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+          >{{ tableHeader[0].date1 }}</span>
+        </template>
+        <template slot-scope="{row}">
+          <template v-for="(slot,index) in plotLeaveSlotsPerDay(row,tableHeader[0].date)">
+            <cell-content
+              :key="index"
+              :slot="plotLeaveSlotsPerDay(row,tableHeader[0].date)[index]"
+              :date="tableHeader[0].date"
+            />
+          </template>
+        </template>
+      </el-table-column>-->
+      <!-- <el-table-column align="center">
               <template slot="header" slot-scope="scope">
                 <h4
                   :class="[dateToday(tableHeader[1].date)?'today-header':'']"
@@ -199,87 +194,92 @@
                 />
                 </template>
               </template>
-            </el-table-column> -->
-          </el-table>
+      </el-table-column>-->
+    </el-table>
   </div>
 </template>
 
 <script>
-import axios from "axios"
-import moment from "moment"
-import { mapActions,mapGetters } from "vuex"
-import cellContent from "./cellContent"
+import axios from "axios";
+import moment from "moment";
+import { mapActions, mapGetters } from "vuex";
+import cellContent from "./cellContent";
 export default {
-  props:["dates","tableHeader"],
-  data(){
-    return{
-      table_config:{
-        page:1,
-        display_size:10,
-        count:1,
-        loader:false,
+  components: { cellContent },
+  props: ["dates", "tableHeader"],
+  data() {
+    return {
+      table_config: {
+        page: 1,
+        display_size: 10,
+        count: 1,
+        loader: false
       },
-    dummy:[
+      dummy: [
         {
-          info:{
-            image_url:"default.gif",
-            full_name:"Emmanuel James E. Lajom",
-            firstname:"Emmanuel James",
-            lastname:"Lajom"
+          info: {
+            image_url: "default.gif",
+            full_name: "Emmanuel James E. Lajom",
+            firstname: "Emmanuel James",
+            lastname: "Lajom"
           },
-          vto:{
+          vto: {
             hours: "3",
             spent_credits: "3"
           }
         },
         {
-          info:{
-            image_url:null,
-            full_name:"Allen B. Lamparas",
-            firstname:"Allen",
-            lastname:"Lamparas"
+          info: {
+            image_url: null,
+            full_name: "Allen B. Lamparas",
+            firstname: "Allen",
+            lastname: "Lamparas"
           },
-          vto:{
+          vto: {
             hours: "3",
             spent_credits: "3"
           }
         }
       ]
-    }
+    };
   },
-  mounted(){
+  mounted() {
     // this.fetchLeaveSlots()
   },
-  computed:{
-    ...mapGetters(["fetchLeaveSlotsState","fetchLeaveSlotsData","fetchLeaveSlotsError"])
+  computed: {
+    ...mapGetters([
+      "fetchLeaveSlotsState",
+      "fetchLeaveSlotsData",
+      "fetchLeaveSlotsError"
+    ])
   },
-  watch:{
-    fetchLeaveSlotsState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true
+  watch: {
+    fetchLeaveSlotsState({ initial, success, fail }) {
+      if (initial) {
+        this.table_config.loader = true;
       }
-      if(success){
-        this.table_config.loader = false
+      if (success) {
+        this.table_config.loader = false;
         this.table_config.data = this.fetchLeaveSlotsData.leave_slots;
-        this.table_config.count = this.fetchLeaveSlotsData.count
+        this.table_config.count = this.fetchLeaveSlotsData.count;
       }
-      if(fail){
-        this.table_config.loader = false
+      if (fail) {
+        this.table_config.loader = false;
       }
     },
-    tableHeader(v){
-      this.fetchLeaveSlots()
+    tableHeader(v) {
+      this.fetchLeaveSlots();
     }
   },
-  methods:{
+  methods: {
     ...mapActions(["fetchLeaveSlots"]),
     plotLeaveSlotsPerDay(slots, date) {
       const slot = slots.filter(
         i => moment(i.date).format("YYYY-MM-DD") == date
       );
-      if(slot.length==0){
+      if (slot.length == 0) {
         return [{}];
-      }else{
+      } else {
         return slot;
       }
     },
@@ -289,13 +289,12 @@ export default {
       } else {
         return false;
       }
-    },
+    }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-
 .user-block {
   .username,
   .description {

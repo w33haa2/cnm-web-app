@@ -24,11 +24,31 @@
         </el-col>
         <el-col :md="{span:20}">
           <div style="float:right">
-            <el-select size="mini" placeholder="Operations Manager" v-model="select.operationsManager" v-if="position != 'Operations Manager' && position != 'Team Leader'">
-              <el-option v-for="(option,index) in options.operationsManager" :key="index" :label="option.label" :value="option.value" />
+            <el-select
+              size="mini"
+              placeholder="Operations Manager"
+              v-model="select.operationsManager"
+              v-if="position != 'Operations Manager' && position != 'Team Leader'"
+            >
+              <el-option
+                v-for="(option,index) in options.operationsManager"
+                :key="index"
+                :label="option.label"
+                :value="option.value"
+              />
             </el-select>
-            <el-select size="mini" placeholder="Team Leader" v-model="select.teamLeader" :disabled="disable_select.teamLeader">
-              <el-option v-for="(option,index) in options.teamLeader" :key="index" :label="option.label" :value="option.value" />
+            <el-select
+              size="mini"
+              placeholder="Team Leader"
+              v-model="select.teamLeader"
+              :disabled="disable_select.teamLeader"
+            >
+              <el-option
+                v-for="(option,index) in options.teamLeader"
+                :key="index"
+                :label="option.label"
+                :value="option.value"
+              />
             </el-select>
           </div>
         </el-col>
@@ -36,16 +56,18 @@
 
       <el-row>
         <el-col :md="{span:12}" style="margin-top:10px">
-            <el-button-group>
-              <template v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'">
-                <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
-              </template>
-              <template v-if="position=='HR Manager' || position=='HR Assistant'">
-                <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
-              </template>
-            </el-button-group>
+          <el-button-group>
+            <template
+              v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"
+            >
+              <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+            </template>
+            <template v-if="position=='HR Manager' || position=='HR Assistant'">
+              <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+            </template>
+          </el-button-group>
         </el-col>
-        <el-col  :md="{span:12}" style="margin-top:10px">
+        <el-col :md="{span:12}" style="margin-top:10px">
           <div style="float:right">
             <el-dropdown>
               <el-button type="success" :plain="true" size="mini">
@@ -82,7 +104,6 @@
         </el-col>
       </el-row>
       <el-row style="margin-top:10px;">
-
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
           <el-table v-loading="agentsWorkReportsfetchState.initial" :data="tableData">
             <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
@@ -121,14 +142,15 @@
                 >{{ tableHeader[0].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[0].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[0].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)[index]"
-                  :date="tableHeader[0].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)[index]"
+                    :date="tableHeader[0].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -143,14 +165,15 @@
                 >{{ tableHeader[1].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[1].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[1].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)[index]"
-                  :date="tableHeader[1].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)[index]"
+                    :date="tableHeader[1].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -165,14 +188,15 @@
                 >{{ tableHeader[2].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[2].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[2].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)[index]"
-                  :date="tableHeader[2].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)[index]"
+                    :date="tableHeader[2].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -187,14 +211,15 @@
                 >{{ tableHeader[3].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[3].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[3].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)[index]"
-                  :date="tableHeader[3].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)[index]"
+                    :date="tableHeader[3].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -209,14 +234,15 @@
                 >{{ tableHeader[4].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[4].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[4].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)[index]"
-                  :date="tableHeader[4].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)[index]"
+                    :date="tableHeader[4].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -231,14 +257,15 @@
                 >{{ tableHeader[5].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[5].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[5].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)[index]"
-                  :date="tableHeader[5].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)[index]"
+                    :date="tableHeader[5].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -253,14 +280,15 @@
                 >{{ tableHeader[6].date1 }}</span>
               </template>
               <template slot-scope="{row}">
-
-                <template v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[6].date)">
+                <template
+                  v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[6].date)"
+                >
                   <cell-content
-                  :key="index"
-                  :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)[index]"
-                  :date="tableHeader[6].date"
-                  :info="row.info"
-                />
+                    :key="index"
+                    :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)[index]"
+                    :date="tableHeader[6].date"
+                    :info="row.info"
+                  />
                 </template>
               </template>
             </el-table-column>
@@ -328,7 +356,6 @@
               reserve-keyword
               placeholder="Agents..."
               :remote-method="remoteAgent"
-              :loading="loading"
             >
               <el-option
                 v-for="item in agents.agents"
@@ -342,19 +369,16 @@
             >count: {{ form.addSchedule.model.agents.length }}</span>
           </el-col>
           <el-col>
-            <label for="dates">Team Leader</label>
+            <label for="dates">Operations Manager</label>
             <el-select
-              v-model="form.addSchedule.model.teamleader"
-              class="form-input"
+              v-model="form.addSchedule.model.operationsManager"
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+              class="form-input"
               size="mini"
-              filterable
-              remote
-              reserve-keyword
               placeholder="Select"
             >
               <el-option
-                v-for="item in agents.agents"
+                v-for="item in form.addSchedule.options.operationsManager"
                 :key="item.id"
                 :label="item.full_name"
                 :value="item.id"
@@ -362,21 +386,16 @@
             </el-select>
           </el-col>
           <el-col>
-            <label for="dates">Operations Manager</label>
+            <label for="dates">Team Leader</label>
             <el-select
-              v-model="form.addSchedule.model.teamleader"
-              style="width:100%;padding-bottom:2px"
+              v-model="form.addSchedule.model.teamLeader"
               class="form-input"
+              style="width:100%;padding-bottom:2px;margin-bottom:10px;"
               size="mini"
-              filterable
-              remote
-              reserve-keyword
               placeholder="Select"
-              :remote-method="remoteTeamLeader"
-              :loading="loading"
             >
               <el-option
-                v-for="item in agents.agents"
+                v-for="item in form.addSchedule.options.teamLeader"
                 :key="item.id"
                 :label="item.full_name"
                 :value="item.id"
@@ -386,7 +405,12 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
-          <el-button type="danger" size="mini" @click="onSubmit">Confirm</el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="submitAddSchedule"
+            :loading="btn_loader"
+          >Confirm</el-button>
         </span>
       </el-dialog>
 
@@ -442,7 +466,12 @@
               class="form-input"
               style="width:100%;margin-bottom:10px;"
             >
-            <el-option v-for="(type, index) in options.leave_type.hr" :key="index" :value="type.value" :label="type.label" />
+              <el-option
+                v-for="(type, index) in options.leave_type.hr"
+                :key="index"
+                :value="type.value"
+                :label="type.label"
+              />
             </el-select>
           </el-col>
         </el-row>
@@ -472,10 +501,40 @@ export default {
       "agentsfetchState",
       "position",
       "token",
-      "head_id"
+      "head_id",
+      "createScheduleBulkState",
+      "createScheduleBulkData",
+      "createScheduleBulkError"
     ])
   },
   watch: {
+    createScheduleBulkState({ initial, success, fail }) {
+      if (initial) {
+        this.form.addSchedule.btn_loader = true;
+      }
+
+      if (success) {
+        this.form.addSchedule.btn_loader = false;
+        this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+        this.$message({
+          type: "success",
+          message: "Schedules successfully created!.",
+          duration: 5000
+        });
+      }
+
+      if (fail) {
+        this.form.addSchedule.btn_loader = false;
+        this.$message({
+          type: "warning",
+          message: "There's a problem creating the schedules.",
+          duration: 5000
+        });
+      }
+    },
+    "form.addSchedule.model.operationsManager": function() {
+      this.getFormOptions({ query: "team leader", var: "teamLeader" });
+    },
     searchQuery(v) {
       if (v != "") {
         this.query["target[]"] = "full_name";
@@ -505,29 +564,41 @@ export default {
         this.tableData = [];
       }
     },
-    "select.operationsManager":function(v){
-      if(this.position != "Operations Manager" && this.position != "Team Leader"){
-        if(v=="all"){
+    "select.operationsManager": function(v) {
+      if (
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
+      ) {
+        if (v == "all") {
           this.disable_select.teamLeader = true;
           this.select.teamLeader = "all";
-        }else{
+        } else {
           this.disable_select.teamLeader = false;
-          this.getUsersByPosition({query:"team leader",var:"teamLeader"})
+          this.getUsersByPosition({ query: "team leader", var: "teamLeader" });
         }
       }
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"))
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     },
-    "select.teamLeader":function(v){
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"))
+    "select.teamLeader": function(v) {
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     }
   },
   mounted() {
-    if(this.position == "Admin" || this.position == "HR Manager" || this.position == "HR Assistant" || this.position == "RTA Manager" || this.position == "RTA Analyst"){
+    if (
+      this.position == "Admin" ||
+      this.position == "HR Manager" ||
+      this.position == "HR Assistant" ||
+      this.position == "RTA Manager" ||
+      this.position == "RTA Analyst"
+    ) {
       this.disable_select.teamLeader = true;
-      this.getUsersByPosition({query:"operations manager",var:"operationsManager"});
-    }else{
+      this.getUsersByPosition({
+        query: "operations manager",
+        var: "operationsManager"
+      });
+    } else {
       this.disable_select.teamLeader = false;
-      this.getUsersByPosition({query:"team leader",var:"teamLeader"});
+      this.getUsersByPosition({ query: "team leader", var: "teamLeader" });
     }
     this.weekChange(
       moment()
@@ -535,6 +606,10 @@ export default {
         .startOf("isoweek")
         .format("YYYY-MM-DD")
     );
+    this.getFormOptions({
+      query: "operations manager",
+      var: "operationsManager"
+    });
   },
   data() {
     return {
@@ -542,12 +617,18 @@ export default {
       form: {
         addSchedule: {
           show: false, // temporary value
+          btn_loader: false,
           model: {
             dates: [],
             time_in: null,
             duration: null,
             agents: [],
-            teamleader: null
+            teamleader: null,
+            operationsManager: null
+          },
+          options: {
+            teamLeader: [],
+            operationsManager: []
           }
         },
         addLeave: {
@@ -568,10 +649,9 @@ export default {
         options: []
       },
       week: {
-        start:
-        moment()
-        .startOf("isoweek")
-        .format("YYYY-MM-DD"),
+        start: moment()
+          .startOf("isoweek")
+          .format("YYYY-MM-DD"),
         end: null
       },
       fetchData: [],
@@ -589,24 +669,24 @@ export default {
         selections: []
       },
       select: {
-        teamLeader:null,
-        operationsManager:null,
+        teamLeader: null,
+        operationsManager: null
       },
       options: {
-        teamLeader:[],
-        operationsManager:[],
-        leave_type:[
-          { value:"bereavement_leave", label:"Bereavement"},
-          { value:"leave_of_absence", label:"Leave of absence"},
-          { value:"maternity_leave", label:"Maternity"},
-          { value:"paternity_leave", label:"Paternity"},
-          { value:"solo_parent_leave", label:"Solo Parent"},
-          { value:"vawc", label:"Violence Againts Women and Children"},
+        teamLeader: [],
+        operationsManager: [],
+        leave_type: [
+          { value: "bereavement_leave", label: "Bereavement" },
+          { value: "leave_of_absence", label: "Leave of absence" },
+          { value: "maternity_leave", label: "Maternity" },
+          { value: "paternity_leave", label: "Paternity" },
+          { value: "solo_parent_leave", label: "Solo Parent" },
+          { value: "vawc", label: "Violence Againts Women and Children" }
         ]
       },
-      disable_select:{
-        teamLeader:false,
-        operationsManager:false,
+      disable_select: {
+        teamLeader: false,
+        operationsManager: false
       }
     };
   },
@@ -614,38 +694,138 @@ export default {
     ...mapActions([
       "fetchAgentsWorkReports",
       "fetchAgents",
-      "createBulkSchedule"
+      "createBulkSchedule",
+      "createScheduleBulk"
     ]),
-    getUsersByPosition(query){
-      let url = "api/v1/users/search?target[]=position&query="+query.query,options = {
-        headers:{
-          Authorization: "Bearer "+ this.token
-        }
-      };
-      axios.get(
-        url, options
-      ).then(res => {
-        let filtered = res.data.meta.users;
-        if(query.query == "team leader"){
-          if(this.position == "Team Leader"){
-            filtered = res.data.meta.users.filter(i => i.parent_id == this.head_id)
-          }else if(this.position == "Operations Manager"){
-            filtered = res.data.meta.users.filter(i => i.parent_id == this.user_id)
-          }else{
-            filtered = res.data.meta.users.filter(i => i.parent_id == this.select.operationsManager)
-            if(filtered.length>0){
-              this.disable_select.teamLeader = false;
-            }else{
-              this.disable_select.teamLeader = true;
+    processAddScheduleData() {
+      let form = this.form.addSchedule.model,
+        data = [];
+      form.agents.forEach(
+        ((v, i) => {
+          form.dates.forEach(
+            ((v1, i1) => {
+              let start = moment(
+                  moment(v1).format("YYYY-MM-DD") +
+                    " " +
+                    moment(form.time_in).format("HH:mm:ss")
+                ).format("YYYY-MM-DD HH:mm:ss"),
+                duration = moment(
+                  moment(form.duration).format("HH:mm:ss"),
+                  "HH:mm:ss"
+                ).diff(moment().startOf("day"), "seconds");
+              // alert(v1+" "+start+" "+duration)
+              alert(start + " " + duration);
+              data.push({
+                user_id: v,
+                tl_id: form.teamLeader,
+                om_id: form.operationsManager,
+                title_id: 1,
+                start_event: start,
+                end_event: moment(moment(start).add(duration, "s")).format(
+                  "YYYY-MM-DD HH:mm:ss"
+                )
+              });
+            }).bind(this)
+          );
+        }).bind(this)
+      );
+      return data;
+    },
+    submitAddSchedule() {
+      if (this.validateAddSchedule()) {
+        this.createScheduleBulk(this.processAddScheduleData());
+      } else {
+        this.$message({
+          type: "warning",
+          message: "Please fillup all form fields.",
+          duration: 5000
+        });
+      }
+    },
+    validateAddSchedule() {
+      let form = this.form.addSchedule.model;
+      if (
+        form.dates.length < 1 ||
+        form.agents < 1 ||
+        form.duration == null ||
+        form.time_in == null ||
+        form.teamLeader == null ||
+        form.operationsManager == null
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    getFormOptions(query) {
+      let url = "api/v1/users/search?target[]=position&query=" + query.query,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      axios
+        .get(url, options)
+        .then(res => {
+          let result = res.data.meta.users;
+          if (query.query == "team leader") {
+            this.form.addSchedule.options[query.var] = result.filter(
+              i => i.parent_id == this.form.addSchedule.model.operationsManager
+            );
+            if (this.form.addSchedule.options[query.var].length < 1) {
+              this.form.addSchedule.options[query.var] = [];
+            } else {
+              this.form.addSchedule.model[
+                query.var
+              ] = this.form.addSchedule.options[query.var][0].id;
+            }
+          } else {
+            this.form.addSchedule.options[query.var] = result;
+            this.form.addSchedule.model[
+              query.var
+            ] = this.form.addSchedule.options[query.var][0].id;
+          }
+        })
+        .catch(err => console.log(err.response.data));
+    },
+    getUsersByPosition(query) {
+      let url = "api/v1/users/search?target[]=position&query=" + query.query,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      axios
+        .get(url, options)
+        .then(res => {
+          let filtered = res.data.meta.users;
+          if (query.query == "team leader") {
+            if (this.position == "Team Leader") {
+              filtered = res.data.meta.users.filter(
+                i => i.parent_id == this.head_id
+              );
+            } else if (this.position == "Operations Manager") {
+              filtered = res.data.meta.users.filter(
+                i => i.parent_id == this.user_id
+              );
+            } else {
+              filtered = res.data.meta.users.filter(
+                i => i.parent_id == this.select.operationsManager
+              );
+              if (filtered.length > 0) {
+                this.disable_select.teamLeader = false;
+              } else {
+                this.disable_select.teamLeader = true;
+              }
             }
           }
-        }
-        this.options[query.var] = filtered.map(function(v){
-          return {value:v.id, label:v.full_name}
-        });
-        this.options[query.var].unshift({value:"all",label:"All"})
-        this.select[query.var] = "all"
-      }).catch(err=>console.log(err.response.data))
+          this.options[query.var] = filtered.map(function(v) {
+            return { value: v.id, label: v.full_name };
+          });
+          this.options[query.var].unshift({ value: "all", label: "All" });
+          this.select[query.var] = "all";
+        })
+        .catch(err => console.log(err.response.data));
     },
     showModal(type) {
       this.form[type].show = true;
@@ -654,7 +834,6 @@ export default {
       const start = moment(e)
         .startOf("isoweek")
         .format("YYYY-MM-DD");
-        alert(start)
       const end = moment(e)
         .endOf("isoweek")
         .format("YYYY-MM-DD");
@@ -684,21 +863,30 @@ export default {
         data.query = this.searchQuery;
       }
 
-      if(this.position != "Operations Manager" && this.position != "Team Leader"){
-        if(this.select.operationsManager!="all"){
+      if (
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
+      ) {
+        if (this.select.operationsManager != "all") {
           data.om_id = this.select.operationsManager;
+        }else{
+          delete data.om_id;
         }
-        if(this.select.teamLeader!="all"){
-          data.tl_id = this.select.teamLeader;
-        }
-      }else{
-        if(this.select.teamLeader!="all"){
+        if (this.select.teamLeader != "all") {
+          delete data.om_id
           data.tl_id = this.select.teamLeader;
         }else{
-          if(this.position == "Operations Manager"){
-            data.om_id=this.user_id;
-          }else{
-            data.om_id=this.head_id;
+          delete data.tl_id;
+        }
+      } else {
+        if (this.select.teamLeader != "all") {
+          delete data.om_id;
+          data.tl_id = this.select.teamLeader;
+        } else {
+          if (this.position == "Operations Manager") {
+            data.om_id = this.user_id;
+          } else {
+            data.om_id = this.head_id;
           }
         }
       }
@@ -729,25 +917,29 @@ export default {
         data.query = this.searchQuery;
       }
 
-      if(this.position != "Operations Manager" && this.position != "Team Leader"){
-        if(this.select.operationsManager!="all"){
+      if (
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
+      ) {
+        if (this.select.operationsManager != "all") {
           data.om_id = this.select.operationsManager;
-        }else{
-          data.om_id = null;
+        } else {
+          delete data.om_id;
         }
-        if(this.select.teamLeader!="all"){
+        if (this.select.teamLeader != "all") {
           data.tl_id = this.select.teamLeader;
-        }else{
-          data.tl_id = null;
+        } else {
+          delete data.tl_id;
         }
-      }else{
-        if(this.select.teamLeader!="all"){
+      } else {
+        if (this.select.teamLeader != "all") {
+          delete data.om_id;
           data.tl_id = this.select.teamLeader;
-        }else{
-          if(this.position == "operationsManager"){
-            url+="&om_id="+this.user_id;
-          }else{
-            url+="&om_id="+this.head_id;
+        } else {
+          if (this.position == "operationsManager") {
+            data.om_id= this.user_id;
+          } else {
+            data.om_id= this.head_id;
           }
         }
       }
@@ -757,9 +949,9 @@ export default {
       const schedule = schedules.filter(
         i => moment(i.start_event.date).format("YYYY-MM-DD") == date
       );
-      if(schedule.length==0){
+      if (schedule.length == 0) {
         return [{}];
-      }else{
+      } else {
         return schedule;
       }
     },

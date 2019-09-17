@@ -9,8 +9,8 @@ const getters = {
   gender: state => state.user.userDetails.gender,
   name: state => state.user.userDetails.full_name,
   user_id: state => state.user.userDetails.id,
-  head_access_id:state => state.user.userDetails.head,
-  head_id:state => state.user.userDetails.parent_id,
+  head_access_id: state => state.user.userDetails.head,
+  head_id: state => state.user.userDetails.parent_id,
   introduction: state => state.user.introduction,
   roles: state => state.user.userDetails.position,
   permission_routes: state => state.permission.routes,
@@ -188,6 +188,10 @@ const getters = {
   // fetch_leave_slots
   fetchLeaveSlotsState: state => state.fetch_leave_slots.state,
   fetchLeaveSlotsData: state => state.fetch_leave_slots.data,
-  fetchLeaveSlotsError: state => state.fetch_leave_slots.errors
+  fetchLeaveSlotsError: state => state.fetch_leave_slots.errors,
+  // create_schedule_bulk
+  createScheduleBulkState: state => state.create_schedule_bulk.state,
+  createScheduleBulkData: state => state.create_schedule_bulk.data,
+  createScheduleBulkError: state => state.create_schedule_bulk.errors
 };
 export default getters;

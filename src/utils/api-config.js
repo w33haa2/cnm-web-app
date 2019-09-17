@@ -125,6 +125,10 @@ const api = {
               // end region bulk creation
             }
           },
+          create_bulk: {
+            $url: "create/bulk",
+            $method: "POST",
+          },
           update: {
             $url: "update",
             $method: "POST",
