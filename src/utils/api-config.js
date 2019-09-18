@@ -597,6 +597,10 @@ const api = {
             $url: "create",
             $method: "POST"
           },
+          create_bulk: {
+            $url: "create/bulk",
+            $method: "POST"
+          },
           update: {
             $url: "update",
             $method: "POST",

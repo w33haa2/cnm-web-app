@@ -2,35 +2,51 @@
   <div class="app-container">
     <h4 style="color:#646464">Overtime Agents</h4>
     <el-row>
-      <el-col v-if="position =='Admin' || position =='RTA Manager' || position =='RTA Supervisor' || position =='RTA Analyst'" :md="{span:4}">
-        <el-select v-model="select.operationsManager" placeholder="Operations Manager" size="mini" style="margin-bottom:20px;">
+      <el-col v-if="position != 'Operations Manager' && position != 'Team Leader'" :md="{span:4}">
+        <el-select v-model="select.operationsManager" placeholder="Operations Manager" size="mini" style="margin-bottom:20px;width:100%;padding-right:5px">
           <el-option v-for="(item,index) in options.operationsManager" :key="index" :label="item.label" :value="item.value" />
         </el-select>
       </el-col>
-      <el-col v-if="position =='Operations Manager' || position =='Team Leader'" :md="{span:4}">
-        <el-select v-model="select.teamLeader" placeholder="Team Leader..." size="mini" style="margin-bottom:20px;" :disabled="disable_select.teamLeader">
+      <el-col :md="{span:4}">
+        <el-select v-model="select.teamLeader" placeholder="Team Leader..." size="mini" style="margin-bottom:20px;width:100%" :disabled="disable_select.teamLeader">
           <el-option v-for="(item,index) in options.teamLeader" :key="index" :label="item.label" :value="item.value" />
         </el-select>
       </el-col>
     </el-row>
-      <el-tabs type="border-card" v-model="activeTab" @tab-click="tabClick">
-        <el-tab-pane label="Approved" name="approved"><approved-tab :approved="tabApproved" :filter="{teamLeader:select.teamLeader,operationsManager:select.operationsManager}" :activeTab="activeTab"></approved-tab></el-tab-pane>
-        <el-tab-pane label="Not Approved" name="not_approved"><unapproved-tab :approved="tabApproved" :filter="{teamLeader:select.teamLeader,operationsManager:select.operationsManager}" :activeTab="activeTab"></unapproved-tab></el-tab-pane>
+      <el-tabs type="border-card" v-model="activeTab">
+        <el-tab-pane v-for="(tab,index) in tabs" :key="index" :label="tab.label" :name="tab.name" >
+          <tab-content :tabName="tab.name" :filter="filterContent"></tab-content>
+        </el-tab-pane>
       </el-tabs>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import moment from "moment"
-import axios from "axios"
-import approvedTab from "./components/approvedTab"
-import unapprovedTab from "./components/unapprovedTab"
+import moment from "moment";
+import axios from "axios";
+import tabContent from "./components/tabContent";
 export default {
-  components:{approvedTab, unapprovedTab},
+  components:{ tabContent },
   data() {
     return {
-      activeTab:"approved",
+      filterContent:{},
+      filter:{
+        activeTab:null,
+        field:null,
+        id:null
+      },
+      activeTab:null,
+      tabs:[
+        {
+          label:"Approved",
+          name:"approved"
+        },
+        {
+          label:"Unapproved",
+          name:"unapprove"
+        }
+        ],
       options:{
         teamLeader:[{value:"all",label:"All"}],
         operationsManager:null
@@ -43,13 +59,13 @@ export default {
         teamLeader:false,
         operationsManager:false,
       },
-      tabApproved:true,
     };
   },
   computed: {
     ...mapGetters(["token","position","user_id","head_id"])
   },
   created() {
+    this.activeTab="approved";
     if(this.position == "Operations Manager" || this.position =='Team Leader'){
       this.disable_select.teamLeader = false;
       this.getUsersByPosition({query:"team leader", var:"teamLeader"})
@@ -59,27 +75,31 @@ export default {
     }
   },
   watch:{
+    activeTab(v){
+      this.filter.activeTab = v;
+      this.filterContent = this.filter;
+    },
+
     "select.operationsManager":function(v){
-      if(this.position != "Operations Manager" && this.position != "Team Leader"){
-          if(v=="all"){
-            this.disable_select.teamLeader = true;
-            this.select.teamLeader = "all";
-          }else{
-            this.disable_select.teamLeader = false;
-            this.getUsersByPosition({query:"team leader",var:"teamLeader"})
-          }
+      if(this.position != "Operations Manager" || this.position != "Team Leader"){
+        this.filter.field = "om";
+        this.filter.id = v;
+        this.filterContent = this.filter
+        if(v == "all"){
+          this.disable_select.teamLeader = true;
+          this.select.teamLeader = v;
+        }else{
+          this.disable_select.teamLeader = false;
+          this.getUsersByPosition({query:"team leader",var:"teamLeader"})
+        }
       }
+    },
+    "select.teamLeader":function(v){
+      this.filter.field = "tl"
+      this.filter.id = v
     }
   },
   methods: {
-    tabClick(tab,event){
-      // console.log(tab,event)
-      if(tab.name=="approved"){
-        this.tabApproved = true;
-      }else{
-        this.tabApproved = false;
-      }
-    },
     getUsersByPosition(query){
       let url = "api/v1/users/search?target[]=position&query="+query.query,options = {
         headers:{
@@ -91,7 +111,7 @@ export default {
       ).then(res => {
         let filtered = res.data.meta.users;
         if(query.query == "team leader"){
-          filtered = res.data.meta.users.filter(i => i.parent_id == this.head_id)
+          filtered = res.data.meta.users.filter(i => i.parent_id == this.select.operationsManager)
         }
         this.options[query.var] = filtered.map(function(v){
           return {value:v.id, label:v.full_name}

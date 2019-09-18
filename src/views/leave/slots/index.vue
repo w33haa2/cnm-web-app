@@ -107,6 +107,10 @@
               />
             </el-select>
           </el-col>
+          <el-col>
+            <label for="dates">Value</label>
+            <el-input-number size="mini" v-model="form.addLeaveSlot.field.value" step="1" step-strictly controls-position="right" style="width:100%"></el-input-number>
+          </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addLeaveSlot.show=false">Cancel</el-button>
@@ -114,6 +118,7 @@
             type="danger"
             size="mini"
             :loading="form.addLeaveSlot.btn_loader"
+            @click="submitLeaveSlotForm"
           >Confirm</el-button>
         </span>
       </el-dialog>
@@ -122,7 +127,7 @@
 
 <script>
 import tabContent from "./components/tabContent"
-import { mapGetters } from "vuex"
+import { mapGetters, mapActions } from "vuex"
 import Moment from "moment/moment";
 import { extendMoment } from "moment-range";
 const moment = extendMoment(Moment);
@@ -169,14 +174,15 @@ export default {
           field:{
             dates:[],
             cluster:[],
-            leave_type:null
+            leave_type:null,
+            value:10
           }
         }
       },
     }
   },
   computed:{
-    ...mapGetters(["token"])
+    ...mapGetters(["token","createLeaveSlotBulkState","createLeaveSlotBulkData","createLeaveSlotBulkError"])
   },
   watch:{
     activeTab(v){
@@ -185,7 +191,30 @@ export default {
         end_date: this.week.end,
         leave_type: v
       }
-    }
+    },
+    createLeaveSlotBulkState({initial,success,fail}){
+      if(initial){
+        this.form.addLeaveSlot.btn_loader = true
+      }
+      if(success){
+        this.form.addLeaveSlot.btn_loader = false
+        this.form.addLeaveSlot.show = false
+        this.$message({
+          type: "success",
+          message: "You have successfully generated leave slots.",
+          duration:5000
+        });
+      }
+      if(fail){
+        this.form.addLeaveSlot.btn_loader = false
+        this.form.addLeaveSlot.show = false
+        this.$message({
+          type: "error",
+          message: "There is a problem processing your request.",
+          duration:5000
+        });
+      }
+    },
 
   },
   mounted(){
@@ -197,6 +226,31 @@ export default {
     );
   },
   methods:{
+    ...mapActions(["createLeaveSlotBulk"]),
+    resetLeaveSlotForm(){
+      this.form.addLeaveSlot.field= {
+        dates:[],
+        cluster:[],
+        leave_type:null,
+        value:10
+      }
+    },
+    submitLeaveSlotForm(){
+      let data = {}, form = this.form.addLeaveSlot.field, leave_slots=[];
+      form.cluster.forEach(((v,i)=>{
+        form.dates.forEach(((v1,i1)=>{
+          leave_slots.push({
+            user_id: v,
+            leave_type: form.leave_type,
+            value: form.value,
+            date:moment(v1).format("YYYY-MM-DD")
+          })
+        }).bind(this))
+      }).bind(this));
+      console.log(leave_slots)
+      data.leave_slots = leave_slots;
+      this.createLeaveSlotBulk(data);
+    },
     weekChange(e) {
       let start = moment(e)
         .startOf("isoweek")

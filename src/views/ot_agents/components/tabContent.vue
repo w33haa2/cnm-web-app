@@ -98,9 +98,10 @@ import { mapActions, mapGetters } from "vuex";
 import moment from "moment"
 import axios from "axios"
 export default {
-  props:['filter','approved',"activeTab"],
+  props:['filter','tabName'],
   data() {
     return {
+      activeTab:null,
       searchQuery:'',
       table_config: {
         display_size: 10,
@@ -114,6 +115,7 @@ export default {
         limit: 10,
         order:"desc",
         sort:"created_at",
+        status:"",
       },
       filter:{
         om_id:null,
@@ -132,24 +134,18 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["token","position","head_id"])
-  },
-  created() {
-    console.log(this.token)
-    if(this.approved==false){
-      this.fetchOvertime();
-    }
+    ...mapGetters(["token","position","head_id","user_id"])
   },
   watch:{
     searchQuery(v){
-      if(this.approved==false){
+      if(this.tabName == this.filter.activeTab){
         if(v!=""){
           this.fetchOvertime();
         }
       }
     },
     filter(v){
-      if(this.approved==false){
+      if(this.tabName == v.activeTab){
         this.fetchOvertime();
       }
     }
@@ -161,7 +157,7 @@ export default {
     },
     fetchOvertime(){
       this.table_config.loader = true;
-      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort+"&approved=false",
+      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort+this.query.status,
       options = {
         headers:{
           Authorization: "Bearer "+ this.token
@@ -172,16 +168,16 @@ export default {
       }
 
       if(this.position != "Operations Manager" && this.position!="Team Leader"){
-        if(this.filter.operationsManager!="all"){
-          url+="&om_id="+this.filter.operationsManager;
+        if(this.filter.field=="om" && this.filter.id!="all"){
+          url+="&om_id="+this.filter.id;
         }
-        if(this.filter.teamLeader!="all"){
-          url+="&tl_id="+this.filter.teamLeader;
+        if(this.filter.field=="tl" && this.filter.id!="all"){
+          url+="&tl_id="+this.filter.id;
         }
       }else{
-        if(this.filter.teamLeader!="all"){
+        if(this.filter.field=="tl" && this.filter.id!="all"){
           url+="&tl_id="+this.filter.teamLeader;
-        }else{
+        }else if(this.filter.field=="tl" && this.filter.id=="all"){
           if(this.position == "Operations Manager"){
             url+="&om_id="+this.user_id;
           }else{
@@ -189,11 +185,13 @@ export default {
           }
         }
       }
-      // if(this.filter == "all"){
-      //   url+="&om_id="
-      // }else{
 
-      // }
+      if(this.filter.activeTab=="approved"){
+        url+="&approved=true"
+      }else{
+        url+="&approved=false"
+
+      }
       axios.get(url,options).then(res => {
         console.log(res.data.meta.agent_schedules)
         this.table_config.loader = false;

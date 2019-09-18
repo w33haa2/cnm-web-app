@@ -198,5 +198,9 @@ const getters = {
   fetchEmployeesTotal: state => state.employee.employeesTotal,
   fetchEmployeesError: state => state.employee.employeeErrors,
   fetchEmployeesState: state => state.employee.employeeFetchState,
+  // create_leave_slot_bulk
+  createLeaveSlotBulkState: state => state.create_leave_slot_bulk.state,
+  createLeaveSlotBulkData: state => state.create_leave_slot_bulk.data,
+  createLeaveSlotBulkError: state => state.create_leave_slot_bulk.errors,
 };
 export default getters;
