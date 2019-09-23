@@ -282,6 +282,25 @@ export const asyncRoutes = [
             },
            ]
          },
+         {
+           path: "/agent_leave_slots",
+           component: Layout,
+           name: "Agent Leave Slots",
+           meta: {
+             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
+           },
+           children: [
+             {
+               path: "/agent_vto",
+               component: () => import("@/views/vto"),
+               name: "Agent VTO",
+               meta: {
+                 title: "Agent VTO",
+                 noCache: false
+               }
+             },
+           ]
+         },
 
          {
            path: "/agent",

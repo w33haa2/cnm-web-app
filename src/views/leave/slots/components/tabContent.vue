@@ -83,7 +83,7 @@ export default {
   data() {
     return {
       query:{
-        limit:10,
+        limit:1,
         offset:0,
         leave_slots:true,
         start_date:[],
@@ -106,13 +106,16 @@ export default {
     ...mapGetters([
       "fetchEmployeesState",
       "fetchEmployeesData",
-      "fetchEmployeesError"
+      "fetchEmployeesError",
+      "fetchEmployeesTotal"
       ])
   },
   watch: {
     fetchEmployeesState({ initial, success, fail }) {
       if (initial) {
         this.table_config.loader = true;
+        this.table_config.data = []
+        this.table_config.count = 0
       }
       if (success) {
         this.table_config.loader = false;
@@ -122,16 +125,13 @@ export default {
       if (fail) {
         this.table_config.loader = false;
         this.table_config.data = []
-        this.$message({
-          type:"warning",
-          message:this.fetchEmployeesError,
-          duration:5000
-        })
+        this.table_config.count = 0
       }
     },
     data(v) {
       // setting query values
       // alert(this.leaveType +" -- "+ v.leave_type)
+      this.query.offset=0;
       if(this.leaveType==v.leave_type){
         this.query.leave_type = this.data.leave_type;
         const range = moment.range(v.start_date, v.end_date);
@@ -168,7 +168,18 @@ export default {
       } else {
         return false;
       }
-    }
+    },
+    tableSizeChange(value) {
+      this.query.limit = value;
+      this.query.offset = 0;
+      const data = this.query;
+      this.fetchEmployees({ data });
+    },
+    tablePageChange(value) {
+      this.query.offset = (value - 1) * this.query.limit;
+      const data = this.query;
+      this.fetchEmployees({ data });
+    },
   }
 };
 </script>

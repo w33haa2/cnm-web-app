@@ -13,6 +13,7 @@ const getters = {
   head_id: state => state.user.userDetails.parent_id,
   introduction: state => state.user.introduction,
   roles: state => state.user.userDetails.position,
+  position_id: state => state.user.userDetails.position_id,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
 
@@ -116,6 +117,8 @@ const getters = {
   //create_leave
   createLeaveData: state => state.create_leave.data,
   createLeaveState: state => state.create_leave.state,
+  createLeaveError: state => state.create_leave.errors,
+  createLeaveParams: state => state.create_leave.params,
   //update_leave
   updateLeaveData: state => state.update_leave.data,
   updateLeaveState: state => state.update_leave.state,
@@ -202,5 +205,21 @@ const getters = {
   createLeaveSlotBulkState: state => state.create_leave_slot_bulk.state,
   createLeaveSlotBulkData: state => state.create_leave_slot_bulk.data,
   createLeaveSlotBulkError: state => state.create_leave_slot_bulk.errors,
+  // update_schedule
+  updateScheduleState: state => state.update_schedule.state,
+  updateScheduleData: state => state.update_schedule.data,
+  updateScheduleError: state => state.update_schedule.errors,
+  // cancel_leave
+  cancelLeaveState: state => state.cancel_leave.state,
+  cancelLeaveData: state => state.cancel_leave.data,
+  cancelLeaveError: state => state.cancel_leave.errors,
+  // create_schedule
+  createScheduleState: state => state.create_schedule.state,
+  createScheduleData: state => state.create_schedule.data,
+  createScheduleError: state => state.create_schedule.errors,
+  // excel_to_array_schedules
+  excelToArrayScheduleState: state => state.excel_to_array_schedules.state,
+  excelToArrayScheduleData: state => state.excel_to_array_schedules.data,
+  excelToArrayScheduleError: state => state.excel_to_array_schedules.errors,
 };
 export default getters;

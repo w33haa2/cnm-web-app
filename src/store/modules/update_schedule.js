@@ -1,6 +1,6 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const CREATE_LEAVE = generateMutationTypes("leaves", "CREATE_LEAVE");
+const UPDATE_SCHEDULE = generateMutationTypes("UPDATE", "UPDATE_SCHEDULE");
 
 /**
  * state
@@ -12,7 +12,6 @@ const state = {
     success: false,
     fail: false
   },
-  params:{},
   data: [],
   errors: null
 };
@@ -25,7 +24,7 @@ const mutations = {
    * Commits initial state for  CREATE LEAVE
    * @param state
    */
-  [CREATE_LEAVE.initial](state) {
+  [UPDATE_SCHEDULE.initial](state) {
     state.state = {
       initial: true,
       success: false,
@@ -36,20 +35,19 @@ const mutations = {
    * Commits success state for  CREATE LEAVE
    * @param state
    */
-  [CREATE_LEAVE.success](state, payload) {
+  [UPDATE_SCHEDULE.success](state, payload) {
     state.state = {
       initial: false,
       success: true,
       fail: false
     };
     state.data = payload.meta;
-    state.params = payload.parameters;
   },
   /**
    * Commits fail state for  CREATE LEAVE
    * @param state
    */
-  [CREATE_LEAVE.fail](state, payload) {
+  [UPDATE_SCHEDULE.fail](state, payload) {
     state.state = {
       initial: false,
       success: false,
@@ -65,12 +63,12 @@ const actions = {
    * @param commit
    * @param params
    */
-  createLeave({ commit }, params) {
-    const slug = "api.leaves.create";
+  updateSchedule({ commit }, params) {
+    const slug = "api.schedules.update";
     STATE_API({ slug, params }, commit, [
-      CREATE_LEAVE.initial,
-      CREATE_LEAVE.success,
-      CREATE_LEAVE.fail
+      UPDATE_SCHEDULE.initial,
+      UPDATE_SCHEDULE.success,
+      UPDATE_SCHEDULE.fail
     ]);
   }
 };

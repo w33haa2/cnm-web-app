@@ -1,9 +1,12 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const CREATE_LEAVE = generateMutationTypes("leaves", "CREATE_LEAVE");
+const EXCEL_TO_ARRAY = generateMutationTypes(
+  "REGULAR SCHEDULE",
+  "EXCEL_TO_ARRAY"
+);
 
 /**
- * state
+ * State
  */
 
 const state = {
@@ -12,7 +15,6 @@ const state = {
     success: false,
     fail: false
   },
-  params:{},
   data: [],
   errors: null
 };
@@ -22,10 +24,10 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for  CREATE LEAVE
+   * Commits initial state for DELETE INCOMING OT
    * @param state
    */
-  [CREATE_LEAVE.initial](state) {
+  [EXCEL_TO_ARRAY.initial](state) {
     state.state = {
       initial: true,
       success: false,
@@ -33,23 +35,22 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for  CREATE LEAVE
+   * Commits success state for DELETE INCOMING OT
    * @param state
    */
-  [CREATE_LEAVE.success](state, payload) {
+  [EXCEL_TO_ARRAY.success](state, payload) {
     state.state = {
       initial: false,
       success: true,
       fail: false
     };
     state.data = payload.meta;
-    state.params = payload.parameters;
   },
   /**
-   * Commits fail state for  CREATE LEAVE
+   * Commits fail state for DELETE INCOMING OT
    * @param state
    */
-  [CREATE_LEAVE.fail](state, payload) {
+  [EXCEL_TO_ARRAY.fail](state, payload) {
     state.state = {
       initial: false,
       success: false,
@@ -61,16 +62,16 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for  CREATE LEAVE
+   * Action for DELETE INCOMING OT
    * @param commit
    * @param params
    */
-  createLeave({ commit }, params) {
-    const slug = "api.leaves.create";
+  excelToArraySchedule({ commit }, params) {
+    const slug = "api.schedules.excel_to_array";
     STATE_API({ slug, params }, commit, [
-      CREATE_LEAVE.initial,
-      CREATE_LEAVE.success,
-      CREATE_LEAVE.fail
+      EXCEL_TO_ARRAY.initial,
+      EXCEL_TO_ARRAY.success,
+      EXCEL_TO_ARRAY.fail
     ]);
   }
 };

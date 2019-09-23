@@ -37,6 +37,7 @@ const state = {
     contact_number: ls.get('token_info').contact_number,
     company_id: ls.get('token_info').company_id,
     position: ls.get('token_info').position,
+    position_id: ls.get('token_info').position_id,
     image_url: ls.get('token_info').image_url,
     login_flag: ls.get('token_info').login_flag,
     head: ls.get('token_info').head,
@@ -147,6 +148,7 @@ const mutations = {
     state.userDetails.contact_number = payload.meta.user.info.contact_number
     state.userDetails.company_id = payload.meta.user.company_id
     state.userDetails.position = payload.meta.user.access.name
+    state.userDetails.position_id = payload.meta.user.access.id
     state.userDetails.login_flag = payload.meta.user.loginFlag
     state.userDetails.head =
       payload.meta.user.access.parent !== null
@@ -174,6 +176,7 @@ const mutations = {
       contact_number: state.userDetails.contact_number,
       company_id: state.userDetails.company_id,
       position: state.userDetails.position,
+      position_id: state.userDetails.position_id,
       head: state.userDetails.head,
       parent_id: state.userDetails.parent_id,
       hired_date: state.userDetails.hired_date,

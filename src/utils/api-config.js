@@ -155,6 +155,10 @@ const api = {
             $requires: ["id"],
             $format: Template(() => `fetch/${id}`)
           },
+          excel_to_array:{
+            $url: "excel_to_array",
+            $method: "POST",
+          },
           report: {
             $url: "work/report",
             $method: "GET"

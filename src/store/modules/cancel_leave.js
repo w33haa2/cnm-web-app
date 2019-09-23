@@ -7,7 +7,7 @@ const CANCEL_LEAVE = generateMutationTypes("leaves", "CANCEL_LEAVE");
  */
 
 const state = {
-  fetchingState: {
+  state: {
     initial: false,
     success: false,
     fail: false
@@ -25,7 +25,7 @@ const mutations = {
    * @param state
    */
   [CANCEL_LEAVE.initial](state) {
-    state.fetchingState = {
+    state.state = {
       initial: true,
       success: false,
       fail: false
@@ -36,7 +36,7 @@ const mutations = {
    * @param state
    */
   [CANCEL_LEAVE.success](state, payload) {
-    state.fetchingState = {
+    state.state = {
       initial: false,
       success: true,
       fail: false
@@ -48,7 +48,7 @@ const mutations = {
    * @param state
    */
   [CANCEL_LEAVE.fail](state, payload) {
-    state.fetchingState = {
+    state.state = {
       initial: false,
       success: false,
       fail: true

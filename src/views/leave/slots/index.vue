@@ -182,7 +182,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters(["token","createLeaveSlotBulkState","createLeaveSlotBulkData","createLeaveSlotBulkError"])
+    ...mapGetters(["token","createLeaveSlotBulkState","createLeaveSlotBulkData","createLeaveSlotBulkError","fetchEmployeesState","fetchEmployeesError"])
   },
   watch:{
     activeTab(v){
@@ -190,6 +190,15 @@ export default {
         start_date: this.week.start,
         end_date: this.week.end,
         leave_type: v
+      }
+    },
+    fetchEmployeesState({ initial, success, fail }) {
+      if (fail) {
+        this.$message({
+          type:"warning",
+          message:this.fetchEmployeesError,
+          duration:5000
+        })
       }
     },
     createLeaveSlotBulkState({initial,success,fail}){

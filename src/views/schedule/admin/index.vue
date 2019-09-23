@@ -64,26 +64,33 @@
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
             </template>
             <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
-            <template v-if="position=='HR Manager' || position=='HR Assistant'">
+            <!-- <template v-if="position=='HR Manager' || position=='HR Assistant'"> -->
               <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
-            </template>
+            <!-- </template> -->
           </el-button-group>
         </el-col>
         <el-col :md="{span:12}" style="margin-top:10px">
           <div style="float:right">
-            <el-dropdown>
+            <el-dropdown @command="handleCommand">
               <el-button type="success" :plain="true" size="mini">
                 Excel
                 <i class="el-icon-arrow-down el-icon--right" />
               </el-button>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>Import Schedule</el-dropdown-item>
+                <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
                 <el-dropdown-item>Export Week Report</el-dropdown-item>
                 <el-dropdown-item>Export Month Report</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
         </el-col>
+        <input
+          type="file"
+          ref="importScheduleInput"
+          accept=".xlsx"
+          style="display:none"
+          @change="importScheduleFileChange"
+        />
       </el-row>
 
       <el-row>
@@ -148,6 +155,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[0].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)[index]"
                     :date="tableHeader[0].date"
@@ -171,6 +179,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[1].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)[index]"
                     :date="tableHeader[1].date"
@@ -194,6 +203,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[2].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)[index]"
                     :date="tableHeader[2].date"
@@ -217,6 +227,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[3].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)[index]"
                     :date="tableHeader[3].date"
@@ -240,6 +251,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[4].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)[index]"
                     :date="tableHeader[4].date"
@@ -263,6 +275,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[5].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)[index]"
                     :date="tableHeader[5].date"
@@ -286,6 +299,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[6].date)"
                 >
                   <cell-content
+                    @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)[index]"
                     :date="tableHeader[6].date"
@@ -457,7 +471,7 @@
               type="daterange"
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
               class="form-input"
-              placeholder="Range picker"
+              placeholder="Range picker..."
             />
           </el-col>
           <el-col>
@@ -479,9 +493,87 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-          <el-button type="danger" :disabled="createLeaveState.initial" size="mini" @click="onSubmit">Confirm</el-button>
+          <el-button type="danger" :loading="createLeaveState.initial" size="mini" @click="onSubmit">Confirm</el-button>
         </span>
       </el-dialog>
+
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="excel.import.dialog"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      title="Importing Schedule..."
+      width="50%"
+      top="5vh"
+    >
+      <el-alert
+        title="Import Report"
+        type="info"
+        description="This report will only be displayed once every import. Please review results to reupload unimported data."
+        show-icon
+      ></el-alert>
+
+      <div style="width:100%;margin-bottom:20px;margin-top:15px;">
+        Progress
+        <span>( {{ excel.import.loop_index }}</span>/
+        <span>{{ excel.import.arr_length }} )</span>
+      </div>
+      <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+      <div style="padding-bottom:15px;  ">
+        <el-tabs
+          v-model="excel.import.report.active_tab"
+          type="border-card"
+          style="margin-top:15px;margin-bottom:10px;"
+        >
+          <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
+            <el-table :data="excel.import.report.data.all.list" height="350px">
+              <el-table-column label="Email" width="350">
+                <template scope="scope">{{scope.row.email}}</template>
+              </el-table-column>
+              <!-- <el-table-column label="Schedule" width="100">
+                <template scope="scope">{{+" To "+}}</template>
+              </el-table-column> -->
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane
+            :label="'Errors: ' +excel.import.report.data.errors.list.length "
+            name="errors"
+          >
+            <el-table :data="excel.import.report.data.errors.list" height="350px">
+              <el-table-column label="Email" width="350">
+                <template scope="scope">{{scope.row.email}}</template>
+              </el-table-column>
+              <!-- <el-table-column label="Schedule" width="300">
+                <template scope="scope">{{scope.row.company_id}}</template>
+              </el-table-column> -->
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+        <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+      </div>
+    </el-dialog>
     </div>
   </div>
 </template>
@@ -503,50 +595,93 @@ export default {
       'agentsfetchState',
       'position',
       'token',
+      'user_id',
       'head_id',
       'createScheduleBulkState',
       'createScheduleBulkData',
       'createLeaveState',
-      'createScheduleBulkError'
+      'createScheduleBulkError',
+      "updateScheduleState",
+      "position_id",
+      "createLeaveParams",
+      "cancelLeaveState"
     ])
   },
   watch: {
+    updateScheduleState({initial,success,fail}){
+      if(initial){
+
+      }
+      if(success){
+        this.$message({
+          type:"success",
+          message:"Successfully updated schedule.",
+          duration:5000
+        })
+        this.weekChange(
+          moment(this.week.start)
+            .format('YYYY-MM-DD')
+        )
+      }
+      if(fail){
+        this.$message({
+          type:"warning",
+          message:"There's a problem processing your request.",
+          duration:5000
+        })
+      }
+    },
     createLeaveState({ initial, success, fail }) {
       if (success) {
         this.form.addLeave.show = false
-        this.$message({
-          type: 'success',
-          message: 'Leave successfully created!.',
-          duration: 5000
-        })
+        if(this.createLeaveParams.approval_status.code == 500 ){
+          this.$message({
+            type:"warning",
+            message:this.createLeaveParams.approval_status.title,
+            duration:5000
+          })
+        }else{
+          this.$message({
+            type:"success",
+            message:this.createLeaveParams.approval_status.title,
+            duration:5000
+          })
+        }
+        this.weekChange(
+          moment(this.week.start)
+            .format('YYYY-MM-DD')
+        )
       } else if (fail) {
         this.$message({
-          type: 'danger',
-          message: 'Internal Server Error.',
+          type: 'error',
+          message: this.createLeaveError,
           duration: 5000
         })
       }
     },
-    createScheduleBulkState({ initial, success, fail }) {
-      if (initial) {
-        this.form.addSchedule.btn_loader = true
-      }
-
+    cancelLeaveState({ initial, success, fail }) {
       if (success) {
-        this.form.addSchedule.btn_loader = false
-        this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+        // if(this.createLeaveParams.approval_status.code == 500 ){
+        //   this.$message({
+        //     type:"warning",
+        //     message:this.createLeaveParams.approval_status.title,
+        //     duration:5000
+        //   })
+        // }else{
+          this.$message({
+            type:"success",
+            message: "You have successfully cancelled a leave.",
+            duration:5000
+          })
+        // }
+        this.weekChange(
+          moment(this.week.start)
+            .format('YYYY-MM-DD')
+        )
+      } else if (fail) {
         this.$message({
-          type: 'success',
-          message: 'Schedules successfully created!.',
-          duration: 5000
-        })
-      }
-
-      if (fail) {
-        this.form.addSchedule.btn_loader = false
-        this.$message({
-          type: 'warning',
-          message: "There's a problem creating the schedules.",
+          type: 'error',
+          message: this.createLeaveError,
           duration: 5000
         })
       }
@@ -632,6 +767,30 @@ export default {
   },
   data() {
     return {
+      excel: {
+        import: {
+          status: null,
+          progress: 0,
+          dialog: false,
+          loop_index: 0,
+          arr_length: 0,
+          data: [],
+          importing: false,
+          report: {
+            active_tab: "all",
+            data: {
+              all: {
+                count: 0,
+                list: []
+              },
+              errors: {
+                count: 0,
+                list: []
+              }
+            }
+          }
+        }
+      },
       searchQuery: '',
       creatingFlag: false,
       form: {
@@ -714,10 +873,111 @@ export default {
     ...mapActions([
       'fetchAgentsWorkReports',
       'fetchAgents',
-      'createBulkSchedule',
       'createLeave',
-      'createScheduleBulk'
+      'createSchedule',
+      'excelToArraySchedule'
     ]),
+    closeImportReport(e) {
+      if (this.excel.import.importing) {
+        this.$message({
+          type: "warning",
+          message:
+            "You are not allowed to close this dialog until the process is done. If you want to checkout something on other pages, Please open another browser tab.",
+          duration: 10000
+        });
+      } else {
+        if (confirm("Are you sure you already reviewed the import report?")) {
+          this.excel.import.dialog = false;
+          this.excel.import.report.data.all.list = [];
+          this.excel.import.report.data.errors.list = [];
+          this.excel.import.loop_index = 0;
+          this.excel.import.arr_length = 0;
+        }
+      }
+    },
+    handleCommand(e){
+      switch(e){
+        case "importSchedule":
+          this.$refs.importScheduleInput.click();
+          break;
+      }
+    },
+    importScheduleFileChange(e) {
+      let file = e.target.files[0],
+        formData = new FormData(),
+        options = {
+          headers: {
+            Authorizaion: "Bearer " + this.token
+          }
+        };
+      formData.append("file", e.target.files[0]);
+      formData.append("auth_id", this.user_id);
+      axios
+        .post("api/v1/schedules/excel_to_array", formData, options)
+        .then(res => {
+          console.log(res.data.meta);
+          let data = res.data.meta.excel_data.map(i=>({title_id:1,auth_id:this.user_id,om_id:i.om_id,tl_id:i.tl_id,email:i.email.toLowerCase(),start_event:moment(i.start_event).format("YYYY-MM-DD HH:mm:ss"),end_event:moment(i.end_event).format("YYYY-MM-DD HH:mm:ss")}));
+          this.loopCreateSchedule(data);
+        console.log(data);
+        })
+        .catch(err => console.log(err));
+    },
+    loopCreateSchedule(data){
+      this.excel.import.importing = true;
+      this.excel.import.dialog = true;
+      this.excel.import.arr_length = data.length;
+      let tmp_arr=[],options = {
+          headers: {
+            Authorizaion: "Bearer " + this.token
+          }
+        };
+      data.forEach(((v,i)=>{
+        let tmp_data={};
+        axios.post("api/v1/schedules/create",v,options).then(res=>{
+          console.log(res)
+          this.excel.import.loop_index = parseInt(i) + 1;
+            this.excel.import.progress =
+              (this.excel.import.loop_index / this.excel.import.arr_length) *
+              100;
+            tmp_data.email = res.data.parameters.email;
+            tmp_data.status_code = res.status;
+            tmp_data.title = res.data.title;
+            tmp_arr.push(tmp_data);
+            this.excel.import.report.data.all.list = tmp_arr;
+            this.excel.import.report.data.errors.list = tmp_arr.filter(
+              i => i.status_code != 200
+            );
+            if (this.excel.import.loop_index == this.excel.import.arr_length) {
+              this.excel.import.importing = false;
+              this.weekChange(
+                moment(this.week.start)
+                  .format('YYYY-MM-DD')
+              )
+            }
+        }).catch(err=>{
+
+            this.excel.import.loop_index = parseInt(i) + 1;
+            this.excel.import.progress =
+              (this.excel.import.loop_index / this.excel.import.arr_length) *
+              100;
+            tmp_data.email = err.response.data.parameters.email;
+            tmp_data.status_code = err.response.data.code;
+            tmp_data.title = err.response.data.title;
+            tmp_arr.push(tmp_data);
+            this.excel.import.report.data.all.list = tmp_arr;
+            this.excel.import.report.data.errors.list = tmp_arr.filter(
+              i => i.status_code != 200
+            );
+            if (this.excel.import.loop_index == this.excel.import.arr_length) {
+              this.excel.import.importing = false;
+              this.weekChange(
+                moment(this.week.start)
+                  .format('YYYY-MM-DD')
+              )
+            }
+        });
+      }).bind(this));
+    },
     processAddScheduleData() {
       const form = this.form.addSchedule.model
       const data = []
@@ -754,7 +1014,7 @@ export default {
     },
     submitAddSchedule() {
       if (this.validateAddSchedule()) {
-        this.createScheduleBulk(this.processAddScheduleData())
+        this.loopCreateSchedule(this.processAddScheduleData())
       } else {
         this.$message({
           type: 'warning',
@@ -986,12 +1246,56 @@ export default {
     onSubmit() {
       const params = {
         user_id: this.form.addLeave.model.user_id,
-        start_event: this.form.addLeave.model.dates[0],
-        end_event: this.form.addLeave.model.dates[0],
-        leave_type: this.form.addLeave.leave_type
+        start_event: moment(this.form.addLeave.model.dates[0]).startOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        end_event: moment(this.form.addLeave.model.dates[1]).endOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        leave_type: this.form.addLeave.leave_type,
+        status: "approved",
+        generated_by: this.user_id,
+        allowed_access: this.position_id
       }
-      console.log(params)
       this.createLeave(params)
+    },
+    refresh_table(v){
+
+      const data = {
+        limit: this.query.limit,
+        offset: this.query.offset,
+        start: this.week.start,
+        end: this.week.end
+      }
+      if (this.searchQuery != '') {
+        data['target[]'] = 'full_name'
+        data.query = this.searchQuery
+      }
+
+      if (
+        this.position != 'Operations Manager' &&
+        this.position != 'Team Leader'
+      ) {
+        if (this.select.operationsManager != 'all') {
+          data.om_id = this.select.operationsManager
+        } else {
+          delete data.om_id
+        }
+        if (this.select.teamLeader != 'all') {
+          delete data.om_id
+          data.tl_id = this.select.teamLeader
+        } else {
+          delete data.tl_id
+        }
+      } else {
+        if (this.select.teamLeader != 'all') {
+          delete data.om_id
+          data.tl_id = this.select.teamLeader
+        } else {
+          if (this.position == 'Operations Manager') {
+            data.om_id = this.user_id
+          } else {
+            data.om_id = this.head_id
+          }
+        }
+      }
+      this.fetchAgentsWorkReports({ data })
     },
     remoteAgent(query) {
       const data = {}
