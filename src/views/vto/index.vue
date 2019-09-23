@@ -4,18 +4,19 @@
     <!-- <el-row style="padding-right:8px;margin-bottom:30px;">
     </el-row> -->
 
-    <el-row style="margin-bottom:10px;">
+    <el-row style="margin-bottom:5px;">
       <el-col :md="{span:8}">
         <el-button :plain="true" size="mini" @click="createForm">Add VTO</el-button>
       </el-col>
-      <el-col :md="{span:16}">
+      <el-col :md="{span:4,offset:12}">
+        <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..." style="width:100%"></el-date-picker>
       </el-col>
     </el-row>
-    <el-row>
+    <!-- <el-row>
       <el-col :md="{span:12}">
         <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..."></el-date-picker>
       </el-col>
-      <el-col :md="{span:12}"style="margin-top:10px;">
+      <el-col :md="{span:12}" style="margin-top:10px;">
         <el-pagination
           style="float:right"
           pager-count="5"
@@ -30,7 +31,7 @@
           small
         />
       </el-col>
-    </el-row>
+    </el-row> -->
    <!-- <el-row>
       <el-col :md="{span:8}">
         <el-table :data="table_config.data" style="width: 100%;" v-loading="table_config.loader">
@@ -79,16 +80,9 @@
       </el-col>
     </el-row> -->
 
-    <el-row style="margin-top:30px;">
+    <el-row style="padding:2px;">
       <el-col>
-        <span style="padding-left:60px;">VTO @</span>
-      </el-col>
-      <el-col style="margin-top:10px;">
-        <el-tabs tab-position="left" style="height: 500px;">
-          <template v-for="(item,index) in table_config.data">
-            <el-tab-pane :key="index" :label="item.start_event"><tab-content :vtoat="item.start_event"></tab-content></el-tab-pane>
-          </template>
-        </el-tabs>
+        <tab-content></tab-content>
       </el-col>
     </el-row>
 
@@ -99,14 +93,35 @@
       :close-on-press-escape="false"
       :show-close="false"
       :title="form.action + ' Overtime Schedule'"
-      width="40%"
+      width="30%"
     >
       <el-row>
-        <el-col style="margin-bottom:10px;">
-          <label width="100%" >Schedule</label>
+        <el-col style="margin-bottom:8px;">
+          <label width="100%" >VTO at</label>
+          <el-date-picker  style="width:100%" type="datetime" placeholder="Set vto at..." v-model="form.schedule" size="mini"></el-date-picker>
         </el-col>
         <el-col>
-          <el-date-picker  style="width:100%" type="datetimerange" placeholder="Set schedule..." v-model="form.schedule" size="mini"></el-date-picker>
+          <label for="dates">Agents</label>
+          <el-select
+            class="form-input"
+            style="width:100%;padding-bottom:2px"
+            size="mini"
+            multiple
+            filterable
+            remote
+            reserve-keyword
+            placeholder="Agents..."
+          >
+            <!-- <el-option
+              v-for="item in agents.agents"
+              :key="item.id"
+              :label="item.full_name"
+              :value="item.id"
+            /> -->
+          </el-select>
+          <!-- <span
+            style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
+          >count: {{ form.addSchedule.model.agents.length }}</span> -->
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -144,6 +159,10 @@ export default {
         action: "Create",
         update_id:null,
         schedule:null,
+        fields:{
+          vto_at:null,
+
+        },
         model:{
           start_event:null,
           end_event:null,
@@ -156,6 +175,7 @@ export default {
   },
   created() {
     this.fetchOvertimeSchedule(this.query);
+    this.fetchVtoList();
   },
   watch:{
     "form.schedule":function(v){
@@ -292,12 +312,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["fetchOvertimeSchedule","searchOvertimeSchedule","createOvertimeSchedule","updateOvertimeSchedule","deleteOvertimeSchedule"]),
+    ...mapActions(["fetchOvertimeSchedule","searchOvertimeSchedule","createOvertimeSchedule","updateOvertimeSchedule","deleteOvertimeSchedule","fetchVtoList"]),
     previewSched(data){
       const otId = data.id
       this.$router.push({path:`/overtime_agents/${otId}`})
     },
-
     deleteRow(data){
       if(this.ongoing(data.start_event,data.end_event) || moment(moment(data.end_event).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
         this.$message({

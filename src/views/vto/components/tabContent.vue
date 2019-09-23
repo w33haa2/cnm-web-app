@@ -2,10 +2,10 @@
   <div class="tab-content-container">
     <div class="header">
       <el-row style="margin-bottom:10px;">
-        <el-col :md="{span:8}">
+        <el-col :md="{span:4}">
           <el-input size="mini" placeholder="Search..."></el-input>
         </el-col>
-        <el-col :md="{span:16}">
+        <el-col :md="{span:20}">
           <el-pagination
             style="float:right"
             pager-count="4"
@@ -22,8 +22,8 @@
         </el-col>
       </el-row>
     </div>
-    <div class="body">
-      <el-table :data="dummy" style="width: 100%;" height="500px;" v-loading="table_config.loader">
+    <div class="body" style="padding-left:20px;padding-right:20px;">
+      <el-table :data="dummy" style="width:100%;" height="500px;" v-loading="table_config.loader">
         <el-table-column label="Agent" >
           <template slot-scope="scope">
             <div class="user-block">

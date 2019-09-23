@@ -296,7 +296,9 @@ export const asyncRoutes = [
                name: "Agent VTO",
                meta: {
                  title: "Agent VTO",
-                 noCache: false
+                 noCache: false,
+                  icon: "calendar-slots"
+
                }
              },
            ]

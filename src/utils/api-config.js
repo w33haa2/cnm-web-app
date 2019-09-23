@@ -441,6 +441,32 @@ const api = {
         },
         // endregion user status
 
+        // startregion user status
+        vto: {
+          $prefix: "schedules/vto",
+          list:{
+            $url: "list",
+            $method: "GET"
+          },
+          create: {
+            $url: "add_user_status",
+            $method: "POST"
+          },
+          update: {
+            $url: "update_user_status",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `update_user_status/${id}`)
+          },
+          delete: {
+            $url: "delete_user_status",
+            $method: "POST",
+            $requires: ["id"],
+            $format: Template(() => `delete_user_status/${id}`)
+          }
+        },
+        // endregion user status
+
         // region sanction levels
         sanction_levels: {
           $prefix: "sanction_level",
