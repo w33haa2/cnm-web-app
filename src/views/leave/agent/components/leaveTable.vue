@@ -67,7 +67,6 @@ export default {
       query: {
         limit: 10,
         offset: 0,
-        // user_id: this.userDetails.id, //uncomment on production
         user_id: null, // temporary data
         order: "desc",
         sort: "created_at"
@@ -84,7 +83,7 @@ export default {
     ])
   },
   mounted() {
-    this.query.user_id = this.user_id;
+    this.query.generated_by = this.user_id;
     this.fetchLeave(this.query);
   },
   watch: {

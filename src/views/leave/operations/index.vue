@@ -2,89 +2,71 @@
   <div class="app-container">
     <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
-      <el-col :md="{span:24}">
-        <!-- <el-button
-          size="mini"
-          @click="leaveForm({action:'create'})"
-          style="float:right"
-        >Create Request</el-button>-->
+      <el-col :md="{span:4}" style="padding-right:5px;">
+        <el-tooltip placement="top" content="Select week...">
+          <el-date-picker
+            v-model="query.created_at_start"
+            size="mini"
+            type="week"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            :picker-options="{firstDayOfWeek:1}"
+            :clearable="false"
+            style="width:100%"
+            @change="weekChange"
+          />
+        </el-tooltip>
       </el-col>
-      <!-- <el-col :md="{span:10}">
-        <el-calendar v-model="calendar.today"></el-calendar>
-      </el-col> -->
-      <el-col :md="{span:24}" style="padding-left: 20px">
-        <el-tabs v-model="activeTab" type="border-card">
+      <el-col :md="{span:4}" style="padding-right:5px" v-if="!isOperations()">
+        <el-tooltip placement="top" content="Select Operations Manager...">
+          <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_om">
+            <el-option v-for="(option, index) in options.operationsManager" :key="index" :value="option.value" :label="option.label" />
+          </el-select>
+        </el-tooltip>
+      </el-col>
+      <el-col :md="{span:4}">
+        <el-tooltip placement="top" content="Select Team Leader...">
+          <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_tl" :disabled="disable_tl_select">
+            <el-option v-for="(option, index) in options.teamLeader" :key="index" :value="option.value" :label="option.label" />
+          </el-select>
+        </el-tooltip>
+      </el-col>
+      <el-col :md="{span:12}">
+        <el-tooltip placement="top" content="Print selected week approved list.">
+          <el-button size="mini" style="float:right">Print Approved</el-button>
+        </el-tooltip>
+      </el-col>
+      <el-col :md="{span:24}">
+        <el-tabs v-model="query.activeTab" type="border-card">
           <el-tab-pane :label="tab.label" :name="tab.name" v-for="(tab,index) in tabs" :key="index">
-            <leave-table :status="tab.name" @on-update="leaveForm" :active-tab="activeTab" />
+            <leave-table :status="tab.name" @on-update="leaveForm" :data="to_query" />
           </el-tab-pane>
         </el-tabs>
       </el-col>
     </el-row>
-
-    <!-- Create and Update Dialog -->
-    <el-dialog
-      :visible.sync="form.addLeave.show"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      title="Add Leave"
-      width="30%"
-      top="5vh"
-    >
-      <el-row>
-        <el-col>
-          <label for="dates">Dates</label>
-          <el-date-picker
-            size="mini"
-            type="daterange"
-            v-model="form.addLeave.model.dates"
-            style="width:100%;margin-top:4px;margin-bottom:10px;"
-            class="form-input"
-            placeholder="Range picker"
-          ></el-date-picker>
-          <!-- <span style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px">count:   {{ form.addSchedule.model.dates.length}}</span> -->
-        </el-col>
-        <el-col>
-          <label for="dates">Leave Type</label>
-          <el-select
-            v-model="form.addLeave.model.leave_type"
-            size="mini"
-            class="form-input"
-            style="width:100%;margin-top:4px;margin-bottom:10px;"
-          >
-            <el-option value="vacation_leave" label="Vacation" />
-          </el-select>
-        </el-col>
-      </el-row>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-        <el-button type="danger" size="mini">Confirm</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import moment from "moment";
+import { mapActions,mapGetters } from "vuex"
+import axios from "axios"
 import leaveTable from "./components/leaveTable";
 export default {
   components: { leaveTable },
+  computed:{
+    ...mapGetters(["position","token","approveLeaveState","approveLeaveData","approveLeaveError"])
+  },
   data() {
     return {
-      form: {
-        addLeave: {
-          show: false, // temporary value
-          model: {
-            user_id: null,
-            dates: [],
-            leave_type: null,
-            status: null,
-            generated_by: null,
-            allowed_access: null
-          }
-        }
+      list:{
+        teamLeader:[]
       },
-      activeTab: "pending",
+      disable_tl_select:false,
+      options:{
+        teamLeader:[],
+        operationsManager:[],
+      },
       tabs: [
         { label: "Pending", name: "pending" },
         { label: "Approved", name: "approved" },
@@ -92,38 +74,181 @@ export default {
       ],
       calendar: {
         today: moment()
-      }
+      },
+      query:{
+        created_at_start:null,
+        created_at_end:null,
+        activeTab:'pending',
+        filter_tl:'all',
+        filter_om:'all'
+      },
+      to_query:{}
     };
   },
-  methods: {
-    leaveForm(data) {
-      this.form.addLeave.show = true;
-      this.clearForm();
-      if (data.action == "create") {
-        alert("create");
-      } else if (data.action == "update") {
-        // update only if leave is before current date
-        alert("update");
-        this.fillForm(data);
+  created(){
+    if(this.isOperations()){
+      this.disable_tl_select = false;
+    }else{
+      this.disable_tl_select = true;
+    }
+    this.weekChange(moment().startOf('isoweek'))
+  },
+  mounted(){
+    this.getTeamLeaders()
+    this.getOperationsManager()
+  },
+  watch:{
+    approveLeaveState({initial,success,fail}){
+      if(success){
+        this.weekChange(this.query.created_at_start)
+        this.$message({
+          type:"success",
+          message:"Leave is approved!",
+          duration:5000
+        });
+      }
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.approveLeaveError,
+          duration:5000
+        });
       }
     },
-    clearForm() {
-      this.form.addLeave.model = {
-        user_id: null,
-        dates: [],
-        leave_type: null,
-        status: null,
-        generated_by: null,
-        allowed_access: null
-      };
+    "query.created_at_start":function(v){
+      if(this.isOperations()){
+        this.to_query={
+          created_at_start:v,
+          created_at_end:this.query.created_at_end,
+          filter_tl:this.query.filter_tl,
+          activeTab:this.query.activeTab
+        }
+      }else{
+        this.to_query={
+          created_at_start:v,
+          created_at_end:this.query.created_at_end,
+          filter_tl:this.query.filter_tl,
+          filter_om:this.query.filter_om,
+          activeTab:this.query.activeTab
+        }
+      }
     },
-    fillForm(data) {
-      this.form.addLeave.model = {
-        user_id: data.user_id,
-        dates: [data.start_event, data.end_event],
-        leave_type: data.leave_type,
-        id: data.id
-      };
+    "query.activeTab":function(v){
+      if(this.isOperations()){
+        this.to_query={
+          created_at_start:this.query.created_at_start,
+          created_at_end:this.query.created_at_end,
+          filter_tl:this.query.filter_tl,
+          activeTab:v
+        }
+      }else{
+        this.to_query={
+          created_at_start:this.query.created_at_start,
+          created_at_end:this.query.created_at_end,
+          filter_tl:this.query.filter_tl,
+          filter_om:this.query.filter_om,
+          activeTab:v
+        }
+      }
+    },
+    "query.filter_tl":function(v){
+      if(this.isOperations()){
+        this.to_query={
+          created_at_start:this.query.created_at_start,
+          created_at_end:this.query.created_at_end,
+          filter_tl:v,
+          activeTab:this.query.activeTab
+        }
+      }else{
+        this.to_query={
+          created_at_start:this.query.created_at_start,
+          created_at_end:this.query.created_at_end,
+          filter_tl:v,
+          filter_om:this.query.filter_om,
+          activeTab:this.query.activeTab
+        }
+      }
+    },
+    "query.filter_om":function(v){
+      if(!this.isOperations()){
+          this.getTeamLeaders();
+        if(v=='all'){
+          this.disable_tl_select = true;
+          this.query.filter_tl = 'all';
+        }else{
+          let filtered = this.list.teamLeader.filter(i=> i.parent_id == v).map(i=>({value:i.id,label:i.full_name}))
+          if(filtered.length!=0){
+            this.options.teamLeader = filtered;
+            this.disable_tl_select = false;
+            this.options.teamLeader.unshift({value:"all",label:"All"});
+          }else{
+            this.options.teamLeader = [];
+            this.disable_tl_select = true;
+          }
+          // console.log(filtered)
+        }
+        this.to_query={
+          created_at_start:this.query.created_at_start,
+          created_at_end:this.query.created_at_end,
+          filter_tl:this.query.filter_tl,
+          filter_om:v,
+          activeTab:this.query.activeTab
+        }
+      }
+    }
+  },
+  methods: {
+    weekChange(e) {
+      const start = moment(e)
+        .startOf('isoweek')
+        .format('YYYY-MM-DD')
+      const end = moment(e)
+        .endOf('isoweek')
+        .format('YYYY-MM-DD')
+      this.query.created_at_start = start;
+      this.query.created_at_end = end;
+    },
+    getTeamLeaders(){
+      let url = "api/v1/users?tl=true&start_event="+this.query.created_at_start+"&end_event="+this.query.created_at_end,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      axios.get(url,options).then(res=>{
+        console.log(res);
+        this.options.teamLeader = res.data.meta.metadata.map(i=>({value:i.id,label:i.full_name}));
+        this.list.teamLeader = res.data.meta.metadata;
+        this.options.teamLeader.unshift({value:"all", label:"All"})
+        this.query.filter_tl = "all";
+      }).catch(err=>{
+        console.log(err.response.data)
+        this.options.teamLeader = [];
+      })
+    },
+    getOperationsManager(){
+      let url = "api/v1/users?om=true&start_event="+this.query.created_at_start+"&end_event="+this.query.created_at_end,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      axios.get(url,options).then(res=>{
+        console.log(res);
+        this.options.operationsManager = res.data.meta.metadata.map(i=>({value:i.id,label:i.full_name}));
+        this.options.operationsManager.unshift({value:"all", label:"All"})
+        this.query.filter_om = "all";
+      }).catch(err=>{
+        console.log(err.response.data)
+        this.options.operationsManager = [];
+      })
+    },
+    isOperations(){
+      if(this.position.toLowerCase() == "operations manager" || this.position.toLowerCase() == "team leader"){
+        return true;
+      }else{
+        return false;
+      }
     }
   }
 };

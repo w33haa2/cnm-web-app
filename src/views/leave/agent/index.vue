@@ -183,7 +183,7 @@ export default {
         limit: 10,
         offset: 0,
         // user_id: this.userDetails.id, //uncomment on production
-        user_id: this.user_id, // temporary data
+        generated_by: null, // temporary data
         order: "desc",
         sort: "created_at"
       },
@@ -347,6 +347,7 @@ export default {
     }
   },
   mounted() {
+    this.query.generated_by=this.user_id;
     this.getDate();
     this.fetchAgentCalendar({
       userid: this.user_id,
@@ -490,7 +491,7 @@ export default {
         dates: [],
         leave_type: null,
         status: null,
-        generated_by: null,
+        generated_by: this.user_id,
         allowed_access: null
       };
     },

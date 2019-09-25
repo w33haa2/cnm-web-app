@@ -25,6 +25,9 @@ export default {
     switch (this.position.toLowerCase()) {
       case "operations manager":
       case "team leader":
+      case "rta manager":
+      case "rta supervisor":
+      case "rta analyst":
         this.currentRole = "operationsView";
         break;
       case "representative - order placer":

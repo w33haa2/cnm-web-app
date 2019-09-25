@@ -1,10 +1,7 @@
 <template>
   <div>
     <el-row>
-      <!-- pagination -->
-      <!-- <el-col :md="{span:8}">
-        <!-- <el-tag :type="tag.type">{{ tag.label }}</el-tag>
-      </el-col> -->
+      <!-- backup excel -->
       <el-col :md="{span:24}">
         <el-pagination
           style="float:right"
@@ -48,13 +45,13 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Dates"  width="150">
+          <el-table-column align="center" label="Dates">
             <template slot-scope="scope">
               <span>{{ formatDate(scope.row.start_event,"","MMM Do") }}</span> -
               <span>{{ formatDate(scope.row.end_event,"","MMM Do") }}</span>
             </template>
           </el-table-column>
-          <el-table-column align="center" label="Leave Type"  width="150">
+          <el-table-column align="center" label="Leave Type">
             <template slot-scope="scope">{{ remUnderscore(ucwords(scope.row.leave_type)) }}</template>
           </el-table-column>
           <!-- <el-table-column align="center" label="History" width="150">
@@ -62,52 +59,54 @@
               <span style="color:grey">DATE HERE</span>
             </template>
           </el-table-column> -->
-          <el-table-column align="center" label="Credits" width="150">
+          <!-- <el-table-column align="center" label="Credits" width="150">
             <template slot-scope="scope">
               <span style="color:grey">{{ scope.row.leave_credits.filter(i=>i.leave_type == "vacation_leave")[0].value }}</span>
             </template>
-          </el-table-column>
-          <template v-if="status == 'pending'">
-            <el-table-column align="center" label="Action" width="100">
-              <template slot-scope="scope">
-                <el-row>
-                  <el-col>
-                    <el-button
-                      size="mini"
-                      @click="approveLeave({id: scope.row.id})"
-                      type="info"
-                      style="margin-bottom:3px;width:100%"
-                    >Approve</el-button>
-                  </el-col>
-                  <el-col>
-                    <el-button
-                      :plain="true"
-                      size="mini"
-                      @click="rejectLeave({id: scope.row.id})"
-                      type="info"
+          </el-table-column> -->
+          <template v-if="isOperations()">
+            <template v-if="status == 'pending'">
+              <el-table-column align="center" label="Action" width="200px">
+                <template slot-scope="scope">
+                  <el-row>
+                    <el-col :md="{span:12}" style="padding-right:5px;">
+                      <el-button
+                        size="mini"
+                        @click="approveLeave({id: scope.row.id,om_id:query.om_id})"
+                        type="info"
+                        style="width:100%;"
+                      >Approve</el-button>
+                    </el-col>
+                    <el-col  :md="{span:12}">
+                      <el-button
                       style="width:100%"
-                    >Decline</el-button>
-                  </el-col>
-                </el-row>
-              </template>
-            </el-table-column>
-          </template>
-          <template v-if="status == 'approved'">
-            <el-table-column align="center" label="Action" width="100">
-              <template slot-scope="scope">
-                <el-row>
-                  <el-col>
-                    <el-button
-                      :plain="true"
-                      size="mini"
-                      @click="cancelLeave({id: scope.row.id, cancel_event: scope.row.start_event})"
-                      type="info"
-                      style="width:100%"
-                    >Cancel</el-button>
-                  </el-col>
-                </el-row>
-              </template>
-            </el-table-column>
+                        :plain="true"
+                        size="mini"
+                        @click="rejectLeave({id: scope.row.id,om_id:query.om_id})"
+                        type="info"
+                      >Decline</el-button>
+                    </el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+            </template>
+            <template v-if="status == 'approved'">
+              <el-table-column align="center" label="Action" width="100">
+                <template slot-scope="scope">
+                  <el-row>
+                    <el-col>
+                      <el-button
+                        :plain="true"
+                        size="mini"
+                        @click="cancelLeave({id: scope.row.id, cancel_event: scope.row.start_event})"
+                        type="info"
+                        style="width:100%"
+                      >Cancel</el-button>
+                    </el-col>
+                  </el-row>
+                </template>
+              </el-table-column>
+            </template>
           </template>
         </el-table>
       </el-col>
@@ -118,16 +117,21 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
-
+const tag = {
+  pending:"warning",
+  approved:"success",
+  rejected:"danger",
+}
 export default {
   name: "Leave_Tables",
-  props: ["status", "activeTab"],
+  props: ["status", "data"],
   data() {
     return {
       tableData: {},
       query: {
         limit: 10,
         offset: 0,
+        allowed_access:17
       },
       tag: {
         type: null,
@@ -139,50 +143,54 @@ export default {
     ...mapGetters(["userDetails", "leaves", "leavesfetchState","position","head_id","user_id"])
   },
   mounted() {
-    if(this.position.toLowerCase() == "operations manager"){
-      this.query.om_id = this.user_id
-      // this.query.start_date= moment().startOf("isoweek").format("YYYY-MM-DD");
-      // this.query.end_date= moment().format("YYYY-MM-DD");
-    }else if(this.position.toLowerCase() == "team leader"){
-      this.query.om_id = this.head_id
-      // this.query.start_date= moment().startOf("isoweek").format("YYYY-MM-DD");
-      // this.query.end_date= moment().format("YYYY-MM-DD");
-    }
-
-    if (this.activeTab == this.status) {
-      this.tag = {
-        type: "warning",
-        label: "PENDING"
-      };
-      this.query.status = this.activeTab;
-      this.fetchLeave(this.query);
+    if(this.isOperations()){
+      if(this.position.toLowerCase() == "operations manager"){
+        this.query.om_id = this.user_id
+      }else if(this.position.toLowerCase() == "team leader"){
+        this.query.om_id = this.head_id
+      }
     }
   },
   watch: {
-    activeTab(v) {
-      this.tableData = {};
-      if (v == this.status) {
-        switch (v) {
-          case "pending":
-            this.tag = {
-              type: "warning",
-              label: v.toUpperCase()
-            };
-            break;
-          case "approved":
-            this.tag = {
-              type: "success",
-              label: v.toUpperCase()
-            };
-            break;
-          case "rejected":
-            this.tag = {
-              type: "danger",
-              label: v.toUpperCase()
-            };
-            break;
+    data(v) {
+      if (v.activeTab == this.status) {
+        // clear previous query variables
+        delete this.query.status;
+        delete this.query.created_at_start;
+        delete this.query.created_at_end;
+        delete this.query.tl_id;
+        delete this.query.om_id;
+        // reassign query variables
+        this.query.status = v.activeTab;
+        this.query.created_at_start = moment(v.created_at_start).startOf('day').format("YYYY-MM-DD HH:mm:ss");
+        this.query.created_at_end = moment(v.created_at_end).endOf('day').format("YYYY-MM-DD HH:mm:ss");
+
+        if(this.isOperations()){
+          if(v.filter_tl=='all'){
+            if(this.position.toLowerCase() == "operations manager"){
+              this.query.om_id = this.user_id
+            }else if(this.position.toLowerCase() == "team leader"){
+              this.query.om_id = this.head_id
+            }
+          }else{
+            this.query.tl_id = v.filter_tl;
+          }
+        }else{
+          if(v.filter_om!='all'){
+            if(v.filter_tl=='all'){
+              this.query.om_id = v.filter_om;
+            }else{
+              this.query.tl_id = v.filter_tl;
+            }
+          }
         }
-        this.query.status = v;
+
+
+        this.tag = {
+          type:tag[v.activeTab.toUpperCase()],
+          label: v.activeTab.toUpperCase()
+        }
+
         this.fetchLeave(this.query);
       }
     },
@@ -205,6 +213,13 @@ export default {
       "cancelLeave",
       "rejectLeave"
     ]),
+    isOperations(){
+      if(this.position.toLowerCase() == "operations manager" || this.position.toLowerCase() == "team leader"){
+        return true;
+      }else{
+        return false;
+      }
+    },
     updateRow(data) {
       data.action = "update";
       this.$emit("on-update", data);
