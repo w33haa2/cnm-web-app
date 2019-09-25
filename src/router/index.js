@@ -243,7 +243,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Agent Leave",
            meta: {
-             roles: ["Operations Manager", "Team Leader"]
+             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
            children: [
             {
@@ -283,9 +283,9 @@ export const asyncRoutes = [
            ]
          },
          {
-           path: "/agent_leave_slots",
+           path: "/agent_vto",
            component: Layout,
-           name: "Agent Leave Slots",
+           name: "Agent VTO",
            meta: {
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
