@@ -221,5 +221,9 @@ const getters = {
   excelToArrayScheduleState: state => state.excel_to_array_schedules.state,
   excelToArrayScheduleData: state => state.excel_to_array_schedules.data,
   excelToArrayScheduleError: state => state.excel_to_array_schedules.errors,
+  // approve_leave
+  approveLeaveState: state => state.approve_leave.state,
+  approveLeaveData: state => state.approve_leave.data,
+  approveLeaveError: state => state.approve_leave.errors,
 };
 export default getters;
