@@ -10,9 +10,20 @@
               <el-tag
                 :type="tag.type"
                 :effect="tag.effect"
-                style="width:100%;text-align:center
-                "
+                style="width:100%;text-align:center"
               >{{ tag.label }}</el-tag>
+            </el-col>
+            <el-col>
+              <h5 style="margin-bottom:5px;margin-top:8px;">OM</h5>
+            </el-col>
+            <el-col style="text-align:center">
+              <div class="c-grey">{{schedule.om.lastname+", "+schedule.om.firstname[0]}}</div>
+            </el-col>
+            <el-col>
+              <h5 style="margin-bottom:5px;margin-top:8px;">TL</h5>
+            </el-col>
+            <el-col style="text-align:center">
+              <div class="c-grey">{{schedule.tl.lastname+", "+schedule.tl.firstname[0]}}</div>
             </el-col>
             <el-col>
               <h5 style="margin-bottom:5px;margin-top:8px;">Schedule</h5>
@@ -77,6 +88,9 @@
             <el-col v-if="tag.bc=='#E6A23C'" style="margin-top:5px;">
               <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
             </el-col>
+            <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
+              <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
+            </el-col>
           </el-row>
         </el-col>
       </el-row>
@@ -133,14 +147,11 @@ const tag  = {
   "present":{
     bc:"#67C23A",fc:"white",label:"PRESENT"
   },
-  "on-leave":{
-    bc:"#E6A23C",fc:"white",label:"ON-LEAVE"
-  },
   "off":{
     bc:"#EBEEF5",fc:"#909399",label:"OFF"
   },
   "upcoming":{
-    bc:"#EBEEF5",fc:"#909399",label:"OFF"
+    bc:"#0072ff",fc:"white",label:"UPCOMING"
   },
   "ncns":{
     bc:"#F56C6C",fc:"white",label:"NCNS"
@@ -152,7 +163,17 @@ const tag  = {
     bc:"#000000",fc:"white",label:"INACTIVE"
   }
 }
-
+const leave_label = {
+  "vacation_leave":"vacation",
+  "sick_leave":"sick",
+  "leave_of_absence":"LOA",
+  "maternity_leave":"maternity",
+  "paternity_leave":"paternity",
+  "bereavement_leave":"bereavement",
+  "solo_parent_leave":"solo parent",
+  "vawc":"vawc",
+  "magna_carta_leave":"magna carta",
+}
 export default {
   props: ["schedule", "date", "info"],
   data() {
@@ -290,15 +311,15 @@ export default {
         // if active
         if(schedule.user_status.status == "active"){
           if(schedule.remarks.toLowerCase()=="on-leave" && schedule.leave.status=="approved"){
-            this.tag.label = schedule.leave.leave_type.toUpperCase()
+            this.tag.label = leave_label[schedule.leave.leave_type].toUpperCase()
             this.tag.bc ="#E6A23C"
             this.tag.fc ="white"
           }else{
-            this.tag = tag[schedule.remarks.toLowerCase()]
+              this.tag = tag[schedule.remarks.toLowerCase()]
           }
-          if(moment(moment(schedule.start_event.date).format("YYYY-MM-DD")).isBefore(moment(this.date).format("YYYY-MM-DD"))){
-            this.tag = tag["upcoming"]
-          }
+          // if(moment(moment(schedule.start_event.date).format("YYYY-MM-DD")).isBefore(moment(this.date).format("YYYY-MM-DD"))){
+          //   this.tag = tag["upcoming"]
+          // }
         }else{
           let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
           separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),

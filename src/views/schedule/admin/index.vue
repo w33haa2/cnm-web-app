@@ -728,7 +728,12 @@ export default {
           this.select.teamLeader = 'all'
         } else {
           this.disable_select.teamLeader = false
-          this.getUsersByPosition({ query: 'team leader', var: 'teamLeader' })
+          this.getUsersByPosition({
+            query: 'team leader',
+            var: 'teamLeader',
+            start:this.week.start,
+            end:this.week.end,
+          })
         }
       }
       this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
@@ -743,16 +748,24 @@ export default {
       this.position == 'HR Manager' ||
       this.position == 'HR Assistant' ||
       this.position == 'RTA Manager' ||
-      this.position == 'RTA Analyst'
+      this.position == 'RTA Analyst' ||
+      this.position == 'RTA Supervisor'
     ) {
       this.disable_select.teamLeader = true
       this.getUsersByPosition({
         query: 'operations manager',
-        var: 'operationsManager'
+        var: 'operationsManager',
+        start:this.week.start,
+        end:this.week.end,
       })
     } else {
       this.disable_select.teamLeader = false
-      this.getUsersByPosition({ query: 'team leader', var: 'teamLeader' })
+      this.getUsersByPosition({
+        query: 'team leader',
+        var: 'teamLeader',
+        start:this.week.start,
+        end:this.week.end
+      })
     }
     this.weekChange(
       moment()
@@ -831,7 +844,9 @@ export default {
         start: moment()
           .startOf('isoweek')
           .format('YYYY-MM-DD'),
-        end: null
+        end: moment()
+          .endOf('isoweek')
+          .format('YYYY-MM-DD'),
       },
       fetchData: [],
       tableHeader: [],
@@ -860,6 +875,7 @@ export default {
           { value: 'maternity_leave', label: 'Maternity' },
           { value: 'paternity_leave', label: 'Paternity' },
           { value: 'solo_parent_leave', label: 'Solo Parent' },
+          { value: 'magna_carta_leave', label: 'Magna Carta' },
           { value: 'vawc', label: 'Violence Againts Women and Children' }
         ]
       },
@@ -907,7 +923,7 @@ export default {
         formData = new FormData(),
         options = {
           headers: {
-            Authorizaion: "Bearer " + this.token
+            Authorization: "Bearer " + this.token
           }
         };
       formData.append("file", e.target.files[0]);
@@ -928,7 +944,7 @@ export default {
       this.excel.import.arr_length = data.length;
       let tmp_arr=[],options = {
           headers: {
-            Authorizaion: "Bearer " + this.token
+            Authorization: "Bearer " + this.token
           }
         };
       data.forEach(((v,i)=>{
@@ -1038,6 +1054,7 @@ export default {
         return true
       }
     },
+    // for add schedule form options
     getFormOptions(query) {
       const url = 'api/v1/users/search?target[]=position&query=' + query.query
       const options = {
@@ -1048,11 +1065,14 @@ export default {
       axios
         .get(url, options)
         .then(res => {
-          const result = res.data.meta.users
+          let result = res.data.meta.users
           if (query.query == 'team leader') {
-            this.form.addSchedule.options[query.var] = result.filter(
+            result = result.filter(
               i => i.parent_id == this.form.addSchedule.model.operationsManager
             )
+
+            this.form.addSchedule.options[query.var] = result.length>0 ? result: [{value:null,label:"No Data"}];
+
             if (this.form.addSchedule.options[query.var].length < 1) {
               this.form.addSchedule.options[query.var] = []
             } else {
@@ -1067,10 +1087,18 @@ export default {
             ] = this.form.addSchedule.options[query.var][0].id
           }
         })
-        .catch(err => console.log(err.response.data))
+        .catch(err => {
+          console.log(err.response.data)
+          this.form.addSchedule.options[query.var] = []
+        })
     },
+    // for filter options
     getUsersByPosition(query) {
-      const url = 'api/v1/users/search?target[]=position&query=' + query.query
+      const position = {
+        "operations manager": "om",
+        "team leader": "tl"
+      }
+      const url = 'api/v1/users?' + position[query.query]+"=true&start_date="+query.start+"&end_date="+query.end;
       const options = {
         headers: {
           Authorization: 'Bearer ' + this.token
@@ -1079,18 +1107,18 @@ export default {
       axios
         .get(url, options)
         .then(res => {
-          let filtered = res.data.meta.users
+          let filtered = res.data.meta.metadata
           if (query.query == 'team leader') {
             if (this.position == 'Team Leader') {
-              filtered = res.data.meta.users.filter(
+              filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.head_id
               )
             } else if (this.position == 'Operations Manager') {
-              filtered = res.data.meta.users.filter(
+              filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.user_id
               )
             } else {
-              filtered = res.data.meta.users.filter(
+              filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.select.operationsManager
               )
               if (filtered.length > 0) {
@@ -1120,6 +1148,7 @@ export default {
         .format('YYYY-MM-DD')
       this.week.start = start
       this.week.end = end
+
       this.generateHeader(start, end)
     },
     generateHeader(start, end) {

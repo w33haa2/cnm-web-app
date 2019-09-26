@@ -209,7 +209,7 @@ export default {
       this.query.created_at_end = end;
     },
     getTeamLeaders(){
-      let url = "api/v1/users?tl=true&start_event="+this.query.created_at_start+"&end_event="+this.query.created_at_end,
+      let url = "api/v1/users?tl=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,
         options = {
           headers: {
             Authorization: "Bearer " + this.token
@@ -227,7 +227,7 @@ export default {
       })
     },
     getOperationsManager(){
-      let url = "api/v1/users?om=true&start_event="+this.query.created_at_start+"&end_event="+this.query.created_at_end,
+      let url = "api/v1/users?om=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,
         options = {
           headers: {
             Authorization: "Bearer " + this.token
