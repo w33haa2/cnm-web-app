@@ -78,8 +78,7 @@
               </el-button>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
-                <el-dropdown-item>Export Week Report</el-dropdown-item>
-                <el-dropdown-item>Export Month Report</el-dropdown-item>
+                <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -411,8 +410,8 @@
               placeholder="Select"
             >
               <el-option
-                v-for="item in form.addSchedule.options.teamLeader"
-                :key="item.id"
+                v-for="(item,index) in form.addSchedule.options.teamLeader"
+                :key="index"
                 :label="item.full_name"
                 :value="item.id"
               />
@@ -420,7 +419,7 @@
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="form.addSchedule.show=false">Cancel</el-button>
+          <el-button size="mini" @click="(form.addSchedule.show=false)">Cancel</el-button>
           <el-button
             type="danger"
             size="mini"
@@ -494,6 +493,35 @@
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
           <el-button type="danger" :loading="createLeaveState.initial" size="mini" @click="onSubmit">Confirm</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- Create and Update Dialog -->
+      <el-dialog
+        :visible.sync="excel.export_sva.dialog"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        title="Select export range..."
+        width="30%"
+        top="5vh"
+      >
+        <el-row>
+          <el-col>
+            <label for="dates">Dates</label>
+            <el-date-picker
+              v-model="excel.export_sva.field.dates"
+              size="mini"
+              type="daterange"
+              style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+              class="form-input"
+              placeholder="Range picker..."
+            />
+          </el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+          <el-button size="mini" @click="excel.export_sva.dialog=false">Cancel</el-button>
+          <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button>
         </span>
       </el-dialog>
 
@@ -604,10 +632,32 @@ export default {
       "updateScheduleState",
       "position_id",
       "createLeaveParams",
-      "cancelLeaveState"
+      "cancelLeaveState",
+      "deleteSingleScheduleData",
+      "deleteSingleScheduleState",
+      "deleteSingleScheduleError"
     ])
   },
   watch: {
+    deleteSingleScheduleState({initial,success,fail}){
+
+      if(success){
+        this.weekChange(this.query.created_at_start)
+        this.$message({
+          type:"success",
+          message:"You have successfully deleted a schedule.",
+          duration:5000
+        })
+      }
+
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.deleteSingleScheduleError,
+          duration:5000
+        })
+      }
+    },
     updateScheduleState({initial,success,fail}){
       if(initial){
 
@@ -740,6 +790,10 @@ export default {
     },
     'select.teamLeader': function(v) {
       this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    },
+    'excel.export_sva.field.dates':function(v){
+      this.excel.export_sva.model.start = moment(v[0]).format("YYYY-MM-DD");
+      this.excel.export_sva.model.end = moment(v[1]).format("YYYY-MM-DD");
     }
   },
   mounted() {
@@ -802,20 +856,30 @@ export default {
               }
             }
           }
+        },
+        export_sva:{
+          dialog:false,
+          model:{
+            start:null,
+            end:null,
+          },
+          field:{
+            dates:[]
+          }
         }
       },
       searchQuery: '',
       creatingFlag: false,
       form: {
         addSchedule: {
-          show: false, // temporary value
+          show: false,
           btn_loader: false,
           model: {
             dates: [],
             time_in: null,
             duration: null,
             agents: [],
-            teamleader: null,
+            teamLeader: null,
             operationsManager: null
           },
           options: {
@@ -891,8 +955,136 @@ export default {
       'fetchAgents',
       'createLeave',
       'createSchedule',
-      'excelToArraySchedule'
+      'excelToArraySchedule',
+      'exportEmployeeTemplate'
     ]),
+    generateSvaReport(){
+      let query = this.excel.export_sva.model,
+        url = 'api/v1/schedules/work/report?start='+query.start+"&end="+query.end,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      let data = [];
+      let header = [""];
+      let header1 = ["Agent"];
+
+        axios.get(url,options).then(res=>{
+          console.log(res.data.meta.agent_schedules)
+          const range = moment.range(query.start, query.end)
+          const dates = Array.from(range.by('day')).map(m =>
+            m.format('YYYY-MM-DD')
+          )
+            res.data.meta.agent_schedules.forEach(((v,i)=>{
+              // get agent info
+              let obj = [];
+              obj.push(v.full_name);
+              dates.forEach(((v1,i1)=>{
+                // get per date info
+                header.push(moment(v1).format("ddd MM-DD-YYYY"),"","","","","")
+                header1.push("OM","TL","SCHED","TIME_IN","TIME_OUT","CONFORMANCE")
+                if(v.schedule.length>0){
+                  let tmp = v.schedule.filter(i=>moment(v1).format("YYYY-MM-DD") == moment(i.start_event.date).format("YYYY-MM-DD") && i.overtime_id==null)
+                  if(tmp.length>0){
+                    tmp=tmp[0];
+                    obj.push(tmp.om.full_name);
+                    obj.push(tmp.tl.full_name);
+                    obj.push(moment(tmp.start_event.date).format('hh:mm a')+"-"+moment(tmp.end_event.date).format('hh:mm a'));
+                    switch(tmp.remarks.toLowerCase()){
+                      case 'present':
+                          obj.push(moment(tmp.time_in.date).format("YYYY-MM-DD hh:mm a"));
+                          obj.push(moment(tmp.time_out.date).format("YYYY-MM-DD hh:mm a"));
+                        break;
+                      case 'ncns':
+                      case 'absent':
+                          obj.push(tmp.remarks);
+                          obj.push(tmp.remarks);
+                        break;
+                      case 'on-leave':
+                          obj.push(tmp.leave.leave_type);
+                          obj.push(tmp.leave.leave_type);
+                        break;
+                      case 'upcoming':
+                          obj.push("NO STAMP");
+                          obj.push("NO STAMP");
+                        break;
+                    }
+                    obj.push(tmp.conformance+"%")
+                  }else{
+                    // return off
+                    obj.push("NA");
+                    obj.push("NA");
+                    obj.push('OFF');
+                    obj.push("OFF");
+                    obj.push("OFF");
+                    obj.push("0%")
+
+                  }
+                }else{
+                  // return off
+                    // obj.om = null;
+                    // obj.tl = null;
+                    // obj.rop = v.full_name;
+                    obj.push("NA");
+                    obj.push("NA");
+                    obj.push('OFF');
+                    obj.push('OFF');
+                    obj.push('OFF');
+                    obj.push("0%")
+
+                }
+              }).bind(this));
+                data.push(obj)
+            }).bind(this));
+            data.unshift([])
+            data.unshift(header1)
+            data.unshift([])
+            data.unshift(header)
+            console.log(data)
+
+
+            // convertToExcel
+            let excel = {
+              fileName:"Something.xlxs",
+              content:[]
+            }
+
+            excel.content.push({sheet_data:data,sheet_title:"SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")});
+            this.createMultisheetExcel(excel)
+
+
+        }).catch(err=>{
+          console.log(err)
+        })
+    },
+    createMultisheetExcel(data){
+      let url = "api/v1/excel/create_multisheet_excel",
+        formData = new FormData(),
+        options = {
+          responseType: "blob",
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      formData.append("obj",JSON.stringify(data))
+      axios.post(url,formData, options).then(res => {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        console.log(res);
+        var // json = JSON.stringify(res.data),
+          blob = new Blob([res.data], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }),
+          url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+    },
     closeImportReport(e) {
       if (this.excel.import.importing) {
         this.$message({
@@ -915,6 +1107,10 @@ export default {
       switch(e){
         case "importSchedule":
           this.$refs.importScheduleInput.click();
+          break;
+          case "exportSVA":
+            this.excel.export_sva.field.dates = [];
+            this.excel.export_sva.dialog = true;
           break;
       }
     },
@@ -995,8 +1191,8 @@ export default {
       }).bind(this));
     },
     processAddScheduleData() {
-      const form = this.form.addSchedule.model
-      const data = []
+      let form = this.form.addSchedule.model
+      let data = []
       form.agents.forEach(
         (v, i) => {
           form.dates.forEach(
@@ -1134,7 +1330,10 @@ export default {
           this.options[query.var].unshift({ value: 'all', label: 'All' })
           this.select[query.var] = 'all'
         })
-        .catch(err => console.log(err.response.data))
+        .catch(err => {console.log(err.response.data)
+          this.options[query.var].unshift({ value: 'all', label: 'All' })
+          this.select[query.var] = 'all'
+        })
     },
     showModal(type) {
       this.form[type].show = true

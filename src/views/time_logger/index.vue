@@ -386,8 +386,7 @@ export default {
           schedule_id: this.today.schedule.id,
           time_in: moment().format("YYYY-MM-DD HH:mm:ss")
         };
-        if(this.today.schedule.leave==null){
-        }else{
+        if(this.today.schedule.leave!=null){
           if(this.today.schedule.leave.status=="approved"){
             this.$message({
               type:"warning",
@@ -397,6 +396,8 @@ export default {
           }else{
             this.agentStartWork(data);
           }
+        }else{
+            this.agentStartWork(data);
         }
       }
     }

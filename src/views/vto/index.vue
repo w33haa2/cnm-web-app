@@ -92,7 +92,7 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      :title="form.action + ' Overtime Schedule'"
+      :title="'Add VTO'"
       width="30%"
     >
       <el-row>

@@ -225,5 +225,17 @@ const getters = {
   approveLeaveState: state => state.approve_leave.state,
   approveLeaveData: state => state.approve_leave.data,
   approveLeaveError: state => state.approve_leave.errors,
+  // create_multisheet_excel
+  createMultisheetExcelState: state => state.create_multisheet_excel.state,
+  createMultisheetExcelData: state => state.create_multisheet_excel.data,
+  createMultisheetExcelError: state => state.create_multisheet_excel.errors,
+  // delete_single_schedule
+  deleteSingleScheduleState: state => state.delete_single_schedule.state,
+  deleteSingleScheduleData: state => state.delete_single_schedule.data,
+  deleteSingleScheduleError: state => state.delete_single_schedule.errors,
+  // fetch_work_force
+  fetchWorkForceState: state => state.fetch_work_force.state,
+  fetchWorkForceData: state => state.fetch_work_force.data,
+  fetchWorkForceError: state => state.fetch_work_force.errors,
 };
 export default getters;

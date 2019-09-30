@@ -33,7 +33,7 @@
       </el-col>
       <el-col :md="{span:12}">
         <el-tooltip placement="top" content="Print selected week approved list.">
-          <el-button size="mini" style="float:right">Print Approved</el-button>
+          <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Print Approved</el-button>
         </el-tooltip>
       </el-col>
       <el-col :md="{span:24}">
@@ -55,7 +55,7 @@ import leaveTable from "./components/leaveTable";
 export default {
   components: { leaveTable },
   computed:{
-    ...mapGetters(["position","token","approveLeaveState","approveLeaveData","approveLeaveError"])
+    ...mapGetters(["position","token","deleteSingleScheduleState","deleteSingleScheduleData","deleteSingleScheduleError"])
   },
   data() {
     return {
@@ -98,6 +98,24 @@ export default {
     this.getOperationsManager()
   },
   watch:{
+    deleteSingleScheduleState({initial,success,fail}){
+      if(success){
+        this.weekChange(this.query.created_at_start)
+        this.$message({
+          type:"success",
+          message:"You have successfully deleted a schedule.",
+          duration:5000
+        })
+      }
+
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.deleteSingleScheduleError,
+          duration:5000
+        })
+      }
+    },
     approveLeaveState({initial,success,fail}){
       if(success){
         this.weekChange(this.query.created_at_start)
@@ -207,6 +225,72 @@ export default {
         .format('YYYY-MM-DD')
       this.query.created_at_start = start;
       this.query.created_at_end = end;
+    },
+    getDataApprovedLeaves(){
+      let url = "api/v1/leaves?status=approved&created_at_start="+this.query.created_at_start+"&created_at_end="+this.query.created_at_end,
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        }, data = [];
+        axios.get(url,options).then(res=>{
+          let result = res.data.meta.leaves;
+          result.forEach(((v,i)=>{
+            data.push([
+              v.leave_type,
+              moment(v.start_event).format("YYYY-MM-DD") +" to "+ moment(v.end_event).format("YYYY-MM-DD"),
+              v.user.full_name,
+              v.approved_by.full_name,
+              moment(v.created_at).format("YYYY-MM-DD HH:mm:ss")
+            ])
+          }).bind(this));
+          console.log(data)
+          data.unshift(["Leave Type","Date Range","Employee","Approved By","Created at"])
+          data.unshift(["List of approved leave from "+ this.query.created_at_start +" to "+ this.query.created_at_start])
+          let obj = {
+            content:[
+              {
+                sheet_data:data,
+                sheet_name:"Approved List"
+              }
+            ]
+          }
+          this.exportToExcel(obj,this.query.created_at_start +" to "+ this.query.created_at_start+" Approved Leave List")
+        }).catch(err=>{
+          this.$message({
+            type:"error",
+            message: err.response.data.title,
+            duration:5000
+          })
+        });
+    },
+    exportToExcel(data,filename) {
+      let url = "api/v1/excel/create_multisheet_excel",
+        options = {
+          responseType: "blob",
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        },
+        fd=new FormData;
+      fd.append("obj",JSON.stringify(data))
+
+
+      axios.post(url, fd, options).then(res => {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        var // json = JSON.stringify(res.data),
+          blob = new Blob([res.data], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }),
+          url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = filename+".xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
     },
     getTeamLeaders(){
       let url = "api/v1/users?tl=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,

@@ -182,6 +182,26 @@ export const asyncRoutes = [
            ]
          },
          {
+           path: "/work_force",
+           component: Layout,
+           name: "Work Force",
+           meta: {
+             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Team Leader","Operations Manager","Admin"]
+           },
+           children: [
+             {
+               path: "/work_force",
+               component: () => import("@/views/work_force"),
+               name: "Work Force",
+               meta: {
+                 title: "Work Force",
+                 icon: "calendar-check",
+                 noCache:false
+               }
+             }
+           ]
+         },
+         {
            path: "/work_report",
            component: Layout,
            name: "Work Report",

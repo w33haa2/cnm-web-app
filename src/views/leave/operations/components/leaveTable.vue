@@ -131,7 +131,7 @@ export default {
       query: {
         limit: 10,
         offset: 0,
-        allowed_access:17
+        allowed_access:null
       },
       tag: {
         type: null,
@@ -146,8 +146,10 @@ export default {
     if(this.isOperations()){
       if(this.position.toLowerCase() == "operations manager"){
         this.query.om_id = this.user_id
+        this.query.allowed_access=17
       }else if(this.position.toLowerCase() == "team leader"){
         this.query.om_id = this.head_id
+        delete this.query.allowed_access;
       }
     }
   },

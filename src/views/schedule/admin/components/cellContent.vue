@@ -14,16 +14,16 @@
               >{{ tag.label }}</el-tag>
             </el-col>
             <el-col>
-              <h5 style="margin-bottom:5px;margin-top:8px;">OM</h5>
+              <h5 style="margin-bottom:1px;margin-top:8px;">OM</h5>
             </el-col>
             <el-col style="text-align:center">
-              <div class="c-grey">{{schedule.om.lastname+", "+schedule.om.firstname[0]}}</div>
+              <div class="c-grey" style="font-size:0.8em">{{schedule.om.lastname+", "+schedule.om.firstname[0]}}</div>
             </el-col>
             <el-col>
-              <h5 style="margin-bottom:5px;margin-top:8px;">TL</h5>
+              <h5 style="margin-bottom:1px;margin-top:8px;">TL</h5>
             </el-col>
             <el-col style="text-align:center">
-              <div class="c-grey">{{schedule.tl.lastname+", "+schedule.tl.firstname[0]}}</div>
+              <div class="c-grey" style="font-size:0.8em">{{schedule.tl.lastname+", "+schedule.tl.firstname[0]}}</div>
             </el-col>
             <el-col>
               <h5 style="margin-bottom:5px;margin-top:8px;">Schedule</h5>
@@ -32,7 +32,7 @@
               <div class="c-grey">{{ formatDate(popup.data.schedule.in,"YYYY-MM-DD HH:mm:ss","MMM Do, YYYY hh:mm a") }}</div>
               <div class="c-grey">{{ formatDate(popup.data.schedule.out,"YYYY-MM-DD HH:mm:ss","MMM Do, YYYY hh:mm a") }}</div>
             </el-col>
-            <template v-if="tag.label!='WORK'">
+            <template v-if="tag.label!='UPCOMING'">
               <el-col>
                 <h5 style="margin-bottom:5px;margin-top:8px;">Attendance</h5>
               </el-col>
@@ -95,7 +95,7 @@
         </el-col>
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
-      <span slot="reference" style="width:100%;padding:0px;margin:0px">
+      <span slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer">
         <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
         </span>
         <span  :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">
@@ -191,7 +191,6 @@ export default {
       tag: {
         bc:null,fc:null
       },
-
       popup: {
         width: 0,
         data: {
@@ -229,7 +228,12 @@ export default {
     this.evaluateSchedule();
   },
   methods: {
-    ...mapActions(["updateSchedule","createLeave","cancelLeave"]),
+    ...mapActions(["updateSchedule","createLeave","cancelLeave","deleteSingleSchedule"]),
+    deleteSchedule(){
+      if(confirm("Are you sure you want to delete this schedule?")){
+        this.deleteSingleSchedule({id:this.schedule.id})
+      }
+    },
     tagSick(){
       const data = {
         user_id: this.schedule.user_id,

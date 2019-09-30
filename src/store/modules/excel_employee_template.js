@@ -55,7 +55,7 @@ const mutations = {
       success: false,
       fail: true
     };
-    state.errors = payload.response.data.title;
+    state.errors = payload.response;
   }
 };
 

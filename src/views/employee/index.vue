@@ -444,7 +444,8 @@ export default {
       if (success) {
         this.change_status.confirm = false;
         this.query.offset = 0;
-        this.fetchEmployees(this.query);
+        let data = this.query;
+        this.fetchEmployees({data});
         this.$message({
           type: "success",
           message: "You have successfully changed status of chosen employee/s.",
@@ -532,7 +533,7 @@ export default {
       "fetchEmployees",
       "fetchStatusList",
       "fetchRSEmployees",
-      "resetPassEmployee"
+      "resetPassEmployee",
     ]),
     confirmChangeStatus() {
       // let data = {};
@@ -605,7 +606,8 @@ export default {
             if (this.excel.import.loop_index == this.excel.import.arr_length) {
               this.excel.import.importing = false;
               this.query.offset = 0;
-              this.fetchEmployees(this.query);
+              let data = this.query;
+              this.fetchEmployees({data});
             }
           })
           .catch(err => {
@@ -624,7 +626,8 @@ export default {
             if (this.excel.import.loop_index == this.excel.import.arr_length) {
               this.excel.import.importing = false;
               this.query.offset = 0;
-              this.fetchEmployees(this.query);
+              let data = this.query;
+              this.fetchEmployees({data});
             }
           });
       }
@@ -693,7 +696,7 @@ export default {
           }),
           url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = "fileName.xlsx";
+        a.download = "EmployeeTemplate.xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
       });

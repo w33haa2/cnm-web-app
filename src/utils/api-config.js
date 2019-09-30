@@ -449,7 +449,7 @@ const api = {
             $method: "GET"
           },
           create: {
-            $url: "add_user_status",
+            $url: "create",
             $method: "POST"
           },
           update: {
@@ -680,6 +680,10 @@ const api = {
           },
           reassignTemplate: {
             $url: "reassign_template",
+            $method: "GET"
+          },
+          multisheet: {
+            $url: "create_multisheet_excel",
             $method: "GET"
           }
         }

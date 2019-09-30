@@ -19,6 +19,7 @@ import "./icons"; // icon
 import "./permission"; // permission control
 import "./utils/error-log"; // error log
 import VueSweetalert2 from "vue-sweetalert2"; // sweetalert
+import axios from "axios"
 
 import * as filters from "./filters"; // global filters
 
