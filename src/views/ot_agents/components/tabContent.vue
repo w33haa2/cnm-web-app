@@ -43,29 +43,33 @@
         </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Log" width="300">
+      <el-table-column align="center" label="Log">
         <template slot-scope="scope">
-          <span>{{ formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a") +" - " }}</span>
+          <span>{{ formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span> -
+          <span v-if="scope.row.time_out.date">{{formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span>
+          <span v-else>ONGOING</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Conformance" width="200">
+      <el-table-column align="center" label="Conformance">
         <template slot-scope="scope">
           <el-progress :percentage="scope.row.conformance | toFix" color="#6f7ad3"></el-progress>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Status" width="100">
+      <!-- <el-table-column align="center" label="Status" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.approved_by" type="success">Approved</el-tag>
           <el-tag v-else type="warning">Pending</el-tag>
         </template>
-      </el-table-column>
-      <el-table-column align="center" label="Approval" width="150">
-        <template slot-scope="scope">
-          <el-button icon="el-icon-check" :plain="true" size="mini" @click="approveRow(scope.row)">
-            Approve
-          </el-button>
-        </template>
-      </el-table-column>
+      </el-table-column> -->
+      <template v-if="tabName=='approved'">
+        <el-table-column align="center" label="Approved" width="150">
+          <template slot-scope="scope">
+            <el-button size="mini" type="danger" @click="revertRow(scope.row)">
+              Remove
+            </el-button>
+          </template>
+        </el-table-column>
+      </template>
     </el-table>
 
     <!-- Create and Update Dialog -->
@@ -98,10 +102,9 @@ import { mapActions, mapGetters } from "vuex";
 import moment from "moment"
 import axios from "axios"
 export default {
-  props:['filter','tabName'],
+  props:['activeTab','tabName',"refresh"],
   data() {
     return {
-      activeTab:null,
       searchQuery:'',
       table_config: {
         display_size: 10,
@@ -137,27 +140,32 @@ export default {
     ...mapGetters(["token","position","head_id","user_id"])
   },
   watch:{
+    refresh(v){
+      if(this.tabName == this.activeTab){
+        this.fetchOvertime();
+      }
+    },
     searchQuery(v){
-      if(this.tabName == this.filter.activeTab){
+      if(this.tabName == this.activeTab){
         if(v!=""){
           this.fetchOvertime();
         }
       }
     },
-    filter(v){
-      if(this.tabName == v.activeTab){
+    activeTab(v){
+      if(this.tabName == v){
         this.fetchOvertime();
       }
     }
   },
   methods: {
-    ...mapActions(["approveOvertimeSchedules"]),
-    approveRow(data){
-      this.approveOvertimeSchedules({schedules:[data.id]})
+    ...mapActions(["approveOvertimeSchedules","revertOvertimeSchedule"]),
+    revertRow(data){
+      this.revertOvertimeSchedule({schedules:[{id:data.id}]})
     },
     fetchOvertime(){
       this.table_config.loader = true;
-      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort+this.query.status,
+      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort,
       options = {
         headers:{
           Authorization: "Bearer "+ this.token
@@ -167,26 +175,7 @@ export default {
         url+="&target[]=full_name&query="+this.searchQuery;
       }
 
-      if(this.position != "Operations Manager" && this.position!="Team Leader"){
-        if(this.filter.field=="om" && this.filter.id!="all"){
-          url+="&om_id="+this.filter.id;
-        }
-        if(this.filter.field=="tl" && this.filter.id!="all"){
-          url+="&tl_id="+this.filter.id;
-        }
-      }else{
-        if(this.filter.field=="tl" && this.filter.id!="all"){
-          url+="&tl_id="+this.filter.teamLeader;
-        }else if(this.filter.field=="tl" && this.filter.id=="all"){
-          if(this.position == "Operations Manager"){
-            url+="&om_id="+this.user_id;
-          }else{
-            url+="&om_id="+this.head_id;
-          }
-        }
-      }
-
-      if(this.filter.activeTab=="approved"){
+      if(this.activeTab=="approved"){
         url+="&approved=true"
       }else{
         url+="&approved=false"
@@ -210,12 +199,10 @@ export default {
     },
     tableSizeChange(value) {
       this.query.limit = value;
-      const data = this.query;
       this.fetchOvertime() ;
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
       this.fetchOvertime();
     }
   }

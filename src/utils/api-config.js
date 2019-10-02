@@ -174,6 +174,10 @@ const api = {
           approve_ot:{
             $url: "overtime/approve",
             $method: "POST"
+          },
+          revert_ot:{
+            $url: "overtime/approve/revert",
+            $method: "POST"
           }
         },
         // endregion schedules

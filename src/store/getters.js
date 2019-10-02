@@ -173,6 +173,14 @@ const getters = {
   deleteOvertimeScheduleState: state => state.delete_overtime_schedule.state,
   deleteOvertimeScheduleData: state => state.delete_overtime_schedule.data,
   deleteOvertimeScheduleError: state => state.delete_overtime_schedule.errors,
+  // approve_overtime_schedule
+  approveOvertimeSchedulesState: state => state.approve_overtime_schedule.state,
+  approveOvertimeSchedulesData: state => state.approve_overtime_schedule.data,
+  approveOvertimeSchedulesError: state => state.approve_overtime_schedule.errors,
+  // revert_overtime_schedule
+  revertOvertimeScheduleState: state => state.revert_overtime_schedule.state,
+  revertOvertimeScheduleData: state => state.revert_overtime_schedule.data,
+  revertOvertimeScheduleError: state => state.revert_overtime_schedule.errors,
   // fetch_todays_overtime_schedule
   fetchTodaysOvertimeScheduleState: state =>
     state.fetch_todays_overtime_schedule.state,
@@ -237,5 +245,9 @@ const getters = {
   fetchWorkForceState: state => state.fetch_work_force.state,
   fetchWorkForceData: state => state.fetch_work_force.data,
   fetchWorkForceError: state => state.fetch_work_force.errors,
+  // create_vto
+  createVtoState: state => state.create_vto.state,
+  createVtoData: state => state.create_vto.data,
+  createVtoError: state => state.create_vto.errors,
 };
 export default getters;

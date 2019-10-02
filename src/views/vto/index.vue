@@ -12,73 +12,6 @@
         <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..." style="width:100%"></el-date-picker>
       </el-col>
     </el-row>
-    <!-- <el-row>
-      <el-col :md="{span:12}">
-        <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..."></el-date-picker>
-      </el-col>
-      <el-col :md="{span:12}" style="margin-top:10px;">
-        <el-pagination
-          style="float:right"
-          pager-count="5"
-          :page-sizes="[10,25,50]"
-          :page-size="table_config.display_size"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          :current-page.sync="table_config.page"
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-          background
-          small
-        />
-      </el-col>
-    </el-row> -->
-   <!-- <el-row>
-      <el-col :md="{span:8}">
-        <el-table :data="table_config.data" style="width: 100%;" v-loading="table_config.loader">
-          <el-table-column align="center" label="VTO@">
-            <template slot-scope="scope">
-              <span>{{ formatDate(scope.row.start_event,"","MMM Do, YYYY hh:mm a")  + " - " + formatDate(scope.row.end_event,"","MMM Do, YYYY hh:mm a")   }}
-              </span>
-              <span v-if="ongoing(scope.row.start_event,scope.row.end_event)"><small style="color:#409EFF">ONGOING</small></span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-col>
-      <el-col :md="{span:16}">
-        <div style="padding:20px;margin:10px;background-color:#e9e9e9">
-
-        <el-row>
-          <el-col :md="12" >
-            <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..."></el-date-picker>
-          </el-col>
-          <el-col :md="12" style="margin-top:10px;">
-            <el-pagination
-              style="float:right"
-              pager-count="3"
-              :page-sizes="[10,25,50]"
-              :page-size="table_config.display_size"
-              layout="total, sizes, prev, pager, next"
-              :total="table_config.count"
-              :current-page.sync="table_config.page"
-              @size-change="tableSizeChange"
-              @current-change="tablePageChange"
-              background
-              small
-            />
-          </el-col>
-        </el-row>
-        <el-table :data="table_config.data" style="width: 100%;margin-top:30px;" height="500px" v-loading="table_config.loader">
-          <el-table-column align="center" label="VTO@">
-            <template slot-scope="scope">
-              <span>{{ formatDate(scope.row.start_event,"","MMM Do, YYYY hh:mm a")  + " - " + formatDate(scope.row.end_event,"","MMM Do, YYYY hh:mm a")   }}
-              </span>
-              <span v-if="ongoing(scope.row.start_event,scope.row.end_event)"><small style="color:#409EFF">ONGOING</small></span>
-            </template>
-          </el-table-column>
-        </el-table>
-        </div>
-      </el-col>
-    </el-row> -->
 
     <el-row style="padding:2px;">
       <el-col>
@@ -98,42 +31,119 @@
       <el-row>
         <el-col style="margin-bottom:8px;">
           <label width="100%" >VTO at</label>
-          <el-date-picker  style="width:100%" type="datetime" placeholder="Set vto at..." v-model="form.schedule" size="mini"></el-date-picker>
-        </el-col>
-        <el-col>
-          <label for="dates">Agents</label>
-          <el-select
-            class="form-input"
-            style="width:100%;padding-bottom:2px"
-            size="mini"
-            multiple
-            filterable
-            remote
-            reserve-keyword
-            placeholder="Agents..."
-          >
-            <!-- <el-option
-              v-for="item in agents.agents"
-              :key="item.id"
-              :label="item.full_name"
-              :value="item.id"
-            /> -->
-          </el-select>
-          <!-- <span
-            style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
-          >count: {{ form.addSchedule.model.agents.length }}</span> -->
-        </el-col>
+          <el-date-picker  style="width:100%" type="datetime" placeholder="Set vto at..." v-model="form.field.vto_at" size="mini"></el-date-picker>
+        </el-col><el-col>
+            <label for="dates">Agents</label>
+            <el-select
+              v-model="form.field.agents"
+              class="form-input"
+              style="width:100%;padding-bottom:2px"
+              size="mini"
+              multiple
+              filterable
+              remote
+              reserve-keyword
+              placeholder="Agents..."
+              :remote-method="remoteAgent"
+            >
+              <el-option
+                v-for="item in agents.agents"
+                :key="item.id"
+                :label="item.full_name"
+                :value="item.id"
+              />
+            </el-select>
+            <span
+              style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
+            >count: {{ form.field.agents.length }}</span>
+          </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelForm" size="mini">Cancel</el-button>
         <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
       </span>
     </el-dialog>
+
+    <!-- Create and Update Dialog -->
+    <el-dialog
+      :visible.sync="form.report.dialog"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :append-to-body="true"
+      :show-close="false"
+      title="Creating Vto..."
+      width="50%"
+      top="5vh"
+    >
+      <el-alert
+        title="Create Report"
+        type="info"
+        description="This report will only be displayed once every import. Please review results to reupload unimported data."
+        show-icon
+      ></el-alert>
+
+      <div style="width:100%;margin-bottom:20px;margin-top:15px;">
+        Progress
+        <span>( {{ form.report.loop_index }}</span>/
+        <span>{{ form.report.arr_length }} )</span>
+      </div>
+      <el-progress :percentage="form.report.progress" :text-inside="true" :stroke-width="18"></el-progress>
+      <div style="padding-bottom:15px;  ">
+        <el-tabs
+          v-model="form.report.active_tab"
+          type="border-card"
+          style="margin-top:15px;margin-bottom:10px;"
+        >
+          <el-tab-pane :label="'All: '+form.report.data.all.length" name="all">
+            <el-table :data="form.report.data.all" height="350px">
+              <el-table-column label="Name" width="350">
+                <template scope="scope">{{scope.row.full_name}}</template>
+              </el-table-column>
+              <!-- <el-table-column label="Schedule" width="100">
+                <template scope="scope">{{+" To "+}}</template>
+              </el-table-column> -->
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane
+            :label="'Errors: ' +form.report.data.errors.length "
+            name="errors"
+          >
+            <el-table :data="form.report.data.errors" height="350px">
+              <el-table-column label="Name" width="350">
+                <template scope="scope">{{scope.row.full_name}}</template>
+              </el-table-column>
+              <el-table-column label="Status">
+                <template scope="scope">
+                  <template v-if="scope.row.status_code==200">
+                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  </template>
+                  <template v-else>
+                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
+        <!-- <el-button size="mini" @click="closeCreateVtoReport" style="float:right">Close</el-button> -->
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import axios from "axios"
+import { mapActions, mapGetters } from "vuex"
 import tabContent from "./components/tabContent"
 import moment from "moment"
 export default {
@@ -159,160 +169,38 @@ export default {
         action: "Create",
         update_id:null,
         schedule:null,
-        fields:{
+        confirm:false,
+        field:{
           vto_at:null,
-
+          agents:[]
         },
         model:{
           start_event:null,
           end_event:null,
+        },
+        report:{
+          dialog:false,
+          arr_length:0,
+          loop_index:0,
+          progress:0,
+          data:{
+            all:[],
+            errors:[]
+          }
         }
       }
     };
   },
   computed: {
-    ...mapGetters(["fetchOvertimeScheduleState","fetchOvertimeScheduleData","fetchOvertimeScheduleError","searchOvertimeScheduleState","searchOvertimeScheduleData","searchOvertimeScheduleError","createOvertimeScheduleState","createOvertimeScheduleData","createOvertimeScheduleError","updateOvertimeScheduleState","updateOvertimeScheduleData","updateOvertimeScheduleError","deleteOvertimeScheduleState","deleteOvertimeScheduleData","deleteOvertimeScheduleError"])
+    ...mapGetters(["agents","token"])
   },
   created() {
-    this.fetchOvertimeSchedule(this.query);
     this.fetchVtoList();
   },
   watch:{
-    "form.schedule":function(v){
-      this.form.model.start_event = moment(v[0]).format("YYYY-MM-DD HH:mm:ss")
-      this.form.model.end_event = moment(v[1]).format("YYYY-MM-DD HH:mm:ss")
-    },
-    fetchOvertimeScheduleState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true
-        this.table_config.data = []
-      }
-      if(success){
-        this.table_config.loader = false
-        this.table_config.data = this.fetchOvertimeScheduleData.overtimes
-        this.table_config.count = this.fetchOvertimeScheduleData.count
-      }
-      if(fail){
-        this.table_config.loader = false
-        this.table_config.data = []
-        this.$message({
-          type:"error",
-          message:this.fetchOvertimeScheduleError,
-          duration:5000
-        });
-      }
-    },
-    searchOvertimeScheduleState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true
-        this.table_config.data = []
-      }
-      if(success){
-        this.table_config.loader = false
-        this.table_config.data = this.searchOvertimeScheduleData.overtime
-        this.table_config.count = this.searchOvertimeScheduleData.count
-      }
-      if(fail){
-        this.table_config.loader = false
-        this.table_config.data = []
-        this.$message({
-          type:"error",
-          message:this.searchOvertimeScheduleError,
-          duration:5000
-        });
-      }
-    },
-    searchQuery(v){
-      this.query.offset=0;
-      if(v==null){
-        v=""
-      }
-      if(v!=""){
-        this.query['target[]'] = 'start_event';
-        this.query.query = moment(v).format("YYYY-MM-DD");
-        this.searchOvertimeSchedule(this.query)
-      }else{
-        delete this.query['target[]'];
-        delete this.query.query;
-        this.fetchOvertimeSchedule(this.query)
-      }
-    },
-    createOvertimeScheduleState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true;
-        this.form.confirm = true;
-      }
-      if(success){
-        this.table_config.loader = false;
-        this.form.confirm = false;
-        this.query.offset = 0;
-        this.form.show = false;
-        this.resetForm();
-        this.fetchOvertimeSchedule(this.query);
-        this.$message({
-          type:"success",
-          message: "You have successfully created a schedule."
-        });
-      }
-      if(fail){
-        this.table_config.loader = false;
-        this.form.confirm = false;
-        this.$message({
-          type:"error",
-          message: "There is a problem in creating the schedule."
-        });
-      }
-    },
-    updateOvertimeScheduleState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true;
-        this.form.confirm = true;
-      }
-      if(success){
-        this.table_config.loader = false;
-        this.form.confirm = false;
-        this.query.offset = 0;
-        this.form.show = false;
-        this.resetForm();
-        this.fetchOvertimeSchedule(this.query);
-        this.$message({
-          type:"success",
-          message: "You have successfully updated a schedule."
-        });
-      }
-      if(fail){
-        this.table_config.loader = false;
-        this.form.confirm = false;
-        this.$message({
-          type:"error",
-          message: "There is a problem in updating the schedule."
-        });
-      }
-    },
-    deleteOvertimeScheduleState({initial,success,fail}){
-      if(initial){
-        this.table_config.loader = true;
-      }
-      if(success){
-        this.table_config.loader = false;
-        this.query.offset = 0;
-        this.fetchOvertimeSchedule(this.query);
-        this.$message({
-          type:"success",
-          message: "You have successfully deleted a status."
-        });
-      }
-      if(fail){
-        this.table_config.loader = false;
-        this.$message({
-          type:"error",
-          message: "There is a problem in deleting the status."
-        });
-      }
-    }
   },
   methods: {
-    ...mapActions(["fetchOvertimeSchedule","searchOvertimeSchedule","createOvertimeSchedule","updateOvertimeSchedule","deleteOvertimeSchedule","fetchVtoList"]),
+    ...mapActions(["fetchVtoList","fetchAgents"]),
     previewSched(data){
       const otId = data.id
       this.$router.push({path:`/overtime_agents/${otId}`})
@@ -331,29 +219,53 @@ export default {
       }
     },
     submitForm() {
-        let data = this.form.model;
-      if (this.form.action == "Create") {
-        if(moment(moment(data.start_event).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
-          this.$message({
-            type:"warning",
-            message:"Please enter future dates.",
-            duration:5000
-          })
-        }else{
-          data.id = null;
-          this.createOvertimeSchedule(data)
+      let field = this.form.field;
+      this.form.confirm = true;
+      if(field.agents.length > 0 && field.vto_at!=""){
+        this.loopCreateVto();
+      }else{
+        this.form.confirm=false;
+        this.$message({
+          type:"warning",
+          message:"Please fill all fields.",
+          duration:5000
+        })
+      }
+    },
+    loopCreateVto(){
+      let field = this.form.field,
+      url="api/v1/schedules/vto/create",
+      options={
+        headers:{
+          Authorization: "Bearer "+ this.token
         }
+      };
+      this.form.report.arr_length = field.agents.length;
+      this.form.report.dialog = true;
+
+      field.agents.forEach(((v,i)=>{
+        let formData = new FormData;
+        formData.append('agent',v);
+        formData.append('timestamp',moment(field.vto_at).format("YYYY-MM-DD HH:mm:ss"))
+        axios.post(url,formData,options).then(res=>{
+          this.form.report.loop_index = i+1;
+          this.form.report.progress = this.form.report.arr_length/this.form.report.loop_index;
+          if(res.data.code == 200){
+            this.form.report.data.all.push({full_name: res.data.parameters.agent});
+          }
+        }).catch(err=>console.log(err.response.data.title));
+      }).bind(this));
+    },
+    remoteAgent(query) {
+      const data = {}
+      if (query !== '') {
+        data['target[]'] = 'full_name'
+        data.query = query
+        this.fetchAgents({ data })
       } else {
-        data.id = this.form.update_id;
-        if(this.ongoing(data.start_event,data.end_event) || moment(moment(data.end_event).format("YYYY-MM-DD HH:mm:ss")).isBefore(moment().format("YYYY-MM-DD HH:mm:ss"))){
-          this.$message({
-            type:"warning",
-            message: "You cannot update/delete ongoing or past schedules.",
-            duration:5000
-          });
-        }else{
-          this.updateOvertimeSchedule(data)
-        }
+        data['target[]'] = ''
+        data.query = ''
+        this.fetchAgents({ data })
       }
     },
     updateRow(row) {
