@@ -5,7 +5,7 @@
     <!-- Search and Pagination -->
     <el-row>
       <el-col :md="{span:8}">
-        <el-date-picker type="date" size="mini" v-model="searchQuery" placeholder="Select date..."></el-date-picker>
+        <el-date-picker type="date" size="mini" v-model="query.start_date" placeholder="Select date..."></el-date-picker>
       </el-col>
     </el-row>
 
@@ -80,8 +80,8 @@ export default {
         // order:"desc",
         // sort:"created_at",
         tl:true,
-        start_date:moment().startOf("day").format("YYYY-MM-DD HH:mm:ss"),
-        end_date:moment().endOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        start_date:null,
+        end_date:null,
       },
       form: {
         show: false,
@@ -99,9 +99,15 @@ export default {
     ...mapGetters(["fetchWorkForceState","fetchWorkForceData","fetchWorkForceError"])
   },
   created() {
+    this.query.start_date = moment().startOf("day").format("YYYY-MM-DD HH:mm:ss");
     this.fetchWorkForce(this.query);
   },
   watch:{
+    "query.start_date":function(v){
+      this.query.start_date = moment(v).startOf('day').format("YYYY-MM-DD HH:mm:ss")
+      this.query.end_date = moment(v).endOf('day').format("YYYY-MM-DD HH:mm:ss");
+      this.fetchWorkForce(this.query);
+    },
     fetchWorkForceState({initial,success,fail}){
       if(initial){
         this.table_config.loader=true;

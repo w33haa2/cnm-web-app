@@ -33,7 +33,7 @@
       </el-col>
       <el-col :md="{span:12}">
         <el-tooltip placement="top" content="Print selected week approved list.">
-          <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Print Approved</el-button>
+          <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
         </el-tooltip>
       </el-col>
       <el-col :md="{span:24}">

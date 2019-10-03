@@ -452,8 +452,16 @@ const api = {
             $url: "list",
             $method: "GET"
           },
+          search:{
+            $url: "search",
+            $method: "GET"
+          },
           create: {
             $url: "create",
+            $method: "POST"
+          },
+          cancel: {
+            $url: "create/revert",
             $method: "POST"
           },
           update: {

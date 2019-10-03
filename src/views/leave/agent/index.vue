@@ -20,8 +20,8 @@
         <!-- <el-col :md="{span:6}">
         <el-calendar v-model="calendar.today"></el-calendar>
         </el-col>-->
-        <el-col :md="{span:6}">
-          <el-row>
+        <!-- <el-col :md="{span:6}"> -->
+          <!-- <el-row>
             <el-col>
               <div style="margin-bottom:10px;">
                 <el-button
@@ -75,10 +75,10 @@
                 />
               </div>
             </el-col>
-          </el-row>
+          </el-row> -->
           <!-- <calendar :view="'month'" style="height:800px"/> -->
-        </el-col>
-        <el-col :md="{span:18}" style="padding-left: 20px">
+        <!-- </el-col> -->
+        <el-col :md="{span:24}" style="padding-left: 20px">
           <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
         </el-col>
       </el-row>

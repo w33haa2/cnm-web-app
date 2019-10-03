@@ -1207,7 +1207,7 @@ export default {
                 'HH:mm:ss'
               ).diff(moment().startOf('day'), 'seconds')
               // alert(v1+" "+start+" "+duration)
-              alert(start + ' ' + duration)
+              // alert(start + ' ' + duration)
               data.push({
                 user_id: v,
                 tl_id: form.teamLeader,

@@ -249,5 +249,17 @@ const getters = {
   createVtoState: state => state.create_vto.state,
   createVtoData: state => state.create_vto.data,
   createVtoError: state => state.create_vto.errors,
+  // fetch_vto_list
+  fetchVtoListState: state => state.fetch_vto_list.state,
+  fetchVtoListData: state => state.fetch_vto_list.data,
+  fetchVtoListError: state => state.fetch_vto_list.errors,
+  // fetch_vto
+  fetchVtoState: state => state.fetch_vto.state,
+  fetchVtoData: state => state.fetch_vto.data,
+  fetchVtoError: state => state.fetch_vto.errors,
+  // cancel_vto
+  cancelVtoState: state => state.cancel_vto.state,
+  cancelVtoData: state => state.cancel_vto.data,
+  cancelVtoError: state => state.cancel_vto.errors,
 };
 export default getters;

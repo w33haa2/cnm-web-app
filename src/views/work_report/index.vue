@@ -21,8 +21,12 @@
           <agent-card :stat="summary" :month="work_report.month"></agent-card>
         </el-col>
         <el-col :md="{span:18}" style="padding-left:30px;">
-          <el-row style="margin-bottom:10px;">
+          <!-- <el-row style="margin-bottom:10px;">
             <el-col>
+            </el-col>
+          </el-row> -->
+          <el-card style="padding-bottom:15px;">
+            <el-col class="header" :md="{span:12}">
               <el-date-picker
                 type="month"
                 size="mini"
@@ -31,9 +35,6 @@
                 :clearable="false"
               ></el-date-picker>
             </el-col>
-          </el-row>
-          <el-card style="padding-bottom:15px;">
-            <el-col class="header" :md="{span:12}">{{ formatDate(work_report.month,"", " MMMM YYYY") }}</el-col>
             <el-col :md="{span:12}">
               <span style="float:right">
                 <template v-if="work_report.grid_data.length>1">
@@ -97,10 +98,24 @@
                 <el-col :md="{span:5}">
                   <div class="label">
                     <small>ATTENDANCE
-                      <template v-if="datum.overtime_id">
-                        <small v-if="datum.approved_by" style="padding:2px;background-color:#67C23A;color:white;">APPROVED</small>
-                        <small v-else style="padding:2px;background-color:#F56C6C;color:white;">NOT APPROVED</small>
+                      <template v-if="datum.remarks.toLowerCase() == 'on-leave'">
+                        <span >
+                          <small style="padding:2px;background-color:#E6A23C;color:white">
+                            {{ leave_label[datum.leave.leave_type.toLowerCase()].toUpperCase() }}
+                          </small>
+                        </span>
                       </template>
+                      <template v-else>
+                        <span>
+                          <small  :style="'padding:2px;background-color:'+tag[datum.remarks.toLowerCase()].bc+';color:'+tag[datum.remarks.toLowerCase()].fc">
+                            {{ datum.remarks.toUpperCase() }}
+                          </small>
+                        </span>
+                      </template>
+                      <!-- <template v-else>
+                        <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
+                        <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
+                      </template> -->
                     </small>
                   </div>
                   <div class="text" v-if="datum.remarks == 'Present'">
@@ -130,7 +145,7 @@
                     <el-progress :percentage="datum.conformance | toFix" color="#6f7ad3"></el-progress>
                   </div>
                 </el-col>
-                <el-col :md="{span:6}">
+                <!-- <el-col :md="{span:6}">
                   <div class="label">
                     <small>STATUS</small>
                   </div>
@@ -141,7 +156,7 @@
                       <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
                     </template>
                   </div>
-                </el-col>
+                </el-col> -->
               </el-row>
             </el-col>
           </el-card>
@@ -156,11 +171,43 @@ import agentCard from "./components/AgentCard";
 import logger from "../time_logger";
 import moment from "moment";
 import { mapActions, mapGetters } from "vuex";
+
 export default {
   name: "AgentWorkReports",
   components: { agentCard, logger },
   data() {
     return {
+      tag:{
+        present:{
+          bc:"#67C23A",fc:"white",label:"PRESENT"
+        },
+        off:{
+          bc:"#EBEEF5",fc:"#909399",label:"OFF"
+        },
+        upcoming:{
+          bc:"#0072ff",fc:"white",label:"UPCOMING"
+        },
+        ncns:{
+          bc:"#F56C6C",fc:"white",label:"NCNS"
+        },
+        absent:{
+          bc:"#909399",fc:"white",label:"ABSENT"
+        },
+        inactive:{
+          bc:"#000000",fc:"white",label:"INACTIVE"
+        }
+      },
+      leave_label:{
+        "vacation_leave":"vacation",
+        "sick_leave":"sick",
+        "leave_of_absence":"LOA",
+        "maternity_leave":"maternity",
+        "paternity_leave":"paternity",
+        "bereavement_leave":"bereavement",
+        solo_parent_leave:"solo parent",
+        "vawc":"vawc",
+        "magna_carta_leave":"magna carta",
+      },
       containerLoader: true,
       show_fetch_error: false,
       show_report: false,

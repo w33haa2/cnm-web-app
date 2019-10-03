@@ -195,7 +195,7 @@ export const asyncRoutes = [
                name: "Work Force",
                meta: {
                  title: "Work Force",
-                 icon: "calendar-check",
+                 icon: "work-force",
                  noCache:false
                }
              }
@@ -317,7 +317,7 @@ export const asyncRoutes = [
                meta: {
                  title: "Agent VTO",
                  noCache: false,
-                  icon: "calendar-slots"
+                  icon: "vto"
 
                }
              },

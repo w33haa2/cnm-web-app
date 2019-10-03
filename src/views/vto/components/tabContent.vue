@@ -1,28 +1,5 @@
 <template>
-  <div class="tab-content-container">
-    <div class="header">
-      <el-row style="margin-bottom:10px;">
-        <el-col :md="{span:4}">
-          <el-input size="mini" placeholder="Search..."></el-input>
-        </el-col>
-        <el-col :md="{span:20}">
-          <el-pagination
-            style="float:right"
-            pager-count="4"
-            :page-sizes="[10,25,50]"
-            :page-size="table_config.display_size"
-            layout="total, sizes, prev, pager, next"
-            :total="table_config.count"
-            :current-page.sync="table_config.page"
-            @size-change="tableSizeChange"
-            @current-change="tablePageChange"
-            background
-            small
-          />
-        </el-col>
-      </el-row>
-    </div>
-    <div class="body" style="padding-left:20px;padding-right:20px;">
+  <div>
       <el-table :data="dummy" style="width:100%;" height="500px;" v-loading="table_config.loader">
         <el-table-column label="Agent" >
           <template slot-scope="scope">
@@ -56,7 +33,6 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
   </div>
 </template>
 
@@ -64,7 +40,6 @@
 import axios from "axios"
 import moment from "moment"
 export default {
-  props:["vtoat"],
   data(){
     return{
       table_config:{
