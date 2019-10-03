@@ -37,8 +37,8 @@
                 <h5 style="margin-bottom:5px;margin-top:8px;">Attendance</h5>
               </el-col>
               <el-col style="text-align:center">
-                <template v-if="popup.data.attendance.in.time">
-                  <div class="c-success">{{ popup.data.attendance.in.time }}</div>
+                <template v-if="schedule.time_in">
+                  <div class="c-success">{{ formatDate(schedule.time_in.date,"","MMM Do, YYYY hh:mm a") }}</div>
                 </template>
                 <template v-else>
                   <div class="c-grey">
@@ -47,8 +47,8 @@
                     </small>
                   </div>
                 </template>
-                <template v-if="popup.data.attendance.out.time">
-                  <div class="c-success">{{ popup.data.attendance.out.time }}</div>
+                <template v-if="schedule.time_out">
+                  <div class="c-success">{{ formatDate(schedule.time_out.date,"","MMM Do, YYYY hh:mm a") }}</div>
                 </template>
                 <template v-else>
                   <div class="c-grey">
@@ -64,34 +64,42 @@
                 <h5 style="margin-bottom:5px;margin-top:8px;">Voluntary Time Out</h5>
               </el-col>
               <el-col style="text-align:center">
-                <el-tag
-                  v-if="popup.data.attendance.has_vto"
+                <template v-if="schedule.vto_at">
+                  <span>{{ (schedule.vto_hours.second/60/60) + " hours" }}</span>
+                </template>
+                <template v-else>
+                  <span>NONE</span>
+                </template>
+                <!-- <el-tag
+                  v-if="schedule.vto_at"
                   effect="dark"
                   style="width:100%;text-align:center
                 "
-                >HAS VTO</el-tag>
+                ></el-tag>
                 <el-tag v-else style="width:100%;text-align:center
-                ">ADD VTO</el-tag>
+                ">ADD VTO</el-tag> -->
               </el-col>
             </template>
           </el-row>
-          <el-row style="margin-top:10px;">
-            <el-col v-if="tag.label=='ABSENT'" style="margin-top:5px;">
-              <el-button size="mini" type="danger" style="width:100%" @click="tagStatus(0)">TAG NCNS</el-button>
-            </el-col>
-            <el-col v-if="tag.label=='NCNS'" style="margin-top:5px;">
-              <el-button size="mini" type="info" style="width:100%" @click="tagStatus(1)">TAG ABSENT</el-button>
-            </el-col>
-            <el-col v-if="tag.label=='NCNS' || tag.label=='ABSENT'" style="margin-top:5px;">
-              <el-button size="mini" type="warning" style="width:100%" @click="tagSick">TAG SICK LEAVE</el-button>
-            </el-col>
-            <el-col v-if="tag.bc=='#E6A23C'" style="margin-top:5px;">
-              <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
-            </el-col>
-            <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
-              <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
-            </el-col>
-          </el-row>
+          <template v-if="isRTA()">
+            <el-row style="margin-top:10px;">
+              <el-col v-if="tag.label=='ABSENT'" style="margin-top:5px;">
+                <el-button size="mini" type="danger" style="width:100%" @click="tagStatus(0)">TAG NCNS</el-button>
+              </el-col>
+              <el-col v-if="tag.label=='NCNS'" style="margin-top:5px;">
+                <el-button size="mini" type="info" style="width:100%" @click="tagStatus(1)">TAG ABSENT</el-button>
+              </el-col>
+              <el-col v-if="tag.label=='NCNS' || tag.label=='ABSENT'" style="margin-top:5px;">
+                <el-button size="mini" type="warning" style="width:100%" @click="tagSick">TAG SICK LEAVE</el-button>
+              </el-col>
+              <el-col v-if="tag.bc=='#E6A23C'" style="margin-top:5px;">
+                <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
+              </el-col>
+              <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
+                <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
+              </el-col>
+            </el-row>
+          </template>
         </el-col>
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
@@ -216,7 +224,7 @@ export default {
     };
   },
   computed:{
-    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveData","cancelLeaveError"])
+    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveData","cancelLeaveError","position"])
   },
   watch: {
     schedule(v) {
@@ -349,6 +357,13 @@ export default {
         //   }
         // }
 
+      }
+    },
+    isRTA(){
+      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
+        return true;
+      }else{
+        return false;
       }
     }
   }

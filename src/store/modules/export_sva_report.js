@@ -68,7 +68,8 @@ const actions = {
    */
   exportSvaReport({ commit }, params) {
     const slug = "api.excel.export_sva";
-    STATE_API({ slug, params }, commit, [
+    const headers = {responseType:"blob"};
+    STATE_API({ slug, params, headers }, commit, [
       EXPORT_SVA_REPORT.initial,
       EXPORT_SVA_REPORT.success,
       EXPORT_SVA_REPORT.fail

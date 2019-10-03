@@ -221,6 +221,10 @@ const getters = {
   cancelLeaveState: state => state.cancel_leave.state,
   cancelLeaveData: state => state.cancel_leave.data,
   cancelLeaveError: state => state.cancel_leave.errors,
+  // reject_leave
+  rejectLeaveState: state => state.reject_leave.state,
+  rejectLeaveData: state => state.reject_leave.data,
+  rejectLeaveError: state => state.reject_leave.errors,
   // create_schedule
   createScheduleState: state => state.create_schedule.state,
   createScheduleData: state => state.create_schedule.data,

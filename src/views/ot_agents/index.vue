@@ -16,9 +16,12 @@
       <el-col :md="{span:4}">
         <el-button size="mini" @click="openApproveOtModal()">Approve Agent Overtime</el-button>
       </el-col>
-      <el-col :md="{span:4,offset:16}">
-        <el-button style="float:right" size="mini" @click="exportAgentOt()">Export</el-button>
-      </el-col>
+      <template v-if="isRTA()">
+
+        <el-col :md="{span:4,offset:16}">
+          <el-button style="float:right" size="mini" @click="exportAgentOt()">Export</el-button>
+        </el-col>
+      </template>
     </el-row>
       <el-tabs type="border-card" v-model="activeTab"  style="margin-top:10px;">
         <el-tab-pane v-for="(tab,index) in tabs" :key="index" :label="tab.label" :name="tab.name" >
@@ -300,6 +303,13 @@ export default {
         this.form.approve_ot.remote.loading = false;
         this.form.approve_ot.options.agents=[]
       });
+    },
+    isRTA(){
+      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
+        return true;
+      }else{
+        return false;
+      }
     }
   }
 };

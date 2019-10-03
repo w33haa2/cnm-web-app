@@ -186,7 +186,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Work Force",
            meta: {
-             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Team Leader","Operations Manager","Admin"]
+             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Admin"]
            },
            children: [
              {
@@ -225,7 +225,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Incident Reports",
            meta: {
-             roles: ["Representative - Order Placer"]
+             roles: ["Representative - Order Placer","IT Specialist","IT Support","RTA Analyst","Product Trainer",,"Maintenance Staff", "QA Assurance Analyst", "Payroll Assistant", "Accountant"]
            },
            children: [
              {
@@ -240,11 +240,41 @@ export const asyncRoutes = [
            ]
          },
          {
+          path: "incident_reports",
+          component: Layout,
+          redirect: "/incident_reports/recieved",
+          //  alwaysShow: true, // will always show the root menu
+          name: "Incident Reports",
+          meta: {
+            title: "Incident Reports",
+            icon: "documentation",
+            roles: ["Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
+          },
+          children: [
+            {
+              path: "/incident_reports/receive",
+              component: () => import("@/views/incident_reports/receive"),
+              name: "Receive",
+              meta: {
+                title: "Receive",
+              }
+            },
+            {
+              path: "/incident_reports/issue",
+              component: () => import("@/views/incident_reports/issue"),
+              name: "Issue",
+              meta: {
+                title: "Issue",
+              }
+            },
+          ]
+        },
+         {
            path: "/agent_schedules",
            component: Layout,
            name: "Agent Schedules",
            meta: {
-             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst"]
+             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst","HR Manager", "HR Assistant","Admin"]
            },
            children: [
              {
@@ -323,66 +353,6 @@ export const asyncRoutes = [
              },
            ]
          },
-
-         {
-           path: "/agent",
-           component: Layout,
-           // redirect: "/agent",
-           //  alwaysShow: true, // will always show the root menu
-           name: "Agent",
-           meta: {
-             title: "Agent",
-             icon: "agent-headset",
-             roles: ["Admin"] // you can set roles in root nav
-           },
-           children: [
-             {
-               path: "/agent/schedule",
-               component: () => import("@/views/schedule/index"),
-               name: "Agent Schedules",
-               meta: {
-                 title: "Agent Schedules",
-               }
-             },
-            //  {
-            //    path: "/agent/leave",
-            //    component: () => import("@/views/leave/index"),
-            //    name: "Agent Leave",
-            //    meta: {
-            //      title: "Agent Leave",
-            //      noCache:false
-            //      // if do not set roles, means: this page does not requireincident_report
-            //    }
-            //  },
-             {
-               path: "/agent/work_reports",
-               component: () => import("@/views/work_report/index"),
-               name: "Agent Work Reports",
-               meta: {
-                 title: "Agent Work Reports"
-                 // if do not set roles, means: this page does not requireincident_report
-               }
-             },
-            // //  {
-            // //    path: "/agent/vto",
-            // //    component: () => import("@/views/vto"),
-            // //    name: "Agent VTO",
-            // //    meta: {
-            // //      title: "Agent VTO",
-            // //      noCache: false
-            // //    }
-            // //  },
-            //  {
-            //    path: "/agent/leave_slots",
-            //    component: () => import("@/views/leave/slots"),
-            //    name: "Agent Leave Slots",
-            //    meta: {
-            //      title: "Agent Leave Slots",
-            //      noCache: false
-            //    }
-            // }
-           ]
-         },
          {
            path: "action_logs",
            component: Layout,
@@ -414,7 +384,7 @@ export const asyncRoutes = [
                meta: {
                  title: "Overtime Schedules",
                  icon: "overtime-clock",
-                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager", "Team Leader"]
+                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
                }
              }
            ]
@@ -429,8 +399,9 @@ export const asyncRoutes = [
                component: () => import("@/views/ot_agents/index"),
                meta: {
                  noCache: false,
-                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager", "Team Leader"]
+                //  roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager", "Team Leader"],
                  //  roles: ["Admin", "HR Manager"]
+                 roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
                }
              }
            ]

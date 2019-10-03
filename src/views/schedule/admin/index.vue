@@ -54,34 +54,36 @@
         </el-col>
       </el-row>
 
-      <el-row>
+      <el-row v-if="isRTA() || isHR()">
         <el-col :md="{span:12}" style="margin-top:10px">
           <el-button-group>
             <!--            v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"-->
             <template
-              v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"
+              v-if="isRTA()"
             >
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
             </template>
             <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
-            <!-- <template v-if="position=='HR Manager' || position=='HR Assistant'"> -->
+            <template v-if="isHR()">
               <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
-            <!-- </template> -->
+            </template>
           </el-button-group>
         </el-col>
         <el-col :md="{span:12}" style="margin-top:10px">
-          <div style="float:right">
-            <el-dropdown @command="handleCommand">
-              <el-button type="success" :plain="true" size="mini">
-                Excel
-                <i class="el-icon-arrow-down el-icon--right" />
-              </el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
-                <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </div>
+          <template v-if="isRTA()">
+            <div style="float:right">
+              <el-dropdown @command="handleCommand">
+                <el-button type="success" :plain="true" size="mini">
+                  Excel
+                  <i class="el-icon-arrow-down el-icon--right" />
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
+                    <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
+          </template>
         </el-col>
         <input
           type="file"
@@ -987,8 +989,33 @@ export default {
       'createSchedule',
       'excelToArraySchedule',
       'exportEmployeeTemplate',
-      "exportSvaReport"
     ]),
+    exportSvaReport(){
+      let url = "api/v1/excel/export_sva?start_date="+this.excel.export_sva.model.start+"&end_date="+this.excel.export_sva.model.end,
+        formData = new FormData(),
+        options = {
+          responseType: "blob",
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+      axios.get(url,options).then(res => {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        console.log(res);
+        var // json = JSON.stringify(res.data),
+          blob = new Blob([res.data], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }),
+          url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+    },
     generateSvaReport(){
       let query = this.excel.export_sva.model,
         url = 'api/v1/schedules/work/report?start='+query.start+"&end="+query.end,
@@ -1566,6 +1593,20 @@ export default {
         data['target[]'] = ''
         data.query = ''
         this.fetchAgents({ data })
+      }
+    },
+    isRTA(){
+      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
+        return true;
+      }else{
+        return false;
+      }
+    },
+    isHR(){
+      if(this.position.toLowerCase() == "hr manager" || this.position.toLowerCase() == "hr assistant"){
+        return true;
+      }else{
+        return false;
       }
     }
   }

@@ -700,7 +700,7 @@ const api = {
           },
           export_sva: {
             $url: "export_sva",
-            $method: "POST"
+            $method: "GET"
           }
         }
       }

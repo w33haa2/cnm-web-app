@@ -2,7 +2,7 @@
   <div class="app-container">
     <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
-      <el-col :md="{span:4}" style="padding-right:5px;">
+      <el-col :md="{span:4}" style="padding-right:5px;margin-bottom:10px;">
         <el-tooltip placement="top" content="Select week...">
           <el-date-picker
             v-model="query.created_at_start"
@@ -24,22 +24,24 @@
           </el-select>
         </el-tooltip>
       </el-col>
-      <el-col :md="{span:4}">
+      <!-- <el-col :md="{span:4}">
         <el-tooltip placement="top" content="Select Team Leader...">
           <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_tl" :disabled="disable_tl_select">
             <el-option v-for="(option, index) in options.teamLeader" :key="index" :value="option.value" :label="option.label" />
           </el-select>
         </el-tooltip>
-      </el-col>
-      <el-col :md="{span:12}">
-        <el-tooltip placement="top" content="Print selected week approved list.">
-          <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
-        </el-tooltip>
-      </el-col>
+      </el-col> -->
+      <template v-if="isRTA()">
+        <el-col :md="{span:12}">
+          <el-tooltip placement="top" content="Print selected week approved list.">
+            <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
+          </el-tooltip>
+        </el-col>
+      </template>
       <el-col :md="{span:24}">
         <el-tabs v-model="query.activeTab" type="border-card">
           <el-tab-pane :label="tab.label" :name="tab.name" v-for="(tab,index) in tabs" :key="index">
-            <leave-table :status="tab.name" @on-update="leaveForm" :data="to_query" />
+            <leave-table :status="tab.name" @on-update="leaveForm" :data="to_query" :refresh="refresh_table"/>
           </el-tab-pane>
         </el-tabs>
       </el-col>
@@ -55,10 +57,11 @@ import leaveTable from "./components/leaveTable";
 export default {
   components: { leaveTable },
   computed:{
-    ...mapGetters(["position","token","deleteSingleScheduleState","deleteSingleScheduleData","deleteSingleScheduleError"])
+    ...mapGetters(["position","token","leaves","leavesfetchState","approveLeaveState","approveLeaveData","approveLeaveError","rejectLeaveState","rejectLeaveData","rejectLeaveError","cancelLeaveState","cancelLeaveData","cancelLeaveError"])
   },
   data() {
     return {
+      refresh_table:false,
       list:{
         teamLeader:[]
       },
@@ -86,6 +89,12 @@ export default {
     };
   },
   created(){
+
+    if(!this.isOperations()){
+      this.getOperationsManager()
+    }
+
+
     if(this.isOperations()){
       this.disable_tl_select = false;
     }else{
@@ -93,32 +102,14 @@ export default {
     }
     this.weekChange(moment().startOf('isoweek'))
   },
-  mounted(){
-    this.getTeamLeaders()
-    this.getOperationsManager()
-  },
   watch:{
-    deleteSingleScheduleState({initial,success,fail}){
-      if(success){
-        this.weekChange(this.query.created_at_start)
-        this.$message({
-          type:"success",
-          message:"You have successfully deleted a schedule.",
-          duration:5000
-        })
-      }
-
-      if(fail){
-        this.$message({
-          type:"error",
-          message:this.deleteSingleScheduleError,
-          duration:5000
-        })
-      }
+    leavesfetchState({initial,success,fail}){
+      if(success){}
     },
     approveLeaveState({initial,success,fail}){
       if(success){
-        this.weekChange(this.query.created_at_start)
+        // this.weekChange(this.query.created_at_start)
+        this.refresh_table = !this.refresh_table;
         this.$message({
           type:"success",
           message:"Leave is approved!",
@@ -129,6 +120,42 @@ export default {
         this.$message({
           type:"error",
           message:this.approveLeaveError,
+          duration:5000
+        });
+      }
+    },
+    cancelLeaveState({initial,success,fail}){
+      if(success){
+        // this.weekChange(this.query.created_at_start)
+        this.refresh_table = !this.refresh_table;
+        this.$message({
+          type:"success",
+          message:"Leave is cancelled!",
+          duration:5000
+        });
+      }
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.cancelLeaveError,
+          duration:5000
+        });
+      }
+    },
+    rejectLeaveState({initial,success,fail}){
+      if(success){
+        // this.weekChange(this.query.created_at_start)
+        this.refresh_table = !this.refresh_table;
+        this.$message({
+          type:"success",
+          message:"Leave is rejected!",
+          duration:5000
+        });
+      }
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.rejectLeaveError,
           duration:5000
         });
       }
@@ -189,7 +216,6 @@ export default {
     },
     "query.filter_om":function(v){
       if(!this.isOperations()){
-          this.getTeamLeaders();
         if(v=='all'){
           this.disable_tl_select = true;
           this.query.filter_tl = 'all';
@@ -292,24 +318,6 @@ export default {
         window.URL.revokeObjectURL(url);
       });
     },
-    getTeamLeaders(){
-      let url = "api/v1/users?tl=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      axios.get(url,options).then(res=>{
-        console.log(res);
-        this.options.teamLeader = res.data.meta.metadata.map(i=>({value:i.id,label:i.full_name}));
-        this.list.teamLeader = res.data.meta.metadata;
-        this.options.teamLeader.unshift({value:"all", label:"All"})
-        this.query.filter_tl = "all";
-      }).catch(err=>{
-        console.log(err.response.data)
-        this.options.teamLeader = [];
-      })
-    },
     getOperationsManager(){
       let url = "api/v1/users?om=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,
         options = {
@@ -329,6 +337,13 @@ export default {
     },
     isOperations(){
       if(this.position.toLowerCase() == "operations manager" || this.position.toLowerCase() == "team leader"){
+        return true;
+      }else{
+        return false;
+      }
+    },
+    isRTA(){
+      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
         return true;
       }else{
         return false;

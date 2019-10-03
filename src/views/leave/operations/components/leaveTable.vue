@@ -82,7 +82,7 @@
                       style="width:100%"
                         :plain="true"
                         size="mini"
-                        @click="rejectLeave({id: scope.row.id,om_id:query.om_id})"
+                        @click="rejectLeaveRow({id: scope.row.id,om_id:query.om_id})"
                         type="info"
                       >Decline</el-button>
                     </el-col>
@@ -90,7 +90,7 @@
                 </template>
               </el-table-column>
             </template>
-            <template v-if="status == 'approved'">
+            <!-- <template v-if="status == 'approved'">
               <el-table-column align="center" label="Action" width="100">
                 <template slot-scope="scope">
                   <el-row>
@@ -98,7 +98,7 @@
                       <el-button
                         :plain="true"
                         size="mini"
-                        @click="cancelLeave({id: scope.row.id, cancel_event: scope.row.start_event})"
+                        @click="cancelLeaveRow({id: scope.row.id, cancel_event: scope.row.start_event})"
                         type="info"
                         style="width:100%"
                       >Cancel</el-button>
@@ -106,7 +106,7 @@
                   </el-row>
                 </template>
               </el-table-column>
-            </template>
+            </template> -->
           </template>
         </el-table>
       </el-col>
@@ -124,7 +124,7 @@ const tag = {
 }
 export default {
   name: "Leave_Tables",
-  props: ["status", "data"],
+  props: ["status", "data","refresh"],
   data() {
     return {
       tableData: {},
@@ -144,16 +144,57 @@ export default {
   },
   mounted() {
     if(this.isOperations()){
+      this.query.allowed_access=17
       if(this.position.toLowerCase() == "operations manager"){
         this.query.om_id = this.user_id
-        this.query.allowed_access=17
       }else if(this.position.toLowerCase() == "team leader"){
         this.query.om_id = this.head_id
-        delete this.query.allowed_access;
       }
     }
   },
   watch: {
+    refresh(v){
+      if (this.data.activeTab == this.status) {
+        // clear previous query variables
+        delete this.query.status;
+        delete this.query.created_at_start;
+        delete this.query.created_at_end;
+        delete this.query.tl_id;
+        delete this.query.om_id;
+        // reassign query variables
+        this.query.status = this.data.activeTab;
+        this.query.created_at_start = moment(this.data.created_at_start).startOf('day').format("YYYY-MM-DD HH:mm:ss");
+        this.query.created_at_end = moment(this.data.created_at_end).endOf('day').format("YYYY-MM-DD HH:mm:ss");
+
+        if(this.isOperations()){
+          if(this.data.filter_tl=='all'){
+            if(this.position.toLowerCase() == "operations manager"){
+              this.query.om_id = this.user_id
+            }else if(this.position.toLowerCase() == "team leader"){
+              this.query.om_id = this.head_id
+            }
+          }else{
+            this.query.tl_id = this.data.filter_tl;
+          }
+        }else{
+          if(this.data.filter_om!='all'){
+            if(this.data.filter_tl=='all'){
+              this.query.om_id = this.data.filter_om;
+            }else{
+              this.query.tl_id = this.data.filter_tl;
+            }
+          }
+        }
+
+
+        this.tag = {
+          type:tag[this.data.activeTab.toUpperCase()],
+          label: this.data.activeTab.toUpperCase()
+        }
+
+        this.fetchLeave(this.query);
+      }
+    },
     data(v) {
       if (v.activeTab == this.status) {
         // clear previous query variables
@@ -215,6 +256,16 @@ export default {
       "cancelLeave",
       "rejectLeave"
     ]),
+    rejectLeaveRow(data){
+      if(confirm("Are you sure you want to decline request? This change will be permanent.")){
+        this.rejectLeave(data)
+      }
+    },
+    cancelLeaveRow(data){
+      if(confirm("Are you sure you want to cancel approved leave? This change will be permanent.")){
+        this.cancelLeave(data)
+      }
+    },
     isOperations(){
       if(this.position.toLowerCase() == "operations manager" || this.position.toLowerCase() == "team leader"){
         return true;

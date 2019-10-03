@@ -11,7 +11,7 @@ const IrRouter = {
   meta: {
     title: "Incident Reports",
     icon: "documentation",
-    roles: ["Admin", "HR Manager", "HR Assistant"] // you can set roles in root nav
+    roles: ["Admin", "HR Manager", "HR Assistant"]
   },
   children: [
     {
@@ -19,7 +19,8 @@ const IrRouter = {
       component: () => import("@/views/incident_reports/receive"),
       name: "Receive",
       meta: {
-        title: "Receive"
+        title: "Receive",
+        roles: ["Admin", "HR Manager", "HR Assistant","Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
       }
     },
     {
@@ -27,7 +28,8 @@ const IrRouter = {
       component: () => import("@/views/incident_reports/issue"),
       name: "Issue",
       meta: {
-        title: "Issue"
+        title: "Issue",
+        roles: ["Admin", "HR Manager", "HR Assistant","Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
       }
     },
     {
