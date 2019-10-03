@@ -697,6 +697,10 @@ const api = {
           multisheet: {
             $url: "create_multisheet_excel",
             $method: "GET"
+          },
+          export_sva: {
+            $url: "export_sva",
+            $method: "POST"
           }
         }
       }

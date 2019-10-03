@@ -101,7 +101,7 @@
         <span  :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">
           <span>{{ tag.label }}</span>
         </span>
-        <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span>
+        <!-- <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span> -->
       </span>
     </el-popover>
     <span v-else :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span>

@@ -154,6 +154,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[0].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[0].date)[index]"
@@ -178,6 +179,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[1].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[1].date)[index]"
@@ -202,6 +204,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[2].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[2].date)[index]"
@@ -226,6 +229,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[3].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[3].date)[index]"
@@ -250,6 +254,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[4].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[4].date)[index]"
@@ -274,6 +279,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[5].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[5].date)[index]"
@@ -298,6 +304,7 @@
                   v-for="(schedule,index) in plotSchedulePerDay(row.schedule,tableHeader[6].date)"
                 >
                   <cell-content
+                    v-if="schedule.overtime_id == null"
                     @refreshTable="refresh_table"
                     :key="index"
                     :schedule="plotSchedulePerDay(row.schedule,tableHeader[6].date)[index]"
@@ -521,7 +528,10 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="excel.export_sva.dialog=false">Cancel</el-button>
-          <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button>
+          <!-- frontend way of exporting sva -->
+          <!-- <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button> -->
+          <!-- backend way -->
+          <el-button type="danger" :loading="false" size="mini" @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})">Confirm</el-button>
         </span>
       </el-dialog>
 
@@ -635,10 +645,30 @@ export default {
       "cancelLeaveState",
       "deleteSingleScheduleData",
       "deleteSingleScheduleState",
-      "deleteSingleScheduleError"
+      "deleteSingleScheduleError",
+      "exportSvaReportData",
+      "exportSvaReportState",
+      "exportSvaReportError"
     ])
   },
   watch: {
+    exportSvaReportState({initial,success,fail}){
+      if(success){
+        // this.toExcel(this.exportSvaReportData);
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        var blob = new Blob([this.exportSvaReportData], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }),
+          url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    },
     deleteSingleScheduleState({initial,success,fail}){
 
       if(success){
@@ -956,7 +986,8 @@ export default {
       'createLeave',
       'createSchedule',
       'excelToArraySchedule',
-      'exportEmployeeTemplate'
+      'exportEmployeeTemplate',
+      "exportSvaReport"
     ]),
     generateSvaReport(){
       let query = this.excel.export_sva.model,

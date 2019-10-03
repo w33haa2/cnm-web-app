@@ -261,5 +261,9 @@ const getters = {
   cancelVtoState: state => state.cancel_vto.state,
   cancelVtoData: state => state.cancel_vto.data,
   cancelVtoError: state => state.cancel_vto.errors,
+  // export_sva_report
+  exportSvaReportState: state => state.export_sva_report.state,
+  exportSvaReportData: state => state.export_sva_report.data,
+  exportSvaReportError: state => state.export_sva_report.errors,
 };
 export default getters;
