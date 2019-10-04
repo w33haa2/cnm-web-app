@@ -144,6 +144,28 @@ export const asyncRoutes = [
          },
          IrRouter,
          {
+          path: "leave_credits",
+          component: Layout,
+          redirect: "/leave_credits",
+          //  alwaysShow: true, // will always show the root menu
+          name: "Leave Credits",
+          meta: {
+            title: "Leave Credits",
+            icon: "leave-credits",
+            // roles: ["Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
+          },
+          children: [
+            {
+              path: "/leave_credits",
+              component: () => import("@/views/leave_credits/index"),
+              meta: {
+                title: "Leave Credits",
+                noCache:false
+              }
+            },
+          ]
+        },
+         {
            path: "/schedules",
            component: Layout,
            name: "Schedules",

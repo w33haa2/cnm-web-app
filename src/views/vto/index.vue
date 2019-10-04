@@ -149,14 +149,11 @@
           type="border-card"
           style="margin-top:15px;margin-bottom:10px;"
         >
-          <el-tab-pane :label="'All: '+form.report.data.all.length" name="all">
+          <el-tab-pane :label="'Success: '+form.report.data.all.length" name="all">
             <el-table :data="form.report.data.all" height="350px">
               <el-table-column label="Name" width="350">
                 <template scope="scope">{{scope.row.full_name}}</template>
               </el-table-column>
-              <!-- <el-table-column label="Schedule" width="100">
-                <template scope="scope">{{+" To "+}}</template>
-              </el-table-column> -->
               <el-table-column label="Status">
                 <template scope="scope">
                   <template v-if="scope.row.status_code==200">
@@ -169,7 +166,7 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <el-tab-pane
+          <!-- <el-tab-pane
             :label="'Errors: ' +form.report.data.errors.length "
             name="errors"
           >
@@ -188,9 +185,9 @@
                 </template>
               </el-table-column>
             </el-table>
-          </el-tab-pane>
+          </el-tab-pane> -->
         </el-tabs>
-        <!-- <el-button size="mini" @click="closeCreateVtoReport" style="float:right">Close</el-button> -->
+        <el-button size="mini" @click="closeCreateVtoReport" style="float:right">Close</el-button>
       </div>
     </el-dialog>
   </div>
@@ -203,6 +200,7 @@ import moment from "moment"
 export default {
   data() {
     return {
+      refresh_table:false,
       filter:{
         options:{
           vto_list:[]
@@ -247,6 +245,7 @@ export default {
           arr_length:0,
           loop_index:0,
           progress:0,
+          active_tab:"all",
           data:{
             all:[],
             errors:[]
@@ -276,11 +275,13 @@ export default {
   watch:{
     cancelVtoState({initial,success,fail}){
       if(success){
+        this.filter.select.vto_list.model=[];
+        this.fetchVtoList();
         this.$message({
           type:"success",
           message:"You have successfully cancelled VTO.",
           duration:5000
-        })
+        });
       }
       if(fail){
         this.$message({
@@ -344,6 +345,14 @@ export default {
   },
   methods: {
     ...mapActions(["fetchVtoList","fetchAgents","fetchVto","cancelVto"]),
+    closeCreateVtoReport(){
+      if(this.form.report.progress==100){
+        this.form.report.dialog = false;
+        this.fetchVtoList();
+        this.form.confirm = false;
+        this.form.show = false;
+      }
+    },
     deleteVto(data){
       if(confirm("Are you sure you want to cancel this vto?")){
         this.cancelVto({schedules:[data.id]})
@@ -386,32 +395,29 @@ export default {
       this.form.report.dialog = true;
 
       field.agents.forEach(((v,i)=>{
-        let formData = new FormData,tmp_data={};
+        let formData = new FormData,tmp_arr=[];
         formData.append('agent',v);
         formData.append('timestamp',moment(field.vto_at).format("YYYY-MM-DD HH:mm:ss"))
         axios.post(url,formData,options).then(res=>{
+          let tmp_data={}
           this.form.report.loop_index = parseInt(i)+1;
           this.form.report.progress = (this.form.report.arr_length/this.form.report.loop_index)*100;
-          if(res.data.code == 200){
-            this.form.report.data.all.push({full_name: res.data.parameters.agent});
-          }
 
-          //   tmp_data.email = res.data.parameters.email;
-          //   tmp_data.status_code = res.status;
-          //   tmp_data.title = res.data.title;
-          //   tmp_arr.push(tmp_data);
-          //   this.excel.import.report.data.all.list = tmp_arr;
-          //   this.excel.import.report.data.errors.list = tmp_arr.filter(
-          //     i => i.status_code != 200
-          //   );
-          //   if (this.excel.import.loop_index == this.excel.import.arr_length) {
-          //     this.excel.import.importing = false;
-          //     this.weekChange(
-          //       moment(this.week.start)
-          //         .format('YYYY-MM-DD')
-          //     )
-          //   }
-        }).catch(err=>console.log(err.response.data.title));
+            tmp_data.full_name = res.data.meta[0].agent_schedule.user_info.full_name;
+            tmp_data.status_code = res.status;
+            tmp_data.title = res.data.title;
+            tmp_arr.push(tmp_data);
+            this.form.report.data.all = tmp_arr;
+            this.form.report.data.error = tmp_arr.filter(
+              i => i.status_code != 200
+            );
+        }).catch(err=>{
+          // if(err.response.data.title.toLowerCase()=="no schedule found"){
+            console.log(err.response.data)
+            this.form.report.loop_index = parseInt(i)+1;
+            this.form.report.progress = (this.form.report.arr_length/this.form.report.loop_index)*100;
+          // }
+        });
       }).bind(this));
     },
     remoteAgent(query) {

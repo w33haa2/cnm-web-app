@@ -333,12 +333,14 @@ export default {
           //   this.tag = tag["upcoming"]
           // }
         }else{
-          let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
-          if(moment(now).isBetween(hired_date,separation_date)){
-            this.tag = tag[schedule.remarks.toLowerCase()]
-          }
+          // let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          // separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
+          // now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
+          // if(moment(now).isBetween(hired_date,separation_date)){
+          //   this.tag = tag[schedule.remarks.toLowerCase()]
+          // }
+              this.tag = tag["inactive"];
+
         }
 
       } else {

@@ -27,53 +27,41 @@
       <el-table-column label="Agent">
         <template slot-scope="scope">
           <div class="user-block">
-          <img v-if="scope.row.user_info.image_url" class="img-circle" :src="scope.row.user_info.image_url">
+          <img v-if="scope.row.user.image_url" class="img-circle" :src="scope.row.user.image_url">
           <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
             <div
               style="align-self:center;width:100%;text-align:center;"
               class="text-point-eight-em"
             >
-            {{ getAvatarLetters(scope.row.user_info.firstname,scope.row.user_info.lastname) }}
+            {{ getAvatarLetters(scope.row.user.firstname,scope.row.user.lastname) }}
 
             </div>
           </div>
           <span>
-              {{ scope.row.user_info.full_name }}
+              {{ scope.row.user.full_name }}
           </span>
         </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Log">
+      <el-table-column align="center" label="Credits">
         <template slot-scope="scope">
-          <span>{{ formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span> -
-          <span v-if="scope.row.time_out.date">{{formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span>
-          <span v-else>ONGOING</span>
+          <span>{{ scope.row.value }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Conformance">
+      <el-table-column align="center" label="Action">
         <template slot-scope="scope">
-          <el-progress :percentage="scope.row.conformance | toFix" color="#6f7ad3"></el-progress>
+          <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
+            <i class="el-icon-edit-outline" />
+          </el-button>
+          <el-button :plain="true" size="mini" type="danger" @click="deleteRow(scope.row)">
+            <i class="el-icon-delete" />
+          </el-button>
         </template>
       </el-table-column>
-      <!-- <el-table-column align="center" label="Status" width="100">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.approved_by" type="success">Approved</el-tag>
-          <el-tag v-else type="warning">Pending</el-tag>
-        </template>
-      </el-table-column> -->
-      <template v-if="tabName=='approved'">
-        <el-table-column align="center" label="Approved" width="150">
-          <template slot-scope="scope">
-            <el-button size="mini" type="danger" @click="revertRow(scope.row)">
-              Remove
-            </el-button>
-          </template>
-        </el-table-column>
-      </template>
     </el-table>
 
     <!-- Create and Update Dialog -->
-    <el-dialog
+    <!-- <el-dialog
       :visible.sync="form.show"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -93,14 +81,13 @@
         <el-button @click="cancelForm" size="mini">Cancel</el-button>
         <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment"
-import axios from "axios"
 export default {
   props:['activeTab','tabName',"refresh"],
   data() {
@@ -118,7 +105,7 @@ export default {
         limit: 10,
         order:"desc",
         sort:"created_at",
-        status:"",
+        leave_type:""
       },
       filter:{
         om_id:null,
@@ -137,73 +124,90 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["token","position","head_id","user_id"])
+    ...mapGetters(["token","position","head_id","user_id","fetchLeaveCreditsState","fetchLeaveCreditsData","fetchLeaveCreditsError"])
   },
   watch:{
+    fetchLeaveCreditsState({initial,success,fail}){
+      if(this.tabName == this.activeTab){
+        if(initial){
+          this.table_config.loader = true;
+          this.table_config.count = 0;
+          this.table_config.data = [];
+        }
+        if(success){
+          this.table_config.loader = false;
+          this.table_config.count = this.fetchLeaveCreditsData.count;
+          this.table_config.data = this.fetchLeaveCreditsData.leave_credits;
+        }
+      }
+    },
     refresh(v){
       if(this.tabName == this.activeTab){
-        this.fetchOvertime();
+        this.fetchLeaveCredits(this.query);
       }
     },
     searchQuery(v){
       if(this.tabName == this.activeTab){
-        if(v!=""){
-          this.fetchOvertime();
-        }
+        // if(v!=""){
+        //   this.searchLeaveCredits(this.query);
+        // }else{
+        //   this.fetchLeaveCredits(this.query);
+        // }
       }
     },
     activeTab(v){
       if(this.tabName == v){
-        this.fetchOvertime();
+        this.query.leave_type = v;
+        this.fetchLeaveCredits(this.query);
       }
     }
   },
   methods: {
-    ...mapActions(["approveOvertimeSchedules","revertOvertimeSchedule"]),
+    ...mapActions(["fetchLeaveCredits"]),
     revertRow(data){
       this.revertOvertimeSchedule({schedules:[{id:data.id}]})
     },
-    fetchOvertime(){
-      this.table_config.loader = true;
-      let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort,
-      options = {
-        headers:{
-          Authorization: "Bearer "+ this.token
-        }
-      };
-      if(this.searchQuery!=""){
-        url+="&target[]=full_name&query="+this.searchQuery;
-      }
+    // fetchLeaveCredits(){
+    //   this.table_config.loader = true;
+    //   let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort,
+    //   options = {
+    //     headers:{
+    //       Authorization: "Bearer "+ this.token
+    //     }
+    //   };
+    //   if(this.searchQuery!=""){
+    //     url+="&target[]=full_name&query="+this.searchQuery;
+    //   }
 
-      if(this.activeTab=="approved"){
-        url+="&approved=true"
-      }else{
-        url+="&approved=false"
+    //   if(this.activeTab=="approved"){
+    //     url+="&approved=true"
+    //   }else{
+    //     url+="&approved=false"
 
-      }
-      axios.get(url,options).then(res => {
-        console.log(res.data.meta.agent_schedules)
-        this.table_config.loader = false;
-        this.table_config.data = res.data.meta.agent_schedules
-        this.table_config.count = res.data.meta.count
-        })
-      .catch(err=>{
-        this.table_config.loader = false;
-          this.table_config.data = []
-        this.$message({
-          type:"error",
-          message:err.response.data.title,
-          duration:5000
-        });
-      })
-    },
+    //   }
+    //   axios.get(url,options).then(res => {
+    //     console.log(res.data.meta.agent_schedules)
+    //     this.table_config.loader = false;
+    //     this.table_config.data = res.data.meta.agent_schedules
+    //     this.table_config.count = res.data.meta.count
+    //     })
+    //   .catch(err=>{
+    //     this.table_config.loader = false;
+    //       this.table_config.data = []
+    //     this.$message({
+    //       type:"error",
+    //       message:err.response.data.title,
+    //       duration:5000
+    //     });
+    //   })
+    // },
     tableSizeChange(value) {
       this.query.limit = value;
-      this.fetchOvertime() ;
+      this.fetchLeaveCredits() ;
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      this.fetchOvertime();
+      this.fetchLeaveCredits();
     }
   }
 };
