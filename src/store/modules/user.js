@@ -46,7 +46,6 @@ const state = {
     c_email: ls.get('token_info').c_email,
     contract: ls.get('token_info').contract
   },
-  avatar: '',
   introduction: '',
   userErrors: '',
   comrades: [],
@@ -141,6 +140,7 @@ const mutations = {
     }
     state.token = payload.meta.token.access_token
     state.userDetails.full_name = payload.meta.user.full_name
+    state.userDetails.image_url = payload.meta.user.info.image_url,
     state.userDetails.birth_date = payload.meta.user.info.birthdate
     state.userDetails.gender = payload.meta.user.info.gender
     state.userDetails.address = payload.meta.user.info.address
@@ -160,7 +160,6 @@ const mutations = {
         : 'N/A'
     state.userDetails.hired_date = payload.meta.user.info.hired_date
     state.userDetails.c_email = payload.meta.user.email
-    state.userDetails.image_url = payload.meta.user.info.image_url
     state.userDetails.firstname = payload.meta.user.info.firstname
     state.userDetails.middlename = payload.meta.user.info.middlename
     state.userDetails.lastname = payload.meta.user.info.lastname

@@ -5,7 +5,7 @@
         <el-col :md="{span:12}">
           <template v-if="today.ot.has_schedule">
             <template v-if="today.ot.joined">
-              <span style="color:#F56C6C;font-weight:600;cursor:default">Attending Overtime.</span>
+              <span style="color:#409EFF;font-weight:600;cursor:default">Attending Overtime.</span>
             </template>
             <template v-else>
               <el-button
@@ -146,7 +146,11 @@ export default {
   watch: {
     joinOvertimeScheduleState({ initial, success, fail }) {
       if (success) {
+        alert("You have successfully timed-in with the overtime schedule.")
         this.fetchAgentsTodayWork(this.today.query);
+      }
+      if(fail){
+        alert(this.joinOvertimeScheduleError);
       }
     },
     agentStartWorkfetchState({ initial, success, fail }) {
@@ -166,10 +170,19 @@ export default {
     todaysWorkfetchState({ initial, success, fail }) {
       if (success) {
         let schedule = this.todaysWork.agent_schedules[0].schedule;
+
         if (schedule.length > 0) {
-          let unfinished_work = schedule.filter((
+          let unfinished_work,ot_sched = schedule.filter(i=> i.overtime_id !== null);
+
+          unfinished_work = ot_sched.filter((
             i //1
-          ) => this.ongoing(i.start_event.date, i.end_event.date));
+          ) => this.ongoing(moment(i.start_event.date).subtract(10,'minutes').format("YYYY-MM-DD HH:mm:ss"), i.end_event.date));
+          if(unfinished_work.length==0){
+            unfinished_work = schedule.filter((
+              i //1
+            ) => this.ongoing(i.start_event.date, i.end_event.date));
+          }
+
           if (unfinished_work.length > 0) {
             this.today.ot.allowed = false;
             this.today.has_schedule = true;
@@ -270,11 +283,6 @@ export default {
   },
   mounted() {
     this.today.query.userid = this.user_id;
-
-    // let data = {
-    //   "target[]": "start_event",
-    //   query: moment().format("YYYY-MM-DD")
-    // };
     this.fetchAgentsTodayWork(this.today.query);
   },
   methods: {
@@ -352,8 +360,20 @@ export default {
       this.getchAgentsTodayWork();
     },
     joinOvertime() {
+      // this.today.schedule.leave.status=="approved"
       if (this.today.ot.allowed) {
-        this.joinOvertimeSchedule();
+        // confirm if 10mins before overtime start_event
+        if(this.today.ot.has_schedule){
+          let start10mins = moment(this.today.ot.schedule.start_event).subtract(10,"minutes").format("YYYY-MM-DD HH:mm:ss"), end = moment(this.today.ot.schedule.end_event).format("YYYY-MM-DD HH:mm:ss"), isBetweenAllowedTime = moment().isBetween(start10mins,end);
+          // alert(isBetweenAllowedTime);
+          if(isBetweenAllowedTime){
+            this.joinOvertimeSchedule();
+          }else{
+            alert(
+              "You're only allowed to start 10mins before the actual schedule."
+            );
+          }
+        }
       } else {
         this.$message({
           type: "warning",
@@ -388,11 +408,7 @@ export default {
         };
         if(this.today.schedule.leave!=null){
           if(this.today.schedule.leave.status=="approved"){
-            this.$message({
-              type:"warning",
-              message:'This schedule is under "ON-LEAVE" status. Please inform RTA group if you want start work.',
-              duration:"10000"
-            });
+            alert('This schedule is under "ON-LEAVE" status. Please inform RTA group if you wanted to start work.')
           }else{
             this.agentStartWork(data);
           }

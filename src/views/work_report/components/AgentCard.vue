@@ -7,7 +7,7 @@
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb
-          :image="avatar  ?  avatar : 'default.gif'"
+          :image="userDetails.image_url"
           :height="'100px'"
           :width="'100px'"
           :hoverable="false"
@@ -90,12 +90,14 @@ import { mapGetters } from "vuex";
 export default {
   props: ["stat", "month"],
   components: { PanThumb },
+  data(){
+    return{
+      image:null
+    }
+  },
   computed: {
-    ...mapGetters(["name", "position", "avatar"])
-  }
-  // mounted(){
-  //   this.getDetails();
-  // },
+    ...mapGetters(["name", "position", "userDetails"])
+  },
   // methods:{
   //   getDetails(){
 

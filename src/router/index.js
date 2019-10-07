@@ -152,7 +152,7 @@ export const asyncRoutes = [
           meta: {
             title: "Leave Credits",
             icon: "leave-credits",
-            // roles: ["Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
+            roles: ["Admin","HR Manager"]
           },
           children: [
             {

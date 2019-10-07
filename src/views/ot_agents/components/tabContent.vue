@@ -46,8 +46,8 @@
       <el-table-column align="center" label="Log">
         <template slot-scope="scope">
           <span>{{ formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span> -
-          <span v-if="scope.row.time_out.date">{{formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span>
-          <span v-else>ONGOING</span>
+          <span v-if="scope.row.time_out">{{formatDate(scope.row.time_in.date,"","MMM Do, YYYY hh:mm a")}}</span>
+          <span v-else style="color:#409EFF">ONGOING</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="Conformance">

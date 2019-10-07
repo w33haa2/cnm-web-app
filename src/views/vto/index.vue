@@ -55,16 +55,21 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="VTO Hours" align="center">
+        <el-table-column label="VTO Hours">
           <template slot-scope="scope">
             <span>{{scope.row.vto_hours.time}}</span>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="Credit spent" width="200px" align="center">
+        <el-table-column label="Rendered Hours">
           <template slot-scope="scope">
-            <span>{{scope.row.vto.spent_credits}}</span>
+            <span>{{ scope.row.rendered_hours.billable.second/60/60 +'hr/s'}}</span>
           </template>
-        </el-table-column> -->
+        </el-table-column>
+        <el-table-column label="Conformance">
+          <template slot-scope="scope">
+            <el-progress :percentage="scope.row.conformance | toFix" color="#6f7ad3"></el-progress>
+          </template>
+        </el-table-column>
         <el-table-column label="Remove" width="200px">
           <template slot-scope="scope">
             <el-button size="mini" type="danger" @click="deleteVto(scope.row)">Delete</el-button>
@@ -149,7 +154,7 @@
           type="border-card"
           style="margin-top:15px;margin-bottom:10px;"
         >
-          <el-tab-pane :label="'Success: '+form.report.data.all.length" name="all">
+          <el-tab-pane :label="'All: '+form.report.data.all.length" name="all">
             <el-table :data="form.report.data.all" height="350px">
               <el-table-column label="Name" width="350">
                 <template scope="scope">{{scope.row.full_name}}</template>
@@ -166,11 +171,11 @@
               </el-table-column>
             </el-table>
           </el-tab-pane>
-          <!-- <el-tab-pane
-            :label="'Errors: ' +form.report.data.errors.length "
+          <el-tab-pane
+            :label="'Errors: ' +form.report.data.all.filter(i=> i.status_code != 200).length "
             name="errors"
           >
-            <el-table :data="form.report.data.errors" height="350px">
+            <el-table :data="form.report.data.all.filter(i=> i.status_code != 200)" height="350px">
               <el-table-column label="Name" width="350">
                 <template scope="scope">{{scope.row.full_name}}</template>
               </el-table-column>
@@ -185,7 +190,7 @@
                 </template>
               </el-table-column>
             </el-table>
-          </el-tab-pane> -->
+          </el-tab-pane>
         </el-tabs>
         <el-button size="mini" @click="closeCreateVtoReport" style="float:right">Close</el-button>
       </div>
@@ -351,6 +356,12 @@ export default {
         this.fetchVtoList();
         this.form.confirm = false;
         this.form.show = false;
+        this.form.report.arr_length=0;
+        this.form.report.loop_index=0;
+        this.form.report.progress=0;
+        this.form.report.active_tab='all';
+        this.form.report.data.all =[];
+        this.form.report.data.errors =[];
       }
     },
     deleteVto(data){
@@ -384,7 +395,7 @@ export default {
       }
     },
     loopCreateVto(){
-      let field = this.form.field,
+      let field = this.form.field,tmp_arr=[],
       url="api/v1/schedules/vto/create",
       options={
         headers:{
@@ -395,28 +406,31 @@ export default {
       this.form.report.dialog = true;
 
       field.agents.forEach(((v,i)=>{
-        let formData = new FormData,tmp_arr=[];
+        let formData = new FormData,tmp_data={};
         formData.append('agent',v);
         formData.append('timestamp',moment(field.vto_at).format("YYYY-MM-DD HH:mm:ss"))
         axios.post(url,formData,options).then(res=>{
-          let tmp_data={}
-          this.form.report.loop_index = parseInt(i)+1;
-          this.form.report.progress = (this.form.report.arr_length/this.form.report.loop_index)*100;
-
-            tmp_data.full_name = res.data.meta[0].agent_schedule.user_info.full_name;
-            tmp_data.status_code = res.status;
-            tmp_data.title = res.data.title;
+          this.form.report.loop_index = this.form.report.loop_index+1;
+          tmp_data.full_name = res.data.meta.agent_schedule.user_info.full_name;
+          tmp_data.status_code = res.status;
+          tmp_data.title = res.data.title;
+          tmp_arr.push(tmp_data);
+          this.form.report.data.all = tmp_arr;
+          this.form.report.data.error = tmp_arr.filter(
+            i => i.status_code != 200
+          );
+          this.form.report.progress = (this.form.report.loop_index/this.form.report.arr_length)*100;
+        }).catch(err=>{
+            let res = err.response.data;
+            console.log(res)
+            this.form.report.loop_index = this.form.report.loop_index+1;
+            tmp_data.full_name = res.meta.agent_schedule.user_info.full_name;
+            tmp_data.status_code = res.code;
+            tmp_data.title = res.title;
             tmp_arr.push(tmp_data);
             this.form.report.data.all = tmp_arr;
-            this.form.report.data.error = tmp_arr.filter(
-              i => i.status_code != 200
-            );
-        }).catch(err=>{
-          // if(err.response.data.title.toLowerCase()=="no schedule found"){
-            console.log(err.response.data)
-            this.form.report.loop_index = parseInt(i)+1;
-            this.form.report.progress = (this.form.report.arr_length/this.form.report.loop_index)*100;
-          // }
+            this.form.report.progress = (this.form.report.loop_index/this.form.report.arr_length)*100;
+
         });
       }).bind(this));
     },

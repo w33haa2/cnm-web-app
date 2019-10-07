@@ -134,8 +134,8 @@
                   <div class="label">
                     <small>VTO</small>
                   </div>
-                  <el-tag v-if="datum.vto_at" type="primary" size="mini">TRUE</el-tag>
-                  <el-tag v-else type="info" size="mini">FALSE</el-tag>
+                  <el-tag v-if="datum.vto_at" type="primary" size="mini">{{ datum.vto_hours.second/60/60 +" hr/s" }}</el-tag>
+                  <el-tag v-else type="info" size="mini">0 hr/s</el-tag>
                 </el-col>
                 <el-col :md="{span:4}">
                   <div class="label">

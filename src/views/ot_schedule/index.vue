@@ -42,14 +42,22 @@
           <span v-if="ongoing(scope.row.start_event,scope.row.end_event)"><small style="color:#409EFF">ONGOING</small></span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="View" width="100">
+      <el-table-column align="center" label="Agents" width="100">
+        <template slot-scope="scope">
+          <span>{{ scope.row.schedules.length }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="View/Export" width="300">
         <template slot-scope="scope">
           <el-button :plain="true" size="mini" @click="previewSched(scope.row)">
             <i class="el-icon-view" />
           </el-button>
+          <el-button :plain="true" size="mini" @click="exportAgentOt(scope.row)">
+              <svg-icon icon-class="excel" />
+          </el-button>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="Action" width="300">
+      <el-table-column align="center" label="Update/Delete" width="300">
         <template slot-scope="scope">
           <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
             <i class="el-icon-edit-outline" />
@@ -89,6 +97,7 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment"
+import axios from "axios"
 export default {
   data() {
     return {
@@ -104,7 +113,8 @@ export default {
         offset: 0,
         limit: 10,
         order:"desc",
-        sort:"created_at"
+        sort:"created_at",
+        relations:['schedules']
       },
       form: {
         show: false,
@@ -119,7 +129,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["fetchOvertimeScheduleState","fetchOvertimeScheduleData","fetchOvertimeScheduleError","searchOvertimeScheduleState","searchOvertimeScheduleData","searchOvertimeScheduleError","createOvertimeScheduleState","createOvertimeScheduleData","createOvertimeScheduleError","updateOvertimeScheduleState","updateOvertimeScheduleData","updateOvertimeScheduleError","deleteOvertimeScheduleState","deleteOvertimeScheduleData","deleteOvertimeScheduleError"])
+    ...mapGetters(["token","fetchOvertimeScheduleState","fetchOvertimeScheduleData","fetchOvertimeScheduleError","searchOvertimeScheduleState","searchOvertimeScheduleData","searchOvertimeScheduleError","createOvertimeScheduleState","createOvertimeScheduleData","createOvertimeScheduleError","updateOvertimeScheduleState","updateOvertimeScheduleData","updateOvertimeScheduleError","deleteOvertimeScheduleState","deleteOvertimeScheduleData","deleteOvertimeScheduleError"])
   },
   created() {
     this.fetchOvertimeSchedule(this.query);
@@ -260,6 +270,58 @@ export default {
   },
   methods: {
     ...mapActions(["fetchOvertimeSchedule","searchOvertimeSchedule","createOvertimeSchedule","updateOvertimeSchedule","deleteOvertimeSchedule"]),
+    exportToExcel(data,filename) {
+      let url = "api/v1/excel/create_multisheet_excel",
+        options = {
+          responseType: "blob",
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        },
+        fd=new FormData;
+      fd.append("obj",JSON.stringify(data))
+      axios.post(url, fd, options).then(res => {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        var // json = JSON.stringify(res.data),
+          blob = new Blob([res.data], {
+            type:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          }),
+          url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = filename+".xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+    },
+     exportAgentOt(data){
+      let url="api/v1/schedules?overtime_id="+ data.id;
+      axios.get(url,{
+        headers:{
+          Authorization: "Bearer " + this.token,
+        }
+      }).then(res=>{
+        let result = res.data.meta.agent_schedules;
+        result = result.map(i=>([i.user_info.full_name,moment(i.time_in.date).format("YYYY-MM-DD hh:mm a"), i.time_out ? moment(i.time_out.date).format("YYYY-MM-DD hh:mm a"):'ongoing',i.conformance+"%"] ));
+        result.unshift([]);
+        result.unshift(["Agent","Time In", "Time Out", "Conformance"]);
+        result.unshift([]);
+        result.unshift(["Agent Overtime ("+data.start_event+" - "+data.end_event+")"]);
+        this.exportToExcel({content:[{
+          sheet_data:result,
+          sheet_name:"Agent Overtime"
+        }]},"Agent Overtime "+data.start_event+" - "+data.end_event)
+        console.log(result);
+      }).catch(err=>{
+        this.$message({
+          type:"error",
+          message:"There is a problem fetching your request.",
+          duration:5000
+        });
+      });
+    },
     previewSched(data){
       const otId = data.id
       this.$router.push({path:`/overtime_agents/${otId}`})
