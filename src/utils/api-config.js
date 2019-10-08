@@ -524,10 +524,6 @@ const api = {
             $url: "create",
             $method: "POST"
           },
-          bulk_create: {
-            $url: "create/agents",
-            $method: "POST"
-          },
           update: {
             $url: "update",
             $method: "POST",
@@ -604,6 +600,10 @@ const api = {
           },
           create: {
             $url: "create",
+            $method: "POST"
+          },
+          bulk_create: {
+            $url: "create/agents",
             $method: "POST"
           },
           update: {

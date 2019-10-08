@@ -168,7 +168,7 @@ const tag  = {
     bc:"#909399",fc:"white",label:"ABSENT"
   },
   "inactive":{
-    bc:"#000000",fc:"white",label:"INACTIVE"
+    bc:"rgb(143, 2, 2)",fc:"white",label:"INACTIVE"
   }
 }
 const leave_label = {
@@ -289,38 +289,6 @@ export default {
           // vto: schedule.vto_at
           vto: true
         };
-        // if (moment(schedule.start_event.date).isBefore(moment())) {
-        //   if (schedule.time_in) {
-        //     this.tag = colors["present"]
-        //   } else {
-        //     // ?leave?absent
-        //     if (schedule.leave_id) {
-        //       this.tag = {
-        //         type: "warning",
-        //         effect: "",
-        //         label: "LEAVE"
-        //       };
-        //     } else {
-        //       if (schedule.remarks == "NCNS") {
-        //         this.tag = colors["ncns"]
-        //       } else {
-        //         this.tag = {
-        //           type: "info",
-        //           effect: "dark",
-        //           label: "ABSENT"
-        //         };
-        //       }
-        //     }
-        //   }
-        // } else {
-        //   this.tag = {
-        //     type: "",
-        //     effect: "",
-        //     label: "WORK"
-        //   };
-        // }
-
-        // if active
         if(schedule.user_status.status == "active"){
           if(schedule.remarks.toLowerCase()=="on-leave" && schedule.leave.status=="approved"){
             this.tag.label = leave_label[schedule.leave.leave_type].toUpperCase()
@@ -329,36 +297,13 @@ export default {
           }else{
               this.tag = tag[schedule.remarks.toLowerCase()]
           }
-          // if(moment(moment(schedule.start_event.date).format("YYYY-MM-DD")).isBefore(moment(this.date).format("YYYY-MM-DD"))){
-          //   this.tag = tag["upcoming"]
-          // }
         }else{
-          // let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          // separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-          // now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
-          // if(moment(now).isBetween(hired_date,separation_date)){
-          //   this.tag = tag[schedule.remarks.toLowerCase()]
-          // }
               this.tag = tag["inactive"];
-
+              this.tag.label = schedule.user_status.type.toUpperCase()
         }
 
       } else {
-        // no schedule
         this.with_schedule = false;
-        // if(this.info.status == "active"){
-        //   this.tag = tag["off"]
-        // }else{
-        //   let hired_date = moment(moment(this.info.hired_date).startOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-        //   separation_date = moment(moment(this.info.separation_date).endOf("day")).format("YYYY-MM-DD HH:mm:ss"),
-        //   now = moment(moment(this.date).startOf("day")).format("YYYY-MM-DD HH:mm:ss");
-        //   if(!moment(now).isBetween(hired_date,separation_date)){
-        //     this.tag = tag['inactive'];
-        //   }else{
-        //     this.tag = tag['off'];
-        //   }
-        // }
-
       }
     },
     isRTA(){
@@ -381,5 +326,8 @@ export default {
 }
 .c-success {
   color: #13ce91;
+}
+.something{
+  color:rgb(143, 2, 2);
 }
 </style>

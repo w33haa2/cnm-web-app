@@ -519,7 +519,7 @@ export default {
         this.change_status.model.separation_date = null
       }else{
         this.change_status.model.hired_date = null
-        this.change_status.model.separation_date = this.change_status.form.date.format("YYYY-MM-DD")
+        this.change_status.model.separation_date = moment(this.change_status.form.date).format("YYYY-MM-DD")
       }
     },
     "change_status.form.employees": function(v) {

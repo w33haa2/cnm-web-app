@@ -13,7 +13,7 @@
         </el-select>
       </el-col> -->
       <el-col :md="{span:4}">
-        <el-button size="mini" @click="bulkCreditsCreate()">Create Agent Credits</el-button>
+        <el-button size="mini" @click="openCreateCreditsModal()">Create Agent Credits</el-button>
       </el-col>
     </el-row>
       <el-tabs type="border-card" v-model="activeTab"  style="margin-top:10px;">
@@ -23,63 +23,51 @@
       </el-tabs>
 
       <!-- Create and Update Dialog -->
-      <!-- <el-dialog
-        :visible.sync="form.approve_ot.dialog"
+      <el-dialog
+        :visible.sync="form.credits.dialog"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
-        title="Approve agent overtime"
+        title="Create Agent Credits."
         width="30%"
         top="5vh"
       >
         <el-row>
-          <el-col>
-            <label>Conformance</label>
+          <el-col style="margin-bottom:10px;">
+            <el-alert
+              title="This will only apply to new agents with no existing credits."
+              type="info"
+              show-icon>
+            </el-alert>
+          </el-col>
+          <el-col style="padding-bottom:5px;">
+            <label>Leave Type</label>
+            <el-select size="mini" v-model="form.credits.field.leave_type" style="width:100%;margin-top:5px;">
+              <el-option value="vacation_leave" label="Vacation Leave"/>
+              <el-option value="sick_leave" label="Sick Leave"/>
+            </el-select>
+          </el-col>
+          <el-col style="padding-bottom:5px;">
+            <label>Value</label>
             <el-input-number
-              v-model="form.approve_ot.field.conformance"
+              v-model="form.credits.field.value"
               size="mini"
               :max="100"
-              style="width:100%;padding-bottom:2px;margin-top:5px;"
+              style="width:100%;margin-top:5px;"
               class="form-input"
             />
           </el-col>
-          <el-col style="margin-top:8px;">
-            <label>Agents</label>
-            <el-select
-              v-model="form.approve_ot.field.agents"
-              class="form-input"
-              style="width:100%;padding-bottom:2px;margin-top:5px;"
-              size="mini"
-              multiple
-              filterable
-              remote
-              reserve-keyword
-              placeholder="Agents..."
-              :loading="form.approve_ot.remote.loading"
-              :remote-method="fetchOtAgents"
-            >
-              <el-option
-                v-for="(item,index) in form.approve_ot.options.agents"
-                :key="index"
-                :label="item.user_info.full_name"
-                :value="item.id"
-              />
-            </el-select>
-            <span
-              style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
-            >count: {{ form.approve_ot.field.agents.length }}</span>
-          </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="(form.approve_ot.dialog=false)">Cancel</el-button>
+          <el-button size="mini" @click="(form.credits.dialog=false)">Cancel</el-button>
           <el-button
             type="danger"
             size="mini"
-            :loading="form.approve_ot.confirm"
-            @click="submitApproveOtSchedules()"
-          >Confirm</el-button>
+            :loading="form.credits.confirm"
+            @click="bulkCreateLeaveCredits(form.credits.field)"
+s          >Confirm</el-button>
         </span>
-      </el-dialog> -->
+      </el-dialog>
   </div>
 </template>
 
@@ -103,21 +91,58 @@ export default {
           name:"sick_leave",
           label:"Sick"
         }
-      ]
+      ],
+      form:{
+        credits:{
+          dialog:false,
+          confirm:false,
+          field:{
+            value:0,
+            leave_type:null
+          }
+        }
+      }
     };
   },
   computed: {
-    ...mapGetters([])
+    ...mapGetters(["bulkCreateLeaveCreditsState","bulkCreateLeaveCreditsData","bulkCreateLeaveCreditsError","searchLeaveCreditsState","searchLeaveCreditsData","searchLeaveCreditsError"])
   },
   mounted() {
     this.activeTab = "vacation_leave"
   },
   watch:{
-    // create function
+    bulkCreateLeaveCreditsState({initial,success,fail}){
+      if(initial){
+        this.form.credits.confirm = true;
+      }
+      if(success){
+        this.form.credits.confirm = false
+        this.refresh_table = ! this.refresh_table;
+        this.$message({
+          type:"success",
+          message: "You have successfully initialized agents with no leave credits.",
+          duration: 5000
+        })
+      }
+      if(fail){
+        this.form.credits.confirm = false
+        this.$message({
+          type:"error",
+          message: "There is a problem processing your request.",
+          duration: 5000
+        })
+      }
+    }
   },
   methods: {
-    ...mapActions([]),
-
+    ...mapActions(["bulkCreateLeaveCredits"]),
+    openCreateCreditsModal(){
+      this.form.credits.field = {
+        value:0,
+        leave_type:'vacation_leave'
+      }
+      this.form.credits.dialog = true;
+    }
   }
 };
 </script>

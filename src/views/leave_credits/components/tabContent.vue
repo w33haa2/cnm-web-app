@@ -53,35 +53,33 @@
           <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
             <i class="el-icon-edit-outline" />
           </el-button>
-          <el-button :plain="true" size="mini" type="danger" @click="deleteRow(scope.row)">
+          <!-- <el-button :plain="true" size="mini" type="danger" @click="deleteRow(scope.row)">
             <i class="el-icon-delete" />
-          </el-button>
+          </el-button> -->
         </template>
       </el-table-column>
     </el-table>
 
     <!-- Create and Update Dialog -->
-    <!-- <el-dialog
-      :visible.sync="form.show"
+    <el-dialog
+      :visible.sync="form.credits.update.dialog"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      :title="form.action + ' Overtime Schedule'"
+      :title="form.credits.update.title"
       width="40%"
     >
       <el-row>
-        <el-col style="margin-bottom:10px;">
-          <label width="100%" >Schedule</label>
-        </el-col>
         <el-col>
-          <el-date-picker  style="width:100%" type="datetimerange" placeholder="Set schedule..." v-model="form.schedule" size="mini"></el-date-picker>
+          <label width="100%">Value</label>
+          <el-input-number  style="margin-top:5px;width:100%" size="mini" step="1" v-model="form.credits.update.model.value"></el-input-number>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
+        <el-button @click="cancelUpdateForm" size="mini">Cancel</el-button>
+        <el-button type="danger" @click="submitUpdateForm" size="mini" :loading="form.credits.update.confirm">Confirm</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -105,39 +103,94 @@ export default {
         limit: 10,
         order:"desc",
         sort:"created_at",
-        leave_type:""
+        leave_type:"",
+        'relations[]':'user'
       },
       filter:{
         om_id:null,
         tl_id:null
       },
       form: {
-        show: false,
-        action: "Create",
-        update_id:null,
-        schedule:null,
-        model:{
-          start_event:null,
-          end_event:null,
+        credits:{
+          update:{
+            dialog:false,
+            title:null,
+            confirm:false,
+            model:{
+              id:null,
+              value:0,
+            },
+          }
         }
       }
     };
   },
   computed: {
-    ...mapGetters(["token","position","head_id","user_id","fetchLeaveCreditsState","fetchLeaveCreditsData","fetchLeaveCreditsError"])
+    ...mapGetters(["token","position","head_id","user_id","fetchLeaveCreditsState","fetchLeaveCreditsData","fetchLeaveCreditsError","searchLeaveCreditsState","searchLeaveCreditsData","searchLeaveCreditsError","updateLeaveCreditsState","updateLeaveCreditsData","updateLeaveCreditsError"])
   },
   watch:{
     fetchLeaveCreditsState({initial,success,fail}){
       if(this.tabName == this.activeTab){
         if(initial){
           this.table_config.loader = true;
-          this.table_config.count = 0;
-          this.table_config.data = [];
         }
         if(success){
           this.table_config.loader = false;
           this.table_config.count = this.fetchLeaveCreditsData.count;
           this.table_config.data = this.fetchLeaveCreditsData.leave_credits;
+        }
+        if(fail){
+          this.table_config.loader = false;
+          this.$message({
+            type:"error",
+            message: "There is a problem processing your request.",
+            duration: 5000
+          });
+        }
+      }
+    },
+    searchLeaveCreditsState({initial,success,fail}){
+      if(this.tabName == this.activeTab){
+        if(initial){
+          this.table_config.loader = true;
+        }
+        if(success){
+          this.table_config.loader = false;
+          this.table_config.count = this.fetchLeaveCreditsData.count;
+          this.table_config.data = this.fetchLeaveCreditsData.leave_credits;
+        }
+        if(fail){
+          this.table_config.loader = false;
+          this.$message({
+            type:"error",
+            message: "There is a problem processing your request.",
+            duration: 5000
+          });
+        }
+      }
+    },
+    updateLeaveCreditsState({initial,success,fail}){
+      if(this.tabName == this.activeTab){
+        if(initial){
+          this.form.credits.update.confirm = true;
+        }
+        if(success){
+          this.form.credits.update.confirm = false;
+          this.form.credits.update.dialog = false;
+          this.fetchLeaveCredits(this.query);
+          this.$message({
+            type:"success",
+            message: "You have successfully updated leave credits.",
+            duration: 5000
+          });
+        }
+        if(fail){
+          this.form.credits.update.confirm = false;
+          this.$message({
+            type:"error",
+            message: "There is a problem processing your request.",
+            duration: 5000
+          });
         }
       }
     },
@@ -148,11 +201,15 @@ export default {
     },
     searchQuery(v){
       if(this.tabName == this.activeTab){
-        // if(v!=""){
-        //   this.searchLeaveCredits(this.query);
-        // }else{
-        //   this.fetchLeaveCredits(this.query);
-        // }
+        if(v!=""){
+          this.query["target[]"] = "full_name";
+          this.query["query"] = v;
+          this.searchLeaveCredits(this.query);
+        }else{
+          delete this.query['target[]'];
+          delete this.query['query'];
+          this.fetchLeaveCredits(this.query);
+        }
       }
     },
     activeTab(v){
@@ -163,51 +220,33 @@ export default {
     }
   },
   methods: {
-    ...mapActions(["fetchLeaveCredits"]),
-    revertRow(data){
-      this.revertOvertimeSchedule({schedules:[{id:data.id}]})
+    ...mapActions(["fetchLeaveCredits","searchLeaveCredits","updateLeaveCredits"]),
+    cancelUpdateForm(){
+      this.form.credits.update.dialog = false;
+      this.form.credits.update.title = null;
+      this.form.credits.update.confirm = false;
     },
-    // fetchLeaveCredits(){
-    //   this.table_config.loader = true;
-    //   let url = "api/v1/schedules?overtime_id="+ this.$route.params.id+"&offset="+this.query.offset+"&limit="+this.query.limit+"&order="+this.query.order+"&sort="+this.query.sort,
-    //   options = {
-    //     headers:{
-    //       Authorization: "Bearer "+ this.token
-    //     }
-    //   };
-    //   if(this.searchQuery!=""){
-    //     url+="&target[]=full_name&query="+this.searchQuery;
-    //   }
-
-    //   if(this.activeTab=="approved"){
-    //     url+="&approved=true"
-    //   }else{
-    //     url+="&approved=false"
-
-    //   }
-    //   axios.get(url,options).then(res => {
-    //     console.log(res.data.meta.agent_schedules)
-    //     this.table_config.loader = false;
-    //     this.table_config.data = res.data.meta.agent_schedules
-    //     this.table_config.count = res.data.meta.count
-    //     })
-    //   .catch(err=>{
-    //     this.table_config.loader = false;
-    //       this.table_config.data = []
-    //     this.$message({
-    //       type:"error",
-    //       message:err.response.data.title,
-    //       duration:5000
-    //     });
-    //   })
-    // },
+    submitUpdateForm(){
+      if(confirm("Are you sure you want to apply changes?")){
+        this.updateLeaveCredits(this.form.credits.update.model)
+      }
+    },
+    updateRow(data){
+      // this.revertOvertimeSchedule({schedules:[{id:data.id}]})
+      this.form.credits.update.dialog = true;
+      this.form.credits.update.title = "Updating "+ data.user.full_name+"'s "+this.remUnderscore(data.leave_type);
+      this.form.credits.update.confirm = false;
+      this.form.credits.update.model.id = data.id;
+      this.form.credits.update.model.value = 0;
+      // console.log(data)
+    },
     tableSizeChange(value) {
       this.query.limit = value;
-      this.fetchLeaveCredits() ;
+      this.fetchLeaveCredits(this.query) ;
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      this.fetchLeaveCredits();
+      this.fetchLeaveCredits(this.query);
     }
   }
 };

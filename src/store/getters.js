@@ -269,5 +269,17 @@ const getters = {
   exportSvaReportState: state => state.export_sva_report.state,
   exportSvaReportData: state => state.export_sva_report.data,
   exportSvaReportError: state => state.export_sva_report.errors,
+  // bulk_create_leave_credits
+  bulkCreateLeaveCreditsState: state => state.bulk_create_leave_credits.state,
+  bulkCreateLeaveCreditsData: state => state.bulk_create_leave_credits.data,
+  bulkCreateLeaveCreditsError: state => state.bulk_create_leave_credits.errors,
+  // search_leave_credits
+  searchLeaveCreditsState: state => state.search_leave_credits.state,
+  searchLeaveCreditsData: state => state.search_leave_credits.data,
+  searchLeaveCreditsError: state => state.search_leave_credits.errors,
+  // update_leave_credits
+  updateLeaveCreditsState: state => state.update_leave_credits.state,
+  updateLeaveCreditsData: state => state.update_leave_credits.data,
+  updateLeaveCreditsError: state => state.update_leave_credits.errors,
 };
 export default getters;
