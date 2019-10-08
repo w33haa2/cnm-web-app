@@ -105,7 +105,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["bulkCreateLeaveCreditsState","bulkCreateLeaveCreditsData","bulkCreateLeaveCreditsError","searchLeaveCreditsState","searchLeaveCreditsData","searchLeaveCreditsError"])
+    ...mapGetters(["bulkCreateLeaveCreditsState","bulkCreateLeaveCreditsData","bulkCreateLeaveCreditsError",])
   },
   mounted() {
     this.activeTab = "vacation_leave"

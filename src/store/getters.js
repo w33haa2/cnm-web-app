@@ -281,5 +281,13 @@ const getters = {
   updateLeaveCreditsState: state => state.update_leave_credits.state,
   updateLeaveCreditsData: state => state.update_leave_credits.data,
   updateLeaveCreditsError: state => state.update_leave_credits.errors,
+  // agent_time_in
+  agentTimeInState: state => state.agent_time_in.state,
+  agentTimeInData: state => state.agent_time_in.data,
+  agentTimeInTitle: state => state.agent_time_in.title,
+  // agent_time_out
+  agentTimeOutState: state => state.agent_time_out.state,
+  agentTimeOutData: state => state.agent_time_out.data,
+  agentTimeOutTitle: state => state.agent_time_out.title,
 };
 export default getters;

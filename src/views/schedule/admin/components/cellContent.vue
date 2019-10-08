@@ -289,6 +289,8 @@ export default {
           // vto: schedule.vto_at
           vto: true
         };
+
+
         if(schedule.user_status.status == "active"){
           if(schedule.remarks.toLowerCase()=="on-leave" && schedule.leave.status=="approved"){
             this.tag.label = leave_label[schedule.leave.leave_type].toUpperCase()

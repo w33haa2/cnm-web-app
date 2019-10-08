@@ -35,7 +35,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["name", "avatar", "roles", "position", "gender"])
+    ...mapGetters(["name", "avatar", "roles", "position", "gender","token"])
+  },
+  mounted(){
+    console.log(this.token)
   }
 };
 </script>

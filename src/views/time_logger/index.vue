@@ -140,7 +140,13 @@ export default {
       "fetchTodaysOvertimeScheduleError",
       "joinOvertimeScheduleState",
       "joinOvertimeScheduleData",
-      "joinOvertimeScheduleError"
+      "joinOvertimeScheduleError",
+      "agentTimeInState",
+      "agentTimeInData",
+      "agentTimeInTitle",
+      "agentTimeOutState",
+      "agentTimeOutData",
+      "agentTimeOutTitle",
     ])
   },
   watch: {
@@ -153,18 +159,44 @@ export default {
         alert(this.joinOvertimeScheduleError);
       }
     },
-    agentStartWorkfetchState({ initial, success, fail }) {
+    agentTimeInState({ initial, success, fail }) {
       if(initial){
         this.btn_loading.start_work = true;
       }
       if (success) {
-        alert("Successfully timed in");
+        this.$message({
+          type:"success",
+          message:this.agentTimeInTitle,
+          duration:10000
+        })
         this.btn_loading.start_work = false;
         this.fetchAgentsTodayWork(this.today.query);
       }
       if (fail) {
         this.btn_loading.start_work = false;
-        alert("Oops! There's an error logging your time in.");
+        this.$message({
+          type:"error",
+          message:this.agentTimeInTitle,
+          duration:10000
+        })
+      }
+    },
+    agentTimeOutState({ initial, success, fail }){
+      if(success){
+        this.fetchAgentsTodayWork(this.today.query);
+        this.$message({
+          type:"success",
+          message:this.agentTimeOutTitle,
+          duration:10000,
+        });
+      }
+      if(fail){
+        this.fetchAgentsTodayWork(this.today.query);
+        this.$message({
+          type:"error",
+          message:this.agentTimeOutTitle,
+          duration:10000,
+        });
       }
     },
     todaysWorkfetchState({ initial, success, fail }) {
@@ -291,7 +323,9 @@ export default {
       "agentStartWork",
       "agentEndWork",
       "fetchTodaysOvertimeSchedule",
-      "joinOvertimeSchedule"
+      "joinOvertimeSchedule",
+      "agentTimeIn",
+      "agentTimeOut"
     ]),
     renderedTick() {
       setInterval(() => {
@@ -386,11 +420,9 @@ export default {
       if (confirm("Do you really want to end work?")) {
         // log timeout
         const data = {
-          time_out: moment().format("YYYY-MM-DD HH:mm:ss"),
-          id: this.today.schedule.attendances.slice(-1).pop().id,
-          schedule_id: this.today.schedule.id
+          attendance_id: this.today.schedule.attendances.slice(-1).pop().id,
         };
-        this.agentEndWork(data);
+        this.agentTimeOut(data);
       }
     },
     startWork() {
@@ -404,16 +436,15 @@ export default {
       } else {
         const data = {
           schedule_id: this.today.schedule.id,
-          time_in: moment().format("YYYY-MM-DD HH:mm:ss")
         };
         if(this.today.schedule.leave!=null){
           if(this.today.schedule.leave.status=="approved"){
             alert('This schedule is under "ON-LEAVE" status. Please inform RTA group if you wanted to start work.')
           }else{
-            this.agentStartWork(data);
+            this.agentTimeIn(data);
           }
         }else{
-            this.agentStartWork(data);
+            this.agentTimeIn(data);
         }
       }
     }

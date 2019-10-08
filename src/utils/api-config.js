@@ -74,6 +74,14 @@ const api = {
             $url: "search",
             $method: "GET"
           },
+          agent_timein: {
+            $url: "time_in",
+            $method: "POST"
+          },
+          agent_timeout: {
+            $url: "time_out",
+            $method: "POST"
+          },
           fetch: {
             $url: "fetch",
             $method: "GET",
