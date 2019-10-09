@@ -533,7 +533,7 @@
           <!-- frontend way of exporting sva -->
           <!-- <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button> -->
           <!-- backend way -->
-          <el-button type="danger" :loading="false" size="mini" @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})">Confirm</el-button>
+          <el-button type="danger" size="mini" @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})" :loading="excel.export_sva.confirm">Download</el-button>
         </span>
       </el-dialog>
 
@@ -588,16 +588,13 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.errors.list.length "
+            :label="'Errors: ' +excel.import.report.data.errors.list.length"
             name="errors"
           >
             <el-table :data="excel.import.report.data.errors.list" height="350px">
               <el-table-column label="Email" width="350">
                 <template scope="scope">{{scope.row.email}}</template>
               </el-table-column>
-              <!-- <el-table-column label="Schedule" width="300">
-                <template scope="scope">{{scope.row.company_id}}</template>
-              </el-table-column> -->
               <el-table-column label="Status">
                 <template scope="scope">
                   <template v-if="scope.row.status_code==200">
@@ -611,7 +608,7 @@
             </el-table>
           </el-tab-pane>
         </el-tabs>
-        <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+        <el-button size="mini" @click="closeImportReport" style="float:right" >Close</el-button>
       </div>
     </el-dialog>
     </div>
@@ -891,6 +888,7 @@ export default {
         },
         export_sva:{
           dialog:false,
+          confirm:false,
           model:{
             start:null,
             end:null,
@@ -991,8 +989,8 @@ export default {
       'exportEmployeeTemplate',
     ]),
     exportSvaReport(){
+      this.excel.export_sva.confirm = true;
       let url = "api/v1/excel/export_sva?start_date="+this.excel.export_sva.model.start+"&end_date="+this.excel.export_sva.model.end,
-        formData = new FormData(),
         options = {
           responseType: "blob",
           headers: {
@@ -1014,6 +1012,8 @@ export default {
         a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
+        this.excel.export_sva.confirm = false;
+
       });
     },
     generateSvaReport(){

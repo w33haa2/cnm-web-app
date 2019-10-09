@@ -38,7 +38,7 @@ export default {
     ...mapGetters(["name", "avatar", "roles", "position", "gender","token"])
   },
   mounted(){
-    console.log(this.token)
+    // console.log(this.token)
   }
 };
 </script>
