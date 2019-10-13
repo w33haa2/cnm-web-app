@@ -208,7 +208,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Work Force",
            meta: {
-             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Admin"]
+             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Admin","Operations Manager", "Team Leader"]
            },
            children: [
              {
