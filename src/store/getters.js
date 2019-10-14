@@ -60,6 +60,7 @@ const getters = {
   statusListState: state => state.user.fetchState.statusList,
   potentialHead: state => state.user.data.potentialHead,
   loginState: state => state.user.loggingInState,
+  loginError: state => state.user.loginError,
   fetchStateStatusList: state => state.user.fetchState.statusList,
   fetchStatePotentialHead: state => state.user.fetchState.potentialHead,
 
@@ -200,6 +201,14 @@ const getters = {
   fetchLeaveSlotsState: state => state.fetch_leave_slots.state,
   fetchLeaveSlotsData: state => state.fetch_leave_slots.data,
   fetchLeaveSlotsError: state => state.fetch_leave_slots.errors,
+  // update_leave_slots
+  updateLeaveSlotsState: state => state.update_leave_slots.state,
+  updateLeaveSlotsData: state => state.update_leave_slots.data,
+  updateLeaveSlotsTitle: state => state.update_leave_slots.title,
+  // delete_leave_slots
+  deleteLeaveSlotsState: state => state.delete_leave_slots.state,
+  deleteLeaveSlotsData: state => state.delete_leave_slots.data,
+  deleteLeaveSlotsTitle: state => state.delete_leave_slots.title,
   // create_schedule_bulk
   createScheduleBulkState: state => state.create_schedule_bulk.state,
   createScheduleBulkData: state => state.create_schedule_bulk.data,

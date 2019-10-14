@@ -48,6 +48,7 @@ const state = {
   },
   introduction: '',
   userErrors: '',
+  loginError:"",
   comrades: [],
   comradesTotal: 0,
   fetchingComradeState: {
@@ -199,6 +200,7 @@ const mutations = {
       success: false,
       fail: true
     }
+    state.loginError = payload.response.data.title;
   },
   [LOGOUT.success](state, payload) {
     state.token = null

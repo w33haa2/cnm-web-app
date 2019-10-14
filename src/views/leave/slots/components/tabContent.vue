@@ -8,7 +8,7 @@
         <el-pagination
           style="float:right"
           pager-count="4"
-          :page-sizes="[10,25,50]"
+          :page-sizes="[1,10,25,50]"
           :page-size="table_config.display_size"
           layout="total, sizes, prev, pager, next"
           :total="table_config.count"
@@ -57,8 +57,9 @@
           <template slot-scope="{row}">
             <template v-for="(slot,index) in plotLeaveSlotsPerDay(row.leave_slots,header.date)">
               <cell-content
+                @updateDelete="updateDelete"
                 :key="index"
-                :slot="plotLeaveSlotsPerDay(row.leave_slots,header.date)[index]"
+                :mslot="plotLeaveSlotsPerDay(row.leave_slots,header.date)[index]"
                 :date="header.date"
               />
             </template>
@@ -79,11 +80,11 @@ import { mapActions, mapGetters } from "vuex";
 import cellContent from "./cellContent";
 export default {
   components: { cellContent },
-  props: ["leaveType","data"],
+  props: ["leaveType","data","refresh"],
   data() {
     return {
       query:{
-        limit:1,
+        limit:10,
         offset:0,
         leave_slots:true,
         start_date:[],
@@ -111,11 +112,17 @@ export default {
       ])
   },
   watch: {
+    refresh(v){
+      if(this.leaveType==this.data.leave_type){
+        const data = this.query;
+        this.fetchEmployees({data})
+      }
+    },
     fetchEmployeesState({ initial, success, fail }) {
       if (initial) {
         this.table_config.loader = true;
         this.table_config.data = []
-        this.table_config.count = 0
+        // this.table_config.count = 0
       }
       if (success) {
         this.table_config.loader = false;
@@ -152,6 +159,9 @@ export default {
   },
   methods: {
     ...mapActions(["fetchEmployees"]),
+    updateDelete(data){
+      this.$emit("updateDelete",data)
+    },
     plotLeaveSlotsPerDay(slots, date) {
       const slot = slots.filter(
         i => moment(i.date).format("YYYY-MM-DD") == date
@@ -177,6 +187,7 @@ export default {
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
+      this.table_config.page = value;
       const data = this.query;
       this.fetchEmployees({ data });
     },

@@ -92,7 +92,7 @@
               <el-col v-if="tag.label=='NCNS' || tag.label=='ABSENT'" style="margin-top:5px;">
                 <el-button size="mini" type="warning" style="width:100%" @click="tagSick">TAG SICK LEAVE</el-button>
               </el-col>
-              <el-col v-if="tag.bc=='#E6A23C'" style="margin-top:5px;">
+              <el-col v-if="tag.bc=='#E6A23C' && schedule.leave.leave_type!='loa1' && schedule.leave.leave_type!='loa2'" style="margin-top:5px;">
                 <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
               </el-col>
               <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
@@ -181,6 +181,8 @@ const leave_label = {
   "solo_parent_leave":"solo parent",
   "vawc":"vawc",
   "magna_carta_leave":"magna carta",
+  "loa1":"LOA1(sick)",
+  "loa2":"LOA2(vacation)",
 }
 export default {
   props: ["schedule", "date", "info"],

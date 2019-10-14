@@ -127,7 +127,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['loginState', 'userDetails', 'employeeUpdateState', 'employeeErrors'])
+    ...mapGetters(['loginState', 'userDetails', 'employeeUpdateState', 'employeeErrors',"loginError"])
   },
   watch: {
     $route: {
@@ -155,7 +155,8 @@ export default {
     loginState({ initial, success, fail }) {
       if (initial) {
         this.loading = true
-      } else if (success) {
+      }
+      if (success) {
         this.loading = false
         if (this.userDetails.login_flag === 0) {
           this.changePassDiag = true
@@ -164,9 +165,10 @@ export default {
             path: '/dashboard'
           })
         }
-      } else if (fail) {
+      }
+      if (fail) {
         Message.error({
-          message: 'Invalid username or password',
+          message: this.loginError,
           duration: '2500'
         })
         this.loading = false

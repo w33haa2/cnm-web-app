@@ -536,11 +536,20 @@ export default {
       "resetPassEmployee",
     ]),
     confirmChangeStatus() {
-      // let data = {};
+      let data = {};
       // data.user_id = this.change_status.employees;
       // data.status = this.change_status.form.status;
       // data.type = this.change_status.form.status;
-      this.changeStatusEmployee(this.change_status.model);
+      if(this.change_status.model.status == "active"){
+        data = {
+          reason:this.change_status.model.reason,user_id:this.change_status.model.user_id,type:this.change_status.model.type,status:this.change_status.model.status,hired_date:moment(this.change_status.model.hired_date).format("YYYY-MM-DD"),separation_date:null
+        }
+      }else{
+        data = {
+          reason:this.change_status.model.reason,user_id:this.change_status.model.user_id,type:this.change_status.model.type,status:this.change_status.model.status,separation_date:moment(this.change_status.model.separation_date).format("YYYY-MM-DD"),
+        }
+      }
+      this.changeStatusEmployee(data);
     },
     closeImportReport(e) {
       if (this.excel.import.importing) {

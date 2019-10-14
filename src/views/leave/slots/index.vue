@@ -36,7 +36,7 @@
       <el-col style="margin-top:30px;">
         <el-tabs type="border-card" v-model="activeTab">
           <el-tab-pane v-for="(item,index) in leave_types" :key="index" :label="item.title" :name="item.leave_type">
-            <tab-content :leaveType="item.leave_type" :data="data"></tab-content>
+            <tab-content :leaveType="item.leave_type" :data="data" @updateDelete="updateDelete" :refresh="refresh"></tab-content>
           </el-tab-pane>
         </el-tabs>
       </el-col>
@@ -122,6 +122,37 @@
           >Confirm</el-button>
         </span>
       </el-dialog>
+          <!-- Create and Update Dialog -->
+      <el-dialog
+        :visible.sync="form.updateLeaveSlot.show"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        title="Update Leave Slots"
+        width="20%"
+        top="5vh"
+      >
+        <el-row>
+          <el-col>
+            <label for="dates">Value</label>
+            <el-input-number size="mini" v-model="form.updateLeaveSlot.field.value" step="1" step-strictly controls-position="right" style="width:100%"></el-input-number>
+          </el-col>
+        </el-row>
+        <div slot="footer">
+          <el-row>
+            <el-col>
+              <el-button size="mini" type="info" @click="submitDeleteSlot" style="float:left" :loading="form.updateLeaveSlot.btn_del_loader">Delete</el-button>
+              <el-button size="mini" @click="form.updateLeaveSlot.show=false">Cancel</el-button>
+              <el-button
+                type="danger"
+                size="mini"
+                :loading="form.updateLeaveSlot.btn_loader"
+                @click="submitUpdateSlot()"
+              >Confirm</el-button>
+            </el-col>
+          </el-row>
+        </div>
+      </el-dialog>
   </div>
 </template>
 
@@ -136,6 +167,7 @@ export default {
   components:{ tabContent },
   data() {
     return {
+      refresh:false,
       week:{
         start:moment().startOf("isoweek").format("YYYY-MM-DD"),
         end:null
@@ -177,12 +209,21 @@ export default {
             leave_type:null,
             value:10
           }
+        },
+        updateLeaveSlot:{
+          show:false,
+          btn_del_loader:false,
+          btn_loader:false,
+          field:{
+            value:0,
+            id:null
+          }
         }
       },
     }
   },
   computed:{
-    ...mapGetters(["token","createLeaveSlotBulkState","createLeaveSlotBulkData","createLeaveSlotBulkError","fetchEmployeesState","fetchEmployeesError"])
+    ...mapGetters(["token","createLeaveSlotBulkState","createLeaveSlotBulkData","createLeaveSlotBulkError","fetchEmployeesState","fetchEmployeesError","updateLeaveSlotsState","updateLeaveSlotsData","updateLeaveSlotsTitle","deleteLeaveSlotsState","deleteLeaveSlotsData","deleteLeaveSlotsTitle"])
   },
   watch:{
     activeTab(v){
@@ -190,6 +231,40 @@ export default {
         start_date: this.week.start,
         end_date: this.week.end,
         leave_type: v
+      }
+    },
+    updateLeaveSlotsState({ initial, success, fail }){
+      if(initial){
+        this.form.updateLeaveSlot.btn_loader = true;
+      }
+      if(success || fail){
+        this.$message({
+          type:success?"success":"error",
+          message:this.updateLeaveSlotsTitle,
+          duration:5000
+        });
+        this.form.updateLeaveSlot.btn_loader = false;
+        if(success){
+          this.refresh = !this.refresh;
+          this.form.updateLeaveSlot.show = false;
+        }
+      }
+    },
+    deleteLeaveSlotsState({ initial, success, fail }){
+      if(initial){
+        this.form.updateLeaveSlot.btn_del_loader = true;
+      }
+      if(success || fail){
+        this.$message({
+          type:success?"success":"error",
+          message:this.deleteLeaveSlotsTitle,
+          duration:5000
+        });
+        this.form.updateLeaveSlot.btn_del_loader = false;
+        if(success){
+          this.refresh = !this.refresh;
+          this.form.updateLeaveSlot.show = false;
+        }
       }
     },
     fetchEmployeesState({ initial, success, fail }) {
@@ -213,6 +288,7 @@ export default {
           message: "You have successfully generated leave slots.",
           duration:5000
         });
+        this.refresh = !this.refresh;
       }
       if(fail){
         this.form.addLeaveSlot.btn_loader = false
@@ -235,7 +311,20 @@ export default {
     );
   },
   methods:{
-    ...mapActions(["createLeaveSlotBulk"]),
+    ...mapActions(["createLeaveSlotBulk","updateLeaveSlots","deleteLeaveSlots"]),
+    submitDeleteSlot(){
+      if(confirm("Are you sure you want to delete slots?")){
+        this.deleteLeaveSlots({id:this.form.updateLeaveSlot.field.id});
+      }
+    },
+    submitUpdateSlot(){
+      this.updateLeaveSlots(this.form.updateLeaveSlot.field);
+    },
+    updateDelete(data){
+      this.form.updateLeaveSlot.show = true;
+      this.form.updateLeaveSlot.field.value = data.value;
+      this.form.updateLeaveSlot.field.id = data.id;
+    },
     resetLeaveSlotForm(){
       this.form.addLeaveSlot.field= {
         dates:[],

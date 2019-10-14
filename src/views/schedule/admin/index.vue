@@ -588,10 +588,10 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.errors.list.length"
+            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code != 200).length"
             name="errors"
           >
-            <el-table :data="excel.import.report.data.errors.list" height="350px">
+            <el-table :data="excel.import.report.data.all.list.filter(i=> i.status_code != 200)" height="350px">
               <el-table-column label="Email" width="350">
                 <template scope="scope">{{scope.row.email}}</template>
               </el-table-column>
@@ -651,6 +651,11 @@ export default {
     ])
   },
   watch: {
+    "excel.import.loop_index":function(v){
+      if(v == this.excel.import.arr_length){
+        this.excel.import.importing = false;
+      }
+    },
     exportSvaReportState({initial,success,fail}){
       if(success){
         // this.toExcel(this.exportSvaReportData);
@@ -947,7 +952,7 @@ export default {
       tableData: [],
       query: {
         offset: 0,
-        limit: 10
+        limit: 10,
       },
       table_config: {
         page: 1
@@ -966,6 +971,8 @@ export default {
         leave_type: [
           { value: 'bereavement_leave', label: 'Bereavement' },
           { value: 'leave_of_absence', label: 'Leave of absence' },
+          { value: 'loa1', label: 'Leave of absence 1 (Sick)' },
+          { value: 'loa2', label: 'Leave of absence 2 (Vacation)' },
           { value: 'maternity_leave', label: 'Maternity' },
           { value: 'paternity_leave', label: 'Paternity' },
           { value: 'solo_parent_leave', label: 'Solo Parent' },
@@ -1201,11 +1208,12 @@ export default {
             Authorization: "Bearer " + this.token
           }
         };
+      this.excel.import.loop_index = 0;
       data.forEach(((v,i)=>{
         let tmp_data={};
         axios.post("api/v1/schedules/create",v,options).then(res=>{
           console.log(res)
-          this.excel.import.loop_index = parseInt(i) + 1;
+          this.excel.import.loop_index +=1;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
               100;
@@ -1214,19 +1222,8 @@ export default {
             tmp_data.title = res.data.title;
             tmp_arr.push(tmp_data);
             this.excel.import.report.data.all.list = tmp_arr;
-            this.excel.import.report.data.errors.list = tmp_arr.filter(
-              i => i.status_code != 200
-            );
-            if (this.excel.import.loop_index == this.excel.import.arr_length) {
-              this.excel.import.importing = false;
-              this.weekChange(
-                moment(this.week.start)
-                  .format('YYYY-MM-DD')
-              )
-            }
         }).catch(err=>{
-
-            this.excel.import.loop_index = parseInt(i) + 1;
+            this.excel.import.loop_index +=1;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
               100;
@@ -1235,16 +1232,6 @@ export default {
             tmp_data.title = err.response.data.title;
             tmp_arr.push(tmp_data);
             this.excel.import.report.data.all.list = tmp_arr;
-            this.excel.import.report.data.errors.list = tmp_arr.filter(
-              i => i.status_code != 200
-            );
-            if (this.excel.import.loop_index == this.excel.import.arr_length) {
-              this.excel.import.importing = false;
-              this.weekChange(
-                moment(this.week.start)
-                  .format('YYYY-MM-DD')
-              )
-            }
         });
       }).bind(this));
     },
@@ -1539,7 +1526,13 @@ export default {
         generated_by: this.user_id,
         allowed_access: this.position_id
       }
-      this.createLeave(params)
+      if(this.form.addLeave.leave_type != "loa1" && this.form.addLeave.leave_type != "loa2"){
+        this.createLeave(params)
+      }else{
+        if(confirm("LOA1 and LOA2 do not have revert or cancel function. Please check your data before hitting OK.")){
+          this.createLeave(params)
+        }
+      }
     },
     refresh_table(v){
 
