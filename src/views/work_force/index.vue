@@ -5,7 +5,7 @@
     <!-- Search and Pagination -->
     <el-row>
       <el-col :md="{span:8}">
-        <el-date-picker type="date" size="mini" v-model="query.start_date" placeholder="Select date..."></el-date-picker>
+        <el-date-picker type="date" size="mini" :clearable="false" v-model="query.start_date" placeholder="Select date..." @change="fetchWorkForce(query)"></el-date-picker>
       </el-col>
     </el-row>
 
@@ -25,49 +25,91 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="SCHEDULED">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            Scheduled
+            <span style="color:white;background-color:grey;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.scheduled }}</small></span>
+        </template>
         <template slot-scope="scope">
           <span>{{scope.row.tl_schedules.length}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="PRESENT">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            Present
+            <span style="color:white;background-color:#67C23A;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.present }}</small></span>
+        </template>
         <template slot-scope="scope">
           <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="present").length}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="ON-LEAVE">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            On-leave
+            <span style="color:white;background-color:#E6A23C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.onleave }}</small></span>
+        </template>
         <template slot-scope="scope">
           <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="on-leave").length}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="ABSENT">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            Absent
+            <span style="color:white;background-color:#909399;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.absent }}</small></span>
+        </template>
         <template slot-scope="scope">
           <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="absent").length}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="NCNS">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            NCNS
+            <span style="color:white;background-color:#F56C6C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.ncns }}</small></span>
+        </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="ncns").length}}</span>
+          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="ncns" && i.user_status.status == "active").length}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="UPCOMING">
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            Upcoming
+            <span style="color:white;background-color:#0072ff;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.upcoming }}</small></span>
+        </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="upcoming").length}}</span>
+          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="upcoming"  && i.user_status.status == "active").length}}</span>
         </template>
       </el-table-column>
-
+      <el-table-column align="center">
+        <template slot="header" slot-scope="scope">
+            Inactive
+            <span style="color:white;background-color:rgb(143, 2, 2);padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.inactive }}</small></span>
+        </template>
+        <template slot-scope="scope">
+          <span>{{scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=="ncns"|| i.remarks.toLowerCase() == "upcoming")  && i.user_status.status == "inactive" ).length}}</span>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import moment from "moment"
+import moment from "moment";
+import axios from "axios";
 export default {
   data() {
     return {
       searchQuery:'',
       table_config: {
+        col_count:{
+          scheduled:0,
+          present:0,
+          onleave:0,
+          absent:0,
+          ncns:0,
+          upcoming:0,
+          inactive:0,
+        },
         display_size: 10,
         page: 1,
         loader:false,
@@ -75,10 +117,7 @@ export default {
         count:0,
       },
       query: {
-        // offset: 0,
-        // limit: 10,
-        // order:"desc",
-        // sort:"created_at",
+        om_id:null,
         tl:true,
         start_date:null,
         end_date:null,
@@ -96,17 +135,26 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["fetchWorkForceState","fetchWorkForceData","fetchWorkForceError"])
+    ...mapGetters(["token","position","user_id","fetchWorkForceState","fetchWorkForceData","fetchWorkForceError"])
   },
   created() {
     this.query.start_date = moment().startOf("day").format("YYYY-MM-DD HH:mm:ss");
+    this.query.end_date = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
     this.fetchWorkForce(this.query);
   },
   watch:{
     "query.start_date":function(v){
       this.query.start_date = moment(v).startOf('day').format("YYYY-MM-DD HH:mm:ss")
       this.query.end_date = moment(v).endOf('day').format("YYYY-MM-DD HH:mm:ss");
-      this.fetchWorkForce(this.query);
+
+     if(this.position =="Operations Manager"){
+        this.query.om_id = this.user_id;
+      }else if(this.position =="Team Leader"){
+        // fetch om of tl base on related schedule
+        this.getOmBySelectedDate();
+      }else{
+        delete this.query.om_id;
+      }
     },
     fetchWorkForceState({initial,success,fail}){
       if(initial){
@@ -116,6 +164,16 @@ export default {
       if(success){
         this.table_config.loader=false;
         this.table_config.data = this.fetchWorkForceData.metadata
+        let res = [].concat(this.fetchWorkForceData.metadata.map(i=> i.tl_schedules));
+        res = [].concat.apply([],res)
+        console.log(res)
+        this.table_config.col_count.scheduled = res.length;
+        this.table_config.col_count.present = res.filter(i=>i.remarks.toLowerCase() == "present").length;
+        this.table_config.col_count.onleave = res.filter(i=>i.remarks.toLowerCase() == "on-leave").length;
+        this.table_config.col_count.absent = res.filter(i=>i.remarks.toLowerCase() == "absent").length;
+        this.table_config.col_count.upcoming = res.filter(i=>i.remarks.toLowerCase() == "upcoming" && i.user_status.status == "active").length;
+        this.table_config.col_count.ncns = res.filter(i=>i.remarks.toLowerCase() == "ncns" && i.user_status.status == "active").length;
+        this.table_config.col_count.inactive = res.filter(i=>(i.remarks.toLowerCase() == "ncns" || i.remarks.toLowerCase() == "upcoming")  && i.user_status.status == "inactive").length;
       }
       if(fail){
         this.table_config.loader=false
@@ -125,15 +183,29 @@ export default {
   },
   methods: {
     ...mapActions(["fetchWorkForce"]),
-    tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      // this.fetchOvertimeSchedule(data) ;
-    },
-    tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      // this.fetchOvertimeSchedule(data);
+    getOmBySelectedDate(){
+      this.table_config.loader = true;
+      let query= this.query, options = {
+        headers:{
+          Authorization: "Bearer " + this.token
+        }
+      }, url = "api/v1/schedules?tl_id="+this.user_id+"&start_date="+query.start_date+"&end_date="+query.end_date;
+
+      axios.get(url,options).then(res=>{
+        let result = res.data.meta;
+        if(result.agent_schedules.length > 0){
+          this.query.om_id = res.agent_schedules[0].om_id;
+          this.fetchWorkForce(this.query);
+        }else{
+          this.table_config.loader = false;
+          this.table_config.data = [];
+        }
+      }).catch(err=>{
+          console.log(err.response.data)
+          this.table_config.loader = false;
+          this.table_config.data = [];
+      });
+
     }
   }
 };
