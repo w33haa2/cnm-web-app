@@ -278,6 +278,11 @@ export default {
     this.fetchVtoList();
   },
   watch:{
+    "form.report.loop_index":function(v){
+      if(v==this.form.report.arr_length){
+        this.fetchVtoList();
+      }
+    },
     cancelVtoState({initial,success,fail}){
       if(success){
         this.filter.select.vto_list.model=[];
@@ -401,7 +406,7 @@ export default {
         headers:{
           Authorization: "Bearer "+ this.token
         }
-      };
+      }, loop_count = 0;;
       this.form.report.arr_length = field.agents.length;
       this.form.report.dialog = true;
 
@@ -410,27 +415,24 @@ export default {
         formData.append('agent',v);
         formData.append('timestamp',moment(field.vto_at).format("YYYY-MM-DD HH:mm:ss"))
         axios.post(url,formData,options).then(res=>{
-          this.form.report.loop_index = this.form.report.loop_index+1;
+          loop_count+=1;
+          this.form.report.loop_index = loop_count;
           tmp_data.full_name = res.data.meta.agent_schedule.user_info.full_name;
           tmp_data.status_code = res.status;
           tmp_data.title = res.data.title;
           tmp_arr.push(tmp_data);
           this.form.report.data.all = tmp_arr;
-          this.form.report.data.error = tmp_arr.filter(
-            i => i.status_code != 200
-          );
           this.form.report.progress = (this.form.report.loop_index/this.form.report.arr_length)*100;
         }).catch(err=>{
+          loop_count+=1;
             let res = err.response.data;
-            console.log(res)
-            this.form.report.loop_index = this.form.report.loop_index+1;
+            this.form.report.loop_index = loop_count;
             tmp_data.full_name = res.meta.agent_schedule.user_info.full_name;
             tmp_data.status_code = res.code;
             tmp_data.title = res.title;
             tmp_arr.push(tmp_data);
             this.form.report.data.all = tmp_arr;
             this.form.report.progress = (this.form.report.loop_index/this.form.report.arr_length)*100;
-
         });
       }).bind(this));
     },

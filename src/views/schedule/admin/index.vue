@@ -1200,6 +1200,7 @@ export default {
         .catch(err => console.log(err));
     },
     loopCreateSchedule(data){
+      this.form.addSchedule.show = false;
       this.excel.import.importing = true;
       this.excel.import.dialog = true;
       this.excel.import.arr_length = data.length;

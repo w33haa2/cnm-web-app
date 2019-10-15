@@ -247,10 +247,10 @@
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.errors.list.length "
+            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code!=200).length "
             name="errors"
           >
-            <el-table :data="excel.import.report.data.errors.list" height="350px">
+            <el-table :data="excel.import.report.data.all.list.filter(i=> i.status_code!=200)" height="350px">
               <el-table-column label="CID" width="100">
                 <template scope="scope">{{scope.row.company_id}}</template>
               </el-table-column>
@@ -420,6 +420,14 @@ export default {
     ])
   },
   watch: {
+    "excel.import.loop_index":function(v){
+      if(v==this.excel.import.arr_length){
+          this.excel.import.importing = false;
+          this.query.offset = 0;
+          let data = this.query;
+          this.fetchEmployees({data});
+      }
+    },
     resetPassState({ initial, success, fail }) {
       if (success) {
         this.$message({
@@ -577,7 +585,7 @@ export default {
       this.excel.import.arr_length = arr.length;
       this.excel.import.dialog = true;
       this.excel.import.importing = true;
-      let tmp_arr = [];
+      let tmp_arr = [], loop_count=0;
 
       var i = 0;
       for (i in arr) {
@@ -601,7 +609,8 @@ export default {
           })
           .then(res => {
             console.log(res);
-            this.excel.import.loop_index = parseInt(i) + 1;
+            loop_count+=1;
+            this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
               100;
@@ -609,19 +618,11 @@ export default {
             tmp_data.title = res.data.title;
             tmp_arr.push(tmp_data);
             this.excel.import.report.data.all.list = tmp_arr;
-            this.excel.import.report.data.errors.list = tmp_arr.filter(
-              i => i.status_code != 200
-            );
-            if (this.excel.import.loop_index == this.excel.import.arr_length) {
-              this.excel.import.importing = false;
-              this.query.offset = 0;
-              let data = this.query;
-              this.fetchEmployees({data});
-            }
           })
           .catch(err => {
             console.log(err.response.data);
-            this.excel.import.loop_index = parseInt(i) + 1;
+            loop_count+=1;
+            this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
               100;
@@ -629,15 +630,6 @@ export default {
             tmp_data.title = err.response.data.title;
             tmp_arr.push(tmp_data);
             this.excel.import.report.data.all.list = tmp_arr;
-            this.excel.import.report.data.errors.list = tmp_arr.filter(
-              i => i.status_code != 200
-            );
-            if (this.excel.import.loop_index == this.excel.import.arr_length) {
-              this.excel.import.importing = false;
-              this.query.offset = 0;
-              let data = this.query;
-              this.fetchEmployees({data});
-            }
           });
       }
     },
