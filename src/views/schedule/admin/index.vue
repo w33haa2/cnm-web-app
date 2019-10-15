@@ -316,6 +316,174 @@
                 </template>
               </template>
             </el-table-column>
+            <!-- <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[0].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[0].date)?'today-header':'']"
+                >{{ tableHeader[0].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[0].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[0].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[0].date)[index]"
+                    :date="tableHeader[0].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[1].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[1].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[1].date)?'today-header':'']"
+                >{{ tableHeader[1].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[1].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[1].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[1].date)[index]"
+                    :date="tableHeader[1].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[2].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[2].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[2].date)?'today-header':'']"
+                >{{ tableHeader[2].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[index]"
+                    :date="tableHeader[2].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[3].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[3].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[3].date)?'today-header':'']"
+                >{{ tableHeader[3].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[3].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[3].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[3].date)[index]"
+                    :date="tableHeader[3].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[4].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[4].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[4].date)?'today-header':'']"
+                >{{ tableHeader[4].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[4].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[4].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[4].date)[index]"
+                    :date="tableHeader[4].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[5].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[5].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[5].date)?'today-header':'']"
+                >{{ tableHeader[5].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[5].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[5].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[5].date)[index]"
+                    :date="tableHeader[5].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column align="center">
+              <template slot="header" slot-scope="scope">
+                <h4
+                  :class="[dateToday(tableHeader[6].date)?'today-header':'']"
+                  style="margin-bottom:5px"
+                >{{ tableHeader[6].day }}</h4>
+                <span
+                  :class="[dateToday(tableHeader[6].date)?'today-header':'']"
+                >{{ tableHeader[6].date1 }}</span>
+              </template>
+              <template slot-scope="{row}">
+                <template
+                  v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[6].date).length == 0? blank :sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[6].date)"
+                >
+                  <cell-content
+                    @refreshTable="refresh_table"
+                    :key="index"
+                    :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[6].date)[index]"
+                    :date="tableHeader[6].date"
+                    :info="row.info"
+                  />
+                </template>
+              </template>
+            </el-table-column> -->
           </el-table>
         </el-col>
       </el-row>
@@ -849,6 +1017,10 @@ export default {
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
         this.tableData = this.agentsWorkReports.agent_schedules
+        let tmp = [].concat(this.agentsWorkReports.agent_schedules.map(i=>i.schedule));
+        tmp = [].concat(...tmp.map(i=>i));
+        tmp = tmp.filter(i=>i.overtime_id == null);
+        this.sched_array = tmp;
       }
       if (fail) {
         this.tableData = []
@@ -920,6 +1092,8 @@ export default {
   },
   data() {
     return {
+      blank:[{}],
+      sched_array:[],
       excel: {
         import: {
           status: null,

@@ -259,6 +259,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.schedule.start_event.date)
     this.evaluateSchedule();
   },
   methods: {
