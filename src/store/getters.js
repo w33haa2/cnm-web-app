@@ -36,7 +36,10 @@ const getters = {
 
   // employee module
   employees: state => state.employee.employees,
+
   rs_employees: state => state.employee.rs_employeesData,
+  rs_employeesfetchState: state => state.employee.rs_employeeFetchState,
+  // rs_employees: state => state.employee.rs_employeesData,
   userDetails: state => state.user.userDetails,
   comrades: state => state.user.comrades,
   comradesTotal: state => state.user.comradesTotal,

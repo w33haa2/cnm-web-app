@@ -134,6 +134,7 @@
             reserve-keyword
             placeholder="Employees..."
             :remote-method="remoteMethod"
+            :loading="change_status.remote_loader"
           >
             <el-option
               v-for="item in rs_employees"
@@ -361,6 +362,7 @@ export default {
       },
       change_status: {
         dialog: false,
+        remote_loader:false,
         form: {
           employees: [],
           status_id: 1,
@@ -416,10 +418,22 @@ export default {
       "rs_employees",
       "token",
       "changeStatusState",
-      "resetPassState"
+      "resetPassState",
+      "rs_employeesfetchState"
     ])
   },
   watch: {
+    rs_employeesfetchState({initial,success,fail}){
+      if(initial){
+        this.change_status.remote_loader = true;
+      }
+      if(success){
+        this.change_status.remote_loader = false;
+      }
+      if(fail){
+        this.change_status.remote_loader = false;
+      }
+    },
     "excel.import.loop_index":function(v){
       if(v==this.excel.import.arr_length){
           this.excel.import.importing = false;

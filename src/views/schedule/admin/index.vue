@@ -380,6 +380,7 @@
               reserve-keyword
               placeholder="Agents..."
               :remote-method="remoteAgent"
+              :loading="form.addSchedule.remote_loader"
             >
               <el-option
                 v-for="item in agents.agents"
@@ -651,6 +652,18 @@ export default {
     ])
   },
   watch: {
+
+    agentsfetchState({initial,success,fail}){
+      if(initial){
+        this.form.addSchedule.remote_loader=true;
+      }
+      if(success){
+        this.form.addSchedule.remote_loader=false;
+      }
+      if(fail){
+        this.form.addSchedule.remote_loader=false;
+      }
+    },
     "excel.import.loop_index":function(v){
       if(v == this.excel.import.arr_length){
         this.excel.import.importing = false;
@@ -907,6 +920,7 @@ export default {
       creatingFlag: false,
       form: {
         addSchedule: {
+          remote_loader:false,
           show: false,
           btn_loader: false,
           model: {

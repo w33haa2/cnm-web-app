@@ -105,6 +105,7 @@
               reserve-keyword
               placeholder="Agents..."
               :remote-method="remoteAgent"
+              :loading="form.remote_loader"
             >
               <el-option
                 v-for="item in agents.agents"
@@ -234,6 +235,7 @@ export default {
       form: {
         show: false,
         action: "Create",
+        remote_loader:false,
         update_id:null,
         schedule:null,
         confirm:false,
@@ -272,12 +274,24 @@ export default {
       "cancelVtoState",
       "cancelVtoData",
       "cancelVtoError",
+      "agentsfetchState"
       ])
   },
   created() {
     this.fetchVtoList();
   },
   watch:{
+    agentsfetchState({initial,success,fail}){
+      if(initial){
+        this.form.remote_loader=true;
+      }
+      if(success){
+        this.form.remote_loader=false;
+      }
+      if(fail){
+        this.form.remote_loader=false;
+      }
+    },
     "form.report.loop_index":function(v){
       if(v==this.form.report.arr_length){
         this.fetchVtoList();

@@ -78,6 +78,7 @@
               reserve-keyword
               placeholder="Cluster..."
               :remote-method="remoteCluster"
+              :loading="form.addLeaveSlot.remote_loader"
             >
               <el-option
                 v-for="item in remote.cluster"
@@ -201,6 +202,7 @@ export default {
       ],
       form:{
         addLeaveSlot:{
+          remote_loader:false,
           show:false,
           btn_loader:false,
           field:{
@@ -376,11 +378,16 @@ export default {
         }).catch(err=>console.log(err.response.data))
     },
     remoteCluster(query) {
+      this.form.addLeaveSlot.remote_loader=true;
       const data = {};
       if (query !== "") {
         this.remote.cluster = this.options.cluster.filter(i=>i.full_name.toLowerCase().indexOf(query)>-1)
+        this.form.addLeaveSlot.remote_loader=false;
+
       } else {
         this.remote.cluster = this.options.cluster;
+        this.form.addLeaveSlot.remote_loader=false;
+
       }
     }
   }
