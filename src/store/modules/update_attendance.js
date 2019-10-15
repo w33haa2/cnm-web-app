@@ -68,7 +68,7 @@ const actions = {
    * @param params
    */
   updateAttendance({ commit }, params) {
-    const slug = "api.leave_slots.update";
+    const slug = "api.attendance.update";
     STATE_API({ slug, params }, commit, [
       UPDATE_ATTENDANCE.initial,
       UPDATE_ATTENDANCE.success,

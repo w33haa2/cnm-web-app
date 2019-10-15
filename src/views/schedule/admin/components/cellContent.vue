@@ -58,6 +58,18 @@
                   </div>
                 </template>
               </el-col>
+              <template v-if="tag.label=='PRESENT'" >
+                <template v-if="!schedule.attendances[0].time_out">
+                <el-col style="margin-top:5px;">
+                  <el-button size="mini" type="danger" style="width:100%" @click="form.rtaTimeOut.show=true">Define Timeout</el-button>
+                </el-col>
+                </template>
+                <template v-if="schedule.attendances[0].time_out_by">
+                <el-col style="margin-top:5px;">
+                  <el-button size="mini" type="danger" :plain="true" style="width:100%" @click="rtaClearTimeOut()">Clear Timeout</el-button>
+                </el-col>
+                </template>
+              </template>
             </template>
             <template v-if="tag.label == 'PRESENT'">
               <el-col>
@@ -80,6 +92,10 @@
                 ">ADD VTO</el-tag> -->
               </el-col>
             </template>
+                <el-col>
+                <h5 style="margin-bottom:5px;margin-top:8px;">Conformance</h5>
+                <el-progress :percentage="schedule.conformance" :text-inside="true" :stroke-width="18"></el-progress>
+              </el-col>
           </el-row>
           <template v-if="isRTA()">
             <el-row style="margin-top:10px;">
@@ -98,6 +114,9 @@
               <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
                 <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
               </el-col>
+              <el-col v-if="tag.label=='PRESENT'" style="margin-top:5px;">
+                <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSickLeave()">TAG PARTIAL SICK LEAVE</el-button>
+              </el-col>
             </el-row>
           </template>
         </el-col>
@@ -114,36 +133,34 @@
     </el-popover>
     <span v-else :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span>
 <!-- Create and Update Dialog -->
-      <!-- <el-dialog
-        :visible.sync="form.cancelLeave.show"
+      <el-dialog
+        :visible.sync="form.rtaTimeOut.show"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
-        title="Add Leave"
+        :title="Object.keys(schedule).length > 0 ? 'Define timeout for ' + schedule.user_info.full_name:'' "
         width="30%"
         top="5vh"
       >
         <el-row>
           <el-col>
-            <label for="dates">Cancel Date</label>
+            <label style="float:left">Timeout <small>{{Object.keys(schedule).length > 0 ? "("+formatDate(popup.data.schedule.in,"YYYY-MM-DD HH:mm:ss","MMM Do, YYYY hh:mm a") + " to "+ formatDate(popup.data.schedule.out,"YYYY-MM-DD HH:mm:ss","MMM Do, YYYY hh:mm a")+")":''}}</small></label>
             <el-date-picker
-              v-model="form.cancelLeave.model.cancel_event"
+              v-model="form.rtaTimeOut.model.time_out"
               size="mini"
-              type="date"
-              format="yyyy-MM-DD"
+              type="datetime"
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
               class="form-input"
-              placeholder="Range picker..."
+              placeholder="Set Timeout..."
             />
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="form.cancelLeave.show=false">Cancel</el-button>
-          <el-button type="danger" :loading="cancelLeaveState.initial" size="mini" @click="cancelSickLeave">Confirm</el-button>
+          <el-button size="mini" @click="form.rtaTimeOut.show=false">Cancel</el-button>
+          <el-button type="danger" :loading="agentTimeOut.initial" size="mini" @click="rtaTimeOut">Confirm</el-button>
         </span>
-      </el-dialog> -->
+      </el-dialog>
 
-    <!-- <el-tag v-else :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
   </div>
 </template>
 
@@ -195,6 +212,13 @@ export default {
             id:null,
             cancel_event:null
           }
+        },
+        rtaTimeOut:{
+          show:false,
+          btn_loader:false,
+          model:{
+            time_out:null
+          }
         }
       },
       with_schedule: false,
@@ -226,7 +250,7 @@ export default {
     };
   },
   computed:{
-    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveData","cancelLeaveError","position"])
+    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveData","cancelLeaveError","position","agentTimeOutState"])
   },
   watch: {
     schedule(v) {
@@ -238,7 +262,27 @@ export default {
     this.evaluateSchedule();
   },
   methods: {
-    ...mapActions(["updateSchedule","createLeave","cancelLeave","deleteSingleSchedule"]),
+    ...mapActions(["updateSchedule","createLeave","cancelLeave","deleteSingleSchedule","agentTimeOut","removeTimeOut"]),
+    rtaClearTimeOut(){
+      let data ={
+        attendance_id: this.schedule.attendances[0].id,
+      }
+      if(confirm("Are you sure you want to proceed?")){
+        this.removeTimeOut(data);
+      }
+    },
+    rtaTimeOut(){
+      // open modal
+      let data ={
+        attendance_id: this.schedule.attendances[0].id,
+        time_out: this.form.rtaTimeOut.model.time_out
+      }
+      console.log(data)
+      if(confirm("Are you sure you want to proceed?")){
+        this.form.rtaTimeOut.show=false;
+        this.agentTimeOut(data);
+      }
+    },
     deleteSchedule(){
       if(confirm("Are you sure you want to delete this schedule?")){
         this.deleteSingleSchedule({id:this.schedule.id})
@@ -292,12 +336,24 @@ export default {
           vto: true
         };
 
+        this.form.rtaTimeOut.model.time_out = moment(this.popup.data.schedule.out).format("YYYY-MM-DD HH:mm:ss");
 
         if(schedule.user_status.status == "active"){
           if(schedule.remarks.toLowerCase()=="on-leave" && schedule.leave.status=="approved"){
             this.tag.label = leave_label[schedule.leave.leave_type].toUpperCase()
             this.tag.bc ="#E6A23C"
             this.tag.fc ="white"
+          }else if(schedule.remarks.toLowerCase()=="present"){
+            this.tag = tag[schedule.remarks.toLowerCase()]
+            if(schedule.time_out){
+              if(schedule.attendances[0].time_out_by){
+                this.tag.fc = "teal";
+              }else{
+                this.tag.fc = "white";
+              }
+            }else{
+              this.tag.fc = "red";
+            }
           }else{
               this.tag = tag[schedule.remarks.toLowerCase()]
           }

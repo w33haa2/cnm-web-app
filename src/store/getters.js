@@ -301,5 +301,13 @@ const getters = {
   agentTimeOutState: state => state.agent_time_out.state,
   agentTimeOutData: state => state.agent_time_out.data,
   agentTimeOutTitle: state => state.agent_time_out.title,
+  // update_attendance
+  updateAttendanceState: state => state.update_attendance.state,
+  updateAttendanceData: state => state.update_attendance.data,
+  updateAttendanceTitle: state => state.update_attendance.title,
+  // remove_rta_time_out
+  removeTimeOutState: state => state.remove_rta_time_out.state,
+  removeTimeOutData: state => state.remove_rta_time_out.data,
+  removeTimeOutTitle: state => state.remove_rta_time_out.title,
 };
 export default getters;

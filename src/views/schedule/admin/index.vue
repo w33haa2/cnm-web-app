@@ -648,11 +648,50 @@ export default {
       "deleteSingleScheduleError",
       "exportSvaReportData",
       "exportSvaReportState",
-      "exportSvaReportError"
+      "exportSvaReportError",
+      "agentTimeOutState",
+      "removeTimeOutState",
+      "agentTimeOutTitle",
+      "removeTimeOutTitle"
     ])
   },
   watch: {
+    agentTimeOutState({initial,success,fail}){
+      if(success){
+        this.weekChange(this.week.start)
+        this.$message({
+          type:"success",
+          message:this.agentTimeOutTitle,
+          duration:5000
+        })
+      }
 
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.agentTimeOutTitle,
+          duration:5000
+        })
+      }
+    },
+    removeTimeOutState({initial,success,fail}){
+      if(success){
+        this.weekChange(this.week.start)
+        this.$message({
+          type:"success",
+          message:this.removeTimeOutTitle,
+          duration:5000
+        })
+      }
+
+      if(fail){
+        this.$message({
+          type:"error",
+          message:this.removeTimeOutTitle,
+          duration:5000
+        })
+      }
+    },
     agentsfetchState({initial,success,fail}){
       if(initial){
         this.form.addSchedule.remote_loader=true;

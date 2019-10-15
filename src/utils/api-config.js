@@ -82,6 +82,10 @@ const api = {
             $url: "time_out",
             $method: "POST"
           },
+          remove_timeout: {
+            $url: "time_out/remove",
+            $method: "POST"
+          },
           fetch: {
             $url: "fetch",
             $method: "GET",
