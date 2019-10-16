@@ -11,7 +11,8 @@
                 :type="tag.type"
                 :effect="tag.effect"
                 style="width:100%;text-align:center"
-              >{{ tag.label }}</el-tag>
+                size="mini"
+              >{{ schedule.user_info.full_name }}</el-tag>
             </el-col>
             <el-col>
               <h5 style="margin-bottom:1px;margin-top:8px;">OM</h5>
@@ -114,8 +115,8 @@
               <el-col v-if="tag.label=='UPCOMING'" style="margin-top:5px;">
                 <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
               </el-col>
-              <el-col v-if="tag.label=='PRESENT'" style="margin-top:5px;">
-                <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSickLeave()">TAG PARTIAL SICK LEAVE</el-button>
+              <el-col v-if="tag.label=='PRESENT' && schedule.time_out!=null" style="margin-top:5px;">
+                <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick">TAG PARTIAL SICK LEAVE</el-button>
               </el-col>
             </el-row>
           </template>
@@ -299,6 +300,17 @@ export default {
         allowed_access: 12
       };
     this.createLeave(data);
+    },
+    tagPartialSick(){
+      const data = {
+        schedule_id: this.schedule.id,
+        leave_type: "partial_sick_leave",
+        status: "approved",
+        generated_by: this.user_id,
+      };
+      if(confirm("There are no revert functions for this action. Are you sure you want to proceed?")){
+        this.createLeave(data);
+      }
     },
     tagStatus(remarks){
       let data = {
