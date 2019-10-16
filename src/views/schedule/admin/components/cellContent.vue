@@ -131,7 +131,7 @@
         <!-- <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span> -->
       </span>
     </el-popover>
-    <span v-else :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span>
+    <!-- <span v-if="!schedule" :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span> -->
 <!-- Create and Update Dialog -->
       <el-dialog
         :visible.sync="form.rtaTimeOut.show"
@@ -259,7 +259,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.schedule.start_event.date)
     this.evaluateSchedule();
   },
   methods: {
@@ -326,8 +325,9 @@ export default {
     },
     evaluateSchedule() {
       const schedule = this.schedule;
-      // alert(this.schedule)
-      if (Object.keys(schedule).length > 0) {
+      console.log(schedule)
+
+      if (schedule) {
         this.with_schedule = true;
         this.popup.data.schedule = {
           in: schedule.start_event.date,
@@ -363,7 +363,7 @@ export default {
               this.tag.label = schedule.user_status.type.toUpperCase()
         }
 
-      } else {
+      }else{
         this.with_schedule = false;
       }
     },
