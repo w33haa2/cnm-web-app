@@ -116,7 +116,9 @@
                 <el-button size="mini" type="info" effect="dark" style="width:100%" @click="deleteSchedule">DELETE SCHEDULE</el-button>
               </el-col>
               <el-col v-if="tag.label=='PRESENT' && schedule.time_out!=null" style="margin-top:5px;">
-                <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick">TAG PARTIAL SICK LEAVE</el-button>
+                <template v-if="isAfter(schedule.end_event.date,schedule.time_out.date)">
+                  <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick">TAG PARTIAL SICK LEAVE</el-button>
+                </template>
               </el-col>
             </el-row>
           </template>
@@ -264,6 +266,9 @@ export default {
   },
   methods: {
     ...mapActions(["updateSchedule","createLeave","cancelLeave","deleteSingleSchedule","agentTimeOut","removeTimeOut"]),
+    isAfter(schedule,attendance){
+      moment(schedule).isAfter(moment(attendance));
+    },
     rtaClearTimeOut(){
       let data ={
         attendance_id: this.schedule.attendances[0].id,

@@ -16,7 +16,7 @@ const state = {
     fail: false
   },
   data: [],
-  errors: null
+  title: null
 };
 
 /**
