@@ -4,9 +4,9 @@
     <!-- Search and Pagination -->
     <el-row>
       <el-col :md="{span:4}">
-        <el-input size="mini" v-model="searchQuery" placeholder="Search"></el-input>
+        <!-- <el-input size="mini" v-model="searchQuery" placeholder="Search"></el-input> -->
       </el-col>
-      <el-col :md="{span:20}">
+      <el-col :md="{span:24}">
         <el-pagination
         style="float:right"
           :page-sizes="[10,25,50]"

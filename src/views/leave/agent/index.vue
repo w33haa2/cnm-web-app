@@ -348,16 +348,16 @@ export default {
   },
   mounted() {
     this.query.generated_by=this.user_id;
-    this.getDate();
-    this.fetchAgentCalendar({
-      userid: this.user_id,
-      start: moment(this.calendar_date)
-        .startOf("month")
-        .format("YYYY-MM-DD"),
-      end: moment(this.calendar_date)
-        .endOf("month")
-        .format("YYYY-MM-DD")
-    });
+    // this.getDate();
+    // this.fetchAgentCalendar({
+    //   userid: this.user_id,
+    //   start: moment(this.calendar_date)
+    //     .startOf("month")
+    //     .format("YYYY-MM-DD"),
+    //   end: moment(this.calendar_date)
+    //     .endOf("month")
+    //     .format("YYYY-MM-DD")
+    // });
     this.fetchLeaveCredits({ user_id: this.user_id });
   },
   methods: {
