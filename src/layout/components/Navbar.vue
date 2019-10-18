@@ -20,13 +20,16 @@
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
-        <div class="avatar-wrapper">
-          <img
-            :src="userDetails.image_url === null ? 'default.gif' : userDetails.image_url"
-            class="user-avatar"
-          />
-          <i class="el-icon-caret-bottom" />
-        </div>
+        <el-tooltip placement="bottom" :content="userDetails.full_name">
+          <div class="avatar-wrapper">
+            <img
+              :src="userDetails.image_url === null ? 'default.gif' : userDetails.image_url"
+              class="user-avatar"
+            />
+            <i class="el-icon-caret-bottom" />
+          </div>
+        </el-tooltip>
+
         <el-dropdown-menu slot="dropdown">
           <router-link :to="'/profile/index/'+userDetails.id">
             <el-dropdown-item>Profile</el-dropdown-item>

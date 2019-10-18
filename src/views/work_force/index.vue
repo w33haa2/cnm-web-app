@@ -5,7 +5,7 @@
     <!-- Search and Pagination -->
     <el-row>
       <el-col :md="{span:8}">
-        <el-date-picker type="date" size="mini" :clearable="false" v-model="query.start_date" placeholder="Select date..." @change="fetchWorkForce(query)"></el-date-picker>
+        <el-date-picker type="date" size="mini" :clearable="false" v-model="query.start_date" placeholder="Select date..."></el-date-picker>
       </el-col>
     </el-row>
 
@@ -140,20 +140,34 @@ export default {
   created() {
     this.query.start_date = moment().startOf("day").format("YYYY-MM-DD HH:mm:ss");
     this.query.end_date = moment().endOf("day").format("YYYY-MM-DD HH:mm:ss");
-    this.fetchWorkForce(this.query);
+
+    if(this.position != "Team Leader"){
+      if(this.position=="Operations Manager"){
+        this.query.om_id = this.user_id;
+        this.fetchWorkForce(this.query);
+      }else{
+        delete this.query.om_id;
+        this.fetchWorkForce(this.query);
+      }
+    }else{
+      this.getOmBySelectedDate();
+    }
   },
   watch:{
     "query.start_date":function(v){
       this.query.start_date = moment(v).startOf('day').format("YYYY-MM-DD HH:mm:ss")
       this.query.end_date = moment(v).endOf('day').format("YYYY-MM-DD HH:mm:ss");
 
-     if(this.position =="Operations Manager"){
-        this.query.om_id = this.user_id;
-      }else if(this.position =="Team Leader"){
-        // fetch om of tl base on related schedule
-        this.getOmBySelectedDate();
+      if(this.position != "Team Leader"){
+        if(this.position=="Operations Manager"){
+          this.query.om_id = this.user_id;
+          this.fetchWorkForce(this.query);
+        }else{
+          delete this.query.om_id;
+          this.fetchWorkForce(this.query);
+        }
       }else{
-        delete this.query.om_id;
+        this.getOmBySelectedDate();
       }
     },
     fetchWorkForceState({initial,success,fail}){
@@ -178,6 +192,13 @@ export default {
       if(fail){
         this.table_config.loader=false
         this.table_config.data=[]
+        this.table_config.col_count.scheduled = 0;
+        this.table_config.col_count.present = 0;
+        this.table_config.col_count.onleave = 0;
+        this.table_config.col_count.absent = 0;
+        this.table_config.col_count.upcoming = 0;
+        this.table_config.col_count.ncns = 0;
+        this.table_config.col_count.inactive = 0;
       }
     }
   },
@@ -194,7 +215,7 @@ export default {
       axios.get(url,options).then(res=>{
         let result = res.data.meta;
         if(result.agent_schedules.length > 0){
-          this.query.om_id = res.agent_schedules[0].om_id;
+          this.query.om_id = result.agent_schedules[0].om_id;
           this.fetchWorkForce(this.query);
         }else{
           this.table_config.loader = false;
