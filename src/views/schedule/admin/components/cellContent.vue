@@ -107,7 +107,7 @@
                 <el-button size="mini" type="info" style="width:100%" @click="tagStatus(1)">TAG ABSENT</el-button>
               </el-col>
               <el-col v-if="tag.label=='NCNS' || tag.label=='ABSENT'" style="margin-top:5px;">
-                <el-button size="mini" type="warning" style="width:100%" @click="tagSick">TAG SICK LEAVE</el-button>
+                <el-button size="mini" type="warning" style="width:100%" @click="tagSick" :disabled="buttons.sick_leave">TAG SICK LEAVE</el-button>
               </el-col>
               <el-col v-if="tag.bc=='#E6A23C' && schedule.leave.leave_type!='loa1' && schedule.leave.leave_type!='loa2'" style="margin-top:5px;">
                 <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
@@ -117,7 +117,7 @@
               </el-col>
               <el-col v-if="tag.label=='PRESENT' && schedule.time_out!=null" style="margin-top:5px;">
                 <template v-if="isAfter(schedule.end_event.date,schedule.time_out.date)">
-                  <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick">TAG PARTIAL SICK LEAVE</el-button>
+                  <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick" :disabled="buttons.partial_sick_leave">TAG PARTIAL SICK LEAVE</el-button>
                 </template>
               </el-col>
             </el-row>
@@ -208,6 +208,10 @@ export default {
   props: ["schedule", "date", "info"],
   data() {
     return {
+      buttons:{
+        sick_leave:false,
+        partial_sick_leave:false,
+      },
       form:{
         cancelLeave:{
           show:false,
@@ -295,6 +299,7 @@ export default {
       }
     },
     tagSick(){
+      this.buttons.sick_leave = true;
       const data = {
         user_id: this.schedule.user_id,
         start_event: moment(this.schedule.start_event.date).startOf("day").format("YYYY-MM-DD HH:mm:ss"),
@@ -307,6 +312,7 @@ export default {
     this.createLeave(data);
     },
     tagPartialSick(){
+      this.buttons.partial_sick_leave = true;
       const data = {
         schedule_id: this.schedule.id,
         leave_type: "partial_sick_leave",
