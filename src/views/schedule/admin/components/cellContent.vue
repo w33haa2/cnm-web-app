@@ -126,8 +126,8 @@
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
       <span slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer">
-        <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
-        </span>
+        <!-- <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
+        </span> -->
         <span  :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">
           <span>{{ tag.label }}</span>
         </span>
@@ -197,6 +197,7 @@ const leave_label = {
   "leave_of_absence":"LOA",
   "maternity_leave":"maternity",
   "paternity_leave":"paternity",
+  "partial_sick_leave":"partial sick",
   "bereavement_leave":"bereavement",
   "solo_parent_leave":"solo parent",
   "vawc":"vawc",
@@ -271,7 +272,7 @@ export default {
   methods: {
     ...mapActions(["updateSchedule","createLeave","cancelLeave","deleteSingleSchedule","agentTimeOut","removeTimeOut"]),
     isAfter(schedule,attendance){
-      moment(schedule).isAfter(moment(attendance));
+      return moment(schedule).isAfter(moment(attendance));
     },
     rtaClearTimeOut(){
       let data ={

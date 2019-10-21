@@ -439,7 +439,7 @@ export default {
         };
         if(this.today.schedule.leave!=null){
           if(this.today.schedule.leave.status=="approved"){
-            alert('This schedule is under "ON-LEAVE" status. Please inform RTA group if you wanted to start work.')
+            alert('This schedule is under "ON-LEAVE" status. Please inform RTA group if you want to start work.')
           }else{
             this.agentTimeIn(data);
           }
