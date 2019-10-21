@@ -322,6 +322,8 @@ export default {
       };
       if(confirm("There are no revert functions for this action. Are you sure you want to proceed?")){
         this.createLeave(data);
+      }else{
+        this.buttons.partial_sick_leave = false;
       }
     },
     tagStatus(remarks){
