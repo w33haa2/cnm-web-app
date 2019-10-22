@@ -310,7 +310,11 @@ export default {
         generated_by: this.user_id,
         allowed_access: 12
       };
-    this.createLeave(data);
+      if(confirm("You are tagging  sick leave to "+ this.schedule.user_info.full_name +", Are you sure you want to proceed?")){
+        this.createLeave(data);
+      }else{
+        this.buttons.sick_leave = false;
+      }
     },
     tagPartialSick(){
       this.buttons.partial_sick_leave = true;
@@ -320,7 +324,7 @@ export default {
         status: "approved",
         generated_by: this.user_id,
       };
-      if(confirm("There are no revert functions for this action. Are you sure you want to proceed?")){
+      if(confirm("You are tagging partial sick leave to "+ this.schedule.user_info.full_name +", Are you sure you want to proceed?")){
         this.createLeave(data);
       }else{
         this.buttons.partial_sick_leave = false;
@@ -335,7 +339,9 @@ export default {
         end_event: moment(this.schedule.end_event.date).format("YYYY-MM-DD HH:mm:ss"),
         remarks:remarks
         };
-      this.updateSchedule(data)
+        if(confirm("You are updating schedule status to "+ this.schedule.user_info.full_name +", Are you sure you want to proceed?")){
+          this.updateSchedule(data)
+        }
     },
     // cancelLeaveForm(){
     //   alert(this.schedule.leave_id)
