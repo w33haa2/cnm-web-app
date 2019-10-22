@@ -176,7 +176,7 @@ const api = {
             $method: "GET"
           },
           today: {
-            $url: "work/today",
+            $url: "today",
             $method: "GET"
           },
           join_ot: {
@@ -285,7 +285,11 @@ const api = {
             $method: "POST",
             $requires: ["id"],
             $format: Template(() => `delete/${id}`)
-          }
+          },
+          current: {
+            $url: "current",
+            $method: "GET"
+          },
         },
         // endregion overtime
 

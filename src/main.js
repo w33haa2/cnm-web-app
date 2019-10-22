@@ -20,6 +20,7 @@ import "./permission"; // permission control
 import "./utils/error-log"; // error log
 import VueSweetalert2 from "vue-sweetalert2"; // sweetalert
 import axios from "axios"
+import VueTimers from "vue-timers"
 
 import * as filters from "./filters"; // global filters
 
@@ -31,7 +32,7 @@ Vue.use(Element, {
 });
 
 Vue.use(VueSweetalert2);
-
+Vue.use(VueTimers);
 // register global utility filters
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key]);

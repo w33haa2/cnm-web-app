@@ -89,7 +89,8 @@ export default {
     };
   },
   created(){
-
+alert(this.token)
+console.log(this.token)
     if(!this.isOperations()){
       this.getOperationsManager()
     }

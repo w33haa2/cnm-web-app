@@ -309,5 +309,9 @@ const getters = {
   removeTimeOutState: state => state.remove_rta_time_out.state,
   removeTimeOutData: state => state.remove_rta_time_out.data,
   removeTimeOutTitle: state => state.remove_rta_time_out.title,
+  // fetch_todays_schedule
+  fetchTodaysScheduleState: state => state.fetch_todays_schedule.state,
+  fetchTodaysScheduleData: state => state.fetch_todays_schedule.data,
+  fetchTodaysScheduleTitle: state => state.fetch_todays_schedule.title,
 };
 export default getters;
