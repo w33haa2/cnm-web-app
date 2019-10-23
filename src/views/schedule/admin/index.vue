@@ -322,7 +322,7 @@
                 reserve-keyword
                 placeholder="Agent..."
                 :remote-method="remoteAgent"
-                :loading="loading"
+                :loading="agentsfetchState.initial"
               >
                 <el-option
                   v-for="item in agents.agents"

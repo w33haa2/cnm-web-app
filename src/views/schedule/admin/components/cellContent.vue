@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-popover v-if="with_schedule" width="200" trigger="click">
+    <el-popover v-if="with_schedule" width="200" trigger="click" v-model="visible">
       <el-row>
         <el-col>
           <!-- if NCNS -->
@@ -107,7 +107,7 @@
                 <el-button size="mini" type="info" style="width:100%" @click="tagStatus(1)">TAG ABSENT</el-button>
               </el-col>
               <el-col v-if="tag.label=='NCNS' || tag.label=='ABSENT'" style="margin-top:5px;">
-                <el-button size="mini" type="warning" style="width:100%" @click="tagSick" :disabled="buttons.sick_leave">TAG SICK LEAVE</el-button>
+                <el-button size="mini" type="warning" style="width:100%" @click="tagSick" :disabled="createLeaveState.initial">TAG SICK LEAVE</el-button>
               </el-col>
               <el-col v-if="tag.bc=='#E6A23C' && schedule.leave.leave_type!='loa1' && schedule.leave.leave_type!='loa2'" style="margin-top:5px;">
                 <el-button size="mini" type="danger" style="width:100%" @click="cancelSickLeave">CANCEL LEAVE</el-button>
@@ -117,7 +117,7 @@
               </el-col>
               <el-col v-if="tag.label=='PRESENT' && schedule.time_out!=null" style="margin-top:5px;">
                 <template v-if="isAfter(schedule.end_event.date,schedule.time_out.date)">
-                  <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick" :disabled="buttons.partial_sick_leave">TAG PARTIAL SICK LEAVE</el-button>
+                  <el-button size="mini" type="warning" style="width:100%" @click="tagPartialSick" :disabled="createLeaveState.initial">TAG PARTIAL SICK LEAVE</el-button>
                 </template>
               </el-col>
             </el-row>
@@ -209,6 +209,7 @@ export default {
   props: ["schedule", "date", "info"],
   data() {
     return {
+      visible:false,
       buttons:{
         sick_leave:false,
         partial_sick_leave:false,
@@ -258,9 +259,17 @@ export default {
     };
   },
   computed:{
-    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveData","cancelLeaveError","position","agentTimeOutState"])
+    ...mapGetters(["user_id","cancelLeaveState","cancelLeaveParams","cancelLeaveData","cancelLeaveError","position","agentTimeOutState","createLeaveState"])
   },
   watch: {
+    createLeaveState({initial,success,fail}){
+      if(success){
+        this.visible=false;
+      }
+      if(fail){
+        this.visible=false;
+      }
+    },
     schedule(v) {
       this.tag={}
       this.evaluateSchedule();
