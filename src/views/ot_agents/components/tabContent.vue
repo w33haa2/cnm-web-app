@@ -182,7 +182,7 @@ export default {
 
       }
       axios.get(url,options).then(res => {
-        console.log(res.data.meta.agent_schedules)
+        // console.log(res.data.meta.agent_schedules)
         this.table_config.loader = false;
         this.table_config.data = res.data.meta.agent_schedules
         this.table_config.count = res.data.meta.count

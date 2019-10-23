@@ -347,7 +347,7 @@ export default {
           })
         }).bind(this))
       }).bind(this));
-      console.log(leave_slots)
+      // console.log(leave_slots)
       data.leave_slots = leave_slots;
       this.createLeaveSlotBulk(data);
     },

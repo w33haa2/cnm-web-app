@@ -313,7 +313,7 @@ export default {
           sheet_data:result,
           sheet_name:"Agent Overtime"
         }]},"Agent Overtime "+data.start_event+" - "+data.end_event)
-        console.log(result);
+        // console.log(result);
       }).catch(err=>{
         this.$message({
           type:"error",

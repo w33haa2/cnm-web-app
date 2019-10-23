@@ -288,7 +288,7 @@ export default {
         attendance_id: this.schedule.attendances[0].id,
         time_out: this.form.rtaTimeOut.model.time_out
       }
-      console.log(data)
+      // console.log(data)
       if(confirm("Are you sure you want to proceed?")){
         this.form.rtaTimeOut.show=false;
         this.agentTimeOut(data);
@@ -357,7 +357,7 @@ export default {
     },
     evaluateSchedule() {
       const schedule = this.schedule;
-      console.log(schedule)
+      // console.log(schedule)
 
       if (schedule) {
         this.with_schedule = true;

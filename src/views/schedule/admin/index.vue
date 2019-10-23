@@ -713,8 +713,8 @@ export default {
         tmp = tmp.filter(i=>i.overtime_id == null);
         this.sched_array = tmp;
 
-        console.log(this.sched_array.filter(i=> i.user_info.id==20 && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[0])
-        console.log(this.sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length)
+        // console.log(this.sched_array.filter(i=> i.user_info.id==20 && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[0])
+        // console.log(this.sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length)
       }
       if (fail) {
         this.tableData = []
@@ -929,7 +929,7 @@ export default {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
-        console.log(res);
+        // console.log(res);
         var // json = JSON.stringify(res.data),
           blob = new Blob([res.data], {
             type:
@@ -957,7 +957,7 @@ export default {
       let header1 = ["Agent"];
 
         axios.get(url,options).then(res=>{
-          console.log(res.data.meta.agent_schedules)
+          // console.log(res.data.meta.agent_schedules)
           const range = moment.range(query.start, query.end)
           const dates = Array.from(range.by('day')).map(m =>
             m.format('YYYY-MM-DD')
@@ -1027,7 +1027,7 @@ export default {
             data.unshift(header1)
             data.unshift([])
             data.unshift(header)
-            console.log(data)
+            // console.log(data)
 
 
             // convertToExcel
@@ -1058,7 +1058,7 @@ export default {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
-        console.log(res);
+        // console.log(res);
         var // json = JSON.stringify(res.data),
           blob = new Blob([res.data], {
             type:
@@ -1116,7 +1116,7 @@ export default {
           console.log(res.data.meta);
           let data = res.data.meta.excel_data.map(i=>({title_id:1,auth_id:this.user_id,om_id:i.om_id,tl_id:i.tl_id,email:i.email.toLowerCase(),start_event:moment(i.start_event).format("YYYY-MM-DD HH:mm:ss"),end_event:moment(i.end_event).format("YYYY-MM-DD HH:mm:ss")}));
           this.loopCreateSchedule(data);
-        console.log(data);
+        // console.log(data);
         })
         .catch(err => console.log(err));
     },

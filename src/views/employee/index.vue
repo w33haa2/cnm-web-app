@@ -484,7 +484,7 @@ export default {
       }
     },
     employeeData: function(v) {
-      console.log(v);
+      // console.log(v);
     },
     searchQuery: function(newData) {
       if (newData !== "") {
@@ -614,7 +614,7 @@ export default {
             arr[i].lastname +
             suffix
         };
-        console.log(tmp_data);
+        // console.log(tmp_data);
         axios
           .post("api/v1/users/import_user", arr[i], {
             headers: {
@@ -622,7 +622,7 @@ export default {
             }
           })
           .then(res => {
-            console.log(res);
+            // console.log(res);
             loop_count+=1;
             this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
@@ -634,7 +634,7 @@ export default {
             this.excel.import.report.data.all.list = tmp_arr;
           })
           .catch(err => {
-            console.log(err.response.data);
+            // console.log(err.response.data);
             loop_count+=1;
             this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
@@ -659,7 +659,7 @@ export default {
       axios
         .post("api/v1/users/excel_to_array", formData, options)
         .then(res => {
-          console.log(res.data.meta.user);
+          // console.log(res.data.meta.user);
           this.excelAddUser(res.data.meta.user);
         })
         .catch(err => console.log(err));
@@ -677,7 +677,7 @@ export default {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
-        console.log(res);
+        // console.log(res);
         var // json = JSON.stringify(res.data),
           blob = new Blob([res.data], {
             type:
@@ -703,7 +703,7 @@ export default {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
-        console.log(res);
+        // console.log(res);
         var // json = JSON.stringify(res.data),
           blob = new Blob([res.data], {
             type:
@@ -777,7 +777,7 @@ export default {
       }
     },
     getUpdateData(id) {
-      console.log(this.employeesData.filter(i => i.id == id)[0]);
+      // console.log(this.employeesData.filter(i => i.id == id)[0]);
 
       return this.employeesData.filter(i => i.id == id)[0];
     },
@@ -792,7 +792,7 @@ export default {
         /* DO SOMETHING WITH workbook HERE */
       };
       reader.readAsArrayBuffer(f);
-      console.log(reader);
+      // console.log(reader);
     },
     closeEmployeeModal(v) {
       this.form.toggle = v;

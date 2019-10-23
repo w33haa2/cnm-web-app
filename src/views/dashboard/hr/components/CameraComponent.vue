@@ -156,13 +156,13 @@ export default {
       // console.log(imageFile);
     },
     onStarted(stream) {
-      console.log('On Started Event', stream)
+      // console.log('On Started Event', stream)
       this.vueCam.autoplay = true
       this.vueCam.buttons.stop = false
       this.vueCam.buttons.capture = false
     },
     onStopped(stream) {
-      console.log('On Stopped Event', stream)
+      // console.log('On Stopped Event', stream)
       // this.vueCam.autoplay = false;
       // this.vueCam.buttons.stop = false;
       this.camera_dialog = false
@@ -175,16 +175,16 @@ export default {
       this.$refs.webcam.start()
     },
     onError(error) {
-      console.log('On Error Event', error)
+      // console.log('On Error Event', error)
     },
     onCameras(cameras) {
       this.vueCam.devices = cameras
-      console.log('On Cameras Event', cameras)
+      // console.log('On Cameras Event', cameras)
     },
     onCameraChange(deviceId) {
       this.vueCam.deviceId = deviceId
       this.vueCam.camera = deviceId
-      console.log('On Camera Change Event', deviceId)
+      // console.log('On Camera Change Event', deviceId)
     },
     // End vue camera
 
@@ -213,7 +213,7 @@ export default {
       }
 
       var blob = new Blob(byteArrays, { type: contentType })
-      console.log(blob)
+      // console.log(blob)
       return blob
     }
   }

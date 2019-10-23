@@ -240,7 +240,7 @@ export default {
       }
     },
     incidentReports(newData) {
-      console.log(newData);
+      // console.log(newData);
     },
     sanctionLevels(v) {
       this.form.sanction_level_id = v.options[0].id;

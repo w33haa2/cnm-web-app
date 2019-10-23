@@ -424,7 +424,7 @@ export default {
       //   }
       // } else
       if (response.status == 500) {
-        console.log(response)
+        // console.log(response)
         if (response.data.title == 'Data Validation Error.') {
           const errors = Object.keys(response.data.meta.errors)
           errors.forEach((v, i) => {
@@ -575,16 +575,16 @@ export default {
       this.$refs.webcam.start()
     },
     onError(error) {
-      console.log('On Error Event', error)
+      // console.log('On Error Event', error)
     },
     onCameras(cameras) {
       this.vueCam.devices = cameras
-      console.log('On Cameras Event', cameras)
+      // console.log('On Cameras Event', cameras)
     },
     onCameraChange(deviceId) {
       this.vueCam.deviceId = deviceId
       this.vueCam.camera = deviceId
-      console.log('On Camera Change Event', deviceId)
+      // console.log('On Camera Change Event', deviceId)
     },
     // End vue camera
 
@@ -613,13 +613,13 @@ export default {
       }
 
       var blob = new Blob(byteArrays, { type: contentType })
-      console.log(blob)
+      // console.log(blob)
       return blob
     },
     ...mapActions(['addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee']),
     captured: function(value) {
       this.form.employee.image = value
-      console.log(value)
+      // console.log(value)
     },
     storeEmployee: async function() {
 

@@ -225,11 +225,11 @@ export default {
     'form.employee.lastname': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
     'form.employee.suffix': function() { this.form.employee.excel_hash = (this.form.employee.firstname + this.form.employee.middlename + this.form.employee.lastname + this.form.employee.suffix).replace(' ', '').toLowerCase() },
     formResponse: function() {
-      console.log(this.formResponse)
+      // console.log(this.formResponse)
       const response = this.formResponse
       if (response.status == 422) {
         const errors = Object.keys(response.data.errors)
-        console.log(errors)
+        // console.log(errors)
         errors.forEach((v, i) => {
           this.form.required[v] = true
         })
@@ -272,7 +272,7 @@ export default {
     ...mapActions(['addUser']),
     captured: function(value) {
       this.form.employee.image = value
-      console.log(value)
+      // console.log(value)
     },
     storeEmployee: async function() {
       this.clearFormErrors()
@@ -313,7 +313,7 @@ export default {
       // alert("form data created")
       const fd = new FormData()
       const tmp = Object.keys(obj)
-      console.log(tmp)
+      // console.log(tmp)
       tmp.forEach((v, i) => {
         if (obj[v]) {
           if (v != 'benefits') {

@@ -213,7 +213,7 @@ export default {
       })
     },
     editUser(params) {
-      console.log(params)
+      // console.log(params)
     },
     tableSizeChange(value) {
       this.table_config.query.limit = value

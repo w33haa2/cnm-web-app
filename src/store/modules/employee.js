@@ -558,7 +558,7 @@ const actions = {
    */
   addEmployee({ commit }, params) {
     const slug = "api.users.create";
-    console.log(params);
+    // console.log(params);
     STATE_API({ slug, params }, commit, [
       ADD_EMPLOYEES.initial,
       ADD_EMPLOYEES.success,
@@ -570,7 +570,7 @@ const actions = {
     axios
       .post(url, employee)
       .then(res => {
-        console.log(res.status);
+        // console.log(res.status);
         commit("FORM_RESPONSE", res);
       })
       .catch(error => {
@@ -588,7 +588,7 @@ const actions = {
     axios
       .post(url, employee)
       .then(res => {
-        console.log(res.status);
+        // console.log(res.status);
         commit("FORM_RESPONSE", res);
       })
       .catch(error => {
@@ -596,7 +596,7 @@ const actions = {
         commit("FORM_RESPONSE", error.response);
       });
 
-    console.log(response);
+    // console.log(response);
   }
   // fetchRecentEmployees({ commit }) {
   //   const url = 'api/v1/users?sort=full_name&'

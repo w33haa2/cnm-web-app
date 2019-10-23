@@ -233,7 +233,7 @@ export default {
   watch: {
     fetchLeaveCreditsState({ initial, success, fail }) {
       if (success) {
-        console.log(this.fetchLeaveCreditsData);
+        // console.log(this.fetchLeaveCreditsData);
         let tmp = this.fetchLeaveCreditsData.leave_credits,
           vl = tmp.filter(i => i.leave_type == "vacation_leave")[0].value,
           sl = tmp.filter(i => i.leave_type == "sick_leave")[0].value;
@@ -266,7 +266,7 @@ export default {
         this.calendarLoader = true;
       }
       if (success) {
-        console.log();
+        // console.log();
         this.calendarLoader = false;
         let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
         this.scheduleList = schedules.map(i => ({

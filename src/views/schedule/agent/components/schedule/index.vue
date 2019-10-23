@@ -102,7 +102,7 @@ export default {
         this.calendarLoader = true;
       }
       if (success) {
-        console.log();
+        // console.log();
         this.calendarLoader = false;
         let schedules = this.fetchAgentCalendarData.agent_schedules[0].schedule;
         this.scheduleList = schedules.map(i => ({

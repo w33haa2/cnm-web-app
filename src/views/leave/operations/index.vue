@@ -89,8 +89,8 @@ export default {
     };
   },
   created(){
-alert(this.token)
-console.log(this.token)
+// alert(this.token)
+// console.log(this.token)
     if(!this.isOperations()){
       this.getOperationsManager()
     }
@@ -271,7 +271,7 @@ console.log(this.token)
               moment(v.created_at).format("YYYY-MM-DD HH:mm:ss")
             ])
           }).bind(this));
-          console.log(data)
+          // console.log(data)
           data.unshift(["Leave Type","Date Range","Employee","Approved By","Created at"])
           data.unshift(["List of approved leave from "+ this.query.created_at_start +" to "+ this.query.created_at_start])
           let obj = {
@@ -327,7 +327,7 @@ console.log(this.token)
           }
         };
       axios.get(url,options).then(res=>{
-        console.log(res);
+        // console.log(res);
         this.options.operationsManager = res.data.meta.metadata.map(i=>({value:i.id,label:i.full_name}));
         this.options.operationsManager.unshift({value:"all", label:"All"})
         this.query.filter_om = "all";
