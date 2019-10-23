@@ -31,7 +31,18 @@
             <span style="color:white;background-color:grey;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.scheduled }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{scope.row.tl_schedules.length}}</span>
+            </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -40,7 +51,18 @@
             <span style="color:white;background-color:#67C23A;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.present }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="present").length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='present')" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="present").length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -49,7 +71,18 @@
             <span style="color:white;background-color:#E6A23C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.onleave }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="on-leave").length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='on-leave')" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="on-leave").length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -58,7 +91,18 @@
             <span style="color:white;background-color:#909399;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.absent }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="absent").length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='absent')" width="100%">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="absent").length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -67,7 +111,18 @@
             <span style="color:white;background-color:#F56C6C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.ncns }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="ncns" && i.user_status.status == "active").length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='ncns' && i.user_status.status == 'active')" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="ncns" && i.user_status.status == "active").length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -76,7 +131,18 @@
             <span style="color:white;background-color:#0072ff;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.upcoming }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="upcoming"  && i.user_status.status == "active").length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='upcoming'  && i.user_status.status == 'active')" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="upcoming"  && i.user_status.status == "active").length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column align="center">
@@ -85,7 +151,18 @@
             <span style="color:white;background-color:rgb(143, 2, 2);padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"><small>{{ table_config.col_count.inactive }}</small></span>
         </template>
         <template slot-scope="scope">
-          <span>{{scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=="ncns"|| i.remarks.toLowerCase() == "upcoming")  && i.user_status.status == "inactive" ).length}}</span>
+          <el-popover
+            width="300"
+            trigger="click">
+              <el-table :data="scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=='ncns'|| i.remarks.toLowerCase() == 'upcoming')  && i.user_status.status == 'inactive' )" width="100%" max-height="300px">
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+            <span slot="reference">{{scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=="ncns"|| i.remarks.toLowerCase() == "upcoming")  && i.user_status.status == "inactive" ).length}}</span>
+          </el-popover>
         </template>
       </el-table-column>
     </el-table>
@@ -180,7 +257,7 @@ export default {
         this.table_config.data = this.fetchWorkForceData.metadata
         let res = [].concat(this.fetchWorkForceData.metadata.map(i=> i.tl_schedules));
         res = [].concat.apply([],res)
-        console.log(res)
+        // console.log(res)
         this.table_config.col_count.scheduled = res.length;
         this.table_config.col_count.present = res.filter(i=>i.remarks.toLowerCase() == "present").length;
         this.table_config.col_count.onleave = res.filter(i=>i.remarks.toLowerCase() == "on-leave").length;

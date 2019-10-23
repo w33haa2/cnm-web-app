@@ -292,7 +292,7 @@
           <el-button
             type="danger"
             size="mini"
-            :loading="btn_loader"
+            :loading="form.addSchedule.btn_loader"
             @click="submitAddSchedule"
           >Confirm</el-button>
         </span>
