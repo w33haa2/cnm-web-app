@@ -563,6 +563,7 @@ export default {
       }
     },
     "excel.import.loop_index":function(v){
+      this.weekChange(this.week.start);
       if(v == this.excel.import.arr_length){
         this.excel.import.importing = false;
       }
@@ -1131,6 +1132,7 @@ export default {
           }
         };
       this.excel.import.loop_index = 0;
+      this.excel.import.progress = 0;
       data.forEach(((v,i)=>{
         let tmp_data={};
         axios.post("api/v1/schedules/create",v,options).then(res=>{
