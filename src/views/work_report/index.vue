@@ -145,18 +145,14 @@
                     <el-progress :percentage="datum.conformance | toFix" color="#6f7ad3"></el-progress>
                   </div>
                 </el-col>
-                <!-- <el-col :md="{span:6}">
+                <el-col :md="{span:6}">
                   <div class="label">
-                    <small>STATUS</small>
+                    <small>RENDERED HOURS</small>
                   </div>
                   <div>
-                    <template v-if="datum.leave_id"><el-tag :type="tagType(datum.remarks)" size="mini">{{ remUnderscore(ucwords(datum.leave.leave_type)) }}</el-tag></template>
-                    <template v-else>
-                      <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
-                      <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
-                    </template>
+                    <span style="color:grey">{{ datum.rendered_hours.time }}</span>
                   </div>
-                </el-col> -->
+                </el-col>
               </el-row>
             </el-col>
           </el-card>
