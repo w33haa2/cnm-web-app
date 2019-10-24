@@ -93,7 +93,7 @@
                   </div>
                   <div
                     class="text"
-                  >{{ formatDate(datum.start_event.date,"","HH:mm a") + " - " + formatDate(datum.end_event.date,"","HH:mm a") }}</div>
+                  >{{ formatDate(datum.start_event.date,"","hh:mm a") + " - " + formatDate(datum.end_event.date,"","hh:mm a") }}</div>
                 </el-col>
                 <el-col :md="{span:5}">
                   <div class="label">
@@ -119,10 +119,10 @@
                     </small>
                   </div>
                   <div class="text" v-if="datum.remarks == 'Present'">
-                    {{ formatDate(datum.time_in.date,"","HH:mm a") + " - " }}
+                    {{ formatDate(datum.time_in.date,"","hh:mm a") + " - " }}
                     <span
                       v-if="datum.time_out"
-                    >{{ formatDate(datum.time_out.date,"","HH:mm a") }}</span>
+                    >{{ formatDate(datum.time_out.date,"","hh:mm a") }}</span>
                     <span v-else>
                       <span v-if="laterDate(datum.end_event.date)" style="color:#409EFF">ongoing..</span>
                       <span v-else style="color:#F56C6C">no timeout</span>
