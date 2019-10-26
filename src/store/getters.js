@@ -313,5 +313,9 @@ const getters = {
   fetchTodaysScheduleState: state => state.fetch_todays_schedule.state,
   fetchTodaysScheduleData: state => state.fetch_todays_schedule.data,
   fetchTodaysScheduleTitle: state => state.fetch_todays_schedule.title,
+  // fetch_hierarchy_log
+  fetchHierarchyLogsState: state => state.fetch_hierarchy_log.state,
+  fetchHierarchyLogsData: state => state.fetch_hierarchy_log.data,
+  fetchHierarchyLogsTitle: state => state.fetch_hierarchy_log.title,
 };
 export default getters;

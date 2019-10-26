@@ -259,6 +259,20 @@ const api = {
         },
         // endregion access levels
 
+        // region access levels
+        hierarchy_log: {
+          $prefix: "hierarchy_log",
+          fetchAll: {
+            $url: "",
+            $method: "GET"
+          },
+          create: {
+            $url: "create",
+            $method: "POST"
+          }
+        },
+        // endregion access levels
+
         // region overtime
         overtime: {
           $prefix: "overtime",

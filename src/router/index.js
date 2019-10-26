@@ -224,6 +224,26 @@ export const asyncRoutes = [
            ]
          },
          {
+           path: "/cluster_log",
+           component: Layout,
+           name: "Cluster Log",
+           meta: {
+             roles: ["RTA Manager","RTA Supervisor","RTA Analyst"]
+           },
+           children: [
+             {
+               path: "/cluster_log",
+               component: () => import("@/views/cluster_log"),
+               name: "Cluster Log",
+               meta: {
+                 title: "Cluster Log",
+                 icon: "table",
+                 noCache:false
+               }
+             }
+           ]
+         },
+         {
            path: "/work_report",
            component: Layout,
            name: "Work Report",

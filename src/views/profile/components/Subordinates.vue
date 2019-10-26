@@ -1,62 +1,59 @@
 <template>
-  <div class="user-activity">
-    <!-- <el-row>
-      <el-col :md="{span:12}">
-        <el-input size="mini" placeholder="Search..."/>
+  <div class="app-container">
+    <h4 style="color:#646464">Subordinates</h4>
+
+    <!-- Search and Pagination -->
+    <el-row :gutter="10">
+      <el-col :md="{ span:4 }">
+          <el-date-picker
+            v-model="table_config.query.date"
+            size="mini"
+            type="date"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            :clearable="false"
+            style="width:100%"
+          />
       </el-col>
-      <el-col :md="{span:12}">
-      <el-pagination
-        style="float:right"
-        small
-        background
-        :page-sizes="[10, 25, 50]"
-        :current-page.sync="table_config.page"
-        :page-size="table_config.display_size"
-        layout="total, sizes, prev, next"
-        :total="table_config.total"
-        @size-change="tableSizeChange"
-        @current-change="tablePageChange"
-      />
+      <el-col :md="{ span:5 }">
+        <el-select
+          v-model="table_config.remoteFilter.select"
+          class="form-input"
+          style="width:100%;padding-bottom:2px"
+          size="mini"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="Search..."
+          :remote-method="remoteSearch"
+          :loading="table_config.remoteFilter.loader"
+        >
+          <el-option
+            v-for="(option,index) in table_config.remoteFilter.options"
+            :key="index"
+            :label="option[table_config.remoteFilter.by].full_name"
+            :value="option[table_config.remoteFilter.by].id"
+          />
+        </el-select>
       </el-col>
-    </el-row>-->
-    <el-table :data="tableData" style="width: 100%;margin-top:10px;">
-      <el-table-column label="Employee" min-width="450" prop="full_name" fixed>
-        <template slot="header">
-          <span style="float:left">
-            <h4 class="text-muted">Name</h4>
-          </span>
-        </template>
+    </el-row>
+
+    <!-- Table -->
+    <el-table :data="table_config.data"  style="width: 100%;margin-top:30px;" v-loading="fetchHierarchyLogsState.initial">
+      <el-table-column align="center" label="Subordinate">
+        <template slot-scope="scope">{{ scope.row.child_details.full_name }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="Start date">
+        <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","MM Do YYYY") }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="End date">
         <template slot-scope="scope">
-          <div class="user-block">
-            <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
-            <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
-              <div
-                style="align-self:center;width:100%;text-align:center;"
-                class="text-point-eight-em"
-              >{{ getAvatarLetters(scope.row.firstname,scope.row.lastname) }}</div>
-            </div>
-            <div style="float:left;height:100%;">
-              <div style="display:flex;height:100%;">
-                <router-link :to="'/profile/index/'+scope.row.id">
-                  <div
-                    style="align-self:center; margin-left:15px;font-size:14px;color:grey;font-weight:600;"
-                  >{{ scope.row.full_name }}</div>
-                </router-link>
-              </div>
-            </div>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="Position" width="150" align="center">
-        <template slot-scope="{row}">
-          <span class>{{ row.position }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" width="200" align="center">
-        <template slot-scope="{row}">
-          <el-tag
-            :type="row.status.toLowerCase() == 'active'?'success':'danger'"
-          >{{ row.status.toUpperCase() }}</el-tag>
+          <template v-if="scope.row.end_date">
+            {{ formatDate(scope.row.end_date,"","MM Do YYYY") }}
+          </template>
+          <template v-else>
+            <el-tag type="success" size="mini">At present</el-tag>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -64,128 +61,88 @@
 </template>
 
 <script>
+import moment from "moment";
 import { mapActions, mapGetters } from "vuex";
-import axios from "axios";
+const ymdHms ="YYYY-MM-DD HH:mm:ss"
 export default {
-  props: ["user"],
   data() {
     return {
-      tableData: [],
-      table_config: {
-        page: 1,
-        display_size: 10,
-        total: 0
-      },
-      query: {
-        id: this.$route.params.id
+      table_config:{
+        data:[],
+        dummy:[],
+        count:0,
+        loader:false,
+        page:1,
+        query:{
+          date:moment().format(ymdHms),
+          parent_id: this.$route.params.id
+        },
+        remoteFilter:{
+          select:null,
+          options:[],
+          by:"child_details",
+          loader:false,
+        }
       }
-    };
-  },
-  watch: {
-    comrades(v) {
-      this.tableData = v;
-    },
-    comradesTotal(v) {
-      this.table_config.total = v;
     }
   },
   computed: {
-    ...mapGetters(["token", "comrades", "comradesTotal"])
+    ...mapGetters([
+      "fetchHierarchyLogsState","fetchHierarchyLogsData","fetchHierarchyLogsTitle",
+      ]),
   },
-  mounted() {
-    this.fetchComrades({ id: this.$route.params.id });
+  watch:{
+    "table_config.query.date":function(v){
+      this.fetchHierarchyLogs(this.table_config.query);
+    },
+    "table_config.remoteFilter.select":function(v){
+      if(v){
+        this.table_config.data = this.table_config.dummy.filter(i=> i.child_id == v);
+      }else{
+        this.table_config.data = this.table_config.dummy;
+      }
+    },
+    fetchHierarchyLogsState({initial, success, fail}){
+      if(success){
+        this.table_config.data = this.fetchHierarchyLogsData.hierarchy_log;
+        this.table_config.dummy = this.fetchHierarchyLogsData.hierarchy_log;
+        this.table_config.count = this.fetchHierarchyLogsData.count;
+      }
+    },
+  },
+  created() {
+    this.fetchHierarchyLogs(this.table_config.query);
   },
   methods: {
-    ...mapActions(["fetchComrades"]),
-    tableSizeChange(value) {
-      this.query.limit = value;
-      const data = this.query;
-      this.fetchComrades(data);
+    ...mapActions(["fetchHierarchyLogs"]),
+    tableSizeChange(){},
+    tablePageChange(){},
+    remoteSearch(query) {
+      let filtered = null;
+      this.table_config.remoteFilter.options = [];
+
+      this.table_config.remoteFilter.loader = true;
+      if (query !== "") {
+        filtered = this.table_config.dummy.filter(i=> i[this.table_config.remoteFilter.by].full_name.toLowerCase().includes(query));
+      } else if(query !== "all"){
+        filtered = this.table_config.dummy;
+      }
+      this.table_config.remoteFilter.options = filtered;
+      this.table_config.remoteFilter.options.unshift({child_details:{id:null,full_name:""}});
+      this.table_config.remoteFilter.loader = false;
+
     },
-    tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchComrades(data);
-    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-.user-activity {
-  .user-block {
-    .username,
-    .description {
-      display: block;
-      padding: 2px 0;
-    }
-
-    .username {
-      font-size: 16px;
-      color: #000;
-    }
-
-    :after {
-      clear: both;
-    }
-
-    .img-circle {
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      float: left;
-    }
-
-    span {
-      font-weight: 500;
-      font-size: 12px;
-    }
+.app-container {
+  .roles-table {
+    margin-top: 30px;
   }
-
-  .post {
-    font-size: 14px;
-    border-bottom: 1px solid #d2d6de;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    color: #666;
-
-    .image {
-      width: 100%;
-      height: 100%;
-    }
-
-    .user-images {
-      padding-top: 20px;
-    }
+  .permission-tree {
+    margin-bottom: 30px;
   }
-
-  .list-inline {
-    padding-left: 0;
-    margin-left: -5px;
-    list-style: none;
-
-    li {
-      display: inline-block;
-      padding-right: 5px;
-      padding-left: 5px;
-      font-size: 13px;
-    }
-
-    .link-black {
-      &:hover,
-      &:focus {
-        color: #999;
-      }
-    }
-  }
-}
-
-.box-center {
-  margin: 0 auto;
-  display: table;
-}
-
-.text-muted {
-  color: #777;
 }
 </style>
