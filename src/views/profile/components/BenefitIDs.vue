@@ -4,51 +4,39 @@
       <div class="user-block">
         <span class="username text-muted">SSS</span>
       </div>
-      <p>{{ user.benefits[0].id_number }}</p>
+      <p>{{ user.benefits[0].id_number ? user.benefits[0].id_number: "NA" }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">PhilHealth</span>
       </div>
-      <p>{{ user.benefits[1].id_number }}</p>
+      <p>{{ user.benefits[1].id_number ? user.benefits[1].id_number: "NA" }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">PagIbig</span>
       </div>
-      <p>{{ user.benefits[2].id_number }}</p>
+      <p>{{ user.benefits[2].id_number ? user.benefits[2].id_number: "NA" }}</p>
     </div>
     <div class="post">
       <div class="user-block">
         <span class="username text-muted">TIN</span>
       </div>
-      <p>{{ user.benefits[3].id_number }}</p>
+      <p>{{ user.benefits[3].id_number ? user.benefits[3].id_number: "NA" }}</p>
     </div>
   </div>
 </template>
 
 <script>
-const avatarPrefix = '?imageView2/1/w/80/h/80'
-const carouselPrefix = '?imageView2/2/h/440'
-
 export default {
-  props: ['user'],
+  props: ["user"],
   data() {
-    return {
-      carouselImages: [
-        'https://wpimg.wallstcn.com/9679ffb0-9e0b-4451-9916-e21992218054.jpg',
-        'https://wpimg.wallstcn.com/bcce3734-0837-4b9f-9261-351ef384f75a.jpg',
-        'https://wpimg.wallstcn.com/d1d7b033-d75e-4cd6-ae39-fcd5f1c0a7c5.jpg',
-        'https://wpimg.wallstcn.com/50530061-851b-4ca5-9dc5-2fead928a939.jpg'
-      ],
-      avatarPrefix,
-      carouselPrefix
-    }
+    return {};
   },
   created() {
     // console.log(this.user)
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

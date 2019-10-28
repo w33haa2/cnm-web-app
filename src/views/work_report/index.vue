@@ -143,7 +143,7 @@
                   </div>
                   <div>
                     <el-progress
-                      :percentage="parseFloat(datum.conformance).toFixed(1)"
+                      :percentage="(parseFloat(datum.conformance).toFixed(1))"
                       color="#6f7ad3"
                     ></el-progress>
                   </div>
