@@ -76,7 +76,10 @@
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.report_details.agent_response" type="success">{{ scope.row.report_details.agent_response }}</el-tag>
+          <el-tag
+            v-if="scope.row.report_details.agent_response"
+            type="success"
+          >{{ scope.row.report_details.agent_response.commitment }}</el-tag>
           <el-tag v-else type="danger">No Response</el-tag>
         </template>
       </el-table-column>
@@ -119,7 +122,13 @@
       <label>Incident Date</label>
       <el-row style="margin-top: 5px; margin-bottom:3px;">
         <el-col>
-          <el-date-picker size="mini" type="date" placeholder="Select date..." v-model="form.incident_date" style="width:100%"></el-date-picker>
+          <el-date-picker
+            size="mini"
+            type="date"
+            placeholder="Select date..."
+            v-model="form.incident_date"
+            style="width:100%"
+          ></el-date-picker>
         </el-col>
       </el-row>
       <label>Sanction Type</label>
@@ -189,7 +198,7 @@ export default {
         show: false,
         action: "Create",
         id: null,
-        incident_date:null,
+        incident_date: null,
         sanction_type_id: null,
         sanction_level_id: null,
         description: null,
@@ -281,7 +290,7 @@ export default {
     this.fetchComrades({ id: this.userDetails.id });
     this.fetchSanctionLevels();
     this.fetchSanctionTypes();
-    window.addEventListener('beforeunload',this.beforeUnload)
+    window.addEventListener("beforeunload", this.beforeUnload);
   },
   methods: {
     ...mapActions([
@@ -292,8 +301,8 @@ export default {
       "createReports",
       "updateIncidentReport"
     ]),
-    beforeUnload(e){
-      alert("UNLOADING")
+    beforeUnload(e) {
+      alert("UNLOADING");
     },
     submitForm() {
       this.confirm = true;
@@ -339,7 +348,7 @@ export default {
             show: true,
             action: action,
             id: data.report_details.id,
-            incident_date:data.report_details.incident_date,
+            incident_date: data.report_details.incident_date,
             sanction_type_id: data.report_details.sanction_type.id,
             sanction_level_id: data.report_details.sanction_level.id,
             description: data.report_details.description,

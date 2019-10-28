@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Cluster Log</h4>
+    <h4 style="color:#646464">Assignment Log</h4>
     <!-- Search and Pagination -->
 
     <el-row :gutter="10" style="margin-bottom:5px;">
@@ -84,7 +84,7 @@
         <template slot-scope="scope">{{ scope.row.child_details.full_name }}</template>
       </el-table-column>
       <el-table-column align="center" label="Start date">
-        <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","M Do YYYY") }}</template>
+        <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","MMM Do YYYY") }}</template>
       </el-table-column>
       <el-table-column align="center" label="End date">
         <template slot-scope="scope">
@@ -124,7 +124,6 @@ export default {
         loader: false,
         query: {
           date: moment().format(ymdHms),
-          operations: true,
           page: 1,
           perpage: 10
         },
@@ -248,7 +247,7 @@ export default {
     },
     remoteSearch(query) {
       let url =
-        "api/v1/hierarchy_log?list=true&operations=true&date=" +
+        "api/v1/hierarchy_log?list=true&date=" +
         moment(this.table_config.query.date).format(ymdHms) +
         "&filter_by=" +
         this.table_config.remoteFilter.by;

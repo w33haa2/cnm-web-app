@@ -139,32 +139,40 @@ export const asyncRoutes = [
                  title: "Status"
                  // if do not set roles, means: this page does not requireincident_report
                }
+             },
+             {
+              path: "/employee/reassign",
+              component: () => import("@/views/cluster_log/admin"),
+              name: "Reassign",
+              meta: {
+                title: "Reassign",
+              }
              }
            ]
          },
          IrRouter,
          {
-          path: "leave_credits",
-          component: Layout,
-          redirect: "/leave_credits",
-          //  alwaysShow: true, // will always show the root menu
-          name: "Leave Credits",
-          meta: {
-            title: "Leave Credits",
-            icon: "leave-credits",
-            roles: ["Admin","HR Manager"]
-          },
-          children: [
-            {
-              path: "/leave_credits",
-              component: () => import("@/views/leave_credits/index"),
-              meta: {
-                title: "Leave Credits",
-                noCache:false
-              }
-            },
-          ]
-        },
+           path: "leave_credits",
+           component: Layout,
+           redirect: "/leave_credits",
+           //  alwaysShow: true, // will always show the root menu
+           name: "Leave Credits",
+           meta: {
+             title: "Leave Credits",
+             icon: "leave-credits",
+             roles: ["Admin", "HR Manager"]
+           },
+           children: [
+             {
+               path: "/leave_credits",
+               component: () => import("@/views/leave_credits/index"),
+               meta: {
+                 title: "Leave Credits",
+                 noCache: false
+               }
+             }
+           ]
+         },
          {
            path: "/schedules",
            component: Layout,
@@ -208,7 +216,14 @@ export const asyncRoutes = [
            component: Layout,
            name: "Work Force",
            meta: {
-             roles: ["RTA Manager","RTA Supervisor","RTA Analyst","Admin","Operations Manager", "Team Leader"]
+             roles: [
+               "RTA Manager",
+               "RTA Supervisor",
+               "RTA Analyst",
+               "Admin",
+               "Operations Manager",
+               "Team Leader"
+             ]
            },
            children: [
              {
@@ -218,7 +233,7 @@ export const asyncRoutes = [
                meta: {
                  title: "Work Force",
                  icon: "work-force",
-                 noCache:false
+                 noCache: false
                }
              }
            ]
@@ -228,7 +243,7 @@ export const asyncRoutes = [
            component: Layout,
            name: "Cluster Log",
            meta: {
-             roles: ["RTA Manager","RTA Supervisor","RTA Analyst"]
+             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
            children: [
              {
@@ -238,7 +253,7 @@ export const asyncRoutes = [
                meta: {
                  title: "Cluster Log",
                  icon: "table",
-                 noCache:false
+                 noCache: false
                }
              }
            ]
@@ -267,7 +282,18 @@ export const asyncRoutes = [
            component: Layout,
            name: "Incident Reports",
            meta: {
-             roles: ["Representative - Order Placer","IT Specialist","IT Support","RTA Analyst","Product Trainer",,"Maintenance Staff", "QA Assurance Analyst", "Payroll Assistant", "Accountant"]
+             roles: [
+               "Representative - Order Placer",
+               "IT Specialist",
+               "IT Support",
+               "RTA Analyst",
+               "Product Trainer",
+               ,
+               "Maintenance Staff",
+               "QA Assurance Analyst",
+               "Payroll Assistant",
+               "Accountant"
+             ]
            },
            children: [
              {
@@ -282,41 +308,59 @@ export const asyncRoutes = [
            ]
          },
          {
-          path: "incident_reports",
-          component: Layout,
-          redirect: "/incident_reports/recieved",
-          //  alwaysShow: true, // will always show the root menu
-          name: "Incident Reports",
-          meta: {
-            title: "Incident Reports",
-            icon: "documentation",
-            roles: ["Finance Officer","Team Leader","Operations Manager","RTA Supervisor", "RTA Manager","QA Supervisor","T & Q Manager","IT Supervisor"]
-          },
-          children: [
-            {
-              path: "/incident_reports/receive",
-              component: () => import("@/views/incident_reports/receive"),
-              name: "Receive",
-              meta: {
-                title: "Receive",
-              }
-            },
-            {
-              path: "/incident_reports/issue",
-              component: () => import("@/views/incident_reports/issue"),
-              name: "Issue",
-              meta: {
-                title: "Issue",
-              }
-            },
-          ]
-        },
+           path: "incident_reports",
+           component: Layout,
+           redirect: "/incident_reports/recieved",
+           //  alwaysShow: true, // will always show the root menu
+           name: "Incident Reports",
+           meta: {
+             title: "Incident Reports",
+             icon: "documentation",
+             roles: [
+               "Finance Officer",
+               "Team Leader",
+               "Operations Manager",
+               "RTA Supervisor",
+               "RTA Manager",
+               "QA Supervisor",
+               "T & Q Manager",
+               "IT Supervisor"
+             ]
+           },
+           children: [
+             {
+               path: "/incident_reports/receive",
+               component: () => import("@/views/incident_reports/receive"),
+               name: "Receive",
+               meta: {
+                 title: "Receive"
+               }
+             },
+             {
+               path: "/incident_reports/issue",
+               component: () => import("@/views/incident_reports/issue"),
+               name: "Issue",
+               meta: {
+                 title: "Issue"
+               }
+             }
+           ]
+         },
          {
            path: "/agent_schedules",
            component: Layout,
            name: "Agent Schedules",
            meta: {
-             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst","HR Manager", "HR Assistant","Admin"]
+             roles: [
+               "Operations Manager",
+               "Team Leader",
+               "RTA Manager",
+               "RTA Supervisor",
+               "RTA Analyst",
+               "HR Manager",
+               "HR Assistant",
+               "Admin"
+             ]
            },
            children: [
              {
@@ -335,21 +379,27 @@ export const asyncRoutes = [
            component: Layout,
            name: "Agent Leave",
            meta: {
-             roles: ["Operations Manager", "Team Leader", "RTA Manager", "RTA Supervisor", "RTA Analyst"]
+             roles: [
+               "Operations Manager",
+               "Team Leader",
+               "RTA Manager",
+               "RTA Supervisor",
+               "RTA Analyst"
+             ]
            },
            children: [
-            {
-              path: "/agent/leave",
-              component: () => import("@/views/leave/index"),
-              name: "Agent Leave",
-              meta: {
-                title: "Agent Leave",
-                noCache:false,
-                icon: "calendar-check"
+             {
+               path: "/agent/leave",
+               component: () => import("@/views/leave/index"),
+               name: "Agent Leave",
+               meta: {
+                 title: "Agent Leave",
+                 noCache: false,
+                 icon: "calendar-check"
 
-                // if do not set roles, means: this page does not requireincident_report
-              }
-            },
+                 // if do not set roles, means: this page does not requireincident_report
+               }
+             }
            ]
          },
          {
@@ -360,18 +410,18 @@ export const asyncRoutes = [
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
            children: [
-            {
-              path: "/agent/leave_slots",
-              component: () => import("@/views/leave/slots"),
-              name: "Agent Leave Slots",
-              meta: {
-                title: "Agent Leave Slots",
-                noCache:false,
-                icon: "calendar-slots"
+             {
+               path: "/agent/leave_slots",
+               component: () => import("@/views/leave/slots"),
+               name: "Agent Leave Slots",
+               meta: {
+                 title: "Agent Leave Slots",
+                 noCache: false,
+                 icon: "calendar-slots"
 
-                // if do not set roles, means: this page does not requireincident_report
-              }
-            },
+                 // if do not set roles, means: this page does not requireincident_report
+               }
+             }
            ]
          },
          {
@@ -389,10 +439,9 @@ export const asyncRoutes = [
                meta: {
                  title: "Agent VTO",
                  noCache: false,
-                  icon: "vto"
-
+                 icon: "vto"
                }
-             },
+             }
            ]
          },
          {

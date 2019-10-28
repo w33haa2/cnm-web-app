@@ -46,7 +46,7 @@ export default {
         }
       }, url="api/v1/reports/issued_to/"+this.user_id;
       axios.get(url,options).then(res => {
-        this.value = res.data.meta.reports.filter(i=> i.report_details.status == "open").length;
+        this.value = res.data.meta.reports.filter(i=> i.report_details.status == 1).length;
       }).catch(err=>console.log(err.response.data));
     }
   }
