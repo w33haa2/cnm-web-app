@@ -180,7 +180,8 @@ const getters = {
   // approve_overtime_schedule
   approveOvertimeSchedulesState: state => state.approve_overtime_schedule.state,
   approveOvertimeSchedulesData: state => state.approve_overtime_schedule.data,
-  approveOvertimeSchedulesError: state => state.approve_overtime_schedule.errors,
+  approveOvertimeSchedulesError: state =>
+    state.approve_overtime_schedule.errors,
   // revert_overtime_schedule
   revertOvertimeScheduleState: state => state.revert_overtime_schedule.state,
   revertOvertimeScheduleData: state => state.revert_overtime_schedule.data,
@@ -317,5 +318,9 @@ const getters = {
   fetchHierarchyLogsState: state => state.fetch_hierarchy_log.state,
   fetchHierarchyLogsData: state => state.fetch_hierarchy_log.data,
   fetchHierarchyLogsTitle: state => state.fetch_hierarchy_log.title,
+  // delete_hierarchy_log
+  deleteHierarchyLogState: state => state.delete_hierarchy_log.state,
+  deleteHierarchyLogData: state => state.delete_hierarchy_log.data,
+  deleteHierarchyLogTitle: state => state.delete_hierarchy_log.title
 };
 export default getters;

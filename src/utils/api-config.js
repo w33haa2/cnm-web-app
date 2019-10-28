@@ -139,7 +139,7 @@ const api = {
           },
           create_bulk: {
             $url: "create/bulk",
-            $method: "POST",
+            $method: "POST"
           },
           update: {
             $url: "update",
@@ -167,9 +167,9 @@ const api = {
             $requires: ["id"],
             $format: Template(() => `fetch/${id}`)
           },
-          excel_to_array:{
+          excel_to_array: {
             $url: "excel_to_array",
-            $method: "POST",
+            $method: "POST"
           },
           report: {
             $url: "work/report",
@@ -183,11 +183,11 @@ const api = {
             $url: "overtime/join",
             $method: "POST"
           },
-          approve_ot:{
+          approve_ot: {
             $url: "overtime/approve",
             $method: "POST"
           },
-          revert_ot:{
+          revert_ot: {
             $url: "overtime/approve/revert",
             $method: "POST"
           }
@@ -269,6 +269,12 @@ const api = {
           create: {
             $url: "create",
             $method: "POST"
+          },
+          delete: {
+            $url: "delete",
+            $method: "DELETE",
+            $requires: ["id"],
+            $format: Template(() => `delete/${id}`)
           }
         },
         // endregion access levels
@@ -303,7 +309,7 @@ const api = {
           current: {
             $url: "current",
             $method: "GET"
-          },
+          }
         },
         // endregion overtime
 
@@ -449,6 +455,10 @@ const api = {
             $method: "POST",
             $requires: ["user_id"],
             $format: Template(() => `delete/${user_id}`)
+          },
+          remote: {
+            $url: "remote",
+            $method: "GET"
           }
         },
         // endregion users
@@ -478,11 +488,11 @@ const api = {
         // startregion user status
         vto: {
           $prefix: "schedules/vto",
-          list:{
+          list: {
             $url: "list",
             $method: "GET"
           },
-          search:{
+          search: {
             $url: "search",
             $method: "GET"
           },
