@@ -6,12 +6,7 @@
       </div>
     </div>
     <!-- eslint-disable-next-line -->
-    <template v-if="image!=null">
-      <div :style="{backgroundImage: `url(${image})`}" class="pan-thumb"></div>
-    </template>
-    <template v-else>
-      <div :style="{backgroundImage: 'default.gif'}" class="pan-thumb"></div>
-    </template>
+    <div :style="{backgroundImage: `url(${image})`}" class="pan-thumb"></div>
   </div>
 </template>
 

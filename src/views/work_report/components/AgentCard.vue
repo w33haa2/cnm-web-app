@@ -7,7 +7,7 @@
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb
-          :image="userDetails.image_url"
+          :image="userDetails.image_url?userDetails.image_url:'default.gif'"
           :height="'100px'"
           :width="'100px'"
           :hoverable="false"
@@ -38,7 +38,7 @@
         <div class="user-bio-section-body">
           <div class="progress-item">
             <!-- <span>{{ formatDate(month,"","YYYY MMMM") }}</span> -->
-            <el-progress :percentage="stat.conformance.overall" />
+            <el-progress :percentage="parseFloat(stat.conformance.overall).toFixed(1)" />
           </div>
           <!-- <div class="progress-item">
             <span>{{ user.summary.yearly.year }}</span>
@@ -90,14 +90,14 @@ import { mapGetters } from "vuex";
 export default {
   props: ["stat", "month"],
   components: { PanThumb },
-  data(){
-    return{
-      image:null
-    }
+  data() {
+    return {
+      image: null
+    };
   },
   computed: {
     ...mapGetters(["name", "position", "userDetails"])
-  },
+  }
   // methods:{
   //   getDetails(){
 

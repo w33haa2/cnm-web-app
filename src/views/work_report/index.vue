@@ -3,11 +3,7 @@
   <div>
     <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div v-if="show_fetch_error" style="margin-top:25px;padding:20px;">
-      <el-alert
-        title="There is an error fetching your data."
-        type="error"
-        show-icon>
-      </el-alert>
+      <el-alert title="There is an error fetching your data." type="error" show-icon></el-alert>
     </div>
     <div style="height:75vh;" v-loading="true" v-if="containerLoader"></div>
     <div v-if="show_fetch_error == false && containerLoader == false" class="app-container">
@@ -24,7 +20,7 @@
           <!-- <el-row style="margin-bottom:10px;">
             <el-col>
             </el-col>
-          </el-row> -->
+          </el-row>-->
           <el-card style="padding-bottom:15px;">
             <el-col class="header" :md="{span:12}">
               <el-date-picker
@@ -39,13 +35,13 @@
               <span style="float:right">
                 <template v-if="work_report.grid_data.length>1">
                   <small>
-                  {{ work_report.grid_data.length }}
+                    {{ work_report.grid_data.length }}
                     <small>SCHEDULES</small>
                   </small>
                 </template>
                 <template v-if="work_report.grid_data.length==1">
                   <small>
-                  {{ work_report.grid_data.length }}
+                    {{ work_report.grid_data.length }}
                     <small>SCHEDULE</small>
                   </small>
                 </template>
@@ -58,21 +54,14 @@
             </el-col>
             <el-col v-if="show_report_noschedule">
               <el-divider style="padding:5px;"></el-divider>
-              <el-alert
-                title="There are no schedules found for this date."
-                type="info"
-                show-icon>
-              </el-alert>
+              <el-alert title="There are no schedules found for this date." type="info" show-icon></el-alert>
             </el-col>
             <el-col v-if="show_report_error">
               <el-divider style="padding:5px;"></el-divider>
-              <el-alert
-                title="There is an error fetching your schedules."
-                type="error"
-                show-icon>
-              </el-alert>
+              <el-alert title="There is an error fetching your schedules." type="error" show-icon></el-alert>
             </el-col>
-            <el-col v-if="show_report"
+            <el-col
+              v-if="show_report"
               class="schedule-container"
               v-for="(datum,index) in work_report.grid_data"
               :key="index"
@@ -80,15 +69,21 @@
               <el-divider style="padding:5px;"></el-divider>
               <el-row>
                 <el-col :md="{span:2}">
-                  <div class="schedule-date">{{ formatDate(datum.start_event.date,"", "DD") }}
-                  </div>
+                  <div class="schedule-date">{{ formatDate(datum.start_event.date,"", "DD") }}</div>
                   <div class="schedule-day">{{ formatDate(datum.start_event.date,"","ddd") }}</div>
                 </el-col>
                 <el-col :md="{span:5}">
                   <div class="label">
-                    <small>SCHEDULE
-                      <small v-if="datum.overtime_id" style="padding:2px;background-color:#F56C6C;color:white;">OVERTIME</small>
-                      <small v-else style="padding:2px;background-color:#409EFF;color:white;">REGULAR</small>
+                    <small>
+                      SCHEDULE
+                      <small
+                        v-if="datum.overtime_id"
+                        style="padding:2px;background-color:#F56C6C;color:white;"
+                      >OVERTIME</small>
+                      <small
+                        v-else
+                        style="padding:2px;background-color:#409EFF;color:white;"
+                      >REGULAR</small>
                     </small>
                   </div>
                   <div
@@ -97,25 +92,26 @@
                 </el-col>
                 <el-col :md="{span:5}">
                   <div class="label">
-                    <small>ATTENDANCE
+                    <small>
+                      ATTENDANCE
                       <template v-if="datum.remarks.toLowerCase() == 'on-leave'">
-                        <span >
-                          <small style="padding:2px;background-color:#E6A23C;color:white">
-                            {{ leave_label[datum.leave.leave_type.toLowerCase()].toUpperCase() }}
-                          </small>
+                        <span>
+                          <small
+                            style="padding:2px;background-color:#E6A23C;color:white"
+                          >{{ leave_label[datum.leave.leave_type.toLowerCase()].toUpperCase() }}</small>
                         </span>
                       </template>
                       <template v-else>
                         <span>
-                          <small  :style="'padding:2px;background-color:'+tag[datum.remarks.toLowerCase()].bc+';color:'+tag[datum.remarks.toLowerCase()].fc">
-                            {{ datum.remarks.toUpperCase() }}
-                          </small>
+                          <small
+                            :style="'padding:2px;background-color:'+tag[datum.remarks.toLowerCase()].bc+';color:'+tag[datum.remarks.toLowerCase()].fc"
+                          >{{ datum.remarks.toUpperCase() }}</small>
                         </span>
                       </template>
                       <!-- <template v-else>
                         <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
                         <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
-                      </template> -->
+                      </template>-->
                     </small>
                   </div>
                   <div class="text" v-if="datum.remarks == 'Present'">
@@ -134,7 +130,11 @@
                   <div class="label">
                     <small>VTO</small>
                   </div>
-                  <el-tag v-if="datum.vto_at" type="primary" size="mini">{{ datum.vto_hours.second/60/60 +" hr/s" }}</el-tag>
+                  <el-tag
+                    v-if="datum.vto_at"
+                    type="primary"
+                    size="mini"
+                  >{{ datum.vto_hours.second/60/60 +" hr/s" }}</el-tag>
                   <el-tag v-else type="info" size="mini">0 hr/s</el-tag>
                 </el-col>
                 <el-col :md="{span:4}">
@@ -142,7 +142,10 @@
                     <small>CONFORMANCE</small>
                   </div>
                   <div>
-                    <el-progress :percentage="datum.conformance | toFix" color="#6f7ad3"></el-progress>
+                    <el-progress
+                      :percentage="parseFloat(datum.conformance).toFixed(1)"
+                      color="#6f7ad3"
+                    ></el-progress>
                   </div>
                 </el-col>
                 <el-col :md="{span:6}">
@@ -173,39 +176,51 @@ export default {
   components: { agentCard, logger },
   data() {
     return {
-      tag:{
-        present:{
-          bc:"#67C23A",fc:"white",label:"PRESENT"
+      tag: {
+        present: {
+          bc: "#67C23A",
+          fc: "white",
+          label: "PRESENT"
         },
-        off:{
-          bc:"#EBEEF5",fc:"#909399",label:"OFF"
+        off: {
+          bc: "#EBEEF5",
+          fc: "#909399",
+          label: "OFF"
         },
-        upcoming:{
-          bc:"#0072ff",fc:"white",label:"UPCOMING"
+        upcoming: {
+          bc: "#0072ff",
+          fc: "white",
+          label: "UPCOMING"
         },
-        ncns:{
-          bc:"#F56C6C",fc:"white",label:"NCNS"
+        ncns: {
+          bc: "#F56C6C",
+          fc: "white",
+          label: "NCNS"
         },
-        absent:{
-          bc:"#909399",fc:"white",label:"ABSENT"
+        absent: {
+          bc: "#909399",
+          fc: "white",
+          label: "ABSENT"
         },
-        inactive:{
-          bc:"#000000",fc:"white",label:"INACTIVE"
+        inactive: {
+          bc: "#000000",
+          fc: "white",
+          label: "INACTIVE"
         }
       },
-      leave_label:{
-        "vacation_leave":"vacation",
-        "sick_leave":"sick",
-        "leave_of_absence":"LOA",
-        "maternity_leave":"maternity",
-        "paternity_leave":"paternity",
-        "bereavement_leave":"bereavement",
-        solo_parent_leave:"solo parent",
-        "vawc":"vawc",
-        "magna_carta_leave":"magna carta",
-        "partial_sick_leave":"partial sick",
-        "loa1":"LOA1 (S)",
-        "loa2":"LOA2 (V)",
+      leave_label: {
+        vacation_leave: "vacation",
+        sick_leave: "sick",
+        leave_of_absence: "LOA",
+        maternity_leave: "maternity",
+        paternity_leave: "paternity",
+        bereavement_leave: "bereavement",
+        solo_parent_leave: "solo parent",
+        vawc: "vawc",
+        magna_carta_leave: "magna carta",
+        partial_sick_leave: "partial sick",
+        loa1: "LOA1 (S)",
+        loa2: "LOA2 (V)"
       },
       containerLoader: true,
       show_fetch_error: false,
@@ -247,18 +262,17 @@ export default {
   },
   watch: {
     agentsWorkReportsfetchState({ initial, success, fail }) {
-      if(initial){
+      if (initial) {
         this.containerLoader = true;
-
       }
       if (success) {
-        this.containerLoader = false
+        this.containerLoader = false;
         let tmp = this.agentsWorkReports.agent_schedules[0].schedule;
-        if(tmp.length>0){
+        if (tmp.length > 0) {
           this.show_report = true;
           this.show_report_error = false;
           this.show_report_noschedule = false;
-        }else{
+        } else {
           this.show_report = false;
           this.show_report_error = false;
           this.show_report_noschedule = true;
@@ -266,12 +280,12 @@ export default {
         this.work_report.grid_data = tmp.sort(this.descStartEvent);
         this.summary = this.agentsWorkReports.agent_schedules[0].summary;
       }
-      if(fail){
-          this.containerLoader = false;
-          this.show_fetch_error = true;
-          this.show_report = false;
-          this.show_report_error = true;
-          this.show_report_noschedule = true;
+      if (fail) {
+        this.containerLoader = false;
+        this.show_fetch_error = true;
+        this.show_report = false;
+        this.show_report_error = true;
+        this.show_report_noschedule = true;
       }
     },
     "work_report.month": function(v) {
@@ -282,7 +296,7 @@ export default {
         end: moment(v)
           .endOf("month")
           .format("YYYY-MM-DD"),
-        userid: this.user_id,
+        userid: this.user_id
       };
       const data = this.query;
       this.fetchAgentsWorkReports({ data });
