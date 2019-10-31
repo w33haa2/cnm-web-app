@@ -148,12 +148,20 @@
                     ></el-progress>
                   </div>
                 </el-col>
-                <el-col :md="{span:6}">
+                <el-col :md="{span:3}">
                   <div class="label">
-                    <small>RENDERED HOURS</small>
+                    <small>HOURS</small>
                   </div>
                   <div>
                     <span style="color:grey">{{ datum.rendered_hours.time }}</span>
+                  </div>
+                </el-col>
+                <el-col :md="{span:3}">
+                  <div class="label">
+                    <small>ND</small>
+                  </div>
+                  <div>
+                    <span style="color:grey">{{ "0" }}</span>
                   </div>
                 </el-col>
               </el-row>
