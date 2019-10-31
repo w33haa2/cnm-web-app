@@ -227,6 +227,12 @@ export default {
           message: this.agentTimeInTitle,
           duration: 10000
         });
+
+        if (
+          this.agentTimeInTitle.toLowerCase() == "schedule no longer available."
+        ) {
+          this.fetchTodaysSchedule(this.today.query);
+        }
       }
     },
     agentTimeOutState({ initial, success, fail }) {
@@ -297,7 +303,7 @@ export default {
     },
     joinOvertime() {
       // if (this.fetchTodaysScheduleData.allow_ot) {
-        this.joinOvertimeSchedule();
+      this.joinOvertimeSchedule();
       // } else {
       //   this.$message({
       //     type: "error",
