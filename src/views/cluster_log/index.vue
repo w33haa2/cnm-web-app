@@ -84,7 +84,7 @@
         <template slot-scope="scope">{{ scope.row.child_details.full_name }}</template>
       </el-table-column>
       <el-table-column align="center" label="Start date">
-        <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","M Do YYYY") }}</template>
+        <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","MMM Do YYYY") }}</template>
       </el-table-column>
       <el-table-column align="center" label="End date">
         <template slot-scope="scope">

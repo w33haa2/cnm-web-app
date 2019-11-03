@@ -8,7 +8,7 @@
         >{{ "("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
       </h4>
 
-      <el-row style="margin-top:10px;">
+      <el-row :gutter="5" style="margin-top:10px;">
         <el-col :md="{span:4}">
           <el-date-picker
             v-model="week.start"
@@ -16,7 +16,7 @@
             type="week"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
-            :picker-options="{firstDayOfWeek:1}"
+            :picker-options="{firstDayOfWeek:2}"
             :clearable="false"
             style="width:100%"
             @change="weekChange"
@@ -54,13 +54,11 @@
         </el-col>
       </el-row>
 
-      <el-row v-if="isRTA() || isHR()">
+      <el-row :gutter="5" v-if="isRTA() || isHR()">
         <el-col :md="{span:12}" style="margin-top:10px">
           <el-button-group>
             <!--            v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"-->
-            <template
-              v-if="isRTA()"
-            >
+            <template v-if="isRTA()">
               <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
             </template>
             <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
@@ -69,20 +67,27 @@
             </template>
           </el-button-group>
         </el-col>
-        <el-col :md="{span:12}" style="margin-top:10px">
+        <el-col :md="{span:3,offset:6}" style="margin-top:10px">
           <template v-if="isRTA()">
-            <div style="float:right">
-              <el-dropdown @command="handleCommand">
-                <el-button type="success" :plain="true" size="mini">
-                  Excel
-                  <i class="el-icon-arrow-down el-icon--right" />
-                </el-button>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
-                    <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </div>
+            <el-select size="mini" v-model="table_config.view">
+              <el-option value="default" label="Default" />
+              <el-option value="log_status" label="Log status" />
+              <el-option value="hnd" label="Hours and night difference" />
+            </el-select>
+          </template>
+        </el-col>
+        <el-col :md="{span:3}" style="margin-top:10px">
+          <template v-if="isRTA()">
+            <el-dropdown @command="handleCommand" style="width:100%">
+              <el-button type="success" :plain="true" size="mini" style="width:100%">
+                Excel
+                <i class="el-icon-arrow-down el-icon--right" />
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
+                <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </template>
         </el-col>
         <input
@@ -124,7 +129,7 @@
               </template>
               <template slot-scope="scope">
                 <div class="user-block">
-                  <img v-if="scope.row.image" class="img-circle" :src="scope.row.image">
+                  <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
                   <div
                     v-else
                     class="img-circle text-muted"
@@ -144,7 +149,7 @@
 
             <template v-for="(thead,index1) in tableHeader">
               <el-table-column align="center" :key="index1">
-                <template  slot="header" slot-scope="scope">
+                <template slot="header" slot-scope="scope">
                   <h4
                     :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
                     style="margin-bottom:5px"
@@ -154,27 +159,36 @@
                   >{{ tableHeader[index1].date1 }}</span>
                 </template>
                 <template slot-scope="{row}">
-                  <template v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length>0">
-                    <template v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)">
-                      <template v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)[index]">
+                  <template
+                    v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length>0"
+                  >
+                    <template
+                      v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)"
+                    >
+                      <template
+                        v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)[index]"
+                      >
                         <cell-content
                           @refreshTable="refresh_table"
                           :key="index"
                           :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)[index]"
                           :date="tableHeader[index1].date"
                           :info="row.info"
+                          :view="table_config.view"
                         />
                       </template>
                     </template>
                   </template>
-                  <template v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length===0">
-                    <span style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399">OFF</span>
+                  <template
+                    v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length===0"
+                  >
+                    <span
+                      style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399"
+                    >OFF</span>
                   </template>
                 </template>
               </el-table-column>
             </template>
-
-
           </el-table>
         </el-col>
       </el-row>
@@ -361,7 +375,12 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
-          <el-button type="danger" :loading="createLeaveState.initial" size="mini" @click="onSubmit">Confirm</el-button>
+          <el-button
+            type="danger"
+            :loading="createLeaveState.initial"
+            size="mini"
+            @click="onSubmit"
+          >Confirm</el-button>
         </span>
       </el-dialog>
 
@@ -393,84 +412,91 @@
           <!-- frontend way of exporting sva -->
           <!-- <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button> -->
           <!-- backend way -->
-          <el-button type="danger" size="mini" @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})" :loading="excel.export_sva.confirm">Download</el-button>
+          <el-button
+            type="danger"
+            size="mini"
+            @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})"
+            :loading="excel.export_sva.confirm"
+          >Download</el-button>
         </span>
       </el-dialog>
 
+      <!-- Create and Update Dialog -->
+      <el-dialog
+        :visible.sync="excel.import.dialog"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        title="Importing Schedule..."
+        width="50%"
+        top="5vh"
+      >
+        <el-alert
+          title="Import Report"
+          type="info"
+          description="This report will only be displayed once every import. Please review results to reupload unimported data."
+          show-icon
+        ></el-alert>
 
-    <!-- Create and Update Dialog -->
-    <el-dialog
-      :visible.sync="excel.import.dialog"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      title="Importing Schedule..."
-      width="50%"
-      top="5vh"
-    >
-      <el-alert
-        title="Import Report"
-        type="info"
-        description="This report will only be displayed once every import. Please review results to reupload unimported data."
-        show-icon
-      ></el-alert>
-
-      <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-        Progress
-        <span>( {{ excel.import.loop_index }}</span>/
-        <span>{{ excel.import.arr_length }} )</span>
-      </div>
-      <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
-      <div style="padding-bottom:15px;  ">
-        <el-tabs
-          v-model="excel.import.report.active_tab"
-          type="border-card"
-          style="margin-top:15px;margin-bottom:10px;"
-        >
-          <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
-            <el-table :data="excel.import.report.data.all.list" height="350px">
-              <el-table-column label="Email" width="350">
-                <template scope="scope">{{scope.row.email}}</template>
-              </el-table-column>
-              <!-- <el-table-column label="Schedule" width="100">
-                <template scope="scope">{{+" To "+}}</template>
-              </el-table-column> -->
-              <el-table-column label="Status">
-                <template scope="scope">
-                  <template v-if="scope.row.status_code==200">
-                    <el-tag size="mini" type="success">UPLOADED</el-tag>
-                  </template>
-                  <template v-else>
-                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
-                  </template>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-tab-pane>
-          <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code != 200).length"
-            name="errors"
+        <div style="width:100%;margin-bottom:20px;margin-top:15px;">
+          Progress
+          <span>( {{ excel.import.loop_index }}</span>/
+          <span>{{ excel.import.arr_length }} )</span>
+        </div>
+        <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+        <div style="padding-bottom:15px;  ">
+          <el-tabs
+            v-model="excel.import.report.active_tab"
+            type="border-card"
+            style="margin-top:15px;margin-bottom:10px;"
           >
-            <el-table :data="excel.import.report.data.all.list.filter(i=> i.status_code != 200)" height="350px">
-              <el-table-column label="Email" width="350">
-                <template scope="scope">{{scope.row.email}}</template>
-              </el-table-column>
-              <el-table-column label="Status">
-                <template scope="scope">
-                  <template v-if="scope.row.status_code==200">
-                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+            <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
+              <el-table :data="excel.import.report.data.all.list" height="350px">
+                <el-table-column label="Email" width="350">
+                  <template scope="scope">{{scope.row.email}}</template>
+                </el-table-column>
+                <!-- <el-table-column label="Schedule" width="100">
+                <template scope="scope">{{+" To "+}}</template>
+                </el-table-column>-->
+                <el-table-column label="Status">
+                  <template scope="scope">
+                    <template v-if="scope.row.status_code==200">
+                      <el-tag size="mini" type="success">UPLOADED</el-tag>
+                    </template>
+                    <template v-else>
+                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                    </template>
                   </template>
-                  <template v-else>
-                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+            <el-tab-pane
+              :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code != 200).length"
+              name="errors"
+            >
+              <el-table
+                :data="excel.import.report.data.all.list.filter(i=> i.status_code != 200)"
+                height="350px"
+              >
+                <el-table-column label="Email" width="350">
+                  <template scope="scope">{{scope.row.email}}</template>
+                </el-table-column>
+                <el-table-column label="Status">
+                  <template scope="scope">
+                    <template v-if="scope.row.status_code==200">
+                      <el-tag size="mini" type="success">UPLOADED</el-tag>
+                    </template>
+                    <template v-else>
+                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                    </template>
                   </template>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-tab-pane>
-        </el-tabs>
-        <el-button size="mini" @click="closeImportReport" style="float:right" >Close</el-button>
-      </div>
-    </el-dialog>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+          </el-tabs>
+          <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -777,7 +803,7 @@ export default {
     this.weekChange(
       moment()
         // .subtract(7, "days")
-        .startOf('isoweek')
+        .startOf('week').isoWeekday(2)
         .format('YYYY-MM-DD')
     )
     this.getFormOptions({
@@ -877,7 +903,8 @@ export default {
         limit: 10,
       },
       table_config: {
-        page: 1
+        page: 1,
+        view:"default"
       },
       action: {
         type: 'Create',
@@ -1308,11 +1335,12 @@ export default {
       this.form[type].show = true
     },
     weekChange(e) {
+      // console.log(moment().day("tuesday"))
       const start = moment(e)
-        .startOf('isoweek')
+        .startOf('week').isoWeekday(2)
         .format('YYYY-MM-DD')
-      const end = moment(e)
-        .endOf('isoweek')
+      const end = moment(start)
+        .add(6,"days")
         .format('YYYY-MM-DD')
       this.week.start = start
       this.week.end = end
