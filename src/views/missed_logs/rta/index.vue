@@ -7,7 +7,16 @@
         <el-col :md="{span: 4}" style="margin-bottom:5px;">
           <el-input v-model="table.request.query" placeholder="Search..." size="mini"></el-input>
         </el-col>
-        <el-col :md="{span: 12,offset:8}">
+        <el-col :md="{span:8}">
+          <el-radio-group v-model="table.request.status" size="mini">
+            <el-radio-button :label="null">All</el-radio-button>
+            <!-- <el-radio-button label="Washington">w/o Coaching</el-radio-button> -->
+            <el-radio-button label="pending">Pending</el-radio-button>
+            <el-radio-button label="noted">For Verification</el-radio-button>
+            <el-radio-button label="verified">Verified</el-radio-button>
+          </el-radio-group>
+        </el-col>
+        <el-col :md="{span: 12}">
           <el-pagination
             style="float:right"
             small
@@ -17,9 +26,9 @@
             :page-size="table.request.perpage"
             layout="total, sizes, prev, pager, next"
             :total="fetchMissedLogsData.missed_logs.total"
+            @current-change="tablePageChange"
+            @size-change="tableSizeChange"
           />
-          <!-- @current-change="tablePageChange" -->
-          <!-- @size-change="tableSizeChange" -->
         </el-col>
       </el-row>
 
@@ -108,8 +117,29 @@
                   <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
                     <span
                       class="card-content-text"
-                      :style="'color:'+(datum.coaching ? datum.coaching.filed_to_action? 'green':'orange':'blue')"
-                    >{{ datum.coaching ? (datum.coaching.filed_to_action? "Approved":"Pending"):"No coaching data..." }}</span>
+                      :style="'color:'+(datum.coaching ? datum.coaching.filed_to_action? 
+                    datum.coaching.filed_to_action == 'approved'? 'green':'red':'orange':'blue')"
+                    >
+                      {{ datum.coaching ? (datum.coaching.filed_to_action?
+                      datum.coaching.filed_to_action == 'approved'? "Approved":"Disapproved"
+                      :"Pending"):"No coaching data..." }}
+                    </span>
+                  </el-col>
+                  <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                    <span class="card-content-text">Coached By</span>
+                  </el-col>
+                  <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
+                    <span
+                      class="card-content-text"
+                    >{{ datum.coaching ? datum.coaching.filed_by.full_name :"NA" }}</span>
+                  </el-col>
+                  <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                    <span class="card-content-text">Verified By</span>
+                  </el-col>
+                  <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
+                    <span
+                      class="card-content-text"
+                    >{{ datum.coaching ? datum.coaching.verified_by? datum.coaching.verified_by.full_name:"NA" :"NA" }}</span>
                   </el-col>
                   <el-col style="margin-top:15px;padding-bottom:20px;">
                     <!-- coaching exist -->
@@ -126,8 +156,18 @@
                         <div style="width:100%;margin-top:5px">
                           <el-button
                             size="mini"
+                            style="width:100%;"
+                            type="danger"
+                            plain
+                            @click="cancelVerifiedRow(datum)"
+                          >CANCEL</el-button>
+                        </div>
+                        <div style="width:100%;margin-top:5px">
+                          <el-button
+                            size="mini"
                             style="width:100%"
-                            type="warning"
+                            type="primary"
+                            plain
                             @click="viewRow(datum)"
                           >VIEW COACHING</el-button>
                         </div>
@@ -135,14 +175,42 @@
                       <!-- no rta verification -->
                       <template v-else>
                         <div style="width:100%">
-                          <el-tag size="mini" style="width:100%" type="warning">PENDING</el-tag>
+                          <el-tag
+                            size="mini"
+                            style="width:100%;text-align:center"
+                            type="warning"
+                          >PENDING</el-tag>
                         </div>
-                        <div style="width:100%">
+                        <div style="width:100%;margin-top:5px">
+                          <template v-if="datum.coaching.filed_to_action == 'approved'">
+                            <el-button
+                              size="mini"
+                              style="width:100%;"
+                              type="success"
+                              plain
+                              @click="verifyRow(datum)"
+                            >VERIFY</el-button>
+                          </template>
+                          <template v-else-if="datum.coaching.filed_to_action == 'disapproved'">
+                            <el-tag
+                              type="info"
+                              style="width:100%;text-align:center"
+                            >DISAPPROVED BY AGENT</el-tag>
+                          </template>
+                          <template v-else>
+                            <el-tag
+                              type="warning"
+                              style="width:100%;text-align:center"
+                            >WAITING FOR APPROVAL</el-tag>
+                          </template>
+                        </div>
+                        <div style="width:100%;margin-top:5px">
                           <el-button
                             size="mini"
                             style="width:100%"
+                            type="primary"
                             plain
-                            type="warning"
+                            @click="viewRow(datum)"
                           >VIEW COACHING</el-button>
                         </div>
                       </template>
@@ -157,12 +225,10 @@
                         >TO BE COACHED</el-tag>
                       </div>
                       <div style="width:100%;margin-top:5px">
-                        <el-button
-                          size="mini"
-                          style="width:100%"
-                          type="primary"
-                          @click="createFormCoaching(datum)"
-                        >ADD COACHING</el-button>
+                        <el-tag style="width:100%;text-align:center" type="info">NOTHING TO VERIFY</el-tag>
+                      </div>
+                      <div style="width:100%;margin-top:5px">
+                        <el-tag style="width:100%;text-align:center" type="info">NOTHING TO VIEW</el-tag>
                       </div>
                     </template>
                   </el-col>
@@ -190,7 +256,7 @@
               style="font-size:0.8em"
             >{{ form.coaching.field.imageName ? form.coaching.field.imageName : "Select image file."}}</span>
           </el-col>
-          <el-col>
+          <el-col style="margin-bottom:10px;">
             <el-button size="mini" @click="uploadProofClick">Upload Proof</el-button>
             <input
               ref="proofInput"
@@ -201,8 +267,8 @@
             />
           </el-col>
         </template>
-        <template v-else>
-          <a :href="form.coaching.details.proof">See Proof</a>
+        <template v-if="form.coaching.action!='Create'">
+          <el-button size="mini" @click="showProof()">Show Proof</el-button>
         </template>
         <el-col>
           <h5>Coaching Details</h5>
@@ -326,7 +392,8 @@ export default {
           query: null,
           tl_id: null,
           om_id: null,
-          id: null
+          id: null,
+          status: null
         }
       }
     };
@@ -335,6 +402,8 @@ export default {
     this.axios.options.headers = "Bearer " + this.token;
     if (this.position == "Team Leader") {
       this.table.request.tl_id = this.user_id;
+    } else if (this.position == "Operations Manager") {
+      this.table.request.om_id = this.user_id;
     }
     this.fetchMissedLogs(this.unsetNull(this.table.request));
   },
@@ -356,10 +425,73 @@ export default {
       setTimeout(() => {
         this.fetchMissedLogs(this.unsetNull(this.table.request));
       }, 3000);
+    },
+    "table.request.status": function(v){
+      this.fetchMissedLogs(this.unsetNull(this.table.request))
     }
   },
   methods: {
     ...mapActions(["fetchMissedLogs", "createCoaching"]),
+    cancelVerifiedRow(data) {
+      if (confirm("Do you want to proceed?")) {
+        axios
+          .post(
+            "api/v1/coaching/revert_verify/" + data.coaching.id,
+            {
+              status: "noted",
+              id: data.coaching.id
+            },
+            this.axios.options.headers
+          )
+          .then(res => {
+            this.$message({
+              type: "success",
+              message: res.data.title,
+              duration: 5000
+            });
+            this.fetchMissedLogs(this.unsetNull(this.table.request));
+          })
+          .catch(err => {
+            this.$message({
+              type: "error",
+              message: err.response.data.title,
+              duration: 5000
+            });
+          });
+      }
+    },
+    verifyRow(data) {
+      if (confirm("Do you want to proceed?")) {
+        axios
+          .post(
+            "api/v1/coaching/verify_coach",
+            {
+              verified_by: this.user_id,
+              status: "verified",
+              id: data.coaching.id
+            },
+            this.axios.options.headers
+          )
+          .then(res => {
+            this.$message({
+              type: "success",
+              message: res.data.title,
+              duration: 5000
+            });
+            this.fetchMissedLogs(this.unsetNull(this.table.request));
+          })
+          .catch(err => {
+            this.$message({
+              type: "error",
+              message: err.response.data.title,
+              duration: 5000
+            });
+          });
+      }
+    },
+    showProof() {
+      window.open(this.form.coaching.details.proof, "_blank");
+    },
     viewRow(data) {
       this.form.coaching.dialog = true;
       this.form.coaching.field.id = data.coaching.id;
@@ -378,9 +510,11 @@ export default {
         " - " +
         (data.time_out
           ? this.formatDate(data.time_out.date, "", "hh:mm a")
-          : "NO LOG");
+          : "no log");
       this.form.coaching.details.log_status =
-        data.log_status[0] + " - " + data.log_status[1];
+        this.remUnderscore(data.log_status[0]) +
+        " - " +
+        this.remUnderscore(data.log_status[1]);
       this.form.coaching.field.sched_id = data.id;
       this.form.coaching.field.status = data.coaching.status;
       this.form.coaching.field.type = data.coaching.type;
@@ -399,6 +533,7 @@ export default {
       //   });
       // } else {
       this.form.coaching.dialog = true;
+      this.form.coaching.details.proof = data.coaching.img_proof_url;
       this.form.coaching.field.id = data.coaching.id;
       this.form.coaching.details.full_name = data.user_info.full_name;
       this.form.coaching.details.date = this.formatDate(
@@ -562,6 +697,14 @@ export default {
       var fileData = e.target.files[0];
       this.form.coaching.field.imageName = fileData.name;
       this.form.coaching.field.image = fileData;
+    },
+    tablePageChange(e) {
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
+    },
+    tableSizeChange(e) {
+      this.table.request.perpage = e;
+      this.table.request.page = 1;
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
     }
   }
 };

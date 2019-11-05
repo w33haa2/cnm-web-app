@@ -449,15 +449,16 @@ export const asyncRoutes = [
            component: Layout,
            name: "Missed Logs",
            meta: {
-             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager","Team Leader"]
+             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager","Team Leader","Representative - Order Placer"]
            },
            children: [
              {
                path: "/missed_logs",
-               component: () => import("@/views/missed_logs/rta"),
+               component: () => import("@/views/missed_logs"),
                name: "Missed Logs",
                meta: {
                  title: "Missed Logs",
+                 icon:"missed_logs",
                  noCache: false
                }
              }

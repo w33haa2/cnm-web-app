@@ -6,13 +6,16 @@
 
 <script>
 import { mapGetters } from "vuex";
+import agentView from "./agent";
+import omView from "./om";
+import rtaView from "./rta";
 
 export default {
-  name: "Dashboard",
-  components: { adminDashboard, agentDashboard, hrDashboard },
+  name: "MissedLogs",
+  components: { rtaView, omView, agentView },
   data() {
     return {
-      currentRole: "hrDashboard"
+      currentRole: null
     };
   },
   computed: {
@@ -21,10 +24,16 @@ export default {
   created() {
     switch (this.position) {
       case "Representative - Order Placer":
-        this.currentRole = "agentDashboard";
+        this.currentRole = "agentView";
         break;
-      default:
-        this.currentRole = "adminDashboard";
+      case "Operations Manager":
+      case "Team Leader":
+        this.currentRole = "omView";
+        break;
+      case "RTA Manager":
+      case "RTA Supervisor":
+      case "RTA Analyst":
+        this.currentRole = "rtaView";
         break;
     }
   }
