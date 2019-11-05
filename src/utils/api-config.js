@@ -113,6 +113,10 @@ const api = {
             $requires: ["id"],
             $format: Template(() => `fetch/${id}`)
           },
+          missed_logs: {
+            $url: "missed_logs",
+            $method: "GET"
+          },
           create: {
             // $url: "create",
             // $method: "POST"
@@ -252,6 +256,16 @@ const api = {
         // region access levels
         access_levels: {
           $prefix: "access_levels",
+          create: {
+            $url: "create",
+            $method: "POST"
+          }
+        },
+        // endregion access levels
+
+        // region access levels
+        coaching: {
+          $prefix: "coaching",
           create: {
             $url: "create",
             $method: "POST"

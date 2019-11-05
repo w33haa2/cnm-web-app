@@ -321,6 +321,14 @@ const getters = {
   // delete_hierarchy_log
   deleteHierarchyLogState: state => state.delete_hierarchy_log.state,
   deleteHierarchyLogData: state => state.delete_hierarchy_log.data,
-  deleteHierarchyLogTitle: state => state.delete_hierarchy_log.title
+  deleteHierarchyLogTitle: state => state.delete_hierarchy_log.title,
+  // fetch_missed_logs
+  fetchMissedLogsState: state => state.fetch_missed_logs.state,
+  fetchMissedLogsData: state => state.fetch_missed_logs.data,
+  fetchMissedLogsTitle: state => state.fetch_missed_logs.title,
+  // create_coaching
+  createCoachingState: state => state.create_coaching.state,
+  createCoachingData: state => state.create_coaching.data,
+  createCoachingTitle: state => state.create_coaching.title
 };
 export default getters;

@@ -141,12 +141,12 @@ export const asyncRoutes = [
                }
              },
              {
-              path: "/employee/reassign",
-              component: () => import("@/views/cluster_log/admin"),
-              name: "Reassign",
-              meta: {
-                title: "Reassign",
-              }
+               path: "/employee/reassign",
+               component: () => import("@/views/cluster_log/admin"),
+               name: "Reassign",
+               meta: {
+                 title: "Reassign"
+               }
              }
            ]
          },
@@ -444,6 +444,44 @@ export const asyncRoutes = [
              }
            ]
          },
+         {
+           path: "/missed_logs",
+           component: Layout,
+           name: "Missed Logs",
+           meta: {
+             roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager","Team Leader"]
+           },
+           children: [
+             {
+               path: "/missed_logs",
+               component: () => import("@/views/missed_logs/rta"),
+               name: "Missed Logs",
+               meta: {
+                 title: "Missed Logs",
+                 noCache: false
+               }
+             }
+           ]
+         },
+        //  {
+        //    path: "/missed_logs",
+        //    component: Layout,
+        //    name: "Agent Missed Logs",
+        //    meta: {
+        //      roles: ["Operations Manager", "Team Leader"]
+        //    },
+        //    children: [
+        //      {
+        //        path: "/missed_logs",
+        //        component: () => import("@/views/missed_logs/rta"),
+        //        name: "Agent Missed Logs",
+        //        meta: {
+        //          title: "Agent Missed Logs",
+        //          noCache: false
+        //        }
+        //      }
+        //    ]
+        //  },
          {
            path: "action_logs",
            component: Layout,

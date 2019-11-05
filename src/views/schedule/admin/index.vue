@@ -803,7 +803,7 @@ export default {
     this.weekChange(
       moment()
         // .subtract(7, "days")
-        .startOf('week').isoWeekday(2)
+        .isoWeekday(2)
         .format('YYYY-MM-DD')
     )
     this.getFormOptions({
@@ -1337,7 +1337,7 @@ export default {
     weekChange(e) {
       // console.log(moment().day("tuesday"))
       const start = moment(e)
-        .startOf('week').isoWeekday(2)
+        .isoWeekday(2)
         .format('YYYY-MM-DD')
       const end = moment(start)
         .add(6,"days")
