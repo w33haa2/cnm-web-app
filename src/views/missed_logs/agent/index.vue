@@ -1,4 +1,6 @@
 <template>
+  <div>
+    <logger v-if="position == 'Representative - Order Placer'"></logger>
   <div class="app-container">
     <h4 style="color:#646464">Missed Logs</h4>
     <div class="filter-container">
@@ -6,7 +8,7 @@
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:15px;">
         <!-- <el-col :md="{span: 4}" style="margin-bottom:5px;">
           <el-input v-model="table.request.query" placeholder="Search..." size="mini"></el-input>
-        </el-col> -->
+        </el-col>-->
         <el-col :md="{span:12}">
           <el-radio-group v-model="table.request.status" size="mini">
             <el-radio-button :label="null">All</el-radio-button>
@@ -144,7 +146,10 @@
                             type="success"
                           >VERIFIED</el-tag>
                         </div>
-                        <el-tag type="success" style="width:100%;text-align:center;margin-top:5px;">RESOLVED</el-tag>
+                        <el-tag
+                          type="success"
+                          style="width:100%;text-align:center;margin-top:5px;"
+                        >RESOLVED</el-tag>
                       </template>
                       <!-- no rta verification -->
                       <template v-else>
@@ -300,14 +305,18 @@
       </span>
     </el-dialog>
   </div>
+
+  </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import logger from "../../time_logger";
+
 import axios from "axios";
 export default {
   name: "RTA-MissedLogs",
-  components: {},
+  components: {logger},
   data() {
     return {
       axios: {
@@ -384,8 +393,8 @@ export default {
         this.fetchMissedLogs(this.unsetNull(this.table.request));
       }, 3000);
     },
-    "table.request.status": function(v){
-      this.fetchMissedLogs(this.unsetNull(this.table.request))
+    "table.request.status": function(v) {
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
     }
   },
   methods: {
