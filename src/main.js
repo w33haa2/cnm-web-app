@@ -44,6 +44,27 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    toUrlParams(obj) {
+      let result = "",
+        tmp = Object.keys(this.unsetNull(obj));
+      tmp.forEach((v, i) => {
+        if (obj[v] != null || obj[v] == 0) {
+          result += "&" + v + "=" + obj[v];
+        }
+      });
+      return "?" + result.slice(1);
+    },
+    isRTA() {
+      let result = false;
+      if (
+        store.getters.position.toLowerCase() == "rta manager" ||
+        store.getters.position.toLowerCase() == "rta supervisor" ||
+        store.getters.position.toLowerCase() == "rta analyst"
+      ) {
+        result = true;
+      }
+      return result;
+    },
     unsetNull(obj) {
       let result = {},
         tmp = Object.keys(obj);
