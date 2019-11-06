@@ -521,16 +521,6 @@ export default {
       }
       // }
     },
-    unsetNull(obj) {
-      let result = {},
-        tmp = Object.keys(obj);
-      tmp.forEach((v, i) => {
-        if (obj[v]) {
-          result[v] = obj[v];
-        }
-      });
-      return result;
-    },
     toFormData(obj) {
       // alert("form data created")
       const fd = new FormData();

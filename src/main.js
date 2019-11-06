@@ -19,8 +19,8 @@ import "./icons"; // icon
 import "./permission"; // permission control
 import "./utils/error-log"; // error log
 import VueSweetalert2 from "vue-sweetalert2"; // sweetalert
-import axios from "axios"
-import VueTimers from "vue-timers"
+import axios from "axios";
+import VueTimers from "vue-timers";
 
 import * as filters from "./filters"; // global filters
 
@@ -44,6 +44,16 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    unsetNull(obj) {
+      let result = {},
+        tmp = Object.keys(obj);
+      tmp.forEach((v, i) => {
+        if (obj[v]) {
+          result[v] = obj[v];
+        }
+      });
+      return result;
+    },
     remUnderscore(string) {
       let str = string.split("_");
       let result = "";
