@@ -14,23 +14,23 @@
                 size="mini"
               >{{ schedule.user_info.full_name }}</el-tag>
             </el-col>
-            <el-col>
-              <h5 style="margin-bottom:1px;margin-top:8px;">OM</h5>
+            <el-col :md="{span:4}" style="margin-top:8px;">
+              <span style="font-weight:600;font-size:.9em">OM</span>
             </el-col>
-            <el-col style="text-align:center">
-              <div
+            <el-col :md="{span:20}" style="margin-top:8px;">
+              <span
                 class="c-grey"
-                style="font-size:0.8em"
-              >{{schedule.om.lastname+", "+schedule.om.firstname[0]}}</div>
+                style="font-size:0.9em;"
+              >{{schedule.om.lastname+", "+schedule.om.firstname[0]}}</span>
             </el-col>
-            <el-col>
-              <h5 style="margin-bottom:1px;margin-top:8px;">TL</h5>
+            <el-col :md="{span:4}" style="margin-top:8px;">
+              <span style="font-weight:600;font-size:.9em">TL</span>
             </el-col>
-            <el-col style="text-align:center">
-              <div
+            <el-col :md="{span:16}" style="margin-top:8px;">
+              <span
                 class="c-grey"
-                style="font-size:0.8em"
-              >{{schedule.tl.lastname+", "+schedule.tl.firstname[0]}}</div>
+                style="font-size:0.9em;"
+              >{{schedule.tl.lastname+", "+schedule.tl.firstname[0]}}</span>
             </el-col>
             <el-col>
               <h5 style="margin-bottom:5px;margin-top:8px;">Schedule</h5>
@@ -73,6 +73,21 @@
                   </div>
                 </template>
               </el-col>
+
+              <template v-if="tag.label=='PRESENT'">
+                <el-col>
+                  <h5 style="margin-bottom:5px;margin-top:8px;">Log status</h5>
+                </el-col>
+                <el-col style="text-align:center">
+                  <div
+                    :class="(schedule.log_status[0]=='punctual'?'c-success':'c-danger')"
+                  >{{ remUnderscore(schedule.log_status[0]) }}</div>
+                  <div
+                    :class="schedule.log_status[1]=='timed_out'?'c-success':'c-danger'"
+                  >{{ remUnderscore(schedule.log_status[1]) }}</div>
+                </el-col>
+              </template>
+
               <template v-if="tag.label=='PRESENT'">
                 <template v-if="!schedule.attendances[0].time_out">
                   <el-col style="margin-top:5px;">
@@ -103,10 +118,10 @@
               </el-col>
               <el-col style="text-align:center">
                 <template v-if="schedule.vto_at">
-                  <span>{{ (schedule.vto_hours.second/60/60) + " hours" }}</span>
+                  <span class="c-grey">{{ (schedule.vto_hours.second/60/60) + " hours" }}</span>
                 </template>
                 <template v-else>
-                  <span>NONE</span>
+                  <span class="c-grey">NONE</span>
                 </template>
                 <!-- <el-tag
                   v-if="schedule.vto_at"
@@ -200,7 +215,7 @@
           v-if="view == 'default'"
           :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
         >
-          <span>{{ tag.label }}</span>  
+          <span>{{ tag.label }}</span>
         </span>
 
         <template v-if="view == 'log_status'">
@@ -650,6 +665,9 @@ export default {
 }
 .c-success {
   color: #13ce91;
+}
+.c-danger {
+  color: #f56c6c;
 }
 .something {
   color: rgb(143, 2, 2);
