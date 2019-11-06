@@ -216,9 +216,9 @@ export default {
 
         // }).bind(this));
 
-        result = result.map(i=>([i.user_info.full_name,moment(i.time_in.date).format("YYYY-MM-DD hh:mm a"), i.time_out ? moment(i.time_out.date).format("YYYY-MM-DD hh:mm a"):'ongoing',i.conformance+"%"] ));
+        result = result.map(i=>([i.user_info.full_name,moment(i.time_in.date).format("YYYY-MM-DD hh:mm a"), i.time_out ? moment(i.time_out.date).format("YYYY-MM-DD hh:mm a"):'ongoing'] ));
         result.unshift([]);
-        result.unshift(["Agent","Time In", "Time Out", "Conformance"]);
+        result.unshift(["Agent","Time In", "Time Out"]);
         result.unshift([]);
         result.unshift(["Agent Overtime ("+this.schedule+")"]);
         this.exportToExcel({content:[{

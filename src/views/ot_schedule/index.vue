@@ -304,9 +304,9 @@ export default {
         }
       }).then(res=>{
         let result = res.data.meta.agent_schedules;
-        result = result.map(i=>([i.user_info.full_name,moment(i.time_in.date).format("YYYY-MM-DD hh:mm a"), i.time_out ? moment(i.time_out.date).format("YYYY-MM-DD hh:mm a"):'ongoing',i.conformance+"%"] ));
+        result = result.map(i=>([i.user_info.full_name,moment(i.time_in.date).format("YYYY-MM-DD hh:mm a"), i.time_out ? moment(i.time_out.date).format("YYYY-MM-DD hh:mm a"):'ongoing'] ));
         result.unshift([]);
-        result.unshift(["Agent","Time In", "Time Out", "Conformance"]);
+        result.unshift(["Agent","Time In", "Time Out"]);
         result.unshift([]);
         result.unshift(["Agent Overtime ("+data.start_event+" - "+data.end_event+")"]);
         this.exportToExcel({content:[{
