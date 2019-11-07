@@ -4,7 +4,6 @@
       <el-row>
         <el-col>
           <!-- if NCNS -->
-
           <el-row>
             <el-col>
               <el-tag
@@ -208,15 +207,21 @@
         </el-col>
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
-      <span slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer">
+      <div slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer">
         <!-- <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
         </span>-->
-        <span
+        <div
           v-if="view == 'default'"
           :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
         >
-          <span>{{ tag.label }}</span>
-        </span>
+          <div>{{ tag.label + "T/T"}}</div>
+        </div>
+        <!-- <div
+          v-if="view == 'default'"
+          :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
+        >
+          <div>{{ tag.label }}</div>
+        </div>-->
 
         <template v-if="view == 'log_status'">
           <template v-if="schedule.log_status.length>0">
@@ -235,21 +240,21 @@
           </template>
         </template>
 
-        <span v-if="view == 'hnd'">
+        <div v-if="view == 'hnd'">
           <template v-if="schedule.log_status.length>0">
-            <span
+            <div
               style="background-color:#fcf951ff;color:#422057ff;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;font-weight:600"
-            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
-            <span
+            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</div>
+            <div
               style="background-color:#422057ff;color:#fcf951ff;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;font-weight:600"
-            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
+            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</div>
           </template>
           <template v-else>
-            <span>{{ tag.label }}</span>
+            <div>{{ tag.label }}</div>
           </template>
-        </span>
+        </div>
         <!-- <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span> -->
-      </span>
+      </div>
     </el-popover>
     <!-- <span v-if="!schedule" :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span> -->
     <!-- Create and Update Dialog -->

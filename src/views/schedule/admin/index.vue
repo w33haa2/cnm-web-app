@@ -182,9 +182,11 @@
                   <template
                     v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length===0"
                   >
-                    <span
+                  <div style="width:100%;padding:0px;margin:0px">
+                    <div
                       style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399"
-                    >OFF</span>
+                    >OFF</div>
+                  </div>
                   </template>
                 </template>
               </el-table-column>
@@ -273,10 +275,14 @@
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
               class="form-input"
               size="mini"
-              placeholder="Select"
+              remote
+              filterable
+              placeholder="Operations Manager"
+              :remote-method="remoteManager"
+              :loading="form.addSchedule.options.operationsManager.loader"
             >
               <el-option
-                v-for="item in form.addSchedule.options.operationsManager"
+                v-for="item in form.addSchedule.options.operationsManager.data"
                 :key="item.id"
                 :label="item.full_name"
                 :value="item.id"
@@ -290,10 +296,14 @@
               class="form-input"
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
               size="mini"
-              placeholder="Select"
+              remote
+              filterable
+              placeholder="Team Leader"
+              :remote-method="remoteLeader"
+              :loading="form.addSchedule.options.teamLeader.loader"
             >
               <el-option
-                v-for="(item,index) in form.addSchedule.options.teamLeader"
+                v-for="(item,index) in form.addSchedule.options.teamLeader.data"
                 :key="index"
                 :label="item.full_name"
                 :value="item.id"
@@ -708,9 +718,9 @@ export default {
         })
       }
     },
-    'form.addSchedule.model.operationsManager': function() {
-      this.getFormOptions({ query: 'team leader', var: 'teamLeader' })
-    },
+    // 'form.addSchedule.model.operationsManager': function() {
+    //   this.getFormOptions({ query: 'team leader', var: 'teamLeader' })
+    // },
     searchQuery(v) {
       if (v != '') {
         this.query['target[]'] = 'full_name'
@@ -776,6 +786,7 @@ export default {
     }
   },
   mounted() {
+    this.axios.options.headers.Authorization = "Bearer "+ this.token;
     if (
       this.position == 'Admin' ||
       this.position == 'HR Manager' ||
@@ -806,14 +817,15 @@ export default {
         .isoWeekday(2)
         .format('YYYY-MM-DD')
     )
-    this.getFormOptions({
-      query: 'operations manager',
-      var: 'operationsManager'
-    })
+    // this.getFormOptions({
+    //   query: 'operations manager',
+    //   var: 'operationsManager'
+    // })
   },
   data() {
     return {
       blank:[{}],
+      axios:{options:{headers:{Authorization: null}}},
       sched_array:[],
       excel: {
         import: {
@@ -866,8 +878,24 @@ export default {
             operationsManager: null
           },
           options: {
-            teamLeader: [],
-            operationsManager: []
+            teamLeader: {
+              request: {
+                full_name:null,
+                list:"heads",
+                position_id:16
+              },
+              data:[],
+              loader:false,
+            },
+            operationsManager: {
+              request: {
+                full_name:null,
+                list:"heads",
+                position_id:15
+              },
+              data:[],
+              loader:false,
+            }
           }
         },
         addLeave: {
@@ -1247,43 +1275,43 @@ export default {
       }
     },
     // for add schedule form options
-    getFormOptions(query) {
-      const url = 'api/v1/users/search?target[]=position&query=' + query.query
-      const options = {
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        }
-      }
-      axios
-        .get(url, options)
-        .then(res => {
-          let result = res.data.meta.users
-          if (query.query == 'team leader') {
-            result = result.filter(
-              i => i.parent_id == this.form.addSchedule.model.operationsManager
-            )
+    // getFormOptions(query) {
+    //   const url = 'api/v1/users/remote?list=heads&'
+    //   const options = {
+    //     headers: {
+    //       Authorization: 'Bearer ' + this.token
+    //     }
+    //   }
+    //   axios
+    //     .get(url, options)
+    //     .then(res => {
+    //       let result = res.data.meta.users
+    //       if (query.query == 'team leader') {
+    //         result = result.filter(
+    //           i => i.parent_id == this.form.addSchedule.model.operationsManager
+    //         )
 
-            this.form.addSchedule.options[query.var] = result.length>0 ? result: [{value:null,label:"No Data"}];
+    //         this.form.addSchedule.options[query.var] = result.length>0 ? result: [{value:null,label:"No Data"}];
 
-            if (this.form.addSchedule.options[query.var].length < 1) {
-              this.form.addSchedule.options[query.var] = []
-            } else {
-              this.form.addSchedule.model[
-                query.var
-              ] = this.form.addSchedule.options[query.var][0].id
-            }
-          } else {
-            this.form.addSchedule.options[query.var] = result
-            this.form.addSchedule.model[
-              query.var
-            ] = this.form.addSchedule.options[query.var][0].id
-          }
-        })
-        .catch(err => {
-          console.log(err.response.data)
-          this.form.addSchedule.options[query.var] = []
-        })
-    },
+    //         if (this.form.addSchedule.options[query.var].length < 1) {
+    //           this.form.addSchedule.options[query.var] = []
+    //         } else {
+    //           this.form.addSchedule.model[
+    //             query.var
+    //           ] = this.form.addSchedule.options[query.var][0].id
+    //         }
+    //       } else {
+    //         this.form.addSchedule.options[query.var] = result
+    //         this.form.addSchedule.model[
+    //           query.var
+    //         ] = this.form.addSchedule.options[query.var][0].id
+    //       }
+    //     })
+    //     .catch(err => {
+    //       console.log(err.response.data)
+    //       this.form.addSchedule.options[query.var] = []
+    //     })
+    // },
     // for filter options
     getUsersByPosition(query) {
       const position = {
@@ -1553,6 +1581,32 @@ export default {
       }else{
         return false;
       }
+    },
+    remoteManager(query){
+      this.form.addSchedule.options.operationsManager.loader = true;
+      this.form.addSchedule.options.operationsManager.request.full_name = query;
+      let url = "api/v1/users/remote"+this.toUrlParams(this.form.addSchedule.options.operationsManager.request);
+      this.axiosRequest("get",url,this.axios.options).then(res=>{
+        this.form.addSchedule.options.operationsManager.loader = false
+        if(res.code == 200){
+          this.form.addSchedule.options.operationsManager.data = res.meta.remote
+        }else{
+          this.form.addSchedule.options.operationsManager.data = []
+        }
+      });
+    },
+    remoteLeader(query){
+      this.form.addSchedule.options.teamLeader.loader = true;
+      this.form.addSchedule.options.teamLeader.request.full_name = query;
+      let url = "api/v1/users/remote"+this.toUrlParams(this.form.addSchedule.options.teamLeader.request);
+      this.axiosRequest("get",url,this.axios.options).then(res=>{
+        this.form.addSchedule.options.teamLeader.loader = false
+        if(res.code == 200){
+          this.form.addSchedule.options.teamLeader.data = res.meta.remote
+        }else{
+          this.form.addSchedule.options.teamLeader.data = []
+        }
+      });
     }
   }
 }
