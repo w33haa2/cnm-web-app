@@ -172,11 +172,11 @@ const getters = {
   // update_overtime_schedule
   updateOvertimeScheduleState: state => state.update_overtime_schedule.state,
   updateOvertimeScheduleData: state => state.update_overtime_schedule.data,
-  updateOvertimeScheduleError: state => state.update_overtime_schedule.errors,
+  updateOvertimeScheduleTitle: state => state.update_overtime_schedule.title,
   // delete_overtime_schedule
   deleteOvertimeScheduleState: state => state.delete_overtime_schedule.state,
   deleteOvertimeScheduleData: state => state.delete_overtime_schedule.data,
-  deleteOvertimeScheduleError: state => state.delete_overtime_schedule.errors,
+  deleteOvertimeScheduleTitle: state => state.delete_overtime_schedule.title,
   // approve_overtime_schedule
   approveOvertimeSchedulesState: state => state.approve_overtime_schedule.state,
   approveOvertimeSchedulesData: state => state.approve_overtime_schedule.data,

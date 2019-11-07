@@ -1,6 +1,9 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const DELETE_OT_SCHEDULE = generateMutationTypes("STICKY TIMEIN", "DELETE_OT_SCHEDULE");
+const DELETE_OT_SCHEDULE = generateMutationTypes(
+  "STICKY TIMEIN",
+  "DELETE_OT_SCHEDULE"
+);
 
 /**
  * State
@@ -13,7 +16,7 @@ const state = {
     fail: false
   },
   data: [],
-  errors: null,
+  title: null
 };
 
 /**
@@ -42,6 +45,7 @@ const mutations = {
       fail: false
     };
     state.data = payload.meta;
+    state.title = payload.title;
   },
   /**
    * Commits fail state for DELETE INCOMING OT
@@ -53,8 +57,8 @@ const mutations = {
       success: false,
       fail: true
     };
-    state.errors = payload.response.data.title;
-  },
+    state.title = payload.response.data.title;
+  }
 };
 
 const actions = {
@@ -70,7 +74,7 @@ const actions = {
       DELETE_OT_SCHEDULE.success,
       DELETE_OT_SCHEDULE.fail
     ]);
-  },
+  }
 };
 
 export default {
