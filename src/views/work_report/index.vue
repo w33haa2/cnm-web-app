@@ -153,7 +153,9 @@
                     <small>HOURS</small>
                   </div>
                   <div>
-                    <span style="color:grey">{{ datum.rendered_hours.time }}</span>
+                    <span
+                      style="color:grey"
+                    >{{ (datum.rendered_hours.billable.second/60/60).toFixed(1) }}</span>
                   </div>
                 </el-col>
                 <el-col :md="{span:3}">
@@ -162,6 +164,9 @@
                   </div>
                   <div>
                     <span style="color:grey">{{ "0" }}</span>
+                    <!-- <span
+                      style="color:grey"
+                    >{{ (datum.rendered_hours.night_diff.second/60/60).toFixed(1) }}</span>-->
                   </div>
                 </el-col>
               </el-row>
