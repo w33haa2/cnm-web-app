@@ -44,6 +44,17 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    axiosRequest(method, url, options) {
+      return new Promise((resolve, reject) => {
+        axios({ method: method, url: url, headers: options })
+          .then(res => {
+            resolve(res.data);
+          })
+          .catch(err => {
+            resolve(err.response.data);
+          });
+      });
+    },
     toUrlParams(obj) {
       let result = "",
         tmp = Object.keys(this.unsetNull(obj));
