@@ -207,7 +207,7 @@
       >
         <el-row>
           <el-col>
-            <label for="dates">Dates</label>
+            <label>Dates</label>
             <el-date-picker
               v-model="form.addSchedule.model.dates"
               size="mini"
@@ -220,7 +220,7 @@
             >count: {{ form.addSchedule.model.dates.length }}</span>
           </el-col>
           <el-col>
-            <label for="dates">Time in</label>
+            <label>Time in</label>
             <el-time-picker
               v-model="form.addSchedule.model.time_in"
               size="mini"
@@ -229,7 +229,7 @@
             />
           </el-col>
           <el-col>
-            <label for="dates">Duration</label>
+            <label>Duration</label>
             <el-time-picker
               v-model="form.addSchedule.model.duration"
               size="mini"
@@ -243,7 +243,7 @@
             />
           </el-col>
           <el-col>
-            <label for="dates">Agents</label>
+            <label>Agents</label>
             <el-select
               v-model="form.addSchedule.model.agents"
               class="form-input"
@@ -269,7 +269,7 @@
             >count: {{ form.addSchedule.model.agents.length }}</span>
           </el-col>
           <el-col>
-            <label for="dates">Operations Manager</label>
+            <label>Operations Manager</label>
             <el-select
               v-model="form.addSchedule.model.operationsManager"
               style="width:100%;padding-bottom:2px;margin-bottom:10px;"
@@ -290,7 +290,7 @@
             </el-select>
           </el-col>
           <el-col>
-            <label for="dates">Team Leader</label>
+            <label>Team Leader</label>
             <el-select
               v-model="form.addSchedule.model.teamLeader"
               class="form-input"
@@ -335,7 +335,7 @@
         <el-row>
           <el-col>
             <el-col>
-              <label for="dates">Agent</label>
+              <label>Agent</label>
               <el-select
                 v-model="form.addLeave.model.user_id"
                 class="form-input"
@@ -356,7 +356,7 @@
                 />
               </el-select>
             </el-col>
-            <label for="dates">Dates</label>
+            <label>Dates</label>
             <el-date-picker
               v-model="form.addLeave.model.dates"
               size="mini"
@@ -367,7 +367,7 @@
             />
           </el-col>
           <el-col>
-            <label for="dates">Leave Type</label>
+            <label>Leave Type</label>
             <el-select
               v-model="form.addLeave.leave_type"
               size="mini"
@@ -400,21 +400,48 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
-        title="Select export range..."
+        title="Export SVA"
         width="30%"
         top="5vh"
       >
         <el-row>
           <el-col>
-            <label for="dates">Dates</label>
+            <el-radio-group size="mini" v-model="excel.export_sva.field.radio_select" @change="excel.export_sva.clear_cluster_field != excel.export_sva.clear_cluster_field">
+              <el-radio-button label="all">All</el-radio-button>
+              <el-radio-button label="multiCluster">Selected Clusters</el-radio-button>
+            </el-radio-group>
+          </el-col>
+          <el-col style="margin-top:10px;">
+            <label>Dates</label>
+          </el-col>
+          <el-col style="margin-top:5px">
             <el-date-picker
               v-model="excel.export_sva.field.dates"
               size="mini"
               type="daterange"
-              style="width:100%;padding-bottom:2px;margin-bottom:10px;"
+              style="width:100%;"
               class="form-input"
               placeholder="Range picker..."
             />
+          </el-col>
+          <el-col style="margin-top:10px;">
+            <label>Clusters</label>
+          </el-col>
+          <el-col style="margin-top:5px">
+            <!-- component here -->
+            <remote-search
+            @selected="excelCluster"
+            :multiple="true"
+            :params="{
+              om:true,
+              start_date:formatDate(excel.export_sva.field.dates[0],'','YYYY-MM-DD'),
+              end_date:formatDate(excel.export_sva.field.dates[1],'','YYYY-MM-DD')
+              }"
+            :placeholder="'Select Cluster...'"
+            style="width:100%"
+            :disabled="excel.export_sva.field.radio_select =='all'"
+            :clear="excel.export_sva.clear_cluster_field"
+            ></remote-search>
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
@@ -453,7 +480,7 @@
           <span>( {{ excel.import.loop_index }}</span>/
           <span>{{ excel.import.arr_length }} )</span>
         </div>
-        <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+        <el-progress :percentage="excel.import.progress=='0.0'? 0:parseFloat(excel.import.progress)" :text-inside="true" :stroke-width="18"></el-progress>
         <div style="padding-bottom:15px;  ">
           <el-tabs
             v-model="excel.import.report.active_tab"
@@ -518,8 +545,10 @@ import Moment from 'moment/moment'
 import { extendMoment } from 'moment-range'
 const moment = extendMoment(Moment)
 import cellContent from './components/cellContent'
+import remoteSearch from './components/userRemoteSearch'
+
 export default {
-  components: { cellContent },
+  components: { cellContent, remoteSearch },
   computed: {
     ...mapGetters([
       'agentsWorkReports',
@@ -781,6 +810,11 @@ export default {
       this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
     },
     'excel.export_sva.field.dates':function(v){
+      let start = this.excel.export_sva.model.start != moment(v[0]).format("YYYY-MM-DD"), 
+      end=this.excel.export_sva.model.end != moment(v[1]).format("YYYY-MM-DD");
+      if(start || end){
+        this.excel.export_sva.clear_cluster_field = !this.excel.export_sva.clear_cluster_field;
+      }
       this.excel.export_sva.model.start = moment(v[0]).format("YYYY-MM-DD");
       this.excel.export_sva.model.end = moment(v[1]).format("YYYY-MM-DD");
     }
@@ -851,14 +885,17 @@ export default {
           }
         },
         export_sva:{
-          dialog:false,
+          dialog:true,
           confirm:false,
+          clear_cluster_field:false,
           model:{
             start:null,
             end:null,
           },
           field:{
-            dates:[]
+            dates:[],
+            radio_select:"all",
+            clusters:[]
           }
         }
       },
@@ -972,9 +1009,20 @@ export default {
       'excelToArraySchedule',
       'exportEmployeeTemplate',
     ]),
+    excelCluster(v){
+      this.excel.export_sva.field.clusters = v;
+    },
     exportSvaReport(){
       this.excel.export_sva.confirm = true;
-      let url = "api/v1/excel/export_sva?start_date="+this.excel.export_sva.model.start+"&end_date="+this.excel.export_sva.model.end,
+      let params = {
+        start_date:this.excel.export_sva.model.start,
+        end_date: this.excel.export_sva.model.end,
+      };
+
+      if(Array.isArray(this.excel.export_sva.field.clusters) && this.excel.export_sva.field.radio_select != 'all'){
+        params.om_id = this.excel.export_sva.field.clusters;
+      }
+      let url = "api/v1/excel/export_sva"+this.toUrlParams(params),
         options = {
           responseType: "blob",
           headers: {
@@ -997,7 +1045,6 @@ export default {
         a.click();
         window.URL.revokeObjectURL(url);
         this.excel.export_sva.confirm = false;
-
       });
     },
     generateSvaReport(){
