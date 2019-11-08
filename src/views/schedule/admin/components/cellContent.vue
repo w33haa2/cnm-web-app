@@ -135,7 +135,7 @@
             <el-col>
               <h5 style="margin-bottom:5px;margin-top:8px;">Conformance</h5>
               <el-progress
-                :percentage="schedule.conformance"
+                :percentage="parseFloat(schedule.conformance)"
                 :text-inside="true"
                 :stroke-width="18"
               ></el-progress>
