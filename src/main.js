@@ -58,9 +58,16 @@ Vue.mixin({
     toUrlParams(obj) {
       let result = "",
         tmp = Object.keys(this.unsetNull(obj));
+      console.log(tmp);
       tmp.forEach((v, i) => {
-        if (obj[v] != null || obj[v] == 0) {
-          result += "&" + v + "=" + obj[v];
+        if (obj[v]) {
+          if (Array.isArray(obj[v])) {
+            obj[v].forEach((v1, i1) => {
+              result += "&" + v + "[]=" + obj[v][i1];
+            });
+          } else {
+            result += "&" + v + "=" + obj[v];
+          }
         }
       });
       return "?" + result.slice(1);
