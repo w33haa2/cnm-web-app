@@ -885,7 +885,7 @@ export default {
           }
         },
         export_sva:{
-          dialog:true,
+          dialog:false,
           confirm:false,
           clear_cluster_field:false,
           model:{
