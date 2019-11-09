@@ -25,6 +25,7 @@
         <el-col :md="{span:20}">
           <div style="float:right">
             <el-select
+              @change="filterOm"
               v-if="position != 'Operations Manager' && position != 'Team Leader'"
               v-model="select.operationsManager"
               size="mini"
@@ -38,6 +39,7 @@
               />
             </el-select>
             <el-select
+            @change="filterTl"
               v-model="select.teamLeader"
               size="mini"
               placeholder="Team Leader"
@@ -70,9 +72,8 @@
         <el-col :md="{span:3,offset:6}" style="margin-top:10px">
           <template v-if="isRTA()">
             <el-select size="mini" v-model="table_config.view">
-              <el-option value="default" label="Default" />
+              <el-option value="hours" label="Hours" />
               <el-option value="log_status" label="Log status" />
-              <el-option value="hnd" label="Hours and night difference" />
             </el-select>
           </template>
         </el-col>
@@ -148,7 +149,7 @@
             </el-table-column>
 
             <template v-for="(thead,index1) in tableHeader">
-              <el-table-column align="center" :key="index1">
+              <el-table-column align="center" :key="index1" width="180">
                 <template slot="header" slot-scope="scope">
                   <h4
                     :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
@@ -182,9 +183,9 @@
                   <template
                     v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length===0"
                   >
-                  <div style="width:100%;padding:0px;margin:0px">
+                  <div style="width:100%;padding:0px;margin:0px;">
                     <div
-                      style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399"
+                      style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399;border-radius:5px;"
                     >OFF</div>
                   </div>
                   </template>
@@ -786,29 +787,29 @@ export default {
         this.tableData = []
       }
     },
-    'select.operationsManager': function(v) {
-      if (
-        this.position != 'Operations Manager' &&
-        this.position != 'Team Leader'
-      ) {
-        if (v == 'all') {
-          this.disable_select.teamLeader = true
-          this.select.teamLeader = 'all'
-        } else {
-          this.disable_select.teamLeader = false
-          this.getUsersByPosition({
-            query: 'team leader',
-            var: 'teamLeader',
-            start:this.week.start,
-            end:this.week.end,
-          })
-        }
-      }
-      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
-    },
-    'select.teamLeader': function(v) {
-      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
-    },
+    // 'select.operationsManager': function(v) {
+    //   if (
+    //     this.position != 'Operations Manager' &&
+    //     this.position != 'Team Leader'
+    //   ) {
+    //     if (v == 'all') {
+    //       this.disable_select.teamLeader = true
+    //       this.select.teamLeader = 'all'
+    //     } else {
+    //       this.disable_select.teamLeader = false
+    //       this.getUsersByPosition({
+    //         query: 'team leader',
+    //         var: 'teamLeader',
+    //         start:this.week.start,
+    //         end:this.week.end,
+    //       })
+    //     }
+    //   }
+      // this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    // },
+    // 'select.teamLeader': function(v) {
+    //   this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    // },
     'excel.export_sva.field.dates':function(v){
       let start = this.excel.export_sva.model.start != moment(v[0]).format("YYYY-MM-DD"), 
       end=this.excel.export_sva.model.end != moment(v[1]).format("YYYY-MM-DD");
@@ -845,16 +846,12 @@ export default {
         end:this.week.end
       })
     }
+    
     this.weekChange(
       moment()
-        // .subtract(7, "days")
         .isoWeekday(2)
         .format('YYYY-MM-DD')
     )
-    // this.getFormOptions({
-    //   query: 'operations manager',
-    //   var: 'operationsManager'
-    // })
   },
   data() {
     return {
@@ -969,7 +966,7 @@ export default {
       },
       table_config: {
         page: 1,
-        view:"default"
+        view:"hours"
       },
       action: {
         type: 'Create',
@@ -1422,6 +1419,29 @@ export default {
 
       this.generateHeader(start, end)
     },
+    filterTl(v){
+      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    },
+    filterOm(v){
+      if (
+        this.position != 'Operations Manager' &&
+        this.position != 'Team Leader'
+      ) {
+        if (v == 'all') {
+          this.disable_select.teamLeader = true
+          this.select.teamLeader = 'all'
+        } else {
+          this.disable_select.teamLeader = false
+          this.getUsersByPosition({
+            query: 'team leader',
+            var: 'teamLeader',
+            start:this.week.start,
+            end:this.week.end,
+          })
+        }
+      }
+      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    },
     generateHeader(start, end) {
       const range = moment.range(start, end)
       const dates = Array.from(range.by('day')).map(m =>
@@ -1433,7 +1453,7 @@ export default {
         date: moment(d).format('YYYY-MM-DD'),
         date1: moment(d).format('MMM Do')
       }))
-      const data = {
+      let data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
@@ -1471,6 +1491,7 @@ export default {
           }
         }
       }
+      data = this.unsetNull(data);
       this.fetchAgentsWorkReports({ data })
     },
     tableSizeChange(value) {

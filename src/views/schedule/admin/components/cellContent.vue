@@ -211,49 +211,45 @@
         <!-- <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
         </span>-->
         <div
-          v-if="view == 'default'"
-          :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
+          :style="'border-radius:5px;padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
         >
-          <div>{{ tag.label + "T/T"}}</div>
+          <el-row>
+            <template v-if="tag.label=='PRESENT'">
+              <el-col :sm="{span:12}">
+                <div>{{ tag.label}}</div>
+              </el-col>
+              <el-col :sm="{span:12}">
+                <div>
+                  <template v-if="schedule.log_status.length>0">
+                    <template v-if="view=='hours'">
+                      <span
+                        :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
+                      >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(2) }}</span>
+                      <span
+                        :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
+                      >{{ (schedule.rendered_hours.night_difference / 60 / 60).toFixed(2) }}</span>
+                    </template>
+                    <template v-else>
+                      <template v-if="missed_log">
+                        <span
+                          style="background-color:orange;color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;"
+                        >MISSED LOG</span>
+                      </template>
+                      <template v-else>
+                        <span
+                          style="background-color:green;color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;"
+                        >TIMED OUT</span>
+                      </template>
+                    </template>
+                  </template>
+                </div>
+              </el-col>
+            </template>
+            <template v-else>
+              <div>{{ tag.label}}</div>
+            </template>
+          </el-row>
         </div>
-        <!-- <div
-          v-if="view == 'default'"
-          :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
-        >
-          <div>{{ tag.label }}</div>
-        </div>-->
-
-        <template v-if="view == 'log_status'">
-          <template v-if="schedule.log_status.length>0">
-            <span style="padding:3px;font-size:.85em;width:100%" :style="timein_status.style">
-              <span>{{ schedule.log_status[0].toUpperCase() }}</span>
-            </span>
-            <br />
-            <span style="padding:3px;font-size:.85em;width:100%" :style="timeout_status.style">
-              <span>{{ schedule.log_status[1].toUpperCase() }}</span>
-            </span>
-          </template>
-          <template v-else>
-            <span :style="'padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc">
-              <span>{{ tag.label }}</span>
-            </span>
-          </template>
-        </template>
-
-        <div v-if="view == 'hnd'">
-          <template v-if="schedule.log_status.length>0">
-            <div
-              style="background-color:#fcf951ff;color:#422057ff;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;font-weight:600"
-            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</div>
-            <div
-              style="background-color:#422057ff;color:#fcf951ff;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;font-weight:600"
-            >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</div>
-          </template>
-          <template v-else>
-            <div>{{ tag.label }}</div>
-          </template>
-        </div>
-        <!-- <span  v-if="tag.label == 'PRESENT' && popup.data.schedule.type == 1 && popup.data.schedule.vto==true" style="padding:3px;font-size:.85em;background-color:indigo;color:white">V</span> -->
       </div>
     </el-popover>
     <!-- <span v-if="!schedule" :style="'padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399'">OFF</span> -->
@@ -437,6 +433,19 @@ export default {
       "agentTimeOutState",
       "createLeaveState"
     ]),
+    missed_log() {
+      let result = true;
+      if (
+        this.schedule.log_status[0] == "tardy" ||
+        this.schedule.log_status[1] == "undertime" ||
+        this.schedule.log_status[1] == "no_timeout"
+      ) {
+        result = true;
+      } else {
+        result = false;
+      }
+      return result;
+    },
     timein_status() {
       return {
         style:
