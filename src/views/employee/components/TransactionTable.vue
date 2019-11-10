@@ -102,22 +102,22 @@
     </el-table-column>-->
     <el-table-column label="SSS #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits?row.benefits[0].id_number:"" }}</span>
+        <span class>{{ row.benefits.length>0 ?row.benefits[0].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="Philhealth #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits?row.benefits[1].id_number:"" }}</span>
+        <span class>{{ row.benefits.length>0 ?row.benefits[1].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="PagIbig #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits?row.benefits[2].id_number:"" }}</span>
+        <span class>{{ row.benefits.length>0 ?row.benefits[2].id_number:"" }}</span>
       </template>
     </el-table-column>
     <el-table-column label="TIN #" width="200">
       <template slot-scope="{row}">
-        <span class>{{ row.benefits?row.benefits[3].id_number:"" }}</span>
+        <span class>{{ row.benefits.length>0 ?row.benefits[3].id_number:"" }}</span>
       </template>
     </el-table-column>
   </el-table>
