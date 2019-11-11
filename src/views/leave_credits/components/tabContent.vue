@@ -141,7 +141,7 @@ export default {
       "user_id",
       "fetchLeaveCreditsState",
       "fetchLeaveCreditsData",
-      "fetchLeaveCreditsError",
+      "fetchLeaveCreditsTitle",
       "searchLeaveCreditsState",
       "searchLeaveCreditsData",
       "searchLeaveCreditsError",
@@ -165,7 +165,7 @@ export default {
           this.table_config.loader = false;
           this.$message({
             type: "error",
-            message: "There is a problem processing your request.",
+            message: this.fetchLeaveCreditsTitle,
             duration: 5000
           });
         }
