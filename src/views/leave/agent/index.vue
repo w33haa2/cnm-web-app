@@ -243,7 +243,7 @@ export default {
       if (fail) {
         this.$message({
           type: "warning",
-          message: "There's a problem fetching your leave credits.",
+          message: this.fetchLeaveCreditsTitle,
           duration: 5000
         });
       }
