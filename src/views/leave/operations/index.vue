@@ -17,13 +17,13 @@
           />
         </el-tooltip>
       </el-col>
-      <el-col :md="{span:4}" style="padding-right:5px" v-if="!isOperations()">
+      <!-- <el-col :md="{span:4}" style="padding-right:5px" v-if="!isOperations()">
         <el-tooltip placement="top" content="Select Operations Manager...">
           <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_om">
             <el-option v-for="(option, index) in options.operationsManager" :key="index" :value="option.value" :label="option.label" />
           </el-select>
         </el-tooltip>
-      </el-col>
+      </el-col> -->
       <!-- <el-col :md="{span:4}">
         <el-tooltip placement="top" content="Select Team Leader...">
           <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_tl" :disabled="disable_tl_select">
@@ -32,7 +32,7 @@
         </el-tooltip>
       </el-col> -->
       <template v-if="isRTA()">
-        <el-col :md="{span:16}">
+        <el-col :md="{span:20}">
           <el-tooltip placement="top" content="Print selected week approved list.">
             <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
           </el-tooltip>
