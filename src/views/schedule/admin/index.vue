@@ -161,18 +161,18 @@
                 </template>
                 <template slot-scope="{row}">
                   <template
-                    v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length>0"
+                    v-if="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length>0"
                   >
                     <template
-                      v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)"
+                      v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)"
                     >
                       <template
-                        v-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)[index]"
+                        v-if="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
                       >
                         <cell-content
                           @refreshTable="refresh_table"
                           :key="index"
-                          :schedule="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date)[index]"
+                          :schedule="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
                           :date="tableHeader[index1].date"
                           :info="row.info"
                           :view="table_config.view"
@@ -180,8 +180,10 @@
                       </template>
                     </template>
                   </template>
+                    <!-- v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length===0" -->
+
                   <template
-                    v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length===0"
+                    v-else
                   >
                   <div style="width:100%;padding:0px;margin:0px;">
                     <div
