@@ -32,7 +32,7 @@
         </el-tooltip>
       </el-col> -->
       <template v-if="isRTA()">
-        <el-col :md="{span:12}">
+        <el-col :md="{span:16}">
           <el-tooltip placement="top" content="Print selected week approved list.">
             <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
           </el-tooltip>
