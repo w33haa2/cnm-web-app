@@ -117,8 +117,13 @@
                   <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
                     <span
                       class="card-content-text"
-                      :style="'color:'+(datum.coaching ? datum.coaching.filed_to_action? 'green':'orange':'blue')"
-                    >{{ datum.coaching ? (datum.coaching.filed_to_action? "Approved":"Pending"):"No coaching data..." }}</span>
+                      :style="'color:'+(datum.coaching ? datum.coaching.filed_to_action? 
+                    datum.coaching.filed_to_action == 'approved'? 'green':'red':'orange':'blue')"
+                    >
+                      {{ datum.coaching ? (datum.coaching.filed_to_action?
+                      datum.coaching.filed_to_action == 'approved'? "Approved":"Disapproved"
+                      :"Pending"):"No coaching data..." }}
+                    </span>
                   </el-col>
                   <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
                     <span class="card-content-text">Coached By</span>
@@ -416,8 +421,8 @@ export default {
         this.fetchMissedLogs(this.unsetNull(this.table.request));
       }, 3000);
     },
-    "table.request.status": function(v){
-      this.fetchMissedLogs(this.unsetNull(this.table.request))
+    "table.request.status": function(v) {
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
     }
   },
   methods: {
