@@ -264,7 +264,7 @@
                 v-for="item in agents.agents"
                 :key="item.id"
                 :label="item.full_name"
-                :value="item.id"
+                :value="item.uid"
               />
             </el-select>
             <span
@@ -631,9 +631,9 @@ export default {
       }
     },
     "excel.import.loop_index":function(v){
-      this.weekChange(this.week.start);
       if(v == this.excel.import.arr_length){
         this.excel.import.importing = false;
+        this.weekChange(this.week.start);
       }
     },
     exportSvaReportState({initial,success,fail}){
@@ -823,6 +823,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.token)
     this.axios.options.headers.Authorization = "Bearer "+ this.token;
     if (
       this.position == 'Admin' ||
@@ -1218,7 +1219,6 @@ export default {
           console.log(res.data.meta);
           let data = res.data.meta.excel_data.map(i=>({title_id:1,auth_id:this.user_id,om_id:i.om_id,tl_id:i.tl_id,email:i.email.toLowerCase(),start_event:moment(i.start_event).format("YYYY-MM-DD HH:mm:ss"),end_event:moment(i.end_event).format("YYYY-MM-DD HH:mm:ss")}));
           this.loopCreateSchedule(data);
-        // console.log(data);
         })
         .catch(err => console.log(err));
     },
@@ -1240,8 +1240,8 @@ export default {
           console.log(res)
           this.excel.import.loop_index +=1;
             this.excel.import.progress =
-              (this.excel.import.loop_index / this.excel.import.arr_length) *
-              100;
+              ((this.excel.import.loop_index / this.excel.import.arr_length) *
+              100).toFixed(2);
             tmp_data.email = res.data.parameters.email;
             tmp_data.status_code = res.status;
             tmp_data.title = res.data.title;
@@ -1250,8 +1250,8 @@ export default {
         }).catch(err=>{
             this.excel.import.loop_index +=1;
             this.excel.import.progress =
-              (this.excel.import.loop_index / this.excel.import.arr_length) *
-              100;
+              ((this.excel.import.loop_index / this.excel.import.arr_length) *
+              100).toFixed(2);
             tmp_data.email = err.response.data.parameters.email;
             tmp_data.status_code = err.response.data.code;
             tmp_data.title = err.response.data.title;
