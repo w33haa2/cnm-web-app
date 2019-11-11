@@ -21,7 +21,7 @@
         <el-calendar v-model="calendar.today"></el-calendar>
         </el-col>-->
         <!-- <el-col :md="{span:6}"> -->
-          <!-- <el-row>
+        <!-- <el-row>
             <el-col>
               <div style="margin-bottom:10px;">
                 <el-button
@@ -75,8 +75,8 @@
                 />
               </div>
             </el-col>
-          </el-row> -->
-          <!-- <calendar :view="'month'" style="height:800px"/> -->
+        </el-row>-->
+        <!-- <calendar :view="'month'" style="height:800px"/> -->
         <!-- </el-col> -->
         <el-col :md="{span:24}" style="padding-left: 20px">
           <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
@@ -140,12 +140,12 @@ import moment from "moment";
 import leaveTable from "./components/leaveTable";
 import "tui-calendar/dist/tui-calendar.css";
 import { Calendar } from "@toast-ui/vue-calendar";
-import { mkdir } from 'fs';
+import { mkdir } from "fs";
 export default {
   components: { leaveTable, Calendar, logger },
   data() {
     return {
-      calendarLoader:true,
+      calendarLoader: true,
       vl_credits: 0,
       sl_credits: 0,
       calendar_date: null,
@@ -225,7 +225,7 @@ export default {
       "fetchAgentCalendarError",
       "fetchLeaveCreditsState",
       "fetchLeaveCreditsData",
-      "fetchLeaveCreditsError",
+      "fetchLeaveCreditsTitle",
       "user_id",
       "position"
     ])
@@ -242,7 +242,7 @@ export default {
       }
       if (fail) {
         this.$message({
-          type:"warning",
+          type: "warning",
           message: "There's a problem fetching your leave credits.",
           duration: 5000
         });
@@ -272,18 +272,20 @@ export default {
         this.scheduleList = schedules.map(i => ({
           body: "something",
           id: i.id,
-          title: i.leave_id? "ON LEAVE *" + i.title.title +
-            "(" +
-            moment(i.start_event.date).format("HH:mm") +
-            " - " +
-            moment(i.end_event.date).format("HH:mm") +
-            ")" :
-            i.title.title +
-            "(" +
-            moment(i.start_event.date).format("HH:mm") +
-            " - " +
-            moment(i.end_event.date).format("HH:mm") +
-            ")",
+          title: i.leave_id
+            ? "ON LEAVE *" +
+              i.title.title +
+              "(" +
+              moment(i.start_event.date).format("HH:mm") +
+              " - " +
+              moment(i.end_event.date).format("HH:mm") +
+              ")"
+            : i.title.title +
+              "(" +
+              moment(i.start_event.date).format("HH:mm") +
+              " - " +
+              moment(i.end_event.date).format("HH:mm") +
+              ")",
           start: moment(i.start_event.date).format("YYYY-MM-DD HH:mm:ss"),
           end: moment(i.end_event.date).format("YYYY-MM-DD HH:mm:ss"),
           category: "time",
@@ -295,14 +297,14 @@ export default {
         ]);
         this.$refs.tuiCalendar.invoke("render");
       }
-      if(fail){
+      if (fail) {
         this.calendarLoader = false;
         this.scheduleList = [];
         this.$message({
-          type:"warning",
-          message:"There's a problem fetching your calendar events.",
+          type: "warning",
+          message: "There's a problem fetching your calendar events.",
           duration: 5000
-        })
+        });
       }
     },
     createLeaveState({ initial, success, fail }) {
@@ -347,7 +349,7 @@ export default {
     }
   },
   mounted() {
-    this.query.generated_by=this.user_id;
+    this.query.generated_by = this.user_id;
     // this.getDate();
     // this.fetchAgentCalendar({
     //   userid: this.user_id,
