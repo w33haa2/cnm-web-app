@@ -163,10 +163,9 @@
                     <small>ND</small>
                   </div>
                   <div>
-                    <span style="color:grey">{{ "0" }}</span>
-                    <!-- <span
+                    <span
                       style="color:grey"
-                    >{{ (datum.rendered_hours.night_diff.second/60/60).toFixed(1) }}</span>-->
+                    >{{ datum.rendered_hours.night_difference }}</span>
                   </div>
                 </el-col>
               </el-row>
