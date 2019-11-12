@@ -222,12 +222,21 @@
                 <div>
                   <template v-if="schedule.log_status.length>0">
                     <template v-if="view=='hours'">
-                      <span
-                        :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
-                      >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(2) }}</span>
-                      <span
-                        :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
-                      >{{ (schedule.rendered_hours.night_difference / 60 / 60).toFixed(2) }}</span>
+                      <el-tooltip class="item" effect="dark" content="Hours" placement="top-start">
+                        <span
+                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
+                        >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(2) }}</span>
+                      </el-tooltip>
+                      <el-tooltip
+                        class="item"
+                        effect="dark"
+                        content="Night Difference"
+                        placement="top-start"
+                      >
+                        <span
+                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
+                        >{{ schedule.rendered_hours.night_difference }}</span>
+                      </el-tooltip>
                     </template>
                     <template v-else>
                       <template v-if="missed_log">
