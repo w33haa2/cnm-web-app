@@ -95,6 +95,23 @@ Vue.mixin({
       }
       return result;
     },
+    isHR() {
+      let result = false;
+      if (
+        store.getters.position.toLowerCase() == "hr manager" ||
+        store.getters.position.toLowerCase() == "hr assistant"
+      ) {
+        result = true;
+      }
+      return result;
+    },
+    isADMIN() {
+      let result = false;
+      if (store.getters.position.toLowerCase() == "admin") {
+        result = true;
+      }
+      return result;
+    },
     unsetNull(obj) {
       let result = {},
         tmp = Object.keys(obj);

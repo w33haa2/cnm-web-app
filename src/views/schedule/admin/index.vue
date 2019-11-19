@@ -22,90 +22,11 @@
             @change="weekChange"
           />
         </el-col>
-        <el-col :md="{span:10,offset:10}">
-          <remote-filter-head :range="week" @filter="filterTable"></remote-filter-head>
-          <!-- <div style="float:right">
-            <el-select
-              @change="filterOm"
-              v-if="position != 'Operations Manager' && position != 'Team Leader'"
-              v-model="select.operationsManager"
-              size="mini"
-              placeholder="Operations Manager"
-            >
-              <el-option
-                v-for="(option,index) in options.operationsManager"
-                :key="index"
-                :label="option.label"
-                :value="option.value"
-              />
-            </el-select>
-            <el-select
-            @change="filterTl"
-              v-model="select.teamLeader"
-              size="mini"
-              placeholder="Team Leader"
-              :disabled="disable_select.teamLeader"
-            >
-              <el-option
-                v-for="(option,index) in options.teamLeader"
-                :key="index"
-                :label="option.label"
-                :value="option.value"
-              />
-            </el-select>
-          </div> -->
+        <el-col :md="{span:4}">
+          <el-input v-model="searchQuery" size="mini" placeholder="Search..." />
         </el-col>
-      </el-row>
 
-      <el-row :gutter="5" v-if="isRTA() || isHR()">
-        <el-col :md="{span:12}" style="margin-top:10px">
-          <el-button-group>
-            <!--            v-if="position=='RTA Manager' || position=='RTA Supervisor' || position=='RTA Analyst'"-->
-            <template v-if="isRTA()">
-              <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
-            </template>
-            <!--            v-if="position=='HR Manager' || position=='HR Assistant'"-->
-            <template v-if="isHR()">
-              <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
-            </template>
-          </el-button-group>
-        </el-col>
-        <el-col :md="{span:3,offset:6}" style="margin-top:10px">
-          <template v-if="isRTA()">
-            <el-select size="mini" v-model="table_config.view">
-              <el-option value="hours" label="Hours" />
-              <el-option value="log_status" label="Log status" />
-            </el-select>
-          </template>
-        </el-col>
-        <el-col :md="{span:3}" style="margin-top:10px">
-          <template v-if="isRTA()">
-            <el-dropdown @command="handleCommand" style="width:100%">
-              <el-button type="success" :plain="true" size="mini" style="width:100%">
-                Excel
-                <i class="el-icon-arrow-down el-icon--right" />
-              </el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="importSchedule">Import Schedule</el-dropdown-item>
-                <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </template>
-        </el-col>
-        <input
-          type="file"
-          ref="importScheduleInput"
-          accept=".xlsx"
-          style="display:none"
-          @change="importScheduleFileChange"
-        />
-      </el-row>
-
-      <el-row>
-        <el-col :md="{span:4}" style="margin-top:10px;">
-          <el-input v-model="searchQuery" size="mini" placeholder="Agent Search" />
-        </el-col>
-        <el-col :md="{span:20}" style="margin-top:10px;">
+        <el-col :md="{span:16}" style="margin-top:10px;">
           <el-pagination
             style="float:right"
             :page-sizes="[10, 25, 50]"
@@ -118,6 +39,74 @@
             @size-change="tableSizeChange"
             @current-change="tablePageChange"
           />
+        </el-col>
+
+        <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}">
+          <el-switch v-model="show_option" active-text="Show more options"></el-switch>
+        </el-col>
+        <el-col :xs="{span:12}" :sm="{span:12}" :md="{span:12}" style="margin-top:10px;">
+          <el-row :gutter="5" v-show="show_option">
+            <template v-if="position.toLowerCase() != 'team leader'">
+              <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+                <label>Advance Filter</label>
+              </el-col>
+              <el-col :md="{span:16}">
+                <el-tooltip content="Filter By">
+                  <template v-if="isRTA() || isHR() || isADMIN()">
+                    <remote-filter-head :range="week" @filter="filterTable"></remote-filter-head>
+                  </template>
+                  <template v-if="position.toLowerCase() == 'operations manager'">
+                    <tl-filter :range="week" @filter="filterTable" :om_id="user_id"></tl-filter>
+                  </template>
+                </el-tooltip>
+              </el-col>
+            </template>
+            <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+              <label>Preview</label>
+            </el-col>
+            <el-col :md="{span:16}" style="margin-top:5px">
+              <el-tooltip content="Display preview">
+                <template>
+                  <el-select size="mini" v-model="table_config.view" style="float:right">
+                    <el-option value="hours" label="Hours" />
+                    <el-option value="log_status" label="Log status" />
+                  </el-select>
+                </template>
+              </el-tooltip>
+            </el-col>
+            <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+              <label>Functions</label>
+            </el-col>
+            <el-col :md="{span:16}" style="margin-top:5px">
+              <div style="float:right">
+                <template v-if="isRTA()">
+                  <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+                </template>
+                <template v-if="isHR()">
+                  <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+                </template>
+                <template>
+                  <el-dropdown @command="handleCommand">
+                    <el-button type="success" :plain="true" size="mini">
+                      Excel
+                      <i class="el-icon-arrow-down el-icon--right" />
+                    </el-button>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item v-if="isRTA()" command="importSchedule">Import Schedule</el-dropdown-item>
+                      <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </template>
+              </div>
+            </el-col>
+            <input
+              type="file"
+              ref="importScheduleInput"
+              accept=".xlsx"
+              style="display:none"
+              @change="importScheduleFileChange"
+            />
+          </el-row>
         </el-col>
       </el-row>
       <el-row style="margin-top:10px;">
@@ -181,16 +170,14 @@
                       </template>
                     </template>
                   </template>
-                    <!-- v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length===0" -->
+                  <!-- v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length===0" -->
 
-                  <template
-                    v-else
-                  >
-                  <div style="width:100%;padding:0px;margin:0px;">
-                    <div
-                      style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399;border-radius:5px;"
-                    >OFF</div>
-                  </div>
+                  <template v-else>
+                    <div style="width:100%;padding:0px;margin:0px;">
+                      <div
+                        style="padding:3px;font-size:.85em;background-color:#EBEEF5;color:#909399;border-radius:5px;"
+                      >OFF</div>
+                    </div>
                   </template>
                 </template>
               </el-table-column>
@@ -410,7 +397,11 @@
       >
         <el-row>
           <el-col>
-            <el-radio-group size="mini" v-model="excel.export_sva.field.radio_select" @change="excel.export_sva.clear_cluster_field != excel.export_sva.clear_cluster_field">
+            <el-radio-group
+              size="mini"
+              v-model="excel.export_sva.field.radio_select"
+              @change="excel.export_sva.clear_cluster_field != excel.export_sva.clear_cluster_field"
+            >
               <el-radio-button label="all">All</el-radio-button>
               <el-radio-button label="multiCluster">Selected Clusters</el-radio-button>
             </el-radio-group>
@@ -434,18 +425,18 @@
           <el-col style="margin-top:5px">
             <!-- component here -->
             <remote-search
-            @selected="excelCluster"
-            :multiple="true"
-            :filterable="true"
-            :params="{
+              @selected="excelCluster"
+              :multiple="true"
+              :filterable="true"
+              :params="{
               om:true,
               start_date:formatDate(excel.export_sva.field.dates[0],'','YYYY-MM-DD'),
               end_date:formatDate(excel.export_sva.field.dates[1],'','YYYY-MM-DD')
               }"
-            :placeholder="'Select Cluster...'"
-            style="width:100%"
-            :disabled="excel.export_sva.field.radio_select =='all'"
-            :clear="excel.export_sva.clear_cluster_field"
+              :placeholder="'Select Cluster...'"
+              style="width:100%"
+              :disabled="excel.export_sva.field.radio_select =='all'"
+              :clear="excel.export_sva.clear_cluster_field"
             ></remote-search>
           </el-col>
         </el-row>
@@ -485,7 +476,11 @@
           <span>( {{ excel.import.loop_index }}</span>/
           <span>{{ excel.import.arr_length }} )</span>
         </div>
-        <el-progress :percentage="excel.import.progress=='0.0'? 0:parseFloat(excel.import.progress)" :text-inside="true" :stroke-width="18"></el-progress>
+        <el-progress
+          :percentage="excel.import.progress=='0.0'? 0:parseFloat(excel.import.progress)"
+          :text-inside="true"
+          :stroke-width="18"
+        ></el-progress>
         <div style="padding-bottom:15px;  ">
           <el-tabs
             v-model="excel.import.report.active_tab"
@@ -544,31 +539,32 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import axios from 'axios'
-import Moment from 'moment/moment'
-import { extendMoment } from 'moment-range'
-const moment = extendMoment(Moment)
-import cellContent from './components/cellContent'
-import remoteSearch from './components/userRemoteSearch'
-import remoteFilterHead from './components/agentScheduleHeadFilter'
+import { mapActions, mapGetters } from "vuex";
+import axios from "axios";
+import Moment from "moment/moment";
+import { extendMoment } from "moment-range";
+const moment = extendMoment(Moment);
+import cellContent from "./components/cellContent";
+import remoteSearch from "./components/userRemoteSearch";
+import remoteFilterHead from "./components/agentScheduleHeadFilter";
+import tlFilter from "./components/TeamLeaderFilter";
 
 export default {
-  components: { cellContent, remoteSearch,remoteFilterHead },
+  components: { cellContent, remoteSearch, remoteFilterHead, tlFilter },
   computed: {
     ...mapGetters([
-      'agentsWorkReports',
-      'agentsWorkReportsfetchState',
-      'agents',
-      'agentsfetchState',
-      'position',
-      'token',
-      'user_id',
-      'head_id',
-      'createScheduleBulkState',
-      'createScheduleBulkData',
-      'createLeaveState',
-      'createScheduleBulkError',
+      "agentsWorkReports",
+      "agentsWorkReportsfetchState",
+      "agents",
+      "agentsfetchState",
+      "position",
+      "token",
+      "user_id",
+      "head_id",
+      "createScheduleBulkState",
+      "createScheduleBulkData",
+      "createLeaveState",
+      "createScheduleBulkError",
       "updateScheduleState",
       "position_id",
       "createLeaveParams",
@@ -583,64 +579,76 @@ export default {
       "removeTimeOutState",
       "agentTimeOutTitle",
       "removeTimeOutTitle"
-    ])
+    ]),
+    row2offset() {
+      let result = 0,
+        position = this.position.toLowerCase();
+      if (this.isRTA() || this.isHR()) {
+        result = 14;
+      } else {
+        if (position == "admin") {
+          result = 14;
+        }
+      }
+      return result;
+    }
   },
   watch: {
-    agentTimeOutState({initial,success,fail}){
-      if(success){
-        this.weekChange(this.week.start)
+    agentTimeOutState({ initial, success, fail }) {
+      if (success) {
+        this.weekChange(this.week.start);
         this.$message({
-          type:"success",
-          message:this.agentTimeOutTitle,
-          duration:5000
-        })
+          type: "success",
+          message: this.agentTimeOutTitle,
+          duration: 5000
+        });
       }
 
-      if(fail){
+      if (fail) {
         this.$message({
-          type:"error",
-          message:this.agentTimeOutTitle,
-          duration:5000
-        })
+          type: "error",
+          message: this.agentTimeOutTitle,
+          duration: 5000
+        });
       }
     },
-    removeTimeOutState({initial,success,fail}){
-      if(success){
-        this.weekChange(this.week.start)
+    removeTimeOutState({ initial, success, fail }) {
+      if (success) {
+        this.weekChange(this.week.start);
         this.$message({
-          type:"success",
-          message:this.removeTimeOutTitle,
-          duration:5000
-        })
+          type: "success",
+          message: this.removeTimeOutTitle,
+          duration: 5000
+        });
       }
 
-      if(fail){
+      if (fail) {
         this.$message({
-          type:"error",
-          message:this.removeTimeOutTitle,
-          duration:5000
-        })
+          type: "error",
+          message: this.removeTimeOutTitle,
+          duration: 5000
+        });
       }
     },
-    agentsfetchState({initial,success,fail}){
-      if(initial){
-        this.form.addSchedule.remote_loader=true;
+    agentsfetchState({ initial, success, fail }) {
+      if (initial) {
+        this.form.addSchedule.remote_loader = true;
       }
-      if(success){
-        this.form.addSchedule.remote_loader=false;
+      if (success) {
+        this.form.addSchedule.remote_loader = false;
       }
-      if(fail){
-        this.form.addSchedule.remote_loader=false;
+      if (fail) {
+        this.form.addSchedule.remote_loader = false;
       }
     },
-    "excel.import.loop_index":function(v){
-      if(v == this.excel.import.arr_length){
+    "excel.import.loop_index": function(v) {
+      if (v == this.excel.import.arr_length) {
         this.excel.import.importing = false;
         this.weekChange(this.week.start);
       }
     },
-    exportSvaReportState({initial,success,fail}){
-      if(success){
+    exportSvaReportState({ initial, success, fail }) {
+      if (success) {
         // this.toExcel(this.exportSvaReportData);
         var a = document.createElement("a");
         document.body.appendChild(a);
@@ -651,79 +659,76 @@ export default {
           }),
           url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.download =
+          "SVA " +
+          moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+          " to " +
+          moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
+          ".xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
       }
     },
-    deleteSingleScheduleState({initial,success,fail}){
-
-      if(success){
-        this.weekChange(this.week.start)
+    deleteSingleScheduleState({ initial, success, fail }) {
+      if (success) {
+        this.weekChange(this.week.start);
         this.$message({
-          type:"success",
-          message:"You have successfully deleted a schedule.",
-          duration:5000
-        })
+          type: "success",
+          message: "You have successfully deleted a schedule.",
+          duration: 5000
+        });
       }
 
-      if(fail){
+      if (fail) {
         this.$message({
-          type:"error",
-          message:this.deleteSingleScheduleError,
-          duration:5000
-        })
+          type: "error",
+          message: this.deleteSingleScheduleError,
+          duration: 5000
+        });
       }
     },
-    updateScheduleState({initial,success,fail}){
-      if(initial){
-
+    updateScheduleState({ initial, success, fail }) {
+      if (initial) {
       }
-      if(success){
+      if (success) {
         this.$message({
-          type:"success",
-          message:"Successfully updated schedule.",
-          duration:5000
-        })
-        this.weekChange(
-          moment(this.week.start)
-            .format('YYYY-MM-DD')
-        )
+          type: "success",
+          message: "Successfully updated schedule.",
+          duration: 5000
+        });
+        this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
       }
-      if(fail){
+      if (fail) {
         this.$message({
-          type:"warning",
-          message:"There's a problem processing your request.",
-          duration:5000
-        })
+          type: "warning",
+          message: "There's a problem processing your request.",
+          duration: 5000
+        });
       }
     },
     createLeaveState({ initial, success, fail }) {
       if (success) {
-        this.form.addLeave.show = false
-        if(this.createLeaveParams.approval_status.code == 500 ){
+        this.form.addLeave.show = false;
+        if (this.createLeaveParams.approval_status.code == 500) {
           this.$message({
-            type:"warning",
-            message:this.createLeaveParams.approval_status.title,
-            duration:5000
-          })
-        }else{
+            type: "warning",
+            message: this.createLeaveParams.approval_status.title,
+            duration: 5000
+          });
+        } else {
           this.$message({
-            type:"success",
-            message:this.createLeaveParams.approval_status.title,
-            duration:5000
-          })
+            type: "success",
+            message: this.createLeaveParams.approval_status.title,
+            duration: 5000
+          });
         }
-        this.weekChange(
-          moment(this.week.start)
-            .format('YYYY-MM-DD')
-        )
+        this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
       } else if (fail) {
         this.$message({
-          type: 'error',
+          type: "error",
           message: this.createLeaveError,
           duration: 5000
-        })
+        });
       }
     },
     cancelLeaveState({ initial, success, fail }) {
@@ -735,61 +740,60 @@ export default {
         //     duration:5000
         //   })
         // }else{
-          this.$message({
-            type:"success",
-            message: "You have successfully cancelled a leave.",
-            duration:5000
-          })
+        this.$message({
+          type: "success",
+          message: "You have successfully cancelled a leave.",
+          duration: 5000
+        });
         // }
-        this.weekChange(
-          moment(this.week.start)
-            .format('YYYY-MM-DD')
-        )
+        this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
       } else if (fail) {
         this.$message({
-          type: 'error',
+          type: "error",
           message: this.createLeaveError,
           duration: 5000
-        })
+        });
       }
     },
     // 'form.addSchedule.model.operationsManager': function() {
     //   this.getFormOptions({ query: 'team leader', var: 'teamLeader' })
     // },
     searchQuery(v) {
-      if (v != '') {
-        this.query['target[]'] = 'full_name'
-        this.query.query = v
+      if (v != "") {
+        this.query["target[]"] = "full_name";
+        this.query.query = v;
         this.weekChange(
           moment(this.week.start)
             // .subtract(7, "days")
             // .startOf("isoweek")
-            .format('YYYY-MM-DD')
-        )
+            .format("YYYY-MM-DD")
+        );
       } else {
-        delete this.query['target[]']
-        delete this.query.query
+        delete this.query["target[]"];
+        delete this.query.query;
         this.weekChange(
           moment(this.week.start)
             // .subtract(7, "days")
             // .startOf("isoweek")
-            .format('YYYY-MM-DD')
-        )
+            .format("YYYY-MM-DD")
+        );
       }
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
-        this.tableData = this.agentsWorkReports.agent_schedules
-        let tmp = [].concat(this.agentsWorkReports.agent_schedules.map(i=>i.schedule));
-        tmp = [].concat(...tmp.map(i=>i));
-        tmp = tmp.filter(i=>i.overtime_id == null);
+        this.tableData = this.agentsWorkReports.agent_schedules;
+        let tmp = [].concat(
+          this.agentsWorkReports.agent_schedules.map(i => i.schedule)
+        );
+        tmp = [].concat(...tmp.map(i => i));
+        tmp = tmp.filter(i => i.overtime_id == null);
         this.sched_array = tmp;
 
         // console.log(this.sched_array.filter(i=> i.user_info.id==20 && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[0])
         // console.log(this.sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length)
       }
       if (fail) {
-        this.tableData = []
+        this.tableData = [];
       }
     },
     // 'select.operationsManager': function(v) {
@@ -810,16 +814,20 @@ export default {
     //       })
     //     }
     //   }
-      // this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    // this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
     // },
     // 'select.teamLeader': function(v) {
     //   this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
     // },
-    'excel.export_sva.field.dates':function(v){
-      let start = this.excel.export_sva.model.start != moment(v[0]).format("YYYY-MM-DD"), 
-      end=this.excel.export_sva.model.end != moment(v[1]).format("YYYY-MM-DD");
-      if(start || end){
-        this.excel.export_sva.clear_cluster_field = !this.excel.export_sva.clear_cluster_field;
+    "excel.export_sva.field.dates": function(v) {
+      let start =
+          this.excel.export_sva.model.start !=
+          moment(v[0]).format("YYYY-MM-DD"),
+        end =
+          this.excel.export_sva.model.end != moment(v[1]).format("YYYY-MM-DD");
+      if (start || end) {
+        this.excel.export_sva.clear_cluster_field = !this.excel.export_sva
+          .clear_cluster_field;
       }
       this.excel.export_sva.model.start = moment(v[0]).format("YYYY-MM-DD");
       this.excel.export_sva.model.end = moment(v[1]).format("YYYY-MM-DD");
@@ -827,43 +835,44 @@ export default {
   },
   mounted() {
     // console.log(this.token)
-    this.axios.options.headers.Authorization = "Bearer "+ this.token;
+    this.axios.options.headers.Authorization = "Bearer " + this.token;
     if (
-      this.position == 'Admin' ||
-      this.position == 'HR Manager' ||
-      this.position == 'HR Assistant' ||
-      this.position == 'RTA Manager' ||
-      this.position == 'RTA Analyst' ||
-      this.position == 'RTA Supervisor'
+      this.position == "Admin" ||
+      this.position == "HR Manager" ||
+      this.position == "HR Assistant" ||
+      this.position == "RTA Manager" ||
+      this.position == "RTA Analyst" ||
+      this.position == "RTA Supervisor"
     ) {
-      this.disable_select.teamLeader = true
+      this.disable_select.teamLeader = true;
       this.getUsersByPosition({
-        query: 'operations manager',
-        var: 'operationsManager',
-        start:this.week.start,
-        end:this.week.end,
-      })
+        query: "operations manager",
+        var: "operationsManager",
+        start: this.week.start,
+        end: this.week.end
+      });
     } else {
-      this.disable_select.teamLeader = false
+      this.disable_select.teamLeader = false;
       this.getUsersByPosition({
-        query: 'team leader',
-        var: 'teamLeader',
-        start:this.week.start,
-        end:this.week.end
-      })
+        query: "team leader",
+        var: "teamLeader",
+        start: this.week.start,
+        end: this.week.end
+      });
     }
-    
+
     this.weekChange(
       moment()
         .isoWeekday(2)
-        .format('YYYY-MM-DD')
-    )
+        .format("YYYY-MM-DD")
+    );
   },
   data() {
     return {
-      blank:[{}],
-      axios:{options:{headers:{Authorization: null}}},
-      sched_array:[],
+      show_option: true,
+      blank: [{}],
+      axios: { options: { headers: { Authorization: null } } },
+      sched_array: [],
       excel: {
         import: {
           status: null,
@@ -887,26 +896,26 @@ export default {
             }
           }
         },
-        export_sva:{
-          dialog:false,
-          confirm:false,
-          clear_cluster_field:false,
-          model:{
-            start:null,
-            end:null,
+        export_sva: {
+          dialog: false,
+          confirm: false,
+          clear_cluster_field: false,
+          model: {
+            start: null,
+            end: null
           },
-          field:{
-            dates:[],
-            radio_select:"all",
-            clusters:[]
+          field: {
+            dates: [],
+            radio_select: "all",
+            clusters: []
           }
         }
       },
-      searchQuery: '',
+      searchQuery: "",
       creatingFlag: false,
       form: {
         addSchedule: {
-          remote_loader:false,
+          remote_loader: false,
           show: false,
           btn_loader: false,
           model: {
@@ -920,21 +929,21 @@ export default {
           options: {
             teamLeader: {
               request: {
-                full_name:null,
-                list:"heads",
-                position_id:16
+                full_name: null,
+                list: "heads",
+                position_id: 16
               },
-              data:[],
-              loader:false,
+              data: [],
+              loader: false
             },
             operationsManager: {
               request: {
-                full_name:null,
-                list:"heads",
-                position_id:15
+                full_name: null,
+                list: "heads",
+                position_id: 15
               },
-              data:[],
-              loader:false,
+              data: [],
+              loader: false
             }
           }
         },
@@ -950,35 +959,35 @@ export default {
           }
         }
       },
-    filter_table:{
-      om_id:null,
-      tl_id:null,
-    },
+      filter_table: {
+        om_id: null,
+        tl_id: null
+      },
       filter: {
-        by: 'all',
+        by: "all",
         options: []
       },
       week: {
         start: moment()
-          .startOf('isoweek')
-          .format('YYYY-MM-DD'),
+          .startOf("isoweek")
+          .format("YYYY-MM-DD"),
         end: moment()
-          .endOf('isoweek')
-          .format('YYYY-MM-DD'),
+          .endOf("isoweek")
+          .format("YYYY-MM-DD")
       },
       fetchData: [],
       tableHeader: [],
       tableData: [],
       query: {
         offset: 0,
-        limit: 10,
+        limit: 10
       },
       table_config: {
         page: 1,
-        view:"hours"
+        view: "hours"
       },
       action: {
-        type: 'Create',
+        type: "Create",
         selections: []
       },
       select: {
@@ -989,58 +998,61 @@ export default {
         teamLeader: [],
         operationsManager: [],
         leave_type: [
-          { value: 'bereavement_leave', label: 'Bereavement' },
-          { value: 'leave_of_absence', label: 'Leave of absence' },
-          { value: 'loa1', label: 'Leave of absence 1 (Sick)' },
-          { value: 'loa2', label: 'Leave of absence 2 (Vacation)' },
-          { value: 'maternity_leave', label: 'Maternity' },
-          { value: 'paternity_leave', label: 'Paternity' },
-          { value: 'solo_parent_leave', label: 'Solo Parent' },
-          { value: 'magna_carta_leave', label: 'Magna Carta' },
-          { value: 'vawc', label: 'Violence Againts Women and Children' }
+          { value: "bereavement_leave", label: "Bereavement" },
+          { value: "leave_of_absence", label: "Leave of absence" },
+          { value: "loa1", label: "Leave of absence 1 (Sick)" },
+          { value: "loa2", label: "Leave of absence 2 (Vacation)" },
+          { value: "maternity_leave", label: "Maternity" },
+          { value: "paternity_leave", label: "Paternity" },
+          { value: "solo_parent_leave", label: "Solo Parent" },
+          { value: "magna_carta_leave", label: "Magna Carta" },
+          { value: "vawc", label: "Violence Againts Women and Children" }
         ]
       },
       disable_select: {
         teamLeader: false,
         operationsManager: false
       }
-    }
+    };
   },
   methods: {
     ...mapActions([
-      'fetchAgentsWorkReports',
-      'fetchAgents',
-      'createLeave',
-      'createSchedule',
-      'excelToArraySchedule',
-      'exportEmployeeTemplate',
+      "fetchAgentsWorkReports",
+      "fetchAgents",
+      "createLeave",
+      "createSchedule",
+      "excelToArraySchedule",
+      "exportEmployeeTemplate"
     ]),
-    filterTable(v){
+    filterTable(v) {
       this.filter_table.om_id = v.om_id;
       this.filter_table.tl_id = v.tl_id;
-      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     },
-    excelCluster(v){
+    excelCluster(v) {
       this.excel.export_sva.field.clusters = v;
     },
-    exportSvaReport(){
+    exportSvaReport() {
       this.excel.export_sva.confirm = true;
       let params = {
-        start_date:this.excel.export_sva.model.start,
-        end_date: this.excel.export_sva.model.end,
+        start_date: this.excel.export_sva.model.start,
+        end_date: this.excel.export_sva.model.end
       };
 
-      if(Array.isArray(this.excel.export_sva.field.clusters) && this.excel.export_sva.field.radio_select != 'all'){
+      if (
+        Array.isArray(this.excel.export_sva.field.clusters) &&
+        this.excel.export_sva.field.radio_select != "all"
+      ) {
         params.om_id = this.excel.export_sva.field.clusters;
       }
-      let url = "api/v1/excel/export_sva"+this.toUrlParams(params),
+      let url = "api/v1/excel/export_sva" + this.toUrlParams(params),
         options = {
           responseType: "blob",
           headers: {
             Authorization: "Bearer " + this.token
           }
         };
-      axios.get(url,options).then(res => {
+      axios.get(url, options).then(res => {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
@@ -1052,15 +1064,24 @@ export default {
           }),
           url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.download =
+          "SVA " +
+          moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+          " to " +
+          moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
+          ".xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
         this.excel.export_sva.confirm = false;
       });
     },
-    generateSvaReport(){
+    generateSvaReport() {
       let query = this.excel.export_sva.model,
-        url = 'api/v1/schedules/work/report?start='+query.start+"&end="+query.end,
+        url =
+          "api/v1/schedules/work/report?start=" +
+          query.start +
+          "&end=" +
+          query.end,
         options = {
           headers: {
             Authorization: "Bearer " + this.token
@@ -1070,95 +1091,135 @@ export default {
       let header = [""];
       let header1 = ["Agent"];
 
-        axios.get(url,options).then(res=>{
+      axios
+        .get(url, options)
+        .then(res => {
           // console.log(res.data.meta.agent_schedules)
-          const range = moment.range(query.start, query.end)
-          const dates = Array.from(range.by('day')).map(m =>
-            m.format('YYYY-MM-DD')
-          )
-            res.data.meta.agent_schedules.forEach(((v,i)=>{
+          const range = moment.range(query.start, query.end);
+          const dates = Array.from(range.by("day")).map(m =>
+            m.format("YYYY-MM-DD")
+          );
+          res.data.meta.agent_schedules.forEach(
+            ((v, i) => {
               // get agent info
               let obj = [];
               obj.push(v.full_name);
-              dates.forEach(((v1,i1)=>{
-                // get per date info
-                header.push(moment(v1).format("ddd MM-DD-YYYY"),"","","","","")
-                header1.push("OM","TL","SCHED","TIME_IN","TIME_OUT","CONFORMANCE")
-                if(v.schedule.length>0){
-                  let tmp = v.schedule.filter(i=>moment(v1).format("YYYY-MM-DD") == moment(i.start_event.date).format("YYYY-MM-DD") && i.overtime_id==null)
-                  if(tmp.length>0){
-                    tmp=tmp[0];
-                    obj.push(tmp.om.full_name);
-                    obj.push(tmp.tl.full_name);
-                    obj.push(moment(tmp.start_event.date).format('hh:mm a')+"-"+moment(tmp.end_event.date).format('hh:mm a'));
-                    switch(tmp.remarks.toLowerCase()){
-                      case 'present':
-                          obj.push(moment(tmp.time_in.date).format("YYYY-MM-DD hh:mm a"));
-                          obj.push(moment(tmp.time_out.date).format("YYYY-MM-DD hh:mm a"));
-                        break;
-                      case 'ncns':
-                      case 'absent':
+              dates.forEach(
+                ((v1, i1) => {
+                  // get per date info
+                  header.push(
+                    moment(v1).format("ddd MM-DD-YYYY"),
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""
+                  );
+                  header1.push(
+                    "OM",
+                    "TL",
+                    "SCHED",
+                    "TIME_IN",
+                    "TIME_OUT",
+                    "CONFORMANCE"
+                  );
+                  if (v.schedule.length > 0) {
+                    let tmp = v.schedule.filter(
+                      i =>
+                        moment(v1).format("YYYY-MM-DD") ==
+                          moment(i.start_event.date).format("YYYY-MM-DD") &&
+                        i.overtime_id == null
+                    );
+                    if (tmp.length > 0) {
+                      tmp = tmp[0];
+                      obj.push(tmp.om.full_name);
+                      obj.push(tmp.tl.full_name);
+                      obj.push(
+                        moment(tmp.start_event.date).format("hh:mm a") +
+                          "-" +
+                          moment(tmp.end_event.date).format("hh:mm a")
+                      );
+                      switch (tmp.remarks.toLowerCase()) {
+                        case "present":
+                          obj.push(
+                            moment(tmp.time_in.date).format(
+                              "YYYY-MM-DD hh:mm a"
+                            )
+                          );
+                          obj.push(
+                            moment(tmp.time_out.date).format(
+                              "YYYY-MM-DD hh:mm a"
+                            )
+                          );
+                          break;
+                        case "ncns":
+                        case "absent":
                           obj.push(tmp.remarks);
                           obj.push(tmp.remarks);
-                        break;
-                      case 'on-leave':
+                          break;
+                        case "on-leave":
                           obj.push(tmp.leave.leave_type);
                           obj.push(tmp.leave.leave_type);
-                        break;
-                      case 'upcoming':
+                          break;
+                        case "upcoming":
                           obj.push("NO STAMP");
                           obj.push("NO STAMP");
-                        break;
+                          break;
+                      }
+                      obj.push(tmp.conformance + "%");
+                    } else {
+                      // return off
+                      obj.push("NA");
+                      obj.push("NA");
+                      obj.push("OFF");
+                      obj.push("OFF");
+                      obj.push("OFF");
+                      obj.push("0%");
                     }
-                    obj.push(tmp.conformance+"%")
-                  }else{
+                  } else {
                     // return off
-                    obj.push("NA");
-                    obj.push("NA");
-                    obj.push('OFF');
-                    obj.push("OFF");
-                    obj.push("OFF");
-                    obj.push("0%")
-
-                  }
-                }else{
-                  // return off
                     // obj.om = null;
                     // obj.tl = null;
                     // obj.rop = v.full_name;
                     obj.push("NA");
                     obj.push("NA");
-                    obj.push('OFF');
-                    obj.push('OFF');
-                    obj.push('OFF');
-                    obj.push("0%")
+                    obj.push("OFF");
+                    obj.push("OFF");
+                    obj.push("OFF");
+                    obj.push("0%");
+                  }
+                }).bind(this)
+              );
+              data.push(obj);
+            }).bind(this)
+          );
+          data.unshift([]);
+          data.unshift(header1);
+          data.unshift([]);
+          data.unshift(header);
+          // console.log(data)
 
-                }
-              }).bind(this));
-                data.push(obj)
-            }).bind(this));
-            data.unshift([])
-            data.unshift(header1)
-            data.unshift([])
-            data.unshift(header)
-            // console.log(data)
+          // convertToExcel
+          let excel = {
+            fileName: "Something.xlxs",
+            content: []
+          };
 
-
-            // convertToExcel
-            let excel = {
-              fileName:"Something.xlxs",
-              content:[]
-            }
-
-            excel.content.push({sheet_data:data,sheet_title:"SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")});
-            this.createMultisheetExcel(excel)
-
-
-        }).catch(err=>{
-          console.log(err)
+          excel.content.push({
+            sheet_data: data,
+            sheet_title:
+              "SVA " +
+              moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+              " to " +
+              moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")
+          });
+          this.createMultisheetExcel(excel);
         })
+        .catch(err => {
+          console.log(err);
+        });
     },
-    createMultisheetExcel(data){
+    createMultisheetExcel(data) {
       let url = "api/v1/excel/create_multisheet_excel",
         formData = new FormData(),
         options = {
@@ -1167,8 +1228,8 @@ export default {
             Authorization: "Bearer " + this.token
           }
         };
-      formData.append("obj",JSON.stringify(data))
-      axios.post(url,formData, options).then(res => {
+      formData.append("obj", JSON.stringify(data));
+      axios.post(url, formData, options).then(res => {
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.style = "display: none";
@@ -1180,7 +1241,12 @@ export default {
           }),
           url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = "SVA "+moment(this.excel.export_sva.model.start).format("YYYY-MM-DD")+" to "+moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") + ".xlsx";
+        a.download =
+          "SVA " +
+          moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+          " to " +
+          moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
+          ".xlsx";
         a.click();
         window.URL.revokeObjectURL(url);
       });
@@ -1203,14 +1269,14 @@ export default {
         }
       }
     },
-    handleCommand(e){
-      switch(e){
+    handleCommand(e) {
+      switch (e) {
         case "importSchedule":
           this.$refs.importScheduleInput.click();
           break;
-          case "exportSVA":
-            this.excel.export_sva.field.dates = [];
-            this.excel.export_sva.dialog = true;
+        case "exportSVA":
+          this.excel.export_sva.field.dates = [];
+          this.excel.export_sva.dialog = true;
           break;
       }
     },
@@ -1228,96 +1294,108 @@ export default {
         .post("api/v1/schedules/excel_to_array", formData, options)
         .then(res => {
           console.log(res.data.meta);
-          let data = res.data.meta.excel_data.map(i=>({title_id:1,auth_id:this.user_id,om_id:i.om_id,tl_id:i.tl_id,email:i.email.toLowerCase(),start_event:moment(i.start_event).format("YYYY-MM-DD HH:mm:ss"),end_event:moment(i.end_event).format("YYYY-MM-DD HH:mm:ss")}));
+          let data = res.data.meta.excel_data.map(i => ({
+            title_id: 1,
+            auth_id: this.user_id,
+            om_id: i.om_id,
+            tl_id: i.tl_id,
+            email: i.email.toLowerCase(),
+            start_event: moment(i.start_event).format("YYYY-MM-DD HH:mm:ss"),
+            end_event: moment(i.end_event).format("YYYY-MM-DD HH:mm:ss")
+          }));
           this.loopCreateSchedule(data);
         })
         .catch(err => console.log(err));
     },
-    loopCreateSchedule(data){
+    loopCreateSchedule(data) {
       this.form.addSchedule.show = false;
       this.excel.import.importing = true;
       this.excel.import.dialog = true;
       this.excel.import.arr_length = data.length;
-      let tmp_arr=[],options = {
+      let tmp_arr = [],
+        options = {
           headers: {
             Authorization: "Bearer " + this.token
           }
         };
       this.excel.import.loop_index = 0;
       this.excel.import.progress = 0;
-      data.forEach(((v,i)=>{
-        let tmp_data={};
-        axios.post("api/v1/schedules/create",v,options).then(res=>{
-          console.log(res)
-          this.excel.import.loop_index +=1;
-            this.excel.import.progress =
-              ((this.excel.import.loop_index / this.excel.import.arr_length) *
-              100).toFixed(2);
-            tmp_data.email = res.data.parameters.email;
-            tmp_data.status_code = res.status;
-            tmp_data.title = res.data.title;
-            tmp_arr.push(tmp_data);
-            this.excel.import.report.data.all.list = tmp_arr;
-        }).catch(err=>{
-            this.excel.import.loop_index +=1;
-            this.excel.import.progress =
-              ((this.excel.import.loop_index / this.excel.import.arr_length) *
-              100).toFixed(2);
-            tmp_data.email = err.response.data.parameters.email;
-            tmp_data.status_code = err.response.data.code;
-            tmp_data.title = err.response.data.title;
-            tmp_arr.push(tmp_data);
-            this.excel.import.report.data.all.list = tmp_arr;
-        });
-      }).bind(this));
+      data.forEach(
+        ((v, i) => {
+          let tmp_data = {};
+          axios
+            .post("api/v1/schedules/create", v, options)
+            .then(res => {
+              console.log(res);
+              this.excel.import.loop_index += 1;
+              this.excel.import.progress = (
+                (this.excel.import.loop_index / this.excel.import.arr_length) *
+                100
+              ).toFixed(2);
+              tmp_data.email = res.data.parameters.email;
+              tmp_data.status_code = res.status;
+              tmp_data.title = res.data.title;
+              tmp_arr.push(tmp_data);
+              this.excel.import.report.data.all.list = tmp_arr;
+            })
+            .catch(err => {
+              this.excel.import.loop_index += 1;
+              this.excel.import.progress = (
+                (this.excel.import.loop_index / this.excel.import.arr_length) *
+                100
+              ).toFixed(2);
+              tmp_data.email = err.response.data.parameters.email;
+              tmp_data.status_code = err.response.data.code;
+              tmp_data.title = err.response.data.title;
+              tmp_arr.push(tmp_data);
+              this.excel.import.report.data.all.list = tmp_arr;
+            });
+        }).bind(this)
+      );
     },
     processAddScheduleData() {
-      let form = this.form.addSchedule.model
-      let data = []
-      form.agents.forEach(
-        (v, i) => {
-          form.dates.forEach(
-            (v1, i1) => {
-              const start = moment(
-                moment(v1).format('YYYY-MM-DD') +
-                    ' ' +
-                    moment(form.time_in).format('HH:mm:ss')
-              ).format('YYYY-MM-DD HH:mm:ss')
-              const duration = moment(
-                moment(form.duration).format('HH:mm:ss'),
-                'HH:mm:ss'
-              ).diff(moment().startOf('day'), 'seconds')
-              // alert(v1+" "+start+" "+duration)
-              // alert(start + ' ' + duration)
-              data.push({
-                user_id: v,
-                tl_id: form.teamLeader,
-                om_id: form.operationsManager,
-                title_id: 1,
-                start_event: start,
-                end_event: moment(moment(start).add(duration, 's')).format(
-                  'YYYY-MM-DD HH:mm:ss'
-                )
-              })
-            }
-          )
-        }
-      )
-      return data
+      let form = this.form.addSchedule.model;
+      let data = [];
+      form.agents.forEach((v, i) => {
+        form.dates.forEach((v1, i1) => {
+          const start = moment(
+            moment(v1).format("YYYY-MM-DD") +
+              " " +
+              moment(form.time_in).format("HH:mm:ss")
+          ).format("YYYY-MM-DD HH:mm:ss");
+          const duration = moment(
+            moment(form.duration).format("HH:mm:ss"),
+            "HH:mm:ss"
+          ).diff(moment().startOf("day"), "seconds");
+          // alert(v1+" "+start+" "+duration)
+          // alert(start + ' ' + duration)
+          data.push({
+            user_id: v,
+            tl_id: form.teamLeader,
+            om_id: form.operationsManager,
+            title_id: 1,
+            start_event: start,
+            end_event: moment(moment(start).add(duration, "s")).format(
+              "YYYY-MM-DD HH:mm:ss"
+            )
+          });
+        });
+      });
+      return data;
     },
     submitAddSchedule() {
       if (this.validateAddSchedule()) {
-        this.loopCreateSchedule(this.processAddScheduleData())
+        this.loopCreateSchedule(this.processAddScheduleData());
       } else {
         this.$message({
-          type: 'warning',
-          message: 'Please fillup all form fields.',
+          type: "warning",
+          message: "Please fillup all form fields.",
           duration: 5000
-        })
+        });
       }
     },
     validateAddSchedule() {
-      const form = this.form.addSchedule.model
+      const form = this.form.addSchedule.model;
       if (
         form.dates.length < 1 ||
         form.agents < 1 ||
@@ -1326,9 +1404,9 @@ export default {
         form.teamLeader == null ||
         form.operationsManager == null
       ) {
-        return false
+        return false;
       } else {
-        return true
+        return true;
       }
     },
     // for add schedule form options
@@ -1374,314 +1452,321 @@ export default {
       const position = {
         "operations manager": "om",
         "team leader": "tl"
-      }
-      const url = 'api/v1/users?' + position[query.query]+"=true&start_date="+query.start+"&end_date="+query.end;
+      };
+      const url =
+        "api/v1/users?" +
+        position[query.query] +
+        "=true&start_date=" +
+        query.start +
+        "&end_date=" +
+        query.end;
       const options = {
         headers: {
-          Authorization: 'Bearer ' + this.token
+          Authorization: "Bearer " + this.token
         }
-      }
+      };
       axios
         .get(url, options)
         .then(res => {
-          let filtered = res.data.meta.metadata
-          if (query.query == 'team leader') {
-            if (this.position == 'Team Leader') {
+          let filtered = res.data.meta.metadata;
+          if (query.query == "team leader") {
+            if (this.position == "Team Leader") {
               filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.head_id
-              )
-            } else if (this.position == 'Operations Manager') {
+              );
+            } else if (this.position == "Operations Manager") {
               filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.user_id
-              )
+              );
             } else {
               filtered = res.data.meta.metadata.filter(
                 i => i.parent_id == this.select.operationsManager
-              )
+              );
               if (filtered.length > 0) {
-                this.disable_select.teamLeader = false
+                this.disable_select.teamLeader = false;
               } else {
-                this.disable_select.teamLeader = true
+                this.disable_select.teamLeader = true;
               }
             }
           }
           this.options[query.var] = filtered.map(function(v) {
-            return { value: v.id, label: v.full_name }
-          })
-          this.options[query.var].unshift({ value: 'all', label: 'All' })
-          this.select[query.var] = 'all'
+            return { value: v.id, label: v.full_name };
+          });
+          this.options[query.var].unshift({ value: "all", label: "All" });
+          this.select[query.var] = "all";
         })
-        .catch(err => {console.log(err.response.data)
-          this.options[query.var].unshift({ value: 'all', label: 'All' })
-          this.select[query.var] = 'all'
-        })
+        .catch(err => {
+          console.log(err.response.data);
+          this.options[query.var].unshift({ value: "all", label: "All" });
+          this.select[query.var] = "all";
+        });
     },
     showModal(type) {
-      this.form[type].show = true
+      this.form[type].show = true;
     },
     weekChange(e) {
       // console.log(moment().day("tuesday"))
       const start = moment(e)
         .isoWeekday(2)
-        .format('YYYY-MM-DD')
+        .format("YYYY-MM-DD");
       const end = moment(start)
-        .add(6,"days")
-        .format('YYYY-MM-DD')
-      this.week.start = start
-      this.week.end = end
+        .add(6, "days")
+        .format("YYYY-MM-DD");
+      this.week.start = start;
+      this.week.end = end;
 
-      this.generateHeader(start, end)
+      this.generateHeader(start, end);
     },
-    filterTl(v){
-      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    filterTl(v) {
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     },
-    filterOm(v){
+    filterOm(v) {
       if (
-        this.position != 'Operations Manager' &&
-        this.position != 'Team Leader'
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
       ) {
-        if (v == 'all') {
-          this.disable_select.teamLeader = true
-          this.select.teamLeader = 'all'
+        if (v == "all") {
+          this.disable_select.teamLeader = true;
+          this.select.teamLeader = "all";
         } else {
-          this.disable_select.teamLeader = false
+          this.disable_select.teamLeader = false;
           this.getUsersByPosition({
-            query: 'team leader',
-            var: 'teamLeader',
-            start:this.week.start,
-            end:this.week.end,
-          })
+            query: "team leader",
+            var: "teamLeader",
+            start: this.week.start,
+            end: this.week.end
+          });
         }
       }
-      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     },
     generateHeader(start, end) {
-      const range = moment.range(start, end)
-      const dates = Array.from(range.by('day')).map(m =>
-        m.format('YYYY-MM-DD')
-      )
+      const range = moment.range(start, end);
+      const dates = Array.from(range.by("day")).map(m =>
+        m.format("YYYY-MM-DD")
+      );
 
       this.tableHeader = dates.map(d => ({
-        day: moment(d).format('ddd'),
-        date: moment(d).format('YYYY-MM-DD'),
-        date1: moment(d).format('MMM Do')
-      }))
+        day: moment(d).format("ddd"),
+        date: moment(d).format("YYYY-MM-DD"),
+        date1: moment(d).format("MMM Do")
+      }));
       let data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      if (this.searchQuery != '') {
-        data['target[]'] = 'full_name'
-        data.query = this.searchQuery
+      };
+      if (this.searchQuery != "") {
+        data["target[]"] = "full_name";
+        data.query = this.searchQuery;
       }
 
       if (
-        this.position != 'Operations Manager' &&
-        this.position != 'Team Leader'
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
       ) {
         data.om_id = this.filter_table.om_id;
         data.tl_id = this.filter_table.tl_id;
       } else {
-        if (this.select.teamLeader != 'all') {
-          delete data.om_id
-          data.tl_id = this.select.teamLeader
-        } else {
-          if (this.position == 'Operations Manager') {
-            data.om_id = this.user_id
-          } else {
-            data.om_id = this.head_id
-          }
+        if (this.position == "Team Leader") {
+          data.tl_id = this.user_id;
+          data.om_id = null;
+        } else if (this.position == "Operations Manager") {
+          data.om_id = this.user_id;
+          data.tl_id = null;
         }
       }
       data = this.unsetNull(data);
-      this.fetchAgentsWorkReports({ data })
+      this.fetchAgentsWorkReports({ data });
     },
     tableSizeChange(value) {
-      this.query.limit = value
-      this.query.offset = 0
+      this.query.limit = value;
+      this.query.offset = 0;
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      this.fetchAgentsWorkReports({ data })
+      };
+      this.fetchAgentsWorkReports({ data });
     },
     tablePageChange(value) {
-      this.query.offset = (value - 1) * this.query.limit
+      this.query.offset = (value - 1) * this.query.limit;
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
+      };
 
-      if (this.searchQuery != '') {
-        data['target[]'] = 'full_name'
-        data.query = this.searchQuery
+      if (this.searchQuery != "") {
+        data["target[]"] = "full_name";
+        data.query = this.searchQuery;
       }
 
       if (
-        this.position != 'Operations Manager' &&
-        this.position != 'Team Leader'
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
       ) {
-        if (this.select.operationsManager != 'all') {
-          data.om_id = this.select.operationsManager
+        if (this.select.operationsManager != "all") {
+          data.om_id = this.select.operationsManager;
         } else {
-          delete data.om_id
+          delete data.om_id;
         }
-        if (this.select.teamLeader != 'all') {
-          data.tl_id = this.select.teamLeader
+        if (this.select.teamLeader != "all") {
+          data.tl_id = this.select.teamLeader;
         } else {
-          delete data.tl_id
+          delete data.tl_id;
         }
       } else {
-        if (this.select.teamLeader != 'all') {
-          delete data.om_id
-          data.tl_id = this.select.teamLeader
+        if (this.select.teamLeader != "all") {
+          delete data.om_id;
+          data.tl_id = this.select.teamLeader;
         } else {
-          if (this.position == 'operationsManager') {
-            data.om_id = this.user_id
+          if (this.position == "operationsManager") {
+            data.om_id = this.user_id;
           } else {
-            data.om_id = this.head_id
+            data.om_id = this.head_id;
           }
         }
       }
-      this.fetchAgentsWorkReports({ data })
+      this.fetchAgentsWorkReports({ data });
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
-        i => moment(i.start_event.date).format('YYYY-MM-DD') == date
-      )
+        i => moment(i.start_event.date).format("YYYY-MM-DD") == date
+      );
       if (schedule.length == 0) {
-        return [{}]
+        return [{}];
       } else {
-        return schedule
+        return schedule;
       }
     },
     dateToday(date) {
-      if (moment(date).isSame(moment().format('YYYY-MM-DD'))) {
-        return true
+      if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
+        return true;
       } else {
-        return false
+        return false;
       }
     },
     onSubmit() {
       const params = {
         user_id: this.form.addLeave.model.user_id,
-        start_event: moment(this.form.addLeave.model.dates[0]).startOf("day").format("YYYY-MM-DD HH:mm:ss"),
-        end_event: moment(this.form.addLeave.model.dates[1]).endOf("day").format("YYYY-MM-DD HH:mm:ss"),
+        start_event: moment(this.form.addLeave.model.dates[0])
+          .startOf("day")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        end_event: moment(this.form.addLeave.model.dates[1])
+          .endOf("day")
+          .format("YYYY-MM-DD HH:mm:ss"),
         leave_type: this.form.addLeave.leave_type,
         status: "approved",
         generated_by: this.user_id,
         allowed_access: this.position_id
-      }
-      if(this.form.addLeave.leave_type != "loa1" && this.form.addLeave.leave_type != "loa2"){
-        this.createLeave(params)
-      }else{
-        if(confirm("LOA1 and LOA2 do not have revert or cancel function. Please check your data before hitting OK.")){
-          this.createLeave(params)
+      };
+      if (
+        this.form.addLeave.leave_type != "loa1" &&
+        this.form.addLeave.leave_type != "loa2"
+      ) {
+        this.createLeave(params);
+      } else {
+        if (
+          confirm(
+            "LOA1 and LOA2 do not have revert or cancel function. Please check your data before hitting OK."
+          )
+        ) {
+          this.createLeave(params);
         }
       }
     },
-    refresh_table(v){
-
+    refresh_table(v) {
       const data = {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
         end: this.week.end
-      }
-      if (this.searchQuery != '') {
-        data['target[]'] = 'full_name'
-        data.query = this.searchQuery
+      };
+      if (this.searchQuery != "") {
+        data["target[]"] = "full_name";
+        data.query = this.searchQuery;
       }
 
       if (
-        this.position != 'Operations Manager' &&
-        this.position != 'Team Leader'
+        this.position != "Operations Manager" &&
+        this.position != "Team Leader"
       ) {
-        if (this.select.operationsManager != 'all') {
-          data.om_id = this.select.operationsManager
+        if (this.select.operationsManager != "all") {
+          data.om_id = this.select.operationsManager;
         } else {
-          delete data.om_id
+          delete data.om_id;
         }
-        if (this.select.teamLeader != 'all') {
-          delete data.om_id
-          data.tl_id = this.select.teamLeader
+        if (this.select.teamLeader != "all") {
+          delete data.om_id;
+          data.tl_id = this.select.teamLeader;
         } else {
-          delete data.tl_id
+          delete data.tl_id;
         }
       } else {
-        if (this.select.teamLeader != 'all') {
-          delete data.om_id
-          data.tl_id = this.select.teamLeader
+        if (this.select.teamLeader != "all") {
+          delete data.om_id;
+          data.tl_id = this.select.teamLeader;
         } else {
-          if (this.position == 'Operations Manager') {
-            data.om_id = this.user_id
+          if (this.position == "Operations Manager") {
+            data.om_id = this.user_id;
           } else {
-            data.om_id = this.head_id
+            data.om_id = this.head_id;
           }
         }
       }
-      this.fetchAgentsWorkReports({ data })
+      this.fetchAgentsWorkReports({ data });
     },
     remoteAgent(query) {
-      const data = {}
-      if (query !== '') {
-        data['target[]'] = 'full_name'
-        data.query = query
-        this.fetchAgents({ data })
+      const data = {};
+      if (query !== "") {
+        data["target[]"] = "full_name";
+        data.query = query;
+        this.fetchAgents({ data });
       } else {
-        data['target[]'] = ''
-        data.query = ''
-        this.fetchAgents({ data })
+        data["target[]"] = "";
+        data.query = "";
+        this.fetchAgents({ data });
       }
     },
-    isRTA(){
-      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
-        return true;
-      }else{
-        return false;
-      }
-    },
-    isHR(){
-      if(this.position.toLowerCase() == "hr manager" || this.position.toLowerCase() == "hr assistant"){
-        return true;
-      }else{
-        return false;
-      }
-    },
-    remoteManager(query){
+    remoteManager(query) {
       this.form.addSchedule.options.operationsManager.loader = true;
       this.form.addSchedule.options.operationsManager.request.full_name = query;
-      let url = "api/v1/users/remote"+this.toUrlParams(this.form.addSchedule.options.operationsManager.request);
-      this.axiosRequest("get",url,this.axios.options).then(res=>{
-        this.form.addSchedule.options.operationsManager.loader = false
-        if(res.code == 200){
-          this.form.addSchedule.options.operationsManager.data = res.meta.remote
-        }else{
-          this.form.addSchedule.options.operationsManager.data = []
+      let url =
+        "api/v1/users/remote" +
+        this.toUrlParams(
+          this.form.addSchedule.options.operationsManager.request
+        );
+      this.axiosRequest("get", url, this.axios.options).then(res => {
+        this.form.addSchedule.options.operationsManager.loader = false;
+        if (res.code == 200) {
+          this.form.addSchedule.options.operationsManager.data =
+            res.meta.remote;
+        } else {
+          this.form.addSchedule.options.operationsManager.data = [];
         }
       });
     },
-    remoteLeader(query){
+    remoteLeader(query) {
       this.form.addSchedule.options.teamLeader.loader = true;
       this.form.addSchedule.options.teamLeader.request.full_name = query;
-      let url = "api/v1/users/remote"+this.toUrlParams(this.form.addSchedule.options.teamLeader.request);
-      this.axiosRequest("get",url,this.axios.options).then(res=>{
-        this.form.addSchedule.options.teamLeader.loader = false
-        if(res.code == 200){
-          this.form.addSchedule.options.teamLeader.data = res.meta.remote
-        }else{
-          this.form.addSchedule.options.teamLeader.data = []
+      let url =
+        "api/v1/users/remote" +
+        this.toUrlParams(this.form.addSchedule.options.teamLeader.request);
+      this.axiosRequest("get", url, this.axios.options).then(res => {
+        this.form.addSchedule.options.teamLeader.loader = false;
+        if (res.code == 200) {
+          this.form.addSchedule.options.teamLeader.data = res.meta.remote;
+        } else {
+          this.form.addSchedule.options.teamLeader.data = [];
         }
       });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
