@@ -3,7 +3,7 @@
     <el-select
       size="mini"
       remote
-      filterable
+      :filterable="filterable"
       :multiple="multiple"
       :placeholder="placeholder"
       v-model="select"
@@ -22,7 +22,15 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
-  props: ["placeholder", "params", "multiple", "disabled", "clear"],
+  props: [
+    "placeholder",
+    "params",
+    "multiple",
+    "disabled",
+    "clear",
+    "fetch",
+    "filterable"
+  ],
   data() {
     return {
       select: null,
@@ -31,9 +39,34 @@ export default {
     };
   },
   watch: {
-    clear(v) {
+    fetch(v) {
       this.select = null;
       this.options = [];
+      this.disabled = true;
+      let url = "api/v1/users" + this.toUrlParams(this.params),
+        options = {
+          headers: {
+            Authorization: "Bearer " + this.token
+          }
+        };
+
+      this.axiosRequest("get", url, options).then(res => {
+        this.loading = false;
+        if (res.code == 200) {
+          this.disabled = false;
+          this.options = res.meta.metadata;
+          this.select = res.meta.metadata[0].id;
+        } else {
+          this.disabled = true;
+          this.options = [];
+        }
+      });
+    },
+    clear(v) {
+      this.select = null;
+      if (this.filterable) {
+        this.options = [];
+      }
     },
     select(v) {
       this.$emit("selected", v);

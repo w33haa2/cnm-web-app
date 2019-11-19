@@ -44,6 +44,18 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    split(string, del) {
+      return string.split(del);
+    },
+    $ready(fn) {
+      if (process.env.NODE_ENV == "production") {
+        return this.$nextTick(fn);
+      }
+
+      setTimeout(() => {
+        this.$nextTick(fn);
+      }, 1000);
+    },
     axiosRequest(method, url, options) {
       return new Promise((resolve, reject) => {
         axios({ method: method, url: url, headers: options })

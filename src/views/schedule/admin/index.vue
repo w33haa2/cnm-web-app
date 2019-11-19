@@ -22,8 +22,9 @@
             @change="weekChange"
           />
         </el-col>
-        <el-col :md="{span:20}">
-          <div style="float:right">
+        <el-col :md="{span:10,offset:10}">
+          <remote-filter-head :range="week" @filter="filterTable"></remote-filter-head>
+          <!-- <div style="float:right">
             <el-select
               @change="filterOm"
               v-if="position != 'Operations Manager' && position != 'Team Leader'"
@@ -52,7 +53,7 @@
                 :value="option.value"
               />
             </el-select>
-          </div>
+          </div> -->
         </el-col>
       </el-row>
 
@@ -435,6 +436,7 @@
             <remote-search
             @selected="excelCluster"
             :multiple="true"
+            :filterable="true"
             :params="{
               om:true,
               start_date:formatDate(excel.export_sva.field.dates[0],'','YYYY-MM-DD'),
@@ -549,9 +551,10 @@ import { extendMoment } from 'moment-range'
 const moment = extendMoment(Moment)
 import cellContent from './components/cellContent'
 import remoteSearch from './components/userRemoteSearch'
+import remoteFilterHead from './components/agentScheduleHeadFilter'
 
 export default {
-  components: { cellContent, remoteSearch },
+  components: { cellContent, remoteSearch,remoteFilterHead },
   computed: {
     ...mapGetters([
       'agentsWorkReports',
@@ -823,7 +826,7 @@ export default {
     }
   },
   mounted() {
-    console.log(this.token)
+    // console.log(this.token)
     this.axios.options.headers.Authorization = "Bearer "+ this.token;
     if (
       this.position == 'Admin' ||
@@ -947,7 +950,10 @@ export default {
           }
         }
       },
-
+    filter_table:{
+      om_id:null,
+      tl_id:null,
+    },
       filter: {
         by: 'all',
         options: []
@@ -1009,6 +1015,11 @@ export default {
       'excelToArraySchedule',
       'exportEmployeeTemplate',
     ]),
+    filterTable(v){
+      this.filter_table.om_id = v.om_id;
+      this.filter_table.tl_id = v.tl_id;
+      this.weekChange(moment(this.week.start).format('YYYY-MM-DD'))
+    },
     excelCluster(v){
       this.excel.export_sva.field.clusters = v;
     },
@@ -1470,17 +1481,8 @@ export default {
         this.position != 'Operations Manager' &&
         this.position != 'Team Leader'
       ) {
-        if (this.select.operationsManager != 'all') {
-          data.om_id = this.select.operationsManager
-        } else {
-          delete data.om_id
-        }
-        if (this.select.teamLeader != 'all') {
-          delete data.om_id
-          data.tl_id = this.select.teamLeader
-        } else {
-          delete data.tl_id
-        }
+        data.om_id = this.filter_table.om_id;
+        data.tl_id = this.filter_table.tl_id;
       } else {
         if (this.select.teamLeader != 'all') {
           delete data.om_id
