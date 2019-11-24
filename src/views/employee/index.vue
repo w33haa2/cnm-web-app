@@ -107,7 +107,11 @@
             type="error"
             :description="employeeErrors"
           />
-          <transaction-table :table-data="employeesData" @dropdownCommand="dropdownCommand" />
+          <transaction-table
+            :table-data="employeesData"
+            @dropdownCommand="dropdownCommand"
+            @sort="onColumnSort"
+          />
         </el-col>
       </el-row>
     </div>
@@ -161,7 +165,13 @@
       <label>Date</label>
       <el-row style="margin-top: 7px; margin-bottom:5px;">
         <el-col>
-          <el-date-picker size="mini" type="date" v-model="change_status.form.date" style="width:100%" placeholder="Select date..."></el-date-picker>
+          <el-date-picker
+            size="mini"
+            type="date"
+            v-model="change_status.form.date"
+            style="width:100%"
+            placeholder="Select date..."
+          ></el-date-picker>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -251,7 +261,10 @@
             :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code!=200).length "
             name="errors"
           >
-            <el-table :data="excel.import.report.data.all.list.filter(i=> i.status_code!=200)" height="350px">
+            <el-table
+              :data="excel.import.report.data.all.list.filter(i=> i.status_code!=200)"
+              height="350px"
+            >
               <el-table-column label="CID" width="100">
                 <template scope="scope">{{scope.row.company_id}}</template>
               </el-table-column>
@@ -345,9 +358,9 @@ export default {
       },
       query: {
         limit: 10,
-        offset: 0
-        // order:"desc",
-        // sort:"user.created_at"
+        offset: 0,
+        order: "desc",
+        sort: "user_infos.created_at"
       },
       reset: {
         toggle: false,
@@ -362,19 +375,19 @@ export default {
       },
       change_status: {
         dialog: false,
-        remote_loader:false,
+        remote_loader: false,
         form: {
           employees: [],
           status_id: 1,
-          date:null
+          date: null
         },
         model: {
           user_id: null,
           status: null,
           type: null,
           status_reason: null,
-          hired_date:null,
-          separation_date:null
+          hired_date: null,
+          separation_date: null
         },
         confirm: false
       }
@@ -423,23 +436,23 @@ export default {
     ])
   },
   watch: {
-    rs_employeesfetchState({initial,success,fail}){
-      if(initial){
+    rs_employeesfetchState({ initial, success, fail }) {
+      if (initial) {
         this.change_status.remote_loader = true;
       }
-      if(success){
+      if (success) {
         this.change_status.remote_loader = false;
       }
-      if(fail){
+      if (fail) {
         this.change_status.remote_loader = false;
       }
     },
-    "excel.import.loop_index":function(v){
-      if(v==this.excel.import.arr_length){
-          this.excel.import.importing = false;
-          this.query.offset = 0;
-          let data = this.query;
-          this.fetchEmployees({data});
+    "excel.import.loop_index": function(v) {
+      if (v == this.excel.import.arr_length) {
+        this.excel.import.importing = false;
+        this.query.offset = 0;
+        let data = this.query;
+        this.fetchEmployees({ data });
       }
     },
     resetPassState({ initial, success, fail }) {
@@ -467,7 +480,7 @@ export default {
         this.change_status.confirm = false;
         this.query.offset = 0;
         let data = this.query;
-        this.fetchEmployees({data});
+        this.fetchEmployees({ data });
         this.$message({
           type: "success",
           message: "You have successfully changed status of chosen employee/s.",
@@ -527,21 +540,25 @@ export default {
       this.change_status.model.type = row.type;
       this.change_status.model.reason = row.type;
 
-      if(row.status == "active"){
-        this.change_status.model.hired_date = this.change_status.form.date
-        this.change_status.model.separation_date = null
-      }else{
-        this.change_status.model.hired_date = null
-        this.change_status.model.separation_date = this.change_status.form.date
+      if (row.status == "active") {
+        this.change_status.model.hired_date = this.change_status.form.date;
+        this.change_status.model.separation_date = null;
+      } else {
+        this.change_status.model.hired_date = null;
+        this.change_status.model.separation_date = this.change_status.form.date;
       }
     },
-    "change_status.form.date":function(v){
-      if(this.change_status.model.status == "active"){
-        this.change_status.model.hired_date = moment(this.change_status.form.date).format("YYYY-MM-DD")
-        this.change_status.model.separation_date = null
-      }else{
-        this.change_status.model.hired_date = null
-        this.change_status.model.separation_date = moment(this.change_status.form.date).format("YYYY-MM-DD")
+    "change_status.form.date": function(v) {
+      if (this.change_status.model.status == "active") {
+        this.change_status.model.hired_date = moment(
+          this.change_status.form.date
+        ).format("YYYY-MM-DD");
+        this.change_status.model.separation_date = null;
+      } else {
+        this.change_status.model.hired_date = null;
+        this.change_status.model.separation_date = moment(
+          this.change_status.form.date
+        ).format("YYYY-MM-DD");
       }
     },
     "change_status.form.employees": function(v) {
@@ -555,21 +572,34 @@ export default {
       "fetchEmployees",
       "fetchStatusList",
       "fetchRSEmployees",
-      "resetPassEmployee",
+      "resetPassEmployee"
     ]),
     confirmChangeStatus() {
       let data = {};
       // data.user_id = this.change_status.employees;
       // data.status = this.change_status.form.status;
       // data.type = this.change_status.form.status;
-      if(this.change_status.model.status == "active"){
+      if (this.change_status.model.status == "active") {
         data = {
-          reason:this.change_status.model.reason,user_id:this.change_status.model.user_id,type:this.change_status.model.type,status:this.change_status.model.status,hired_date:moment(this.change_status.model.hired_date).format("YYYY-MM-DD"),separation_date:null
-        }
-      }else{
+          reason: this.change_status.model.reason,
+          user_id: this.change_status.model.user_id,
+          type: this.change_status.model.type,
+          status: this.change_status.model.status,
+          hired_date: moment(this.change_status.model.hired_date).format(
+            "YYYY-MM-DD"
+          ),
+          separation_date: null
+        };
+      } else {
         data = {
-          reason:this.change_status.model.reason,user_id:this.change_status.model.user_id,type:this.change_status.model.type,status:this.change_status.model.status,separation_date:moment(this.change_status.model.separation_date).format("YYYY-MM-DD"),
-        }
+          reason: this.change_status.model.reason,
+          user_id: this.change_status.model.user_id,
+          type: this.change_status.model.type,
+          status: this.change_status.model.status,
+          separation_date: moment(
+            this.change_status.model.separation_date
+          ).format("YYYY-MM-DD")
+        };
       }
       this.changeStatusEmployee(data);
     },
@@ -599,7 +629,8 @@ export default {
       this.excel.import.arr_length = arr.length;
       this.excel.import.dialog = true;
       this.excel.import.importing = true;
-      let tmp_arr = [], loop_count=0;
+      let tmp_arr = [],
+        loop_count = 0;
 
       var i = 0;
       for (i in arr) {
@@ -623,7 +654,7 @@ export default {
           })
           .then(res => {
             // console.log(res);
-            loop_count+=1;
+            loop_count += 1;
             this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
@@ -635,7 +666,7 @@ export default {
           })
           .catch(err => {
             // console.log(err.response.data);
-            loop_count+=1;
+            loop_count += 1;
             this.excel.import.loop_index = loop_count;
             this.excel.import.progress =
               (this.excel.import.loop_index / this.excel.import.arr_length) *
@@ -814,7 +845,17 @@ export default {
     },
     onColumnSort(value) {
       this.query.sort = value.sort;
-      this.query.order = value.order ? "asc" : "desc";
+
+      if (value.order == null) {
+        this.query.sort = "user_infos.created_at";
+        this.query.order = "desc";
+      } else {
+        if (value.order == "ascending") {
+          this.query.order = "asc";
+        } else {
+          this.query.order = "desc";
+        }
+      }
       const data = this.query;
       this.fetchEmployees({ data });
     }

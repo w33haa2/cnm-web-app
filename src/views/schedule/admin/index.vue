@@ -111,13 +111,18 @@
       </el-row>
       <el-row style="margin-top:10px;">
         <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
-          <el-table v-loading="agentsWorkReportsfetchState.initial" :data="tableData">
-            <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
-              <template slot="header">
-                <span style="float:left">
-                  <h4 class="text-muted">Employee</h4>
-                </span>
-              </template>
+          <el-table
+            v-loading="agentsWorkReportsfetchState.initial"
+            :data="tableData"
+            @sort-change="columnSort"
+          >
+            <el-table-column
+              label="Employee"
+              min-width="200"
+              prop="user_info.full_name"
+              fixed
+              sortable="custom"
+            >
               <template slot-scope="scope">
                 <div class="user-block">
                   <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
@@ -980,7 +985,9 @@ export default {
       tableData: [],
       query: {
         offset: 0,
-        limit: 10
+        limit: 10,
+        sort: null,
+        order: null
       },
       table_config: {
         page: 1,
@@ -1024,6 +1031,11 @@ export default {
       "excelToArraySchedule",
       "exportEmployeeTemplate"
     ]),
+    columnSort({ column, prop, order }) {
+      this.query.sort = prop;
+      this.query.order = order!=null ? order=='ascending' ? 'asc':'desc':null ;
+      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+    },
     filterTable(v) {
       this.filter_table.om_id = v.om_id;
       this.filter_table.tl_id = v.tl_id;
@@ -1555,7 +1567,9 @@ export default {
         limit: this.query.limit,
         offset: this.query.offset,
         start: this.week.start,
-        end: this.week.end
+        end: this.week.end,
+        sort: this.query.order ? this.query.sort : null,
+        order: this.query.order
       };
       if (this.searchQuery != "") {
         data["target[]"] = "full_name";
@@ -1577,6 +1591,8 @@ export default {
           data.tl_id = null;
         }
       }
+      data.sort = this.query.sort;
+      data.order = this.query.order;
       data = this.unsetNull(data);
       this.fetchAgentsWorkReports({ data });
     },

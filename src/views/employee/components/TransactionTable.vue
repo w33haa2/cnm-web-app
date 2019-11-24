@@ -1,20 +1,17 @@
 <template>
-  <el-table v-loading="employeeFetchState.initial" :data="tableData" style="width: 100%;">
+  <el-table
+    v-loading="employeeFetchState.initial"
+    :data="tableData"
+    style="width: 100%;"
+    @sort-change="columnSort"
+  >
     <!-- <el-table-column type="selection" width="55" fixed /> -->
     <el-table-column label="CNM ID" fixed>
       <template slot-scope="{row}">
         <span class>{{ row.company_id }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Employee" min-width="500" prop="full_name" fixed>
-      <template slot="header">
-        <span style="float:left">
-          <h4 class="text-muted">Employee</h4>
-        </span>
-        <!-- <span style="float:left;padding:15px;">
-          <i class="el-icon-sort text-point-eight-em cur-p" @click="columnSort('email')" />
-        </span>-->
-      </template>
+    <el-table-column label="Employee" min-width="500" fixed sortable="custom" prop="full_name">
       <template slot-scope="scope">
         <div class="user-block">
           <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
@@ -43,7 +40,7 @@
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Position" width="200">
+    <el-table-column label="Position" width="200" sortable="custom" prop="position">
       <template slot-scope="{row}">
         <span class>{{ row.position }}</span>
       </template>
@@ -53,7 +50,7 @@
         <span class>{{ row.head_name }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Email" width="200">
+    <el-table-column label="Email" width="200" sortable="custom" prop="email">
       <template slot-scope="{row}">
         <span class>{{ row.email }}</span>
       </template>
@@ -85,7 +82,7 @@
         <span class>{{ row.birthdate }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="Address" width="200">
+    <el-table-column label="Address" width="200" sortable="custom" prop="user_infos.address">
       <template slot-scope="{row}">
         <span class>{{ row.address }}</span>
       </template>
@@ -132,7 +129,19 @@ export default {
   components: { TableExpansion },
   props: ["tableData"],
   computed: {
-    ...mapGetters(["allPosition", "employeeFetchState"])
+    ...mapGetters(["allPosition", "employeeFetchState"]),
+    sort_icon() {
+      let field = this.sort.field;
+      let order = this.sort.order;
+      return {
+        full_name:
+          field == "full_name"
+            ? order == 1
+              ? "el-icon-sort-down"
+              : "el-icon-sort-up"
+            : ""
+      };
+    }
   },
   data() {
     return {
@@ -147,12 +156,18 @@ export default {
       avatarPrefix,
       sort: {
         field: "full_name",
-        order: true
+        order: 0,
+        icon: ""
       }
     };
   },
   created() {},
   methods: {
+    test({ column, prop, order }) {
+      console.log(column);
+      console.log(prop);
+      console.log(order);
+    },
     ...mapActions(["fetchAccessLevels"]),
     // local component functions
     fetchData() {
@@ -185,14 +200,8 @@ export default {
       this.multiSelect = val;
       this.$emit("table-select", this.multiSelect);
     },
-    columnSort(column) {
-      if (this.sort.field != column) {
-        this.sort.field = column;
-        this.sort.order = true;
-      } else {
-        this.sort.order = !this.sort.order;
-      }
-      this.$emit("sort", { sort: this.sort.field, order: this.sort.order });
+    columnSort({ column, prop, order }) {
+      this.$emit("sort", { sort: prop, order: order });
     }
   }
 };

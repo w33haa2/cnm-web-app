@@ -20,8 +20,9 @@
       :data="table_config.data"
       style="width: 100%;margin-top:30px;"
       v-loading="table_config.loader"
+      @sort-change="columnSort"
     >
-      <el-table-column align="center" label="Team Leader">
+      <el-table-column align="center" label="Team Leader" sortable="custom" prop="full_name">
         <template slot-scope="scope">
           <div class="user-block">
             <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
@@ -413,6 +414,15 @@ export default {
   },
   methods: {
     ...mapActions(["fetchWorkForce"]),
+    columnSort({ column, prop, order }) {
+      this.query.sort = null;
+      this.query.order = null;
+      if (order) {
+        this.query.sort = prop;
+        this.query.order = order == "ascending" ? "asc" : "desc";
+      }
+      this.fetchWorkForce(this.unsetNull(this.query));
+    },
     getOmBySelectedDate() {
       this.table_config.loader = true;
       let query = this.query,

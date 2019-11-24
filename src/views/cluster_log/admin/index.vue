@@ -73,20 +73,31 @@
       :data="table_config.data"
       style="width: 100%;margin-top:30px;"
       v-loading="fetchHierarchyLogsState.initial"
+      @sort-change="columnSort"
     >
-      <el-table-column align="center" label="ID">
+      <el-table-column align="center" label="ID" sortable="custom" prop="id">
         <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Head">
+      <el-table-column
+        align="center"
+        label="Head"
+        prop="parent_details.full_name"
+        sortable="custom"
+      >
         <template slot-scope="scope">{{ scope.row.parent_details.full_name }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Subordinate">
+      <el-table-column
+        align="center"
+        label="Subordinate"
+        prop="child_details.full_name"
+        sortable="custom"
+      >
         <template slot-scope="scope">{{ scope.row.child_details.full_name }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Start date">
+      <el-table-column align="center" label="Start date" sortable="custom" prop="start_date">
         <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","MMM Do YYYY") }}</template>
       </el-table-column>
-      <el-table-column align="center" label="End date">
+      <el-table-column align="center" label="End date" sortable="custom" prop="end_date">
         <template slot-scope="scope">
           <template v-if="scope.row.end_date">{{ formatDate(scope.row.end_date,"","MMM Do YYYY") }}</template>
           <template v-else>
@@ -125,7 +136,9 @@ export default {
         query: {
           date: moment().format(ymdHms),
           page: 1,
-          perpage: 10
+          perpage: 10,
+          sort: null,
+          order: null
         },
         remoteFilter: {
           select: null,
@@ -150,7 +163,7 @@ export default {
   watch: {
     deleteHierarchyLogState({ initial, success, fail }) {
       if (success) {
-        this.fetchHierarchyLogs(this.table_config.query);
+        this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
         this.$message({
           type: "success",
           message: this.deleteHierarchyLogTitle,
@@ -168,7 +181,7 @@ export default {
     "table_config.query.date": function(v) {
       this.table_config.query.page = 1;
       this.table_config.remoteFilter.select = null;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
       this.getTableFilterOptions();
     },
     "table_config.remoteFilter.select": function(v) {
@@ -186,13 +199,13 @@ export default {
         }
         this.fetchHierarchyLogs(data);
       } else {
-        this.fetchHierarchyLogs(this.table_config.query);
+        this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
       }
     },
     "table_config.remoteFilter.by": function(v) {
       this.table_config.remoteFilter.options = [];
       this.table_config.remoteFilter.select = null;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
       if (v != "all") {
         this.table_config.select = this.table_config.dummy[0][
           this.table_config.remoteFilter.by
@@ -209,12 +222,21 @@ export default {
     }
   },
   created() {
-    this.fetchHierarchyLogs(this.table_config.query);
+    this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
   },
   methods: {
     ...mapActions(["fetchHierarchyLogs", "deleteHierarchyLog"]),
+    columnSort({ column, prop, order }) {
+      this.table_config.query.sort = null;
+      this.table_config.query.order = null;
+      if (order) {
+        this.table_config.query.sort = prop;
+        this.table_config.query.order = order == "ascending" ? "asc" : "desc";
+      }
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
+    },
     refetchTable(v) {
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
     },
     deleteRow(data) {
       console.log(data);
@@ -239,11 +261,11 @@ export default {
     tableSizeChange(v) {
       this.table_config.query.page = 1;
       this.table_config.query.perpage = v;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
     },
     tablePageChange(v) {
       this.table_config.query.page = v;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
     },
     remoteSearch(query) {
       let url =
