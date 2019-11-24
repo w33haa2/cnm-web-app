@@ -21,13 +21,8 @@
       </el-col>
     </el-row>
 
-    <el-table v-loading="table_config.loader" :data="table_config.data">
-      <el-table-column label="Employee" min-width="200" prop="full_name" fixed>
-        <template slot="header">
-          <span style="float:left">
-            <h4 class="text-muted">Employee</h4>
-          </span>
-        </template>
+    <el-table v-loading="table_config.loader" :data="table_config.data" @sort-change="columnSort">
+      <el-table-column label="Employee" min-width="200" prop="full_name" fixed sortable="custom">
         <template slot-scope="scope">
           <div class="user-block">
             <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
@@ -50,9 +45,7 @@
               :class="[dateToday(tableHeader[index].date)?'today-header':'']"
               style="margin-bottom:5px"
             >{{ tableHeader[index].day }}</h4>
-            <span
-              :class="[dateToday(header.date)?'today-header':'']"
-            >{{ tableHeader[index].date1 }}</span>
+            <span :class="[dateToday(header.date)?'today-header':'']">{{ tableHeader[index].date1 }}</span>
           </template>
           <template slot-scope="{row}">
             <template v-for="(slot,index) in plotLeaveSlotsPerDay(row.leave_slots,header.date)">
@@ -80,16 +73,18 @@ import { mapActions, mapGetters } from "vuex";
 import cellContent from "./cellContent";
 export default {
   components: { cellContent },
-  props: ["leaveType","data","refresh"],
+  props: ["leaveType", "data", "refresh"],
   data() {
     return {
-      query:{
-        limit:10,
-        offset:0,
-        leave_slots:true,
-        start_date:[],
-        end_date:[],
-        leave_type:this.leaveType
+      query: {
+        limit: 10,
+        offset: 0,
+        leave_slots: true,
+        start_date: [],
+        end_date: [],
+        leave_type: this.leaveType,
+        sort: null,
+        order: null
       },
       tableHeader: [],
       table_config: {
@@ -97,7 +92,7 @@ export default {
         display_size: 10,
         count: 0,
         loader: false
-      },
+      }
     };
   },
   mounted() {
@@ -109,19 +104,19 @@ export default {
       "fetchEmployeesData",
       "fetchEmployeesError",
       "fetchEmployeesTotal"
-      ])
+    ])
   },
   watch: {
-    refresh(v){
-      if(this.leaveType==this.data.leave_type){
-        const data = this.query;
-        this.fetchEmployees({data})
+    refresh(v) {
+      if (this.leaveType == this.data.leave_type) {
+        const data = this.unsetNull(this.query);
+        this.fetchEmployees({ data });
       }
     },
     fetchEmployeesState({ initial, success, fail }) {
       if (initial) {
         this.table_config.loader = true;
-        this.table_config.data = []
+        this.table_config.data = [];
         // this.table_config.count = 0
       }
       if (success) {
@@ -131,15 +126,15 @@ export default {
       }
       if (fail) {
         this.table_config.loader = false;
-        this.table_config.data = []
-        this.table_config.count = 0
+        this.table_config.data = [];
+        this.table_config.count = 0;
       }
     },
     data(v) {
       // setting query values
       // alert(this.leaveType +" -- "+ v.leave_type)
-      this.query.offset=0;
-      if(this.leaveType==v.leave_type){
+      this.query.offset = 0;
+      if (this.leaveType == v.leave_type) {
         this.query.leave_type = this.data.leave_type;
         const range = moment.range(v.start_date, v.end_date);
         const dates = Array.from(range.by("day")).map(m =>
@@ -152,15 +147,26 @@ export default {
         }));
         this.query.start_date = v.start_date;
         this.query.end_date = v.end_date;
-        const data = this.query;
-        this.fetchEmployees({data})
+        const data = this.unsetNull(this.query);
+        this.fetchEmployees({ data });
       }
     }
   },
   methods: {
     ...mapActions(["fetchEmployees"]),
-    updateDelete(data){
-      this.$emit("updateDelete",data)
+    columnSort({ column, prop, order }) {
+      if (order) {
+        this.query.sort = prop;
+        this.query.order = order == "ascending" ? "asc" : "desc";
+      } else {
+        this.query.sort = null;
+        this.query.order = null;
+      }
+      const data = this.unsetNull(this.query);
+      this.fetchEmployees({ data });
+    },
+    updateDelete(data) {
+      this.$emit("updateDelete", data);
     },
     plotLeaveSlotsPerDay(slots, date) {
       const slot = slots.filter(
@@ -182,15 +188,15 @@ export default {
     tableSizeChange(value) {
       this.query.limit = value;
       this.query.offset = 0;
-      const data = this.query;
+      const data = this.unsetNull(this.query);
       this.fetchEmployees({ data });
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
       this.table_config.page = value;
-      const data = this.query;
+      const data = this.unsetNull(this.query);
       this.fetchEmployees({ data });
-    },
+    }
   }
 };
 </script>
