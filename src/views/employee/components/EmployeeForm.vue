@@ -359,12 +359,18 @@ export default {
       }
     },
     'form.employee.access_id': function(v) {
-      const parent_id = this.allPosition.filter(i => i.id === v)[0].parent
-      const data = {
-        'target[]': 'access_id',
-        query: parent_id
+      if(v!=1){
+        this.disable.parent_select = false;
+        const parent_id = this.fetchAccessLevelsData.access_levels.filter(i => i.id === v)[0].parent.id
+        const data = {
+          'target[]': 'access_id',
+          query: parent_id
+        }
+        this.fetchPotentialHead({ data })
+      }else{
+        this.disable.parent_select = true;
+        this.form.employee.parent_id = null;
       }
-      this.fetchPotentialHead({ data })
     },
     'form.employee.status_id': function(v) {
       this.form.employee.status = this.statusList.filter(i => i.id == v)[0].status
@@ -386,11 +392,24 @@ export default {
         this.vueCam.deviceId = first.deviceId
       }
     },
-    allPosition: function(v) {
-      this.options.position = v.map(function(pos) { return { value: pos.id, label: pos.name } })
-      this.form.employee.access_id = this.options.position.filter(i => i.value == 16)[0].value
-      this.cascadeSelectHead()
+    fetchAccessLevelsState({initial,success,fail}){
+      if(success){
+        this.options.position = this.fetchAccessLevelsData.access_levels.map(i=> ({value:i.id, label: i.name}));
+        if(this.data.action.toLowerCase() == "create"){
+          this.form.employee.access_id = 1; // admin
+          const data = {
+            'target[]': 'access_id',
+            query: this.fetchAccessLevelsData.access_levels.filter(i=>i.id===1)[0].parent.id
+          }
+          this.fetchPotentialHead({ data })
+        }
+      }
     },
+    // allPosition: function(v) {
+    //   this.options.position = v.map(function(pos) { return { value: pos.id, label: pos.name } })
+    //   this.form.employee.access_id = this.options.position.filter(i => i.value == 16)[0].value
+    //   this.cascadeSelectHead()
+    // },
     // 'form.employee.access_id': function() {
     //   this.form.employee.parent_id = null
     //   this.cascadeSelectHead()
@@ -464,16 +483,11 @@ export default {
   },
   mounted() {
     this.fetchStatusList()
-    const data = {
-      'target[]': 'access_id',
-      query: this.allPosition.filter(i => i.id === this.form.employee.access_id)[0].parent
-    }
-    this.fetchPotentialHead({ data })
   },
   created() {
-    var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
-    // position.splice(0, 1)
-    this.options.position = position
+    // var position = this.allPosition.map(function(pos) { return { value: pos.id, label: pos.name } })
+    // this.options.position = position
+    this.fetchAccessLevels({sort:"name",order:"asc",relations:["parent"]});
   },
   methods: {
     processBenefits(){
@@ -616,7 +630,7 @@ export default {
       // console.log(blob)
       return blob
     },
-    ...mapActions(['addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee']),
+    ...mapActions(['addUser', 'updateUser', 'fetchStatusList', 'fetchPotentialHead', 'addEmployee',"fetchAccessLevels"]),
     captured: function(value) {
       this.form.employee.image = value
       // console.log(value)
@@ -696,7 +710,17 @@ export default {
     device: function() {
       return this.vueCam.devices.find(n => n.deviceId === this.vueCam.deviceId)
     },
-    ...mapGetters(['potentialHead', 'allPosition', 'formResponse', 'fetchStateStatusList', 'statusList', 'fetchStatePotentialHead', 'employeeCreateState'])
+    ...mapGetters(['potentialHead', 
+    'allPosition', 
+    'formResponse', 
+    'fetchStateStatusList', 
+    'statusList', 
+    'fetchStatePotentialHead',
+     'employeeCreateState',
+     "fetchAccessLevelsState",
+     "fetchAccessLevelsData",
+     "fetchAccessLevelsTitle",
+     ])
   },
   data() {
     return {
