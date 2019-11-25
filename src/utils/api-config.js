@@ -254,16 +254,28 @@ const api = {
         // endregion request schedules
 
         // region access levels
-        access_levels: {
-          $prefix: "access_levels",
+        access_level: {
+          $prefix: "position",
+          fetchAll: {
+            $url: "",
+            $method: "GET"
+          },
           create: {
             $url: "create",
+            $method: "POST"
+          },
+          update: {
+            $url: "update",
+            $method: "POST"
+          },
+          delete: {
+            $url: "delete",
             $method: "POST"
           }
         },
         // endregion access levels
 
-        // region access levels
+        // region coaching
         coaching: {
           $prefix: "coaching",
           create: {
@@ -271,9 +283,9 @@ const api = {
             $method: "POST"
           }
         },
-        // endregion access levels
+        // endregion coaching
 
-        // region access levels
+        // region heirarchy_log
         hierarchy_log: {
           $prefix: "hierarchy_log",
           fetchAll: {
@@ -291,7 +303,7 @@ const api = {
             $format: Template(() => `delete/${id}`)
           }
         },
-        // endregion access levels
+        // endregion heirarchy_log
 
         // region overtime
         overtime: {
