@@ -70,7 +70,7 @@ Vue.mixin({
     toUrlParams(obj) {
       let result = "",
         tmp = Object.keys(this.unsetNull(obj));
-      console.log(tmp);
+      // console.log(tmp);
       tmp.forEach((v, i) => {
         if (obj[v]) {
           if (Array.isArray(obj[v])) {
