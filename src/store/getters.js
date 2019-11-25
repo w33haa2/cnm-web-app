@@ -329,6 +329,23 @@ const getters = {
   // create_coaching
   createCoachingState: state => state.create_coaching.state,
   createCoachingData: state => state.create_coaching.data,
-  createCoachingTitle: state => state.create_coaching.title
+  createCoachingTitle: state => state.create_coaching.title,
+  // fetch_access_levels
+  fetchAccessLevelsState: state => state.fetch_access_levels.state,
+  fetchAccessLevelsData: state => state.fetch_access_levels.data,
+  fetchAccessLevelsTitle: state => state.fetch_access_levels.title,
+
+  // create_access_level
+  createAccessLevelState: state => state.create_access_level.state,
+  createAccessLevelData: state => state.create_access_level.data,
+  createAccessLevelTitle: state => state.create_access_level.title,
+  // update_access_level
+  updateAccessLevelState: state => state.update_access_level.state,
+  updateAccessLevelData: state => state.update_access_level.data,
+  updateAccessLevelTitle: state => state.update_access_level.title,
+  // delete_access_level
+  deleteAccessLevelState: state => state.delete_access_level.state,
+  deleteAccessLevelData: state => state.delete_access_level.data,
+  deleteAccessLevelTitle: state => state.delete_access_level.title
 };
 export default getters;
