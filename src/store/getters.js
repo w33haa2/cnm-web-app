@@ -204,7 +204,7 @@ const getters = {
   // fetch_leave_slots
   fetchLeaveSlotsState: state => state.fetch_leave_slots.state,
   fetchLeaveSlotsData: state => state.fetch_leave_slots.data,
-  fetchLeaveSlotsError: state => state.fetch_leave_slots.errors,
+  fetchLeaveSlotsTitle: state => state.fetch_leave_slots.title,
   // update_leave_slots
   updateLeaveSlotsState: state => state.update_leave_slots.state,
   updateLeaveSlotsData: state => state.update_leave_slots.data,
