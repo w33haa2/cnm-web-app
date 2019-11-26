@@ -423,8 +423,7 @@ export default {
       };
     },
     getClusterOptions() {
-      let url =
-          "api/v1/users/search?target[]=position&query=operations manager",
+      let url = "api/v1/users?target[]=position&query=operations manager",
         options = {
           headers: {
             Authorization: "Bearer " + this.token
@@ -433,7 +432,7 @@ export default {
       axios
         .get(url, options)
         .then(res => {
-          this.options.cluster = res.data.meta.users;
+          this.options.cluster = res.data.meta.metadata;
         })
         .catch(err => console.log(err.response.data));
     },

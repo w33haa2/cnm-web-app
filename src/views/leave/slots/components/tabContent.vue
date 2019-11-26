@@ -2,7 +2,7 @@
   <div class="tab-content-container">
     <el-row style="margin-bottom:10px;">
       <el-col :md="{span:4}">
-        <el-input size="mini" placeholder="Search..."></el-input>
+        <el-input size="mini" placeholder="Search..." v-model="search"></el-input>
       </el-col>
       <el-col :md="{span:20}">
         <el-pagination
@@ -76,6 +76,7 @@ export default {
   props: ["leaveType", "data", "refresh"],
   data() {
     return {
+      search: "",
       query: {
         limit: 10,
         offset: 0,
@@ -84,7 +85,9 @@ export default {
         end_date: [],
         leave_type: this.leaveType,
         sort: null,
-        order: null
+        order: null,
+        query: null,
+        target: null
       },
       tableHeader: [],
       table_config: {
@@ -107,6 +110,17 @@ export default {
     ])
   },
   watch: {
+    search(v) {
+      if (v != "") {
+        this.query.query = v;
+        this.query.target = ["full_name"];
+      } else {
+        this.query.query = null;
+        this.query.target = null;
+      }
+      const data = this.unsetNull(this.query);
+      this.fetchEmployees({ data });
+    },
     refresh(v) {
       if (this.leaveType == this.data.leave_type) {
         const data = this.unsetNull(this.query);
