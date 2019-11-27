@@ -45,9 +45,9 @@
                         name="username"
                         type="text"
                         tabindex="1"
-                        autocomplete="on"
                         size="mini"
                       />
+                      <!-- autocomplete="on" -->
                     </el-form-item>
 
                     <div>
