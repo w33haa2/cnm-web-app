@@ -119,7 +119,7 @@
             <el-table-column
               label="Employee"
               min-width="200"
-              prop="user_info.full_name"
+              prop="full_name"
               fixed
               sortable="custom"
             >
