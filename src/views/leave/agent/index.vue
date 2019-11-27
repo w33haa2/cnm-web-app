@@ -3,83 +3,75 @@
     <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div class="app-container">
       <h4 style="color:#646464">Agent Leave</h4>
-      <el-row>
-        <el-col :md="{span:12}">
+      <el-row :gutter="10">
+        <el-col :md="{span:6}">
           <div>
-            <el-tag size="mini" type="success">VL Credits: {{vl_credits}}</el-tag>
-            <el-tag size="mini" type="warning">SL Credits: {{sl_credits}}</el-tag>
+            <!-- <el-tag size="mini" type="success">VL Credits: {{ vl_credits }}</el-tag>
+            <el-tag size="mini" type="warning">SL Credits: {{ 
+            }}s}}</el-tag>-->
+            <slots-calendar></slots-calendar>
           </div>
         </el-col>
-        <el-col style="margin-bottom:20px;" :md="{span:12}">
-          <el-button
-            size="mini"
-            @click="leaveForm({action:'create'})"
-            style="float:right"
-          >Create Request</el-button>
-        </el-col>
-        <!-- <el-col :md="{span:6}">
-        <el-calendar v-model="calendar.today"></el-calendar>
-        </el-col>-->
-        <!-- <el-col :md="{span:6}"> -->
-        <!-- <el-row>
-            <el-col>
-              <div style="margin-bottom:10px;">
-                <el-button
-                  size="mini"
-                  type="danger"
-                  round
-                  :plain="true"
-                  @click="today()"
-                  style="margin:0px;"
-                >Today</el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  circle
-                  :plain="true"
-                  @click="prev()"
-                  style="margin:0px;"
-                >
-                  <i class="el-icon-arrow-left" />
-                </el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  circle
-                  :plain="true"
-                  @click="next()"
-                  style="margin:0px;"
-                >
-                  <i class="el-icon-arrow-right" />
-                </el-button>
-                <span style="float:right;height:auto;line-height:30px">{{ calendar_date }}</span>
-              </div>
+        <el-col style="margin-bottom:20px;" :md="{span:18}">
+          <el-row gutter="20">
+            <el-col :sm="{span:6,offset:12}">
+              <el-card shadow="hover">
+                <el-row>
+                  <el-col>
+                    <span
+                      style="margin:0px !important;padding:0px !important;font-weight:light;font-size:.8em;"
+                    >Vacation Leave Credits</span>
+                  </el-col>
+                  <el-col style="margin-top:10px;">
+                    <div style="width:100%;text-align:right;font-size:1.3em;color:grey">
+                      <count-to
+                        :start-val="0"
+                        :end-val="vl_credits"
+                        :duration="4000"
+                        :decimals="0"
+                        separator=","
+                        :autoplay="true"
+                      />
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-card>
             </el-col>
-            <el-col v-loading="calendarLoader">
-              <div
-                style="border-bottom:1px solid #ccc;border-left:1px solid #ccc;border-right:1px solid #ccc;height:395px"
-              >
-                <calendar
-                  ref="tuiCalendar"
-                  style="height:375px;"
-                  :schedules="scheduleList"
-                  :view="view"
-                  :taskView="taskView"
-                  :theme="theme"
-                  :week="week"
-                  :month="month"
-                  :disableDblClick="true"
-                  :isReadOnly="true"
-                  :useCreationPopup="false"
-                  :useDetailPopup="useDetailPopup"
-                />
-              </div>
+            <el-col :sm="{span:6}">
+              <el-card shadow="hover">
+                <el-row>
+                  <el-col>
+                    <span
+                      style="margin:0px !important;padding:0px !important;font-weight:light;font-size:.8em;"
+                    >Sick Leave Credits</span>
+                  </el-col>
+                  <el-col style="margin-top:10px;">
+                    <div style="width:100%;text-align:right;font-size:1.3em;color:grey">
+                      <count-to
+                        :start-val="0"
+                        :end-val="sl_credits"
+                        :duration="4000"
+                        :decimals="0"
+                        separator=","
+                        :autoplay="true"
+                      />
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-card>
             </el-col>
-        </el-row>-->
-        <!-- <calendar :view="'month'" style="height:800px"/> -->
-        <!-- </el-col> -->
-        <el-col :md="{span:24}" style="padding-left: 20px">
-          <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
+            <el-col style="margin-top:10px;">
+              <el-button
+                size="mini"
+                @click="leaveForm({action:'create'})"
+                style="float:right"
+                type="primary"
+              >Create Request</el-button>
+            </el-col>
+            <el-col style="margin-top:10px;">
+              <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
+            </el-col>
+          </el-row>
         </el-col>
       </el-row>
 
@@ -136,15 +128,22 @@
 <script>
 import logger from "../../time_logger";
 import { mapActions, mapGetters } from "vuex";
-import moment from "moment";
+import Moment from "moment/moment";
+import tz from "moment-timezone";
+import { extendMoment } from "moment-range";
+const moment = extendMoment(Moment, tz);
 import leaveTable from "./components/leaveTable";
-import "tui-calendar/dist/tui-calendar.css";
-import { Calendar } from "@toast-ui/vue-calendar";
-import { mkdir } from "fs";
+import slotsCalendar from "@/components/SlotsCalendar";
+import countTo from "vue-count-to";
+// import "tui-calendar/dist/tui-calendar.css";
+// import { Calendar } from "@toast-ui/vue-calendar";
+
+// import { mkdir } from "fs";
 export default {
-  components: { leaveTable, Calendar, logger },
+  components: { leaveTable, slotsCalendar, logger, countTo },
   data() {
     return {
+      month: [],
       calendarLoader: true,
       vl_credits: 0,
       sl_credits: 0,
@@ -218,6 +217,7 @@ export default {
   computed: {
     ...mapGetters([
       "createLeaveState",
+      "createLeaveError",
       "updateLeaveState",
       "userDetails",
       "fetchAgentCalendarState",
@@ -233,7 +233,7 @@ export default {
   watch: {
     fetchLeaveCreditsState({ initial, success, fail }) {
       if (success) {
-        // console.log(this.fetchLeaveCreditsData);
+        console.log(this.fetchLeaveCreditsData);
         let tmp = this.fetchLeaveCreditsData.leave_credits,
           vl = tmp.filter(i => i.leave_type == "vacation_leave")[0].value,
           sl = tmp.filter(i => i.leave_type == "sick_leave")[0].value;
@@ -308,6 +308,9 @@ export default {
       }
     },
     createLeaveState({ initial, success, fail }) {
+      if(initial){
+        this.form.leave.loading.confirm = true;
+      }
       if (success) {
         this.form.leave.loading.confirm = false;
         this.form.leave.show = false;
@@ -321,13 +324,16 @@ export default {
       if (fail) {
         this.form.leave.loading.confirm = false;
         this.$message({
-          message: "Oops! There's a problem processing your request.",
+          message: this.createLeaveError,
           type: "error",
           duration: 1000 * 5
         });
       }
     },
     updateLeaveState({ initial, success, fail }) {
+      if(initial){
+        this.form.leave.loading.confirm = true;
+      }
       if (success) {
         this.form.leave.loading.confirm = false;
         this.form.leave.show = false;
@@ -349,6 +355,15 @@ export default {
     }
   },
   mounted() {
+    // console.log(moment.tz.names());
+    // console.log("PHT " + moment().format("YYYY-MM-DD HH:mm:ss"));
+    // console.log(
+    //   "PST " +
+    //     moment()
+    //       .tz("US/Pacific")
+    //       .format("YYYY-MM-DD HH:mm:ss")
+    // );
+    console.log(this.month);
     this.query.generated_by = this.user_id;
     // this.getDate();
     // this.fetchAgentCalendar({
@@ -363,6 +378,17 @@ export default {
     this.fetchLeaveCredits({ user_id: this.user_id });
   },
   methods: {
+    spanMethod({ row, column, rowIndex, columnIndex }) {
+      let no_days = moment(row.end).diff(moment(row.start), "days");
+      if (no_days > 0) {
+        let istart = parseInt(row.start.split("-")[2]),
+          iend = parseInt(row.end.split("-")[2]);
+        // console.log(istart + "-" + iend);
+        if (columnIndex == istart - 1) {
+          return [1, 1 + no_days];
+        }
+      }
+    },
     ...mapActions([
       "createLeave",
       "updateLeave",
