@@ -84,7 +84,7 @@ export default {
   },
   mounted() {
     this.query.generated_by = this.user_id;
-    this.fetchLeave(this.query);
+    this.fetchLeave(this.unsetNull(this.query));
   },
   watch: {
     leavesfetchState({ initial, success, fail }) {
@@ -105,7 +105,7 @@ export default {
           type: "success",
           duration: 1000 * 5
         });
-        this.fetchLeave(this.query);
+        this.fetchLeave(this.unsetNull(this.query));
       }
       if (fail) {
         this.$message({
@@ -159,11 +159,11 @@ export default {
     },
     tableSizeChange(value) {
       this.query.limit = value;
-      this.fetchLeave(this.query);
+      this.fetchLeave(this.unsetNull(this.query));
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      this.fetchLeave(this.query);
+      this.fetchLeave(this.unsetNull(this.query));
     },
     tagType(status) {
       let type = "warning";

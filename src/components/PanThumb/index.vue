@@ -6,7 +6,7 @@
       </div>
     </div>
     <!-- eslint-disable-next-line -->
-    <div :style="{backgroundImage: `url(${image})`}" class="pan-thumb"></div>
+    <img :src="image" class="pan-thumb" />
   </div>
 </template>
 
@@ -29,7 +29,8 @@ export default {
     height: {
       type: String,
       default: "150px"
-    }
+    },
+    bg: null
   }
 };
 </script>
