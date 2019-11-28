@@ -6,7 +6,7 @@
       </div>
     </div>
     <!-- eslint-disable-next-line -->
-    <img :src="image" class="pan-thumb"></img>
+    <img :src="image" class="pan-thumb" />
   </div>
 </template>
 
@@ -31,10 +31,6 @@ export default {
       default: "150px"
     },
     bg: null
-  },
-  mounted() {
-    this.bg = "background-image:url(" + this.image + ");";
-    alert(this.image);
   }
 };
 </script>
