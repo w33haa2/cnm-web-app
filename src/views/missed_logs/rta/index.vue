@@ -5,7 +5,7 @@
       <!-- DISPLAY RECORDS & PAGINATION -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:15px;">
         <el-col :md="{span: 4}" style="margin-bottom:5px;">
-          <el-input v-model="table.request.query" placeholder="Employee..." size="mini"></el-input>
+          <el-input v-model="table.request.query" placeholder="Date or Employee..." size="mini"></el-input>
         </el-col>
         <el-col :md="{span:12,offset:8}">
           <el-radio-group v-model="table.request.type" size="mini" style="float:right">
