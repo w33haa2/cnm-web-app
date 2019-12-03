@@ -80,7 +80,10 @@
             <el-col :md="{span:16}" style="margin-top:5px">
               <div style="float:right">
                 <template v-if="isRTA()">
-                  <el-button size="mini" @click="showModal('addSchedule'), form.addSchedule.model.auto_assign=true">Add Schedule</el-button>
+                  <el-button
+                    size="mini"
+                    @click="showModal('addSchedule'), form.addSchedule.model.auto_assign=true"
+                  >Add Schedule</el-button>
                 </template>
                 <template v-if="isHR()">
                   <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
@@ -609,8 +612,8 @@ export default {
     }
   },
   watch: {
-    "form.addSchedule.model.auto_assign":function(v){
-      if(v){
+    "form.addSchedule.model.auto_assign": function(v) {
+      if (v) {
         this.form.addSchedule.model.teamLeader = null;
         this.form.addSchedule.model.operationsManager = null;
       }
