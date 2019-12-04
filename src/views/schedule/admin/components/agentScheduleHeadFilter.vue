@@ -33,7 +33,12 @@ export default {
   data() {
     return {
       user_remote_config: {
-        params: {},
+        params: {
+          om: null,
+          tl: null,
+          start_date: null,
+          end_date: null
+        },
         placeholder: "Select...",
         multiple: false,
         disabled: false,
@@ -44,7 +49,14 @@ export default {
       disable_remote: false
     };
   },
-  watch: {},
+  watch: {
+    "range.start": function(v) {
+      this.user_remote_config.params.start_date = this.range.start;
+      this.user_remote_config.params.end_date = this.range.end;
+      3;
+      this.fetch = !this.fetch;
+    }
+  },
   mounted() {
     this.init();
   },
@@ -66,19 +78,19 @@ export default {
     selectFilter(e) {
       if (e == "tl") {
         this.disable_remote = false;
-        delete this.user_remote_config.params.om;
+        this.user_remote_config.params.om = null;
         this.user_remote_config.params.tl = true;
         this.fetch = !this.fetch;
       } else if (e == "om") {
         this.disable_remote = false;
-        delete this.user_remote_config.params.tl;
+        this.user_remote_config.params.tl = null;
         this.user_remote_config.params.om = true;
         this.fetch = !this.fetch;
       } else if (e == "all") {
         this.clear = !this.clear;
         this.disable_remote = true;
-        delete this.user_remote_config.params.tl;
-        delete this.user_remote_config.params.om;
+        this.user_remote_config.params.tl = null;
+        this.user_remote_config.params.om = null;
         this.user_remote_config.clear = !this.user_remote_config.clear;
       }
     },

@@ -38,7 +38,10 @@
         <div class="user-bio-section-body">
           <div class="progress-item">
             <!-- <span>{{ formatDate(month,"","YYYY MMMM") }}</span> -->
-            <el-progress :percentage="parseFloat(stat.conformance.overall).toFixed(1)" />
+
+            <el-progress
+              :percentage="stat.conformance.overall? parseFloat(stat.conformance.overall).toFixed(1): 0"
+            />
           </div>
           <!-- <div class="progress-item">
             <span>{{ user.summary.yearly.year }}</span>

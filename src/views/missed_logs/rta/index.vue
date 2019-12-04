@@ -5,23 +5,23 @@
       <!-- DISPLAY RECORDS & PAGINATION -->
       <el-row :gutter="8" style="padding-right:8px;margin-bottom:15px;">
         <el-col :md="{span: 4}" style="margin-bottom:5px;">
-          <el-input v-model="table.request.query" placeholder="Search..." size="mini"></el-input>
+          <el-input v-model="table.request.query" placeholder="Date or Employee..." size="mini"></el-input>
         </el-col>
-        <el-col :md="{span:8}">
-          <el-radio-group v-model="table.request.status" size="mini">
+        <el-col :md="{span:12,offset:8}">
+          <el-radio-group v-model="table.request.type" size="mini" style="float:right">
             <el-radio-button :label="null">All</el-radio-button>
             <!-- <el-radio-button label="Washington">w/o Coaching</el-radio-button> -->
-            <el-radio-button label="pending">Pending</el-radio-button>
-            <el-radio-button label="noted">For Verification</el-radio-button>
-            <el-radio-button label="verified">Verified</el-radio-button>
+            <el-radio-button label="tardy">Tardy</el-radio-button>
+            <el-radio-button label="undertime">Undertime</el-radio-button>
+            <el-radio-button label="no_timeout">No Timeout</el-radio-button>
           </el-radio-group>
         </el-col>
-        <el-col :md="{span: 12}">
+        <el-col :md="{span: 12,offset:12}">
           <el-pagination
             style="float:right"
             small
             background
-            :page-sizes="[15, 50, 100]"
+            :page-sizes="[10, 25, 50, 100]"
             :current-page.sync="table.request.page"
             :page-size="table.request.perpage"
             layout="total, sizes, prev, pager, next"
@@ -32,7 +32,7 @@
         </el-col>
       </el-row>
 
-      <el-row
+      <!-- <el-row
         :gutter="10"
         style="padding-right:8px;margin-bottom:30px;"
         v-loading="fetchMissedLogsState.initial"
@@ -142,9 +142,7 @@
                     >{{ datum.coaching ? datum.coaching.verified_by? datum.coaching.verified_by.full_name:"NA" :"NA" }}</span>
                   </el-col>
                   <el-col style="margin-top:15px;padding-bottom:20px;">
-                    <!-- coaching exist -->
                     <template v-if="datum.coaching">
-                      <!-- rta verified -->
                       <template v-if="datum.coaching.verified_by">
                         <div style="width:100%">
                           <el-tag
@@ -172,7 +170,6 @@
                           >VIEW COACHING</el-button>
                         </div>
                       </template>
-                      <!-- no rta verification -->
                       <template v-else>
                         <div style="width:100%">
                           <el-tag
@@ -215,7 +212,6 @@
                         </div>
                       </template>
                     </template>
-                    <!-- coaching null -->
                     <template v-else>
                       <div style="width:100%">
                         <el-tag
@@ -237,6 +233,112 @@
             </el-card>
           </el-col>
         </template>
+      </el-row>-->
+
+      <el-row>
+        <el-col>
+          <el-table
+            :data="fetchMissedLogsData.missed_logs.data"
+            v-loading="table.loader"
+            @sort-change="columnSort"
+          >
+            <el-table-column label="Type">
+              <template slot-scope="scope">
+                <span
+                  :style="scope.row.log_status[0]!='punctual'?'color:#F56C6C':''"
+                >{{ scope.row.log_status[0] }}</span>
+                <span>-</span>
+                <span
+                  :style="scope.row.log_status[1]!='timed_out'?'color:#F56C6C':''"
+                >{{ scope.row.log_status[1] }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Date" sortable="custom" prop="date">
+              <template slot-scope="scope">
+                <span>{{ scope.row.date.day+", "+ scope.row.date.ymd }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Employee" sortable="custom" prop="user_info.full_name">
+              <template slot-scope="scope">
+                <span>{{ scope.row.user_info.full_name }}</span>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column label="Supervisor" sortable="custom" prop="coaching.filed_by.full_name">
+              <template slot-scope="scope">
+                <span>{{ scope.row.coaching.filed_by.full_name }}</span>
+              </template>
+            </el-table-column>-->
+            <el-table-column label="Schedule">
+              <template slot-scope="scope">
+                <span>{{ formatDate(scope.row.start_event.date,"","hh:mm a") +" - "+ formatDate(scope.row.end_event.date,"","hh:mm a") }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="Log">
+              <template slot-scope="scope">
+                <span>{{ formatDate(scope.row.time_in.date,"","hh:mm a") +" - "}}</span>
+                <template v-if="scope.row.time_out">
+                  <span>{{ formatDate(scope.row.time_out.date,"","hh:mm a") }}</span>
+                </template>
+                <template v-else>
+                  <span style="color:#F56C6C">No data</span>
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column label="Coaching">
+              <template slot-scope="scope">
+                <!-- if misslog type is no_timeout -->
+                <template v-if="scope.row.log_status[1]=='no_timeout'">
+                  <!-- if coaching exist -->
+                  <template v-if="scope.row.coaching">
+                    <template v-if="scope.row.coaching.filed_to_action == 'approved'">
+                      <template v-if="scope.row.coaching.verified_by">
+                        <span>
+                          <el-button-group>
+                            <el-button
+                              size="mini"
+                              type="success"
+                              plain
+                              style="cursor:default"
+                            >VERIFY</el-button>
+                            <el-button size="mini" type="success" @click="viewRow(scope.row)">
+                              <i class="el-icon-view"></i>
+                            </el-button>
+                          </el-button-group>
+                        </span>
+                      </template>
+                      <template v-else>
+                        <span>
+                          <el-button-group>
+                            <el-button
+                              size="mini"
+                              type="warning"
+                              plain
+                              style="cursor:default"
+                            >VERIFIED</el-button>
+                            <el-button size="mini" type="warning" @click="viewRow(scope.row)">
+                              <i class="el-icon-view"></i>
+                            </el-button>
+                          </el-button-group>
+                        </span>
+                      </template>
+                    </template>
+                    <template v-else>
+                      <el-tag type="warning">No Coaching found.</el-tag>
+                    </template>
+                  </template>
+                  <template v-else>
+                    <el-tag type="warning">No Coaching found.</el-tag>
+                  </template>
+                </template>
+                <template v-else>
+                  <span>
+                    <el-tag type="info">Coaching Unavailable</el-tag>
+                  </span>
+                </template>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-col>
       </el-row>
     </div>
 
@@ -248,6 +350,7 @@
       :show-close="false"
       :title="form.coaching.action+' Coaching'"
       width="30%"
+      top="5vh"
     >
       <el-row>
         <template v-if="form.coaching.action!='View'">
@@ -274,7 +377,7 @@
           <h5>Coaching Details</h5>
         </el-col>
         <el-col :md="8" style="margin-bottom:5px;">
-          <span>Agent</span>
+          <span>Employee</span>
         </el-col>
         <el-col :md="16" style="margin-bottom:5px;">
           <span>{{ form.coaching.details.full_name }}</span>
@@ -321,16 +424,40 @@
             <p>{{ form.coaching.field.remarks }}</p>
           </el-col>
         </template>
+        <el-col>
+          <h5>Coached By:</h5>
+        </el-col>
+        <el-col :md="24" style="margin-bottom:5px;">
+          <span>{{ form.coaching.details.coach }}</span>
+        </el-col>
+        <template v-if="form.coaching.details.verified_by">
+          <el-col>
+            <h5>Verified By</h5>
+          </el-col>
+          <el-col :md="24" style="margin-bottom:5px;">
+            <span>{{ form.coaching.details.verified_by.full_name }}</span>
+          </el-col>
+        </template>
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelFormCoaching">Cancel</el-button>
-        <template v-if="form.coaching.action!='View'">
+        <template v-if="form.coaching.details.verified_by">
+          <template v-if="form.coaching.details.verified_by.id == user_id">
+            <el-button
+              type="danger"
+              size="mini"
+              :loading="form.coaching.btn.confirm.loader"
+              @click="cancelVerifiedRow({id:form.coaching.field.id})"
+            >Cancel Verification</el-button>
+          </template>
+        </template>
+        <template v-else>
           <el-button
-            type="danger"
+            type="primary"
             size="mini"
             :loading="form.coaching.btn.confirm.loader"
-            @click="submitCoachingForm()"
-          >Confirm</el-button>
+            @click="verifyRow({id:form.coaching.field.id})"
+          >Verify</el-button>
         </template>
         <!-- @click="resetPassword" -->
         <!-- :loading="employeeUpdateState.initial" -->
@@ -369,7 +496,9 @@ export default {
             date: null,
             schedule: null,
             attendance: null,
-            log_status: null
+            log_status: null,
+            coach: null,
+            verified_by: null
           },
           field: {
             imageName: null,
@@ -388,12 +517,14 @@ export default {
         loader: false,
         request: {
           page: 1,
-          perpage: 15,
+          perpage: 10,
           query: null,
           tl_id: null,
           om_id: null,
           id: null,
-          status: null
+          type: null,
+          sort: "date.ymd",
+          order: "desc"
         }
       }
     };
@@ -426,20 +557,40 @@ export default {
         this.fetchMissedLogs(this.unsetNull(this.table.request));
       }, 3000);
     },
-    "table.request.status": function(v){
-      this.fetchMissedLogs(this.unsetNull(this.table.request))
+    "table.request.type": function(v) {
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
+    },
+    fetchMissedLogsState({ initial, success, fail }) {
+      if (initial) {
+        this.table.loader = true;
+      }
+      if (success) {
+        this.table.loader = false;
+      }
+      if (fail) {
+        this.table.loader = false;
+      }
     }
   },
   methods: {
     ...mapActions(["fetchMissedLogs", "createCoaching"]),
+    columnSort({ column, prop, order }) {
+      this.table.request.sort = order ? prop : "date.ymd";
+      this.table.request.order = order
+        ? order == "ascending"
+          ? "asc"
+          : "desc"
+        : "desc";
+      this.fetchMissedLogs(this.unsetNull(this.table.request));
+    },
     cancelVerifiedRow(data) {
       if (confirm("Do you want to proceed?")) {
         axios
           .post(
-            "api/v1/coaching/revert_verify/" + data.coaching.id,
+            "api/v1/coaching/revert_verify/" + data.id,
             {
               status: "noted",
-              id: data.coaching.id
+              id: data.id
             },
             this.axios.options.headers
           )
@@ -450,6 +601,7 @@ export default {
               duration: 5000
             });
             this.fetchMissedLogs(this.unsetNull(this.table.request));
+            this.form.coaching.dialog = false;
           })
           .catch(err => {
             this.$message({
@@ -468,7 +620,7 @@ export default {
             {
               verified_by: this.user_id,
               status: "verified",
-              id: data.coaching.id
+              id: data.id
             },
             this.axios.options.headers
           )
@@ -479,6 +631,7 @@ export default {
               duration: 5000
             });
             this.fetchMissedLogs(this.unsetNull(this.table.request));
+            this.form.coaching.dialog = false;
           })
           .catch(err => {
             this.$message({
@@ -523,6 +676,8 @@ export default {
       this.form.coaching.action = "View";
       this.form.coaching.field.remarks = data.coaching.remarks;
       this.form.coaching.details.proof = data.coaching.img_proof_url;
+      this.form.coaching.details.coach = data.coaching.filed_by.full_name;
+      this.form.coaching.details.verified_by = data.coaching.verified_by;
     },
     updateRow(data) {
       // if (true) {

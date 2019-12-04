@@ -80,7 +80,10 @@
             <el-col :md="{span:16}" style="margin-top:5px">
               <div style="float:right">
                 <template v-if="isRTA()">
-                  <el-button size="mini" @click="showModal('addSchedule')">Add Schedule</el-button>
+                  <el-button
+                    size="mini"
+                    @click="showModal('addSchedule'), form.addSchedule.model.auto_assign=true"
+                  >Add Schedule</el-button>
                 </template>
                 <template v-if="isHR()">
                   <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
@@ -265,6 +268,14 @@
             >count: {{ form.addSchedule.model.agents.length }}</span>
           </el-col>
           <el-col>
+            <el-switch v-model="form.addSchedule.model.auto_assign" active-text="Auto-assign"></el-switch>
+            <el-alert
+              type="info"
+              title="Activating auto assign will use current cluster supervisors automatically. Else, "
+              style="margin-bottom:10px;margin-top:10px;"
+            />
+          </el-col>
+          <el-col>
             <label>Operations Manager</label>
             <el-select
               v-model="form.addSchedule.model.operationsManager"
@@ -276,6 +287,7 @@
               placeholder="Operations Manager"
               :remote-method="remoteManager"
               :loading="form.addSchedule.options.operationsManager.loader"
+              :disabled="form.addSchedule.model.auto_assign"
             >
               <el-option
                 v-for="item in form.addSchedule.options.operationsManager.data"
@@ -297,6 +309,7 @@
               placeholder="Team Leader"
               :remote-method="remoteLeader"
               :loading="form.addSchedule.options.teamLeader.loader"
+              :disabled="form.addSchedule.model.auto_assign"
             >
               <el-option
                 v-for="(item,index) in form.addSchedule.options.teamLeader.data"
@@ -599,6 +612,12 @@ export default {
     }
   },
   watch: {
+    "form.addSchedule.model.auto_assign": function(v) {
+      if (v) {
+        this.form.addSchedule.model.teamLeader = null;
+        this.form.addSchedule.model.operationsManager = null;
+      }
+    },
     agentTimeOutState({ initial, success, fail }) {
       if (success) {
         this.weekChange(this.week.start);
@@ -928,6 +947,7 @@ export default {
             time_in: null,
             duration: null,
             agents: [],
+            auto_assign: true,
             teamLeader: null,
             operationsManager: null
           },
@@ -1033,7 +1053,8 @@ export default {
     ]),
     columnSort({ column, prop, order }) {
       this.query.sort = prop;
-      this.query.order = order!=null ? order=='ascending' ? 'asc':'desc':null ;
+      this.query.order =
+        order != null ? (order == "ascending" ? "asc" : "desc") : null;
       this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
     },
     filterTable(v) {
@@ -1408,18 +1429,33 @@ export default {
     },
     validateAddSchedule() {
       const form = this.form.addSchedule.model;
-      if (
-        form.dates.length < 1 ||
-        form.agents < 1 ||
-        form.duration == null ||
-        form.time_in == null ||
-        form.teamLeader == null ||
-        form.operationsManager == null
-      ) {
-        return false;
+      let result = false;
+      if (this.form.addSchedule.model.auto_assign) {
+        if (
+          form.dates.length < 1 ||
+          form.agents < 1 ||
+          form.duration == null ||
+          form.time_in == null
+        ) {
+          result = false;
+        } else {
+          result = true;
+        }
       } else {
-        return true;
+        if (
+          form.dates.length < 1 ||
+          form.agents < 1 ||
+          form.duration == null ||
+          form.time_in == null ||
+          form.teamLeader == null ||
+          form.operationsManager == null
+        ) {
+          result = false;
+        } else {
+          result = true;
+        }
       }
+      return result;
     },
     // for add schedule form options
     // getFormOptions(query) {

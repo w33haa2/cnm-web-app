@@ -6,19 +6,19 @@
       <div class="filter-container">
         <!-- DISPLAY RECORDS & PAGINATION -->
         <el-row :gutter="8" style="padding-right:8px;margin-bottom:15px;">
-          <!-- <el-col :md="{span: 4}" style="margin-bottom:5px;">
-          <el-input v-model="table.request.query" placeholder="Search..." size="mini"></el-input>
-          </el-col>-->
-          <el-col :md="{span:12}">
-            <el-radio-group v-model="table.request.status" size="mini">
+          <el-col :md="{span: 4}" style="margin-bottom:5px;">
+            <el-input v-model="table.request.query" placeholder="Date..." size="mini"></el-input>
+          </el-col>
+          <el-col :md="{span:12,offset:8}">
+            <el-radio-group v-model="table.request.type" size="mini" style="float:right">
               <el-radio-button :label="null">All</el-radio-button>
               <!-- <el-radio-button label="Washington">w/o Coaching</el-radio-button> -->
-              <el-radio-button label="pending">Pending</el-radio-button>
-              <el-radio-button label="noted">For Verification</el-radio-button>
-              <el-radio-button label="verified">Verified</el-radio-button>
+              <el-radio-button label="tardy">Tardy</el-radio-button>
+              <el-radio-button label="undertime">Undertime</el-radio-button>
+              <el-radio-button label="no_timeout">No Timeout</el-radio-button>
             </el-radio-group>
           </el-col>
-          <el-col :md="{span: 12}">
+          <el-col :md="{span: 12,offset:12}">
             <el-pagination
               style="float:right"
               small
@@ -34,180 +34,148 @@
           </el-col>
         </el-row>
 
-        <el-row
-          :gutter="10"
-          style="padding-right:8px;margin-bottom:30px;"
-          v-loading="fetchMissedLogsState.initial"
-        >
-          <template v-for="(datum,index) in fetchMissedLogsData.missed_logs.data">
-            <el-col :key="index" :md="{span:6}" :sm="{span:8}" style="margin-bottom:10px;">
-              <el-card shadow="hover" body-style="padding-bottom:0px;">
-                <!-- <div slot="header" class="clear-fix">
-                <div class="user-block">
-                  <img
-                    v-if="datum.user_info.image_url"
-                    class="img-circle"
-                    :src="datum.user_info.image_url"
-                  />
-                  <div
-                    v-else
-                    class="img-circle text-muted"
-                    style="background-color:#d9d9d9;display:flex"
+        <el-row>
+          <el-col>
+            <el-table
+              :data="fetchMissedLogsData.missed_logs.data"
+              v-loading="table.loader"
+              @sort-change="columnSort"
+            >
+              <el-table-column label="Type">
+                <template slot-scope="scope">
+                  <span
+                    :style="scope.row.log_status[0]!='punctual'?'color:#F56C6C':''"
+                  >{{ scope.row.log_status[0] }}</span>
+                  <span>-</span>
+                  <span
+                    :style="scope.row.log_status[1]!='timed_out'?'color:#F56C6C':''"
+                  >{{ scope.row.log_status[1] }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Date" sortable="custom" prop="date">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.date.day+", "+ scope.row.date.ymd }}</span>
+                </template>
+              </el-table-column>
+              <!-- <el-table-column label="Employee" sortable="custom" prop="user_info.full_name">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.user_info.full_name }}</span>
+                </template>
+              </el-table-column>-->
+              <!-- <el-table-column label="Supervisor" sortable="custom" prop="coaching.filed_by.full_name">
+              <template slot-scope="scope">
+                <span>{{ scope.row.coaching.filed_by.full_name }}</span>
+              </template>
+              </el-table-column>-->
+              <el-table-column label="Schedule">
+                <template slot-scope="scope">
+                  <span>{{ formatDate(scope.row.start_event.date,"","hh:mm a") +" - "+ formatDate(scope.row.end_event.date,"","hh:mm a") }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="Log">
+                <template slot-scope="scope">
+                  <span>{{ formatDate(scope.row.time_in.date,"","hh:mm a") +" - "}}</span>
+                  <template v-if="scope.row.time_out">
+                    <span>{{ formatDate(scope.row.time_out.date,"","hh:mm a") }}</span>
+                  </template>
+                  <template v-else>
+                    <span style="color:#F56C6C">No data</span>
+                  </template>
+                </template>
+              </el-table-column>
+              <el-table-column label="Coaching approval">
+                <template slot-scope="scope">
+                  <el-tag
+                    :type="scope.row.coaching?
+                    scope.row.coaching.filed_to_action?
+                    scope.row.coaching.filed_to_action=='approved'?
+                    'success':'danger'
+                    :
+                    'warning'
+                    :
+                    'info'"
                   >
+                    {{ scope.row.coaching?
+                    scope.row.coaching.filed_to_action?
+                    scope.row.coaching.filed_to_action=='approved'?
+                    "Approved":"Disapproved"
+                    :
+                    "Please respond"
+                    :
+                    "No coaching available" }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="Coaching progress">
+                <template slot-scope="scope">
+                  <template v-if="scope.row.log_status[1]=='no_timeout'">
                     <div
-                      style="align-self:center;width:100%;text-align:center;font-size:.7em"
-                    >{{ getAvatarLetters(datum.user_info.firstname,datum.user_info.lastname) }}</div>
-                  </div>
-                  <div style="display:flex;height:30px;padding-left:10px;">
-                    <div
-                      class="el-dropdown-link text-muted"
-                      style="font-weight:600;font-size:.7em;align-self:center"
-                    >{{ datum.user_info.full_name }}</div>
-                  </div>
-                </div>
-                </div>-->
-                <div>
-                  <el-row>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Date</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                      >{{ formatDate(datum.start_event.date,"","MMM Do, YYYY") }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">OM</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span class="card-content-text">{{ datum.om.full_name }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">TL</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span class="card-content-text">{{ datum.tl.full_name }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Schedule</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                      >{{ formatDate(datum.start_event.date,"","hh:mm a") +" - "+ formatDate(datum.end_event.date,"","hh:mm a") }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Log</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                      >{{ formatDate(datum.time_in.date,"","hh:mm a") +" - "+ (datum.time_out?formatDate(datum.time_out.date,"","hh:mm a"):'no log') }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Log status</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                        style="color:red"
-                      >{{ remUnderscore(datum.log_status[0]) +" - "+ remUnderscore(datum.log_status[1]) }}</span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Approval</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                        :style="'color:'+(datum.coaching ? datum.coaching.filed_to_action? datum.coaching.filed_to_action =='approved'? 'green':'red':'orange':'blue')"
-                      >
-                        {{ datum.coaching ? (datum.coaching.filed_to_action?
-                        datum.coaching.filed_to_action =='approved'? "Approved":"Disapproved"
-                        :"Pending"):"No coaching data..." }}
-                      </span>
-                    </el-col>
-                    <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
-                      <span class="card-content-text">Coached By</span>
-                    </el-col>
-                    <el-col :xs="{span:16}" :sm="{span:16}" :md="{span:16}">
-                      <span
-                        class="card-content-text"
-                      >{{ datum.coaching ? datum.coaching.filed_by.full_name :"NA" }}</span>
-                    </el-col>
-                    <el-col style="margin-top:15px;padding-bottom:20px;">
-                      <!-- coaching exist -->
-                      <template v-if="datum.coaching">
-                        <!-- rta verified -->
-                        <template v-if="datum.coaching.verified_by">
-                          <div style="width:100%">
-                            <el-tag
-                              size="mini"
-                              style="width:100%;text-align:center"
-                              type="success"
-                            >VERIFIED</el-tag>
-                          </div>
-                          <el-tag
-                            type="success"
-                            style="width:100%;text-align:center;margin-top:5px;"
-                          >RESOLVED</el-tag>
-                        </template>
-                        <!-- no rta verification -->
-                        <template v-else>
-                          <div style="width:100%">
-                            <el-tag
-                              size="mini"
-                              style="width:100%;text-align:center"
-                              type="warning"
-                            >PENDING</el-tag>
-                          </div>
-                          <div style="width:100%;margin-top:5px">
-                            <el-row gutter="10">
-                              <el-col :xs="{span:12}" :sm="{span:12}" :md="{span:12}">
-                                <el-button
-                                  size="mini"
-                                  type="success"
-                                  @click="updateAgentApproval({id:datum.coaching.id,approval:'approved'})"
-                                  plain
-                                  style="width:100%;text-align:center;padding-left:2px;padding-right:2px;"
-                                  :disabled="datum.coaching.filed_to_action == 'approved'"
-                                >APPROVE</el-button>
-                              </el-col>
-                              <el-col :xs="{span:12}" :sm="{span:12}" :md="{span:12}">
-                                <el-button
-                                  size="mini"
-                                  type="danger"
-                                  plain
-                                  style="width:100%;text-align:center;padding-left:2px;padding-right:2px;"
-                                  @click="updateAgentApproval({id:datum.coaching.id,approval:'disapproved'})"
-                                  :disabled="datum.coaching.filed_to_action == 'disapproved'"
-                                >DISAPPROVE</el-button>
-                              </el-col>
-                            </el-row>
-                          </div>
-                        </template>
-                      </template>
-                      <!-- coaching null -->
-                      <template v-else>
-                        <div style="width:100%">
-                          <el-tag
-                            size="mini"
-                            style="width:100%;text-align:center"
-                            type="primary"
-                          >TO BE COACHED</el-tag>
-                        </div>
-                        <div style="width:100%;margin-top:5px">
-                          <el-tag
-                            type="info"
-                            style="width:100%;text-align:center;"
-                          >NOTHING TO APPROVE</el-tag>
-                        </div>
-                      </template>
-                    </el-col>
-                  </el-row>
-                </div>
-              </el-card>
-            </el-col>
-          </template>
+                      :style="scope.row.coaching?'cursor:pointer':''"
+                      @click="scope.row.coaching?viewRow(scope.row):''"
+                    >
+                      <el-row gutter="1">
+                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                          <el-tooltip
+                            :content="scope.row.coaching?'Coaching available':'No coaching filed'"
+                          >
+                            <div
+                              class="progress-box"
+                              :style="'background-color:'+(scope.row.coaching?'#67C23A':'')"
+                            ></div>
+                          </el-tooltip>
+                        </el-col>
+                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                          <el-tooltip
+                            :content="scope.row.coaching?
+                        scope.row.coaching.filed_to_action?
+                        scope.row.coaching.filed_to_action == 'approved'?'Approved':'Disapproved'
+                        :'Waiting for agent response'
+                        :'No coaching filed'"
+                          >
+                            <div
+                              class="progress-box"
+                              :style="'background-color:'+(scope.row.coaching?
+                          scope.row.coaching.filed_to_action?
+                          scope.row.coaching.filed_to_action == 'approved'?'#67C23A':'#F56C6C':'#E6A23C':'')"
+                            ></div>
+                          </el-tooltip>
+                        </el-col>
+                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                          <el-tooltip
+                            :content="scope.row.coaching?
+                        scope.row.coaching.filed_to_action?
+                        scope.row.coaching.filed_to_action == 'approved'?
+                        scope.row.coaching.verified_by?
+                        'Verified'
+                        :'Waiting for verification'
+                        :'Process denied'
+                        :'Waiting for agent response'
+                        :'No coaching filed'"
+                          >
+                            <div
+                              class="progress-box"
+                              :style="'background-color:'+(scope.row.coaching?
+                          scope.row.coaching.filed_to_action?
+                          scope.row.coaching.filed_to_action == 'approved'?
+                        scope.row.coaching.verified_by?
+                        '#67C23A'
+                        :'#E6A23C'
+                        :'#F56C6C'
+                        :''
+                        :'')"
+                            ></div>
+                          </el-tooltip>
+                        </el-col>
+                      </el-row>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <el-tag type="info" style="text-align:center;width:100%">Coaching Unavailable</el-tag>
+                  </template>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
         </el-row>
       </div>
 
@@ -295,16 +263,30 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="cancelFormCoaching">Cancel</el-button>
-          <template v-if="form.coaching.action!='View'">
+          <template v-if="position.toLowerCase()=='representative - order placer'">
+            <el-button-group>
             <el-button
               type="danger"
               size="mini"
+              plain
               :loading="form.coaching.btn.confirm.loader"
-              @click="submitCoachingForm()"
-            >Confirm</el-button>
+              @click="updateAgentApproval({id:form.coaching.details.id,approval:'disapproved'})"
+              :disabled="(form.coaching.details.verified_by?true:false)||(form.coaching.details.filed_to_action? form.coaching.details.filed_to_action =='disapproved'? true:false:false)"
+            >
+              <svg-icon icon-class="thumbs-down"></svg-icon>
+            </el-button>
+            <el-button
+              type="success"
+              size="mini"
+              plain
+              :loading="form.coaching.btn.confirm.loader"
+              @click="updateAgentApproval({id:form.coaching.details.id,approval:'approved'})"
+              :disabled="(form.coaching.details.verified_by?true:false)||(form.coaching.details.filed_to_action? form.coaching.details.filed_to_action =='approved'? true:false:false)"
+            >
+              <svg-icon icon-class="thumbs-up"></svg-icon>
+            </el-button>
+            </el-button-group>
           </template>
-          <!-- @click="resetPassword" -->
-          <!-- :loading="employeeUpdateState.initial" -->
         </span>
       </el-dialog>
     </div>
@@ -338,12 +320,16 @@ export default {
             }
           },
           details: {
+          id: null,
             proof: null,
             full_name: null,
             date: null,
             schedule: null,
             attendance: null,
-            log_status: null
+            log_status: null,
+            coach: null,
+            verified_by: null,
+            filed_to_action:null
           },
           field: {
             imageName: null,
@@ -415,6 +401,7 @@ export default {
               message: res.data.title,
               duration: 5000
             });
+            this.form.coaching.details.filed_to_action = data.approval;
             this.fetchMissedLogs(this.unsetNull(this.table.request));
           })
           .catch(err => {
@@ -460,77 +447,9 @@ export default {
       this.form.coaching.action = "View";
       this.form.coaching.field.remarks = data.coaching.remarks;
       this.form.coaching.details.proof = data.coaching.img_proof_url;
-    },
-    updateRow(data) {
-      // if (true) {
-      //   this.$message({
-      //     type:"warning",
-      //     message:"You cannot modify coaching once verified.",
-      //     duration:5000
-      //   });
-      // } else {
-      this.form.coaching.dialog = true;
-      this.form.coaching.details.proof = data.coaching.img_proof_url;
-      this.form.coaching.field.id = data.coaching.id;
-      this.form.coaching.details.full_name = data.user_info.full_name;
-      this.form.coaching.details.date = this.formatDate(
-        data.start_event.date,
-        "",
-        "MMM Do, YYYY"
-      );
-      this.form.coaching.details.schedule =
-        this.formatDate(data.start_event.date, "", "hh:mm a") +
-        " - " +
-        this.formatDate(data.end_event.date, "", "hh:mm a");
-      this.form.coaching.details.attendance =
-        this.formatDate(data.time_in.date, "", "hh:mm a") +
-        " - " +
-        (data.time_out
-          ? this.formatDate(data.time_out.date, "", "hh:mm a")
-          : "NO LOG");
-      this.form.coaching.details.log_status =
-        data.log_status[0] + " - " + data.log_status[1];
-      this.form.coaching.field.sched_id = data.id;
-      this.form.coaching.field.status = data.coaching.status;
-      this.form.coaching.field.type = data.coaching.type;
-      this.form.coaching.field.filed_by = data.coaching.filed_by.id;
-      this.form.coaching.field.filed_to = data.user_info.id;
-      this.form.coaching.action = "Update";
-      this.form.coaching.field.remarks = data.coaching.remarks;
-      this.form.coaching.field.imageName = "Select new image proof.";
-      // }
-    },
-    deleteRow(data) {
-      // if (data.coaching.verified_by) {
-      //   this.$message({
-      //     type:"warning",
-      //     message:"You cannot modify coaching once verified.",
-      //     duration:5000
-      //   });
-      // } else {
-      if (confirm("Are you sure you want to delete?")) {
-        axios
-          .post(
-            "api/v1/coaching/delete/" + data.coaching.id,
-            this.axios.options.headers
-          )
-          .then(res => {
-            this.$message({
-              type: "success",
-              message: res.data.title,
-              duration: 5000
-            });
-            this.fetchMissedLogs(this.unsetNull(this.table.request));
-          })
-          .catch(err => {
-            this.$message({
-              type: "error",
-              message: err.response.data.title,
-              duration: 5000
-            });
-          });
-      }
-      // }
+      this.form.coaching.details.filed_to_action = data.coaching.filed_to_action;
+      this.form.coaching.details.verified_by = data.coaching.verified_by;
+      this.form.coaching.details.id = data.coaching.id;
     },
     toFormData(obj) {
       // alert("form data created")

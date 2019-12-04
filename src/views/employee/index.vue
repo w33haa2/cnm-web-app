@@ -460,7 +460,7 @@ export default {
         this.$message({
           type: "success",
           message:
-            "You have successfully reset employees password, NEW PASSWORD HINT: firstname+lastname *small-caps *no-spaces.",
+            "You have successfully reset employees password, NEW PASSWORD HINT: 123456",
           duration: 8000
         });
       }

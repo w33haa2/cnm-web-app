@@ -40,27 +40,29 @@ export default {
   },
   watch: {
     fetch(v) {
-      this.select = null;
-      this.options = [];
-      this.disabled = true;
-      let url = "api/v1/users" + this.toUrlParams(this.params),
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
+      if (this.params.om || this.params.tl) {
+        this.select = null;
+        this.options = [];
+        this.disabled = true;
+        let url = "api/v1/users" + this.toUrlParams(this.params),
+          options = {
+            headers: {
+              Authorization: "Bearer " + this.token
+            }
+          };
 
-      this.axiosRequest("get", url, options).then(res => {
-        this.loading = false;
-        if (res.code == 200) {
-          this.disabled = false;
-          this.options = res.meta.metadata;
-          this.select = res.meta.metadata[0].id;
-        } else {
-          this.disabled = true;
-          this.options = [];
-        }
-      });
+        this.axiosRequest("get", url, options).then(res => {
+          this.loading = false;
+          if (res.code == 200) {
+            this.disabled = false;
+            this.options = res.meta.metadata;
+            this.select = res.meta.metadata[0].id;
+          } else {
+            this.disabled = true;
+            this.options = [];
+          }
+        });
+      }
     },
     clear(v) {
       this.select = null;
