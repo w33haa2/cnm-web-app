@@ -346,6 +346,17 @@ const getters = {
   // delete_access_level
   deleteAccessLevelState: state => state.delete_access_level.state,
   deleteAccessLevelData: state => state.delete_access_level.data,
-  deleteAccessLevelTitle: state => state.delete_access_level.title
+  deleteAccessLevelTitle: state => state.delete_access_level.title,
+  // fetch_user_approved_leaves
+  fetchUserApprovedLeavesState: state => state.fetch_user_approved_leaves.state,
+  fetchUserApprovedLeavesData: state => state.fetch_user_approved_leaves.data,
+  fetchUserApprovedLeavesTitle: state => state.fetch_user_approved_leaves.title,
+  // fetch_user_weekly_leave_requests
+  fetchUserWeeklyLeaveRequestsState: state =>
+    state.fetch_user_weekly_leave_requests.state,
+  fetchUserWeeklyLeaveRequestsData: state =>
+    state.fetch_user_weekly_leave_requests.data,
+  fetchUserWeeklyLeaveRequestsTitle: state =>
+    state.fetch_user_weekly_leave_requests.title
 };
 export default getters;
