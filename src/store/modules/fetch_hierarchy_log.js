@@ -1,6 +1,9 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const FETCH_HIERARCHY_LOG = generateMutationTypes("LOGS", "FETCH_HIERARCHY_LOG");
+const FETCH_HIERARCHY_LOG = generateMutationTypes(
+  "LOGS",
+  "FETCH_HIERARCHY_LOG"
+);
 
 /**
  * State

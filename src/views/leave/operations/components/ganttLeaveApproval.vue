@@ -12,7 +12,7 @@
         <el-col :sm="{ span: 23 }">
           <span class="gantt-header">Cluster <b>{{ cluster }}</b> Approved Leaves</span>
         </el-col>
-        <el-col :sm="{ span: 1 }">
+        <!-- <el-col :sm="{ span: 1 }">
           <el-popover placement="bottom" width="200" trigger="click">
             <el-row>
               <el-col>
@@ -46,10 +46,10 @@
               icon="el-icon-setting"
               style="padding-top:0px;margin-top:0px;"
             >
-              <!-- <i slot="reference" class="el-icon-setting icon-btn" /> -->
+              <!-- <i slot="reference" class="el-icon-setting icon-btn" />
             </el-button>
           </el-popover>
-        </el-col>
+        </el-col> -->
         <el-col style="border-top:1px solid #24254e;margin-top:15px;">
           <el-table
             class="gantt-table"
@@ -372,9 +372,9 @@ export default {
       this.fetchLeaveSlots(this.unsetNull(this.query.leave_slots));
 
       // assign leave params
-      this.query.leaves.status = null;
+      this.query.leaves.status = 'approved';
       this.query.leaves.leave_type = this.filter.leave_type;
-      // this.query.leaves.om_id = this.filter.cluster_id;
+      this.query.leaves.om_id = this.filter.cluster_id;
       this.query.leaves.start_date = moment(this.month[0].date)
         .startOf("month")
         .format("YYYY-MM-DD HH:mm:ss");

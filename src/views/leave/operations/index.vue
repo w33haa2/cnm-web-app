@@ -2,359 +2,182 @@
   <div class="app-container">
     <h4 style="color:#646464">Agent Leave</h4>
     <el-row>
-      <el-col :md="{span:4}" style="padding-right:5px;margin-bottom:10px;">
-        <el-tooltip placement="top" content="Select week...">
+      <!-- <el-col :md="{ span: 4 }" style="padding-right:5px;margin-bottom:10px;">
+        <el-tooltip placement="top" content="Name Search">
+          <el-input placeholder="Search..." size="mini" />
+        </el-tooltip>
+      </el-col> -->
+      <el-col :md="{ span: 12, offset: 12 }">
+        <el-row>
+          <el-col
+            :md="{ span: 8 }"
+            style="padding-right:5px;margin-bottom:10px;"
+          >
+            <el-tooltip placement="top" content="Chart Month">
+              <el-date-picker
+                v-model="filter.month"
+                size="mini"
+                type="month"
+                format="MMMM yyyy"
+                value-format="yyyy-MM-dd"
+                :clearable="false"
+                style="width:100%"
+                @change="fetch = !fetch"
+              />
+            </el-tooltip>
+          </el-col>
+          <el-col
+            :md="{ span: 8 }"
+            style="padding-right:5px;margin-bottom:10px;"
+          >
+            <el-tooltip placement="top" content="Filter Leave Type">
+              <el-select
+                size="mini"
+                style="width:100%"
+                v-model="filter.leave_type"
+                @change="fetch = !fetch"
+              >
+                <el-option
+                  value="vacation_leave"
+                  label="Vacation Leave"
+                ></el-option>
+                <el-option
+                  value="leave_of_absence"
+                  label="Leave of absence"
+                ></el-option>
+              </el-select>
+            </el-tooltip>
+          </el-col>
+          <el-col
+            :md="{ span: 8 }"
+            style="padding-right:5px;margin-bottom:10px;"
+          >
+            <el-tooltip placement="top" content="Filter Cluster">
+              <el-select
+                size="mini"
+                style="width:100%"
+                v-model="filter.cluster_id"
+                @change="fetch = !fetch"
+              >
+                <el-option
+                  v-for="(option, index) in options.cluster"
+                  :key="index"
+                  :value="option.id"
+                  :label="option.full_name"
+                ></el-option>
+              </el-select>
+            </el-tooltip>
+          </el-col>
+        </el-row>
+      </el-col>
+      <el-col :md="{ span: 24 }">
+        <approve-leave-component
+          :filter="filter"
+          :cluster="
+            filter.cluster_id
+              ? options.cluster.filter(i => i.id == filter.cluster_id)[0]
+                  .full_name
+              : null
+          "
+          :fetch="fetch"
+        ></approve-leave-component>
+      </el-col>
+      <el-col style="margin-top:30px">
+        <monday-leave-table
+          :filter="filter"
+          @week="requestWeek"
+        ></monday-leave-table>
+      </el-col>
+    </el-row>
+  </div>
+
+  <!-- <el-col :md="{ span: 4 }" style="padding-right:5px;margin-bottom:10px;">
+        <el-tooltip placement="top" content="Filter requests by week">
           <el-date-picker
-            v-model="query.created_at_start"
+            v-model="filter.request_week"
             size="mini"
             type="week"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
-            :picker-options="{firstDayOfWeek:1}"
+            :picker-options="{ firstDayOfWeek: 1 }"
             :clearable="false"
             style="width:100%"
-            @change="weekChange"
+            @change="weekChange()"
           />
         </el-tooltip>
-      </el-col>
-      <!-- <el-col :md="{span:4}" style="padding-right:5px" v-if="!isOperations()">
-        <el-tooltip placement="top" content="Select Operations Manager...">
-          <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_om">
-            <el-option v-for="(option, index) in options.operationsManager" :key="index" :value="option.value" :label="option.label" />
-          </el-select>
-        </el-tooltip>
       </el-col> -->
-      <!-- <el-col :md="{span:4}">
-        <el-tooltip placement="top" content="Select Team Leader...">
-          <el-select size="mini" style="margin-bottom:10px;width:100%;" placeholder="Select.." v-model="query.filter_tl" :disabled="disable_tl_select">
-            <el-option v-for="(option, index) in options.teamLeader" :key="index" :value="option.value" :label="option.label" />
-          </el-select>
-        </el-tooltip>
-      </el-col> -->
-      <template v-if="isRTA()">
-        <el-col :md="{span:20}">
-          <el-tooltip placement="top" content="Print selected week approved list.">
-            <el-button size="mini" style="float:right" @click="getDataApprovedLeaves()">Export Approved</el-button>
-          </el-tooltip>
-        </el-col>
-      </template>
-      <el-col :md="{span:24}">
-        <el-tabs v-model="query.activeTab" type="border-card">
-          <el-tab-pane :label="tab.label" :name="tab.name" v-for="(tab,index) in tabs" :key="index">
-            <leave-table :status="tab.name" @on-update="leaveForm" :data="to_query" :refresh="refresh_table"/>
-          </el-tab-pane>
-        </el-tabs>
-      </el-col>
-    </el-row>
-  </div>
 </template>
 
 <script>
 import moment from "moment";
-import { mapActions,mapGetters } from "vuex"
-import axios from "axios"
-import leaveTable from "./components/leaveTable";
+import { mapActions, mapGetters } from "vuex";
+import approveLeaveComponent from "./components/ganttLeaveApproval";
+import mondayLeaveTable from "./components/mondayLeaveTable";
 export default {
-  components: { leaveTable },
-  computed:{
-    ...mapGetters(["position","token","leaves","leavesfetchState","approveLeaveState","approveLeaveData","approveLeaveError","rejectLeaveState","rejectLeaveData","rejectLeaveError","cancelLeaveState","cancelLeaveData","cancelLeaveError"])
-  },
+  components: { approveLeaveComponent, mondayLeaveTable },
   data() {
     return {
-      refresh_table:false,
-      list:{
-        teamLeader:[]
+      options: {
+        cluster: []
       },
-      disable_tl_select:false,
-      options:{
-        teamLeader:[],
-        operationsManager:[],
+      filter: {
+        cluster_id: null,
+        leave_type: "vacation_leave",
+        month: moment().format("YYYY-MM-DD"),
+        leave_status: null,
+        request_week: moment()
+          .startOf("isoweek")
+          .format("YYYY-MM-DD")
       },
-      tabs: [
-        { label: "Pending", name: "pending" },
-        { label: "Approved", name: "approved" },
-        { label: "Rejected", name: "rejected" }
-      ],
-      calendar: {
-        today: moment()
-      },
-      query:{
-        created_at_start:null,
-        created_at_end:null,
-        activeTab:'pending',
-        filter_tl:'all',
-        filter_om:'all'
-      },
-      to_query:{}
+      fetch: false
     };
   },
-  created(){
-// alert(this.token)
-// console.log(this.token)
-    if(!this.isOperations()){
-      this.getOperationsManager()
-    }
-
-
-    if(this.isOperations()){
-      this.disable_tl_select = false;
-    }else{
-      this.disable_tl_select = true;
-    }
-    this.weekChange(moment().startOf('isoweek'))
+  computed: {
+    ...mapGetters(["token"])
   },
-  watch:{
-    leavesfetchState({initial,success,fail}){
-      if(success){}
-    },
-    approveLeaveState({initial,success,fail}){
-      if(success){
-        // this.weekChange(this.query.created_at_start)
-        this.refresh_table = !this.refresh_table;
-        this.$message({
-          type:"success",
-          message:"Leave is approved!",
-          duration:5000
-        });
+  created() {
+    this.axiosRequest(
+      "get",
+      "api/v1/users" +
+        this.toUrlParams({
+          om: true,
+          start_date: moment(this.filter.month)
+            .startOf("month")
+            .format("YYYY-MM-DD"),
+          end_date: moment(this.filter.month)
+            .endOf("month")
+            .format("YYYY-MM-DD")
+        }),
+      {
+        Authorization: "Bearer " + this.token
       }
-      if(fail){
-        this.$message({
-          type:"error",
-          message:this.approveLeaveError,
-          duration:5000
-        });
+    ).then(res => {
+      console.log(res);
+      if (res.code == 200) {
+        this.options.cluster = res.meta.metadata;
+        this.filter.cluster_id = res.meta.metadata[0].id;
+        this.fetch = !this.fetch;
+      } else {
+        alert(res.title);
       }
-    },
-    cancelLeaveState({initial,success,fail}){
-      if(success){
-        // this.weekChange(this.query.created_at_start)
-        this.refresh_table = !this.refresh_table;
-        this.$message({
-          type:"success",
-          message:"Leave is cancelled!",
-          duration:5000
-        });
-      }
-      if(fail){
-        this.$message({
-          type:"error",
-          message:this.cancelLeaveError,
-          duration:5000
-        });
-      }
-    },
-    rejectLeaveState({initial,success,fail}){
-      if(success){
-        // this.weekChange(this.query.created_at_start)
-        this.refresh_table = !this.refresh_table;
-        this.$message({
-          type:"success",
-          message:"Leave is rejected!",
-          duration:5000
-        });
-      }
-      if(fail){
-        this.$message({
-          type:"error",
-          message:this.rejectLeaveError,
-          duration:5000
-        });
-      }
-    },
-    "query.created_at_start":function(v){
-      if(this.isOperations()){
-        this.to_query={
-          created_at_start:v,
-          created_at_end:this.query.created_at_end,
-          filter_tl:this.query.filter_tl,
-          activeTab:this.query.activeTab
-        }
-      }else{
-        this.to_query={
-          created_at_start:v,
-          created_at_end:this.query.created_at_end,
-          filter_tl:this.query.filter_tl,
-          filter_om:this.query.filter_om,
-          activeTab:this.query.activeTab
-        }
-      }
-    },
-    "query.activeTab":function(v){
-      if(this.isOperations()){
-        this.to_query={
-          created_at_start:this.query.created_at_start,
-          created_at_end:this.query.created_at_end,
-          filter_tl:this.query.filter_tl,
-          activeTab:v
-        }
-      }else{
-        this.to_query={
-          created_at_start:this.query.created_at_start,
-          created_at_end:this.query.created_at_end,
-          filter_tl:this.query.filter_tl,
-          filter_om:this.query.filter_om,
-          activeTab:v
-        }
-      }
-    },
-    "query.filter_tl":function(v){
-      if(this.isOperations()){
-        this.to_query={
-          created_at_start:this.query.created_at_start,
-          created_at_end:this.query.created_at_end,
-          filter_tl:v,
-          activeTab:this.query.activeTab
-        }
-      }else{
-        this.to_query={
-          created_at_start:this.query.created_at_start,
-          created_at_end:this.query.created_at_end,
-          filter_tl:v,
-          filter_om:this.query.filter_om,
-          activeTab:this.query.activeTab
-        }
-      }
-    },
-    "query.filter_om":function(v){
-      if(!this.isOperations()){
-        if(v=='all'){
-          this.disable_tl_select = true;
-          this.query.filter_tl = 'all';
-        }else{
-          let filtered = this.list.teamLeader.filter(i=> i.parent_id == v).map(i=>({value:i.id,label:i.full_name}))
-          if(filtered.length!=0){
-            this.options.teamLeader = filtered;
-            this.disable_tl_select = false;
-            this.options.teamLeader.unshift({value:"all",label:"All"});
-          }else{
-            this.options.teamLeader = [];
-            this.disable_tl_select = true;
-          }
-          // console.log(filtered)
-        }
-        this.to_query={
-          created_at_start:this.query.created_at_start,
-          created_at_end:this.query.created_at_end,
-          filter_tl:this.query.filter_tl,
-          filter_om:v,
-          activeTab:this.query.activeTab
-        }
-      }
-    }
+    });
   },
+  watch: {},
   methods: {
-    weekChange(e) {
-      const start = moment(e)
-        .startOf('isoweek')
-        .format('YYYY-MM-DD')
-      const end = moment(e)
-        .endOf('isoweek')
-        .format('YYYY-MM-DD')
-      this.query.created_at_start = start;
-      this.query.created_at_end = end;
+    requestWeek(v) {
+      this.filter.request_week = v;
     },
-    getDataApprovedLeaves(){
-      let url = "api/v1/leaves?status=approved&created_at_start="+this.query.created_at_start+"&created_at_end="+this.query.created_at_end,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        }, data = [];
-        axios.get(url,options).then(res=>{
-          let result = res.data.meta.leaves;
-          result.forEach(((v,i)=>{
-            data.push([
-              v.leave_type,
-              moment(v.start_event).format("YYYY-MM-DD") +" to "+ moment(v.end_event).format("YYYY-MM-DD"),
-              v.user.full_name,
-              v.approved_by.full_name,
-              moment(v.created_at).format("YYYY-MM-DD HH:mm:ss")
-            ])
-          }).bind(this));
-          // console.log(data)
-          data.unshift(["Leave Type","Date Range","Employee","Approved By","Created at"])
-          data.unshift(["List of approved leave from "+ this.query.created_at_start +" to "+ this.query.created_at_start])
-          let obj = {
-            content:[
-              {
-                sheet_data:data,
-                sheet_name:"Approved List"
-              }
-            ]
-          }
-          this.exportToExcel(obj,this.query.created_at_start +" to "+ this.query.created_at_start+" Approved Leave List")
-        }).catch(err=>{
-          this.$message({
-            type:"error",
-            message: err.response.data.title,
-            duration:5000
-          })
-        });
-    },
-    exportToExcel(data,filename) {
-      let url = "api/v1/excel/create_multisheet_excel",
-        options = {
-          responseType: "blob",
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        },
-        fd=new FormData;
-      fd.append("obj",JSON.stringify(data))
-
-
-      axios.post(url, fd, options).then(res => {
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        var // json = JSON.stringify(res.data),
-          blob = new Blob([res.data], {
-            type:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          }),
-          url = window.URL.createObjectURL(blob);
-        a.href = url;
-        a.download = filename+".xlsx";
-        a.click();
-        window.URL.revokeObjectURL(url);
-      });
-    },
-    getOperationsManager(){
-      let url = "api/v1/users?om=true&start_date="+this.query.created_at_start+"&end_date="+this.query.created_at_end,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      axios.get(url,options).then(res=>{
-        // console.log(res);
-        this.options.operationsManager = res.data.meta.metadata.map(i=>({value:i.id,label:i.full_name}));
-        this.options.operationsManager.unshift({value:"all", label:"All"})
-        this.query.filter_om = "all";
-      }).catch(err=>{
-        console.log(err.response.data)
-        this.options.operationsManager = [];
-      })
-    },
-    isOperations(){
-      if(this.position.toLowerCase() == "operations manager" || this.position.toLowerCase() == "team leader"){
-        return true;
-      }else{
-        return false;
-      }
-    },
-    isRTA(){
-      if(this.position.toLowerCase() == "rta manager" || this.position.toLowerCase() == "rta supervisor" || this.position.toLowerCase() == "rta analyst"){
-        return true;
-      }else{
-        return false;
-      }
+    weekChange() {
+      this.filter.request_week = moment(this.filter.request_week)
+        .startOf("isoweek")
+        .format("YYYY-MM-DD");
+      this.fetch = !this.fetch;
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .hide-picker-input {
 }
 .app-container {

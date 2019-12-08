@@ -60,6 +60,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import moment from "moment";
 export default {
   name: "ActionLogs",
   mounted() {},
@@ -92,6 +93,9 @@ export default {
     ])
   },
   watch: {
+    date(v) {
+      alert(v);
+    },
     logsSearchState({ initial, success, fail }) {
       if (initial) {
         this.table_config.loader = true;
