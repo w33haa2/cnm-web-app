@@ -10,7 +10,7 @@
     >
       <el-row v-show="!table.loader">
         <el-col :sm="{ span: 23 }">
-          <span class="gantt-header">Cluster Approved Leaves</span>
+          <span class="gantt-header">Cluster <b>{{ cluster }}</b> Approved Leaves</span>
         </el-col>
         <el-col :sm="{ span: 1 }">
           <el-popover placement="bottom" width="200" trigger="click">
@@ -166,6 +166,7 @@
                           :leave="leave"
                           :leaves="scope.row.leaves"
                           :slots="table.slots"
+                          :week="filter.request_week"
                         ></gantt-object>
                       </template>
                     </template>
@@ -193,7 +194,7 @@ import requestBlock from "./requestBlock";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
-  props: ["filter", "fetch"],
+  props: ["filter", "fetch", "cluster"],
   components: {
     ganttObject,
     requestBlock
@@ -212,7 +213,7 @@ export default {
           start_event: null,
           end_event: null,
           user_id: null, //om_id/cluster_id
-          leave_type: null,
+          leave_type: null
         },
         leaves: {
           // limit: 1,
@@ -221,8 +222,8 @@ export default {
           tl_id: null,
           status: "approved",
           leave_type: null,
-          created_start_date: null,
-          created_end_date: null
+          start_date: null,
+          end_date: null
         }
       }
     };
@@ -371,14 +372,14 @@ export default {
       this.fetchLeaveSlots(this.unsetNull(this.query.leave_slots));
 
       // assign leave params
-      // this.query.leaves.status = this.filter.leave_status;
+      this.query.leaves.status = null;
       this.query.leaves.leave_type = this.filter.leave_type;
-      this.query.leaves.om_id = this.filter.cluster_id;
-      this.query.leaves.created_start_date = moment(this.filter.request_week)
-        .startOf("isoweek")
+      // this.query.leaves.om_id = this.filter.cluster_id;
+      this.query.leaves.start_date = moment(this.month[0].date)
+        .startOf("month")
         .format("YYYY-MM-DD HH:mm:ss");
-      this.query.leaves.created_end_date = moment(this.filter.request_week)
-        .endOf("isoweek")
+      this.query.leaves.end_date = moment(this.month[0].date)
+        .endOf("month")
         .format("YYYY-MM-DD HH:mm:ss");
       // fetch leaves
       let data = this.unsetNull(this.query.leaves);
