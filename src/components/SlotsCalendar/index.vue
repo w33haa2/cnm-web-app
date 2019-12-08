@@ -37,7 +37,6 @@
             <template v-if="fetchLeaveSlotsState.success">
               <div
                 style="height:100%;width:100%;text-align:center;padding:10px;"
-                :style="(data.type=='current-month'?'background-color:'+(sufficientSlots(data)?'':'#fff8e6'):'')"
               >
                 <div
                   :style="'font-size:.8em;'+(highlightSunday(data))"
