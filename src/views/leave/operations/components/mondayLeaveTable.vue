@@ -241,6 +241,7 @@ export default {
       this.table.request.created_end_date = moment(v)
         .endOf("isoweek")
         .format("YYYY-MM-DD HH:mm:ss");
+      this.$emit("week", this.table.request.created_start_date);
       this.fetchTableData();
     },
     initializeRequestData() {
