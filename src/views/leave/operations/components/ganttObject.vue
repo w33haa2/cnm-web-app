@@ -1,10 +1,6 @@
 <template>
   <div style="padding:10px;">
-    <el-tooltip
-      :content="
-        leave.start_event.split(' ')[0] + ' - ' + leave.end_event.split(' ')[0]
-      "
-    >
+    <el-tooltip :content="fromNow(leave.updated_at)">
       <div style class="row-detail-container" :class="bgc">
         <div style="height:100%;">
           <div class="name-container">
@@ -22,12 +18,27 @@ import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
 const moment = extendMoment(Moment, tz);
 export default {
-  props: ["leave", "leaves", "slots"],
+  props: ["leave", "leaves", "slots", "week"],
   data() {
     return {
-      bgc: "blue"
+      // bgc: "approved"
     };
+  },
+  computed: {
+    bgc() {
+      let week_start = moment(this.week).startOf("isoweek"),
+        week_end = moment(this.week).endOf("isoweek"),
+        leave_start = moment(this.leave.created_at),
+        isBetween = moment(leave_start).isBetween(
+          week_start,
+          week_end,
+          null,
+          []
+        );
+      return isBetween ? "approved" : "blue";
+    }
   }
+
   // mounted() {
   //   let range = moment.range(
   //       moment(this.leave.start_event).startOf("day"),
@@ -100,7 +111,7 @@ export default {
   background-image: linear-gradient(to right, #fba989, #f8221f);
 }
 .blue {
-  background-color: #58caf4;
+  background-color: #272852;
 }
 
 .blue-hover {
