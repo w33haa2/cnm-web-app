@@ -104,6 +104,7 @@
             </el-col>
             <input
               type="file"
+              v-if="importScheduleReset"
               ref="importScheduleInput"
               accept=".xlsx"
               style="display:none"
@@ -168,7 +169,7 @@
                         v-if="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
                       >
                         <cell-content
-                          @refreshTable="refresh_table"
+                          @refreshTable="weekChange(week.start)"
                           :key="index"
                           :schedule="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
                           :date="tableHeader[index1].date"
@@ -893,6 +894,7 @@ export default {
   },
   data() {
     return {
+      importScheduleReset:true,
       show_option: true,
       blank: [{}],
       axios: { options: { headers: { Authorization: null } } },
@@ -1321,12 +1323,17 @@ export default {
             Authorization: "Bearer " + this.token
           }
         };
-      formData.append("file", e.target.files[0]);
-      formData.append("auth_id", this.user_id);
+      formData.set("file", e.target.files[0]);
+      formData.set("auth_id", this.user_id);
       axios
         .post("api/v1/schedules/excel_to_array", formData, options)
         .then(res => {
-          console.log(res.data.meta);
+          // console.log(res.data.meta);
+          
+          this.importScheduleReset = false;
+          this.$nextTick(() => {
+            this.importScheduleReset = true;
+          })
           let data = res.data.meta.excel_data.map(i => ({
             title_id: 1,
             auth_id: this.user_id,
@@ -1635,55 +1642,18 @@ export default {
     tableSizeChange(value) {
       this.query.limit = value;
       this.query.offset = 0;
-      const data = {
-        limit: this.query.limit,
-        offset: this.query.offset,
-        start: this.week.start,
-        end: this.week.end
-      };
-      this.fetchAgentsWorkReports({ data });
+      // const data = {
+      //   limit: this.query.limit,
+      //   offset: this.query.offset,
+      //   start: this.week.start,
+      //   end: this.week.end
+      // };
+      // this.fetchAgentsWorkReports({ data });
+      this.weekChange(this.week.start);
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      const data = {
-        limit: this.query.limit,
-        offset: this.query.offset,
-        start: this.week.start,
-        end: this.week.end
-      };
-
-      if (this.searchQuery != "") {
-        data["target[]"] = "full_name";
-        data.query = this.searchQuery;
-      }
-
-      if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
-      ) {
-        if (this.select.operationsManager != "all") {
-          data.om_id = this.select.operationsManager;
-        } else {
-          delete data.om_id;
-        }
-        if (this.select.teamLeader != "all") {
-          data.tl_id = this.select.teamLeader;
-        } else {
-          delete data.tl_id;
-        }
-      } else {
-        if (this.select.teamLeader != "all") {
-          delete data.om_id;
-          data.tl_id = this.select.teamLeader;
-        } else {
-          if (this.position == "operationsManager") {
-            data.om_id = this.user_id;
-          } else {
-            data.om_id = this.head_id;
-          }
-        }
-      }
-      this.fetchAgentsWorkReports({ data });
+      this.weekChange(this.week.start);
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
@@ -1730,47 +1700,6 @@ export default {
           this.createLeave(params);
         }
       }
-    },
-    refresh_table(v) {
-      const data = {
-        limit: this.query.limit,
-        offset: this.query.offset,
-        start: this.week.start,
-        end: this.week.end
-      };
-      if (this.searchQuery != "") {
-        data["target[]"] = "full_name";
-        data.query = this.searchQuery;
-      }
-
-      if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
-      ) {
-        if (this.select.operationsManager != "all") {
-          data.om_id = this.select.operationsManager;
-        } else {
-          delete data.om_id;
-        }
-        if (this.select.teamLeader != "all") {
-          delete data.om_id;
-          data.tl_id = this.select.teamLeader;
-        } else {
-          delete data.tl_id;
-        }
-      } else {
-        if (this.select.teamLeader != "all") {
-          delete data.om_id;
-          data.tl_id = this.select.teamLeader;
-        } else {
-          if (this.position == "Operations Manager") {
-            data.om_id = this.user_id;
-          } else {
-            data.om_id = this.head_id;
-          }
-        }
-      }
-      this.fetchAgentsWorkReports({ data });
     },
     remoteAgent(query) {
       const data = {};
