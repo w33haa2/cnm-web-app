@@ -135,7 +135,7 @@ export default {
             end_date: moment(this.filter.month)
               .endOf("month")
               .format("YYYY-MM-DD"),
-            relations: ["no_relations"]
+            no_relations: true
           }),
         {
           Authorization: "Bearer " + this.token
@@ -144,7 +144,7 @@ export default {
         console.log(res);
         if (res.code == 200) {
           this.options.cluster = res.meta.metadata;
-          this.filter.cluster_id = res.meta.metadata[0].uid;
+          this.filter.cluster_id = res.meta.metadata[0].id;
           this.fetch = !this.fetch;
         } else {
           // alert(res.title);

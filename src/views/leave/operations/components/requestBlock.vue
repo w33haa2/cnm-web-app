@@ -3,39 +3,35 @@
     <el-popover width="220" v-if="leave">
       <el-row>
         <el-col>
-          <el-tag style="width:100%;text-align:center">{{
+          <el-tag style="width:100%;text-align:center">
+            {{
             requestedBy
-          }}</el-tag>
+            }}
+          </el-tag>
         </el-col>
         <el-col style="margin-top:15px;text-align:center">
           <small>REQUESTED DATE/S:</small>
         </el-col>
-        <el-col
-          style="margin-top:5px;text-align:center;font-size:.8em;font-weight:bold;"
-        >
+        <el-col style="margin-top:5px;text-align:center;font-size:.8em;font-weight:bold;">
           {{
-            leave.leave_days > 1
-              ? formatDate(leave.start_event, "", "ddd, MMM Do") +
-                " to " +
-                formatDate(leave.end_event, "", "ddd, MMM Do")
-              : formatDate(leave.start_event, "", "ddd, MMM Do")
+          leave.leave_days > 1
+          ? formatDate(leave.start_event, "", "ddd, MMM Do") +
+          " to " +
+          formatDate(leave.end_event, "", "ddd, MMM Do")
+          : formatDate(leave.start_event, "", "ddd, MMM Do")
           }}
         </el-col>
         <template v-if="leave.status == 'pending'">
           <el-col style="margin-top:20px">
-            <el-button style="width:100%" type="success" @click="approveLeave">
-              Approve
-            </el-button>
+            <el-button style="width:100%" type="success" @click="approveLeave">Approve</el-button>
             <!-- <template v-if="leave.status == 'approved'">
             <el-button style="width:100%" type="danger" @click="rejectLeave">
               Undo approve
             </el-button>
-          </template> -->
+            </template>-->
           </el-col>
           <el-col style="margin-top:4px">
-            <el-button style="width:100%" type="danger" @click="rejectLeave">
-              Reject
-            </el-button>
+            <el-button style="width:100%" type="danger" @click="rejectLeave">Reject</el-button>
           </el-col>
         </template>
       </el-row>
@@ -48,22 +44,20 @@
       >
         <div class="content" :class="style.content">
           {{
-            hover
-              ? style.label
-              : leave.leave_days > 1
-              ? formatDate(leave.start_event, "", "ddd, MMM Do") +
-                " (" +
-                leave.leave_days +
-                "d)"
-              : formatDate(leave.start_event, "", "ddd, MMM Do")
+          hover
+          ? style.label
+          : leave.leave_days > 1
+          ? formatDate(leave.start_event, "", "ddd, MMM Do") +
+          " (" +
+          leave.leave_days +
+          "d)"
+          : formatDate(leave.start_event, "", "ddd, MMM Do")
           }}
         </div>
       </div>
     </el-popover>
     <div v-else class="container bg-null">
-      <div class="content">
-        No request
-      </div>
+      <div class="content">No request</div>
     </div>
   </div>
 </template>
@@ -89,6 +83,11 @@ export default {
           result.container = "bg-pending cur-p";
           result.content = "c-white";
           result.label = "PENDING";
+          if (!this.leave.has_schedule_tag) {
+            result.container = "bg-no-sched cur-p";
+            result.content = "c-white";
+            result.label = "NO AFFECTED SCHEDULE";
+          }
         } else if (this.leave.status == "rejected") {
           result.container = "bg-reject cur-p";
           result.content = "c-white";
@@ -181,6 +180,9 @@ export default {
 .bg-cancel {
   background-color: #fb0b2f;
 }
+.bg-no-sched {
+  background-color: maroon;
+}
 .bg-approved:hover {
   background-color: #00df7a;
 }
@@ -192,6 +194,9 @@ export default {
 }
 .bg-cancel:hover {
   background-color: #ff1d3f;
+}
+.bg-no-sched:hover {
+  background-color: rgb(148, 9, 9);
 }
 
 .bg-null {

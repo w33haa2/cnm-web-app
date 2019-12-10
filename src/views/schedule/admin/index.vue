@@ -1364,7 +1364,7 @@ export default {
         ((v, i) => {
           let tmp_data = {};
           axios
-            .post("api/v1/schedules/create", v, options)
+            .post("api/v1/schedules/create", this.unsetNull(v), options)
             .then(res => {
               console.log(res);
               this.excel.import.loop_index += 1;

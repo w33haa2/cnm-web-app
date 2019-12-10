@@ -2,7 +2,7 @@
   <div class="container">
     <el-row :gutter="5">
       <el-col :md="{span:12}">
-        <el-select size="mini" v-model="filter" @change="selectFilter"  style="width:100%">
+        <el-select size="mini" v-model="filter" @change="selectFilter" style="width:100%">
           <el-option value="all" label="All"></el-option>
           <el-option value="tl" label="Team Leader"></el-option>
         </el-select>
@@ -83,6 +83,7 @@ export default {
       this.user_remote_config.params.tl = true;
       this.user_remote_config.params.start_date = this.range.start;
       this.user_remote_config.params.end_date = this.range.end;
+      this.user_remote_config.params.no_relations = true;
     }
   }
 };
