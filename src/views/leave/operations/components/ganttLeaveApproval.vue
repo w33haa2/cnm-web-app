@@ -9,52 +9,19 @@
       "
     >
       <el-row v-show="!table.loader">
-        <el-col :sm="{ span: 23 }">
+        <el-col :sm="{ span: 22 }">
           <span class="gantt-header">Cluster <b>{{ cluster }}</b> Approved Leaves</span>
         </el-col>
-        <!-- <el-col :sm="{ span: 1 }">
-          <el-popover placement="bottom" width="200" trigger="click">
-            <el-row>
-              <el-col>
-                Options
-              </el-col>
-              <el-col>
-                <el-tooltip content="Cluster">
-                  <el-select size="mini" placeholder="Select cluster...">
-                    <el-option></el-option>
-                  </el-select>
-                </el-tooltip>
-              </el-col>
-              <el-col>
-                <el-tooltip content="Leave Type">
-                  <el-select size="mini" placeholder="Select Leave Type...">
-                    <el-option></el-option>
-                  </el-select>
-                </el-tooltip>
-              </el-col>
-              <el-col>
-                <el-tooltip content="Month">
-                  <el-select size="mini" placeholder="Select Leave Type...">
-                    <el-option></el-option>
-                  </el-select>
-                </el-tooltip>
-              </el-col>
-            </el-row>
-            <el-button
-              slot="reference"
-              type="text"
-              icon="el-icon-setting"
-              style="padding-top:0px;margin-top:0px;"
-            >
-              <!-- <i slot="reference" class="el-icon-setting icon-btn" />
-            </el-button>
-          </el-popover>
-        </el-col> -->
+        <el-col :sm="{ span: 2 }">
+          <el-tooltip effect="dark" content="Collapse data" placement="top">
+            <el-switch  style="float:right" v-model="query.leaves.limit" :active-value="null" inactive-value="10" active-color="#1890ff" inactive-color="#ccc" size="mini"></el-switch>
+          </el-tooltip>
+        </el-col>
         <el-col style="border-top:1px solid #24254e;margin-top:15px;">
           <el-table
             class="gantt-table"
             :border="false"
-            style="width: 100%"
+            style="width: 100%;position:relative"
             :data="table.data"
             :span-method="spanMethod"
           >
@@ -62,7 +29,7 @@
 
             <!-- {start:'2019-11-11',end:'2019-11-11',name:'Floyd Francis Matabilas'},
           {start:'2019-11-01',end:'2019-11-15',name:'Allen Lamparas'}-->
-            <el-table-column width="70" fixed sortable="custom">
+            <el-table-column width="70" fixed sortable="custom" class="gantt-table">
               <template slot-scope="scope">
                 <div class="user-block">
                   <div v-if="scope.row.image_url" style="width:100%;">
@@ -186,9 +153,11 @@
 
 <script>
 import Moment from "moment/moment";
-import tz from "moment-timezone";
+// import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment, tz);
+const moment = extendMoment(Moment
+// , tz
+);
 import ganttObject from "./ganttObject";
 import requestBlock from "./requestBlock";
 import { mapActions, mapGetters } from "vuex";
@@ -202,6 +171,9 @@ export default {
   data() {
     return {
       table: {
+        setting:{
+          show_all:false,
+        },
         data: null,
         loader: false,
         slots: []
@@ -216,7 +188,7 @@ export default {
           leave_type: null
         },
         leaves: {
-          // limit: 1,
+          limit: 10,
           leaves: true,
           om_id: null,
           tl_id: null,
@@ -241,6 +213,7 @@ export default {
   },
   watch: {
     fetch(v) {
+      alert("approved");
       this.init();
     },
     fetchEmployeesState({ initial, success, fail }) {
@@ -489,4 +462,29 @@ tbody >>> tr {
 .cell {
   background-color: white !important;
 }
+
+.el-switch__label .is-active{
+  color:white;
+}
+
+
+.el-switch >>> .is-active{
+  color:white !important;
+}
+.el-switch >>> .el-switch__label{
+  color:grey !important;
+}
+/* .gantt-table >>> .el-table__body-wrapper::-webkit-scrollbar {
+  height: .8em;
+}
+
+.gantt-table >>> .el-table__body-wrapper::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.gantt-table >>> .el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+} */
+
 </style>

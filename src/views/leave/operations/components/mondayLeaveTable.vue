@@ -157,13 +157,15 @@
 
 <script>
 import Moment from "moment/moment";
-import tz from "moment-timezone";
+// import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment, tz);
+const moment = extendMoment(Moment
+// , tz
+);
 import requestBlock from "./requestBlock";
 import { mapActions, mapGetters } from "vuex";
 export default {
-  props: ["filter"],
+  props: ["filter","fetch"],
   components: { requestBlock },
   data() {
     return {
@@ -196,6 +198,10 @@ export default {
     this.fetchTableData();
   },
   watch: {
+    fetch(v){
+      this.initializeRequestData();
+      this.fetchTableData()
+    },
     "table.request.query": function(v) {
       if (v != "") {
         this.table.request.target = ["full_name"];
@@ -247,6 +253,12 @@ export default {
     initializeRequestData() {
       this.table.request.leave_type = this.filter.leave_type;
       this.table.request.om_id = this.filter.cluster_id;
+      this.table.request.created_start_date = moment(this.filter.request_week)
+        .startOf("isoweek")
+        .format("YYYY-MM-DD HH:mm:ss");
+      this.table.request.created_end_date = moment(this.filter.request_week)
+        .endOf("isoweek")
+        .format("YYYY-MM-DD HH:mm:ss");
     },
     fetchTableData() {
       this.fetchUserWeeklyLeaveRequests(this.table.request);

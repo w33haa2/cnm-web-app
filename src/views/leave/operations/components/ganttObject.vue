@@ -14,9 +14,11 @@
 
 <script>
 import Moment from "moment/moment";
-import tz from "moment-timezone";
+// import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment, tz);
+const moment = extendMoment(Moment
+// , tz
+);
 export default {
   props: ["leave", "leaves", "slots", "week"],
   data() {
