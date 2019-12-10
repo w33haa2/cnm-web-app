@@ -10,11 +10,22 @@
     >
       <el-row v-show="!table.loader">
         <el-col :sm="{ span: 22 }">
-          <span class="gantt-header">Cluster <b>{{ cluster }}</b> Approved Leaves</span>
+          <span class="gantt-header">
+            Cluster
+            <b>{{ cluster }}</b> Approved Leaves
+          </span>
         </el-col>
         <el-col :sm="{ span: 2 }">
           <el-tooltip effect="dark" content="Collapse data" placement="top">
-            <el-switch  style="float:right" v-model="query.leaves.limit" :active-value="null" inactive-value="10" active-color="#1890ff" inactive-color="#ccc" size="mini"></el-switch>
+            <el-switch
+              style="float:right"
+              v-model="query.leaves.limit"
+              :active-value="null"
+              inactive-value="10"
+              active-color="#1890ff"
+              inactive-color="#ccc"
+              size="mini"
+            ></el-switch>
           </el-tooltip>
         </el-col>
         <el-col style="border-top:1px solid #24254e;margin-top:15px;">
@@ -28,33 +39,26 @@
             <!-- @sort-change="columnSort" -->
 
             <!-- {start:'2019-11-11',end:'2019-11-11',name:'Floyd Francis Matabilas'},
-          {start:'2019-11-01',end:'2019-11-15',name:'Allen Lamparas'}-->
+            {start:'2019-11-01',end:'2019-11-15',name:'Allen Lamparas'}-->
             <el-table-column width="70" fixed sortable="custom" class="gantt-table">
               <template slot-scope="scope">
                 <div class="user-block">
                   <div v-if="scope.row.image_url" style="width:100%;">
                     <div style="margin:0 auto;height:30px;width:30px;">
-                      <img
-                        class="img-circle"
-                        style="margin:0 auto;"
-                        :src="scope.row.image_url"
-                      />
+                      <img class="img-circle" style="margin:0 auto;" :src="scope.row.image_url" />
                     </div>
                   </div>
                   <div v-else class="text-muted" style="width:100%;">
-                    <div
-                      class="img-circle"
-                      style="background-color:white;margin:0 auto;"
-                    >
+                    <div class="img-circle" style="background-color:white;margin:0 auto;">
                       <div style="display:flex;height:30px;width:30px;">
                         <div
                           style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
                         >
                           {{
-                            getAvatarLetters(
-                              scope.row.firstname,
-                              scope.row.lastname
-                            )
+                          getAvatarLetters(
+                          scope.row.firstname,
+                          scope.row.lastname
+                          )
                           }}
                         </div>
                       </div>
@@ -83,20 +87,18 @@
                     <el-tooltip content="slot">
                       <span>
                         {{
-                          table.slots.filter(
-                            i => i.date.slice(0, 10) == datum.date
-                          ).length > 0
-                            ? table.slots.filter(
-                                i => i.date.slice(0, 10) == datum.date
-                              )[0].value + ""
-                            : 0 + ""
+                        table.slots.filter(
+                        i => i.date.slice(0, 10) == datum.date
+                        ).length > 0
+                        ? table.slots.filter(
+                        i => i.date.slice(0, 10) == datum.date
+                        )[0].value + ""
+                        : 0 + ""
                         }}
                       </span>
                     </el-tooltip>
                   </div>
-                  <div
-                    style="display:flex;align-items:center;justify-content:center"
-                  >
+                  <div style="display:flex;align-items:center;justify-content:center">
                     <div
                       style="background-color:white;border-radius:50%;width:31px;height:31px;display:flex"
                       :style="
@@ -104,18 +106,22 @@
                           (headerToday(datum.date) ? 'white' : '#1d1e3d')
                       "
                     >
-                      <span style="font-size:.7em;align-self:center;">{{
+                      <span style="font-size:.7em;align-self:center;">
+                        {{
                         split(datum.date, "-")[2]
-                      }}</span>
+                        }}
+                      </span>
                       <!-- <span style="font-size:.7em">{{ table.slots.filter(i => i.date.slice(0, 10) == datum.date)
                     .length > 0 ? table.slots.filter(i => i.date.slice(0, 10) ==
-                    datum.date)[0] .value + "" : 0 + "" }}</span>-->
+                      datum.date)[0] .value + "" : 0 + "" }}</span>-->
                     </div>
                   </div>
                   <div>
-                    <small style="color:white">{{
+                    <small style="color:white">
+                      {{
                       datum.day.toUpperCase()
-                    }}</small>
+                      }}
+                    </small>
                   </div>
                 </template>
                 <template slot-scope="scope">
@@ -155,8 +161,9 @@
 import Moment from "moment/moment";
 // import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment
-// , tz
+const moment = extendMoment(
+  Moment
+  // , tz
 );
 import ganttObject from "./ganttObject";
 import requestBlock from "./requestBlock";
@@ -171,8 +178,8 @@ export default {
   data() {
     return {
       table: {
-        setting:{
-          show_all:false,
+        setting: {
+          show_all: false
         },
         data: null,
         loader: false,
@@ -213,7 +220,7 @@ export default {
   },
   watch: {
     fetch(v) {
-      alert("approved");
+      // alert("approved");
       this.init();
     },
     fetchEmployeesState({ initial, success, fail }) {
@@ -345,7 +352,7 @@ export default {
       this.fetchLeaveSlots(this.unsetNull(this.query.leave_slots));
 
       // assign leave params
-      this.query.leaves.status = 'approved';
+      this.query.leaves.status = "approved";
       this.query.leaves.leave_type = this.filter.leave_type;
       this.query.leaves.om_id = this.filter.cluster_id;
       this.query.leaves.start_date = moment(this.month[0].date)
@@ -463,16 +470,15 @@ tbody >>> tr {
   background-color: white !important;
 }
 
-.el-switch__label .is-active{
-  color:white;
+.el-switch__label .is-active {
+  color: white;
 }
 
-
-.el-switch >>> .is-active{
-  color:white !important;
+.el-switch >>> .is-active {
+  color: white !important;
 }
-.el-switch >>> .el-switch__label{
-  color:grey !important;
+.el-switch >>> .el-switch__label {
+  color: grey !important;
 }
 /* .gantt-table >>> .el-table__body-wrapper::-webkit-scrollbar {
   height: .8em;
@@ -486,5 +492,4 @@ tbody >>> tr {
   background-color: darkgrey;
   outline: 1px solid slategrey;
 } */
-
 </style>

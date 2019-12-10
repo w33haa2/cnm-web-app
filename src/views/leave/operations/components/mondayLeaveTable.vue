@@ -34,11 +34,7 @@
       </el-col>
       <el-col :md="{ span: 4, offset: 20 }" style="margin-top:10px">
         <el-tooltip content="Name Search">
-          <el-input
-            size="mini"
-            v-model="table.request.query"
-            placeholder="Search..."
-          ></el-input>
+          <el-input size="mini" v-model="table.request.query" placeholder="Search..."></el-input>
         </el-tooltip>
       </el-col>
       <el-col style="margin-top:10px">
@@ -52,43 +48,31 @@
           <el-table-column label="Name" width="250">
             <template slot-scope="scope">
               <div style="height:45px;border-left:red 7px solid;display:flex">
-                <div style="width:100%;align-self:center;padding-left:20px;">
-                  {{ scope.row.full_name }}
-                </div>
+                <div
+                  style="width:100%;align-self:center;padding-left:20px;"
+                >{{ scope.row.full_name }}</div>
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            align="center"
-            width="50"
-            sortable="custom"
-            prop="full_name"
-          >
+          <el-table-column align="center" width="50" sortable="custom" prop="full_name">
             <template slot-scope="scope">
               <div class="user-block">
                 <div v-if="scope.row.image_url" style="width:100%;">
                   <div style="margin:0 auto;height:30px;width:30px;">
-                    <img
-                      class="img-circle"
-                      style="margin:0 auto;"
-                      :src="scope.row.image_url"
-                    />
+                    <img class="img-circle" style="margin:0 auto;" :src="scope.row.image_url" />
                   </div>
                 </div>
                 <div v-else class="text-muted" style="width:100%;">
-                  <div
-                    class="img-circle"
-                    style="background-color:white;margin:0 auto;"
-                  >
+                  <div class="img-circle" style="background-color:white;margin:0 auto;">
                     <div style="display:flex;height:30px;width:30px;">
                       <div
                         style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
                       >
                         {{
-                          getAvatarLetters(
-                            scope.row.firstname,
-                            scope.row.lastname
-                          )
+                        getAvatarLetters(
+                        scope.row.firstname,
+                        scope.row.lastname
+                        )
                         }}
                       </div>
                     </div>
@@ -119,16 +103,16 @@
               <div style="height:45px;display:flex">
                 <div style="align-self:center;width:100%;text-align:center">
                   {{
-                    scope.row.last_approved_leave
-                      ? formatDate(
-                          scope.row.last_approved_leave.start_event,
-                          "",
-                          "ddd MMM Do"
-                        ) +
-                        " (" +
-                        scope.row.last_approved_leave.leave_days +
-                        ")"
-                      : "No approved leaves"
+                  scope.row.last_approved_leave
+                  ? formatDate(
+                  scope.row.last_approved_leave.start_event,
+                  "",
+                  "ddd MMM Do"
+                  ) +
+                  " (" +
+                  scope.row.last_approved_leave.leave_days +
+                  ")"
+                  : "No approved leaves"
                   }}
                 </div>
               </div>
@@ -141,9 +125,12 @@
                   style="align-self:center;width:100%;text-align:center;font-size:2em;font-weight:bold;"
                 >
                   {{
-                    scope.row.leave_credits.filter(
-                      i => i.leave_type == filter.leave_type
-                    )[0].value
+                  scope.row.leave_credits.filter(
+                  i => i.leave_type == filter.leave_type
+                  )[0] ?
+                  scope.row.leave_credits.filter(
+                  i => i.leave_type == filter.leave_type
+                  )[0].value: 0
                   }}
                 </div>
               </div>
@@ -159,13 +146,14 @@
 import Moment from "moment/moment";
 // import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment
-// , tz
+const moment = extendMoment(
+  Moment
+  // , tz
 );
 import requestBlock from "./requestBlock";
 import { mapActions, mapGetters } from "vuex";
 export default {
-  props: ["filter","fetch"],
+  props: ["filter", "fetch"],
   components: { requestBlock },
   data() {
     return {
@@ -187,20 +175,19 @@ export default {
           offset: null,
           limit: 10,
           target: null,
-          query: "",
-          relations: ["leaves", "leave_credits"]
+          query: ""
+          // relations: ["leaves", "leave_credits"]
         }
       }
     };
   },
   mounted() {
-    this.initializeRequestData();
+    this.table.request.om_id = this.filter.cluster_id;
     this.fetchTableData();
   },
   watch: {
-    fetch(v){
-      this.initializeRequestData();
-      this.fetchTableData()
+    fetch(v) {
+      this.fetchTableData();
     },
     "table.request.query": function(v) {
       if (v != "") {
@@ -261,7 +248,10 @@ export default {
         .format("YYYY-MM-DD HH:mm:ss");
     },
     fetchTableData() {
-      this.fetchUserWeeklyLeaveRequests(this.table.request);
+      this.initializeRequestData();
+      if(this.table.request.om_id){
+        this.fetchUserWeeklyLeaveRequests(this.table.request);
+      }
     },
     columnSort({ column, prop, order }) {
       this.table.request.order = order

@@ -164,7 +164,7 @@ const mutations = {
     state.userDetails.firstname = payload.meta.user.info.firstname;
     state.userDetails.middlename = payload.meta.user.info.middlename;
     state.userDetails.lastname = payload.meta.user.info.lastname;
-    state.userDetails.id = payload.meta.user.info.id;
+    state.userDetails.id = payload.meta.user.uid;
     state.userDetails.contract = payload.meta.user.contract;
     ls.set("token", { access_token: state.token });
     ls.set("token_info", {
