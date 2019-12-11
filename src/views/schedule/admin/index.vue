@@ -96,6 +96,7 @@
                     </el-button>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item v-if="isRTA()" command="importSchedule">Import Schedule</el-dropdown-item>
+                      <el-dropdown-item v-if="isRTA()" command="importScheduleQuarterly">Import Schedule(Quarterly)</el-dropdown-item>
                       <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -894,13 +895,14 @@ export default {
   },
   data() {
     return {
-      importScheduleReset:true,
+      importScheduleReset: true,
       show_option: true,
       blank: [{}],
       axios: { options: { headers: { Authorization: null } } },
       sched_array: [],
       excel: {
         import: {
+          replicate:false,
           status: null,
           progress: 0,
           dialog: false,
@@ -1308,6 +1310,11 @@ export default {
       switch (e) {
         case "importSchedule":
           this.$refs.importScheduleInput.click();
+          this.excel.import.replicate = false;
+          break;
+        case "importScheduleQuarterly":
+          this.$refs.importScheduleInput.click();
+          this.excel.import.replicate = true;
           break;
         case "exportSVA":
           this.excel.export_sva.field.dates = [];
@@ -1325,15 +1332,16 @@ export default {
         };
       formData.set("file", e.target.files[0]);
       formData.set("auth_id", this.user_id);
+      formData.set("replicate", this.excel.import.replicate);
       axios
         .post("api/v1/schedules/excel_to_array", formData, options)
         .then(res => {
           // console.log(res.data.meta);
-          
+
           this.importScheduleReset = false;
           this.$nextTick(() => {
             this.importScheduleReset = true;
-          })
+          });
           let data = res.data.meta.excel_data.map(i => ({
             title_id: 1,
             auth_id: this.user_id,
@@ -1347,11 +1355,61 @@ export default {
         })
         .catch(err => console.log(err));
     },
+    generateAgentHLogs(agent, array) {
+      let result = [];
+      agent.forEach(
+        ((v, i) => {
+          result.push(array.filter(fi => fi.email == v)[0]);
+        }).bind(this)
+      );
+      return result;
+    },
+    generateTLHLogs(tl, array) {
+      let result = [];
+      tl.forEach(
+        ((v, i) => {
+          result.push(array.filter(fi => fi.tl_id == v)[0]);
+        }).bind(this)
+      );
+      return result;
+    },
+    createHierarchyObject(data) {
+      let agent = [...new Set(data.map(i => i.email))], tl = [...new Set(data.map(i => i.tl_id))],
+        start = moment(moment.min(data.map(i => moment(i.start_event))))
+          .startOf("day")
+          .format("YYYY-MM-DD HH:mm:ss");
+      agent = this.generateAgentHLogs(agent, data).map(i => ({
+        parent_email: i.tl_id,
+        child_email: i.email,
+        start_date: start
+      }));
+      tl = this.generateTLHLogs(tl, data).map(i => ({
+        parent_email: i.om_id,
+        child_email: i.tl_id,
+        start_date: start
+      }));
+      // let result = {
+      //   data: data,
+      //   start_date: start,
+      //   agent: agent,
+      //   tl:tl,
+      //   final: agent.concat(tl),
+      // };
+      // console.log(result)
+      return agent.concat(tl);
+    },
     loopCreateSchedule(data) {
+      
+      let hierarchy_data = null;
+
+      if(this.excel.import.replicate){
+        hierarchy_data = this.createHierarchyObject(data);
+      }
+
       this.form.addSchedule.show = false;
       this.excel.import.importing = true;
       this.excel.import.dialog = true;
-      this.excel.import.arr_length = data.length;
+      this.excel.import.arr_length = data.length + (hierarchy_data?hierarchy_data.length:0);
       let tmp_arr = [],
         options = {
           headers: {
@@ -1360,6 +1418,42 @@ export default {
         };
       this.excel.import.loop_index = 0;
       this.excel.import.progress = 0;
+      // hierarchy logs insertion
+      if(this.excel.import.replicate){
+        hierarchy_data.forEach(
+          ((v, i) => {
+            let tmp_data = {};
+            axios
+              .post("api/v1/hierarchy_log/create", this.unsetNull(v), options)
+              .then(res => {
+                console.log(res);
+                this.excel.import.loop_index += 1;
+                this.excel.import.progress = (
+                  (this.excel.import.loop_index / this.excel.import.arr_length) *
+                  100
+                ).toFixed(2);
+                tmp_data.email = res.data.parameters.email;
+                tmp_data.status_code = res.status;
+                tmp_data.title = res.data.title;  
+                tmp_arr.push(tmp_data);
+                this.excel.import.report.data.all.list = tmp_arr;
+              })
+              .catch(err => {
+                this.excel.import.loop_index += 1;
+                this.excel.import.progress = (
+                  (this.excel.import.loop_index / this.excel.import.arr_length) *
+                  100
+                ).toFixed(2);
+                tmp_data.email = err.response.data.parameters.email;
+                tmp_data.status_code = err.response.data.code;
+                tmp_data.title = err.response.data.title;
+                tmp_arr.push(tmp_data);
+                this.excel.import.report.data.all.list = tmp_arr;
+              });
+          }).bind(this)
+        );
+      }
+      // schedule insertion
       data.forEach(
         ((v, i) => {
           let tmp_data = {};
@@ -1388,10 +1482,12 @@ export default {
               tmp_data.status_code = err.response.data.code;
               tmp_data.title = err.response.data.title;
               tmp_arr.push(tmp_data);
-              this.excel.import.report.data.all.list = tmp_arr;
+              // this.excel.import.report.data.all.list = tmp_arr;
             });
         }).bind(this)
       );
+        this.excel.import.report.data.all.list = tmp_arr;
+
     },
     processAddScheduleData() {
       let form = this.form.addSchedule.model;
