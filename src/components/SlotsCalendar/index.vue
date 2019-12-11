@@ -154,7 +154,7 @@ export default {
         let position = this.position.toLowerCase();
         switch (position) {
           case "representative - order placer":
-            this.request.slots.user_id = this.fetchHierarchyLogsData.hierarchy_log[0].parent_details.current_head_id;
+            this.request.slots.user_id = this.fetchHierarchyLogsData.hierarchy_log[0].parent_details.current_head.id;
             this.fetchLeaveSlots(this.request.slots);
             break;
         }

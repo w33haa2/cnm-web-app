@@ -260,7 +260,7 @@
             >
               <el-option
                 v-for="item in agents.agents"
-                :key="item.id"
+                :key="item.uid"
                 :label="item.full_name"
                 :value="item.uid"
               />
@@ -361,9 +361,9 @@
               >
                 <el-option
                   v-for="item in agents.agents"
-                  :key="item.id"
+                  :key="item.uid"
                   :label="item.full_name"
-                  :value="item.id"
+                  :value="item.uid"
                 />
               </el-select>
             </el-col>
@@ -1482,7 +1482,7 @@ export default {
               tmp_data.status_code = err.response.data.code;
               tmp_data.title = err.response.data.title;
               tmp_arr.push(tmp_data);
-              // this.excel.import.report.data.all.list = tmp_arr;
+              this.excel.import.report.data.all.list = tmp_arr;
             });
         }).bind(this)
       );
@@ -1623,7 +1623,7 @@ export default {
           if (query.query == "team leader") {
             if (this.position == "Team Leader") {
               filtered = res.data.meta.metadata.filter(
-                i => i.parent_id == this.head_id
+                i => i.parent_id == this.head.id
               );
             } else if (this.position == "Operations Manager") {
               filtered = res.data.meta.metadata.filter(
@@ -1780,7 +1780,8 @@ export default {
         leave_type: this.form.addLeave.leave_type,
         status: "approved",
         generated_by: this.user_id,
-        allowed_access: this.position_id
+        allowed_access: this.position_id,
+        // om_id: this.agents.agents.filter(i=>i.id == this.form.addLeave.model.user_id)[0].operations_manager.id
       };
       if (
         this.form.addLeave.leave_type != "loa1" &&

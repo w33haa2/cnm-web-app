@@ -249,7 +249,7 @@ export default {
     },
     fetchTableData() {
       this.initializeRequestData();
-      if(this.table.request.om_id){
+      if (this.table.request.om_id) {
         this.fetchUserWeeklyLeaveRequests(this.table.request);
       }
     },

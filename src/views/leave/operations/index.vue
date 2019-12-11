@@ -31,8 +31,18 @@
                 v-model="filter.leave_type"
                 @change="fetch = !fetch"
               >
-                <el-option value="vacation_leave" label="Vacation Leave"></el-option>
+                <el-option value="bereavement_leave" label="Bereavement Leave"></el-option>
                 <el-option value="leave_of_absence" label="Leave of absence"></el-option>
+                <el-option value="loa1" label="Leave of absence 1"></el-option>
+                <el-option value="loa2" label="Leave of absence 2"></el-option>
+                <el-option value="magna_carta_leave" label="Magna carta leave"></el-option>
+                <el-option value="maternity_leave" label="Maternity leave"></el-option>
+                <el-option value="partial_sick_leave" label="Partial sick leave"></el-option>
+                <el-option value="paternity_leave" label="Paternity leave"></el-option>
+                <el-option value="sick_leave" label="Sick leave"></el-option>
+                <el-option value="solo_parent_leave" label="Solo parent leave"></el-option>
+                <el-option value="vacation_leave" label="Vacation leave"></el-option>
+                <el-option value="vawc" label="Violence against women and their children"></el-option>
               </el-select>
             </el-tooltip>
           </el-col>
@@ -75,9 +85,11 @@
       <el-col :md="{ span: 24 }">
         <approve-leave-component :filter="filter" :cluster="cluster_name" :fetch="fetch"></approve-leave-component>
       </el-col>
-      <el-col style="margin-top:30px">
-        <monday-leave-table :filter="filter" @week="requestWeek" :fetch="fetch"></monday-leave-table>
-      </el-col>
+      <template v-if="isOP()">
+        <el-col style="margin-top:30px">
+          <monday-leave-table :filter="filter" @week="requestWeek" :fetch="fetch"></monday-leave-table>
+        </el-col>
+      </template>
     </el-row>
   </div>
   <!-- <el-col :md="{ span: 4 }" style="padding-right:5px;margin-bottom:10px;">
