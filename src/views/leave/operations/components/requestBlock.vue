@@ -22,17 +22,19 @@
           }}
         </el-col>
         <template v-if="leave.status == 'pending'">
-          <el-col style="margin-top:20px">
-            <el-button style="width:100%" type="success" @click="approveLeave">Approve</el-button>
-            <!-- <template v-if="leave.status == 'approved'">
-            <el-button style="width:100%" type="danger" @click="rejectLeave">
-              Undo approve
-            </el-button>
-            </template>-->
-          </el-col>
-          <el-col style="margin-top:4px">
-            <el-button style="width:100%" type="danger" @click="rejectLeave">Reject</el-button>
-          </el-col>
+          <template v-if="allowAction">
+            <el-col style="margin-top:20px">
+              <el-button style="width:100%" type="success" @click="approveLeave">Approve</el-button>
+              <!-- <template v-if="leave.status == 'approved'">
+              <el-button style="width:100%" type="danger" @click="rejectLeave">
+                Undo approve
+              </el-button>
+              </template>-->
+            </el-col>
+            <el-col style="margin-top:4px">
+              <el-button style="width:100%" type="danger" @click="rejectLeave">Reject</el-button>
+            </el-col>
+          </template>
         </template>
       </el-row>
       <div
@@ -64,6 +66,7 @@
 
 <script>
 import axios from "axios";
+import { mapGetters } from "vuex";
 export default {
   props: ["slots", "leave", "requestedBy", "cluster_id"],
   data() {
@@ -72,6 +75,24 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["position"]),
+    allowAction() {
+      let result = false;
+
+      if (
+        this.leave.leave_type == "leave_of_absence" ||
+        this.leave.leave_type == "vacation_leave"
+      ) {
+        if (this.position.toLowerCase() == "operations manager") {
+          result = true;
+        } else if (this.position.toLowerCase() == "team leader") {
+          // if(){
+          result = false;
+          // }
+        }
+      }
+      return result;
+    },
     style() {
       let result = {};
       if (this.leave) {

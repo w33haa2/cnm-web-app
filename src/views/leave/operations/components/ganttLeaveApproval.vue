@@ -215,10 +215,14 @@ export default {
       "fetchLeaveSlotsData",
       "fetchLeaveSlotsState",
       "fetchEmployeesData",
-      "fetchEmployeesState"
+      "fetchEmployeesState",
+      "head"
     ])
   },
   watch: {
+    "query.leaves.limit": function() {
+      this.init();
+    },
     fetch(v) {
       // alert("approved");
       this.init();

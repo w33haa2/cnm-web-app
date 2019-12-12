@@ -86,9 +86,13 @@
         <approve-leave-component :filter="filter" :cluster="cluster_name" :fetch="fetch"></approve-leave-component>
       </el-col>
       <template v-if="isOP()">
-        <el-col style="margin-top:30px">
-          <monday-leave-table :filter="filter" @week="requestWeek" :fetch="fetch"></monday-leave-table>
-        </el-col>
+        <template
+          v-if="filter.leave_type =='vacation_leave' || filter.leave_type =='leave_of_absence'"
+        >
+          <el-col style="margin-top:30px">
+            <monday-leave-table :filter="filter" @week="requestWeek" :fetch="fetch"></monday-leave-table>
+          </el-col>
+        </template>
       </template>
     </el-row>
   </div>
@@ -134,7 +138,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["token", "position", "user_id", "name"]),
+    ...mapGetters(["token", "position", "user_id", "name", "head"]),
     fetchOmOptions() {
       this.axiosRequest(
         "get",
@@ -175,6 +179,9 @@ export default {
           case "operations manager":
             result = this.name;
             break;
+          case "team leader":
+            result = this.head.full_name;
+            break;
         }
       }
       return result;
@@ -188,11 +195,10 @@ export default {
     if (this.isOP()) {
       if (position == "operations manager") {
         this.filter.cluster_id = this.user_id;
-        // console.log(this.user_id);
         this.fetch = !this.fetch;
       } else if (position == "team leader") {
-        // alert("team leader");
-        // this.filter.cluster_id = this.user_id;
+        this.filter.cluster_id = this.head.id;
+        this.fetch = !this.fetch;
       }
     }
   },
