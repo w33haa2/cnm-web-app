@@ -211,36 +211,41 @@
         <!-- <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
         </span>-->
         <div
-          :style="'text-align:center;display:flex;align-items:center;height:45px;padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
+          :style="'text-align:center;display:flex;align-items:center;height:45px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
         >
           <template v-if="tag.label=='PRESENT'">
             <div style="width:100%;text-align:center">
               <span>{{ tag.label }}</span>
               <template v-if="schedule.log_status.length>0">
                 <template v-if="view=='hours'">
-                  <el-tooltip class="item" effect="dark" content="Hours" placement="top-start">
-                    <span
-                      :style="'background-color:'+(missed_log?'orange':'green')+';color:white;'"
-                    >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
-                  </el-tooltip>
-                  <el-tooltip
-                    class="item"
-                    effect="dark"
-                    content="Night Difference"
-                    placement="top-start"
-                  >
-                    <span
-                      :style="'background-color:'+(missed_log?'orange':'green')+';color:white;'"
-                    >{{ schedule.rendered_hours.night_difference }}</span>
-                  </el-tooltip>
+                  <div :style="'background-color:'+(missed_log?'orange':'green')+';color:white'">
+                    <el-tooltip class="item" effect="dark" content="Hours" placement="top-start">
+                      <span
+                        :style="'color:white;padding-right:5px;'"
+                      >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
+                    </el-tooltip>
+                    <!-- &nbsp;| -->
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="Night Difference"
+                      placement="top-start"
+                    >
+                      <span
+                        :style="'color:white;padding-left:5px;'"
+                      >{{ schedule.rendered_hours.night_difference }}</span>
+                    </el-tooltip>
+                  </div>
                 </template>
                 <template v-else>
-                  <template v-if="missed_log">
-                    <span style="background-color:orange;color:white;">ML</span>
-                  </template>
-                  <template v-else>
-                    <span style="background-color:green;color:white;">TO</span>
-                  </template>
+                  <div :style="'background-color:'+(missed_log?'orange':'green')+';color:white'">
+                    <template v-if="missed_log">
+                      <span style="color:red;font-weight:lighter">MISSED LOG</span>
+                    </template>
+                    <template v-else>
+                      <span style="color:white;">TIMED OUT</span>
+                    </template>
+                  </div>
                 </template>
               </template>
             </div>
