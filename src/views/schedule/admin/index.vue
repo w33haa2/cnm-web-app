@@ -151,7 +151,7 @@
                 </div>
               </template>
             </el-table-column>-->
-            <el-table-column width="250" label="Name"  sortable="custom" prop="full_name"
+            <el-table-column width="250" label="Name"  sortable="custom" prop="full_name" fixed
             >
               <template slot="header" slot-scope="scope">
                 <span
@@ -168,7 +168,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column align="center" width="50"
+            <el-table-column align="center" width="50" fixed
             >
             <!-- sortable="custom" prop="full_name" -->
 
