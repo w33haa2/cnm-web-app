@@ -531,7 +531,7 @@
           <el-button
             type="danger"
             size="mini"
-            @click="exportSvaReport({start_date:excel.export_sva.model.start,end_date:excel.export_sva.model.end})"
+            @click="generateSvaReport()"
             :loading="excel.export_sva.confirm"
           >Download</el-button>
         </span>
@@ -657,7 +657,7 @@ export default {
       "deleteSingleScheduleError",
       "exportSvaReportData",
       "exportSvaReportState",
-      "exportSvaReportError",
+      "exportSvaReportTitle",
       "agentTimeOutState",
       "removeTimeOutState",
       "agentTimeOutTitle",
@@ -746,25 +746,24 @@ export default {
       }
     },
     exportSvaReportState({ initial, success, fail }) {
+      if(initial){
+        this.excel.export_sva.confirm = true;
+      }
+
       if (success) {
-        // this.toExcel(this.exportSvaReportData);
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        var blob = new Blob([this.exportSvaReportData], {
-            type:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          }),
-          url = window.URL.createObjectURL(blob);
-        a.href = url;
-        a.download =
-          "SVA " +
-          moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-          " to " +
-          moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
-          ".xlsx";
-        a.click();
-        window.URL.revokeObjectURL(url);
+        this.excel.export_sva.dialog = false;
+        this.$message({
+          type: "success",
+          message: this.exportSvaReportTitle,
+        });
+        this.excel.export_sva.confirm = false;
+      }
+      if(fail){
+        this.excel.export_sva.confirm = false;
+        this.$message({
+          type: "error",
+          message: this.exportSvaReportTitle,
+        });
       }
     },
     deleteSingleScheduleState({ initial, success, fail }) {
@@ -1128,7 +1127,8 @@ export default {
       "createLeave",
       "createSchedule",
       "excelToArraySchedule",
-      "exportEmployeeTemplate"
+      "exportEmployeeTemplate",
+      "exportSvaReport"
     ]),
     columnSort({ column, prop, order }) {
       this.query.sort = order ? prop : null;
@@ -1144,8 +1144,7 @@ export default {
     excelCluster(v) {
       this.excel.export_sva.field.clusters = v;
     },
-    exportSvaReport() {
-      this.excel.export_sva.confirm = true;
+    generateSvaReport() {
       let params = {
         start_date: this.excel.export_sva.model.start,
         end_date: this.excel.export_sva.model.end
@@ -1157,180 +1156,186 @@ export default {
       ) {
         params.om_id = this.excel.export_sva.field.clusters;
       }
-      let url = "api/v1/excel/export_sva" + this.toUrlParams(params),
-        options = {
-          responseType: "blob",
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      axios.get(url, options).then(res => {
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        // console.log(res);
-        var // json = JSON.stringify(res.data),
-          blob = new Blob([res.data], {
-            type:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          }),
-          url = window.URL.createObjectURL(blob);
-        a.href = url;
-        a.download =
-          "SVA " +
-          moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-          " to " +
-          moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
-          ".xlsx";
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.excel.export_sva.confirm = false;
-      });
+      // let url = "api/v1/excel/export_sva" + this.toUrlParams(params),
+      //   options = {
+      //     headers: {
+      //       Authorization: "Bearer " + this.token
+      //     }
+      //   };
+      // axios.get(url, options).then(res => {
+      //   // var a = document.createElement("a");
+      //   // document.body.appendChild(a);
+      //   // a.style = "display: none";
+      //   // // console.log(res);
+      //   // var // json = JSON.stringify(res.data),
+      //   //   blob = new Blob([res.data], {
+      //   //     type:
+      //   //       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      //   //   }),
+      //   //   url = window.URL.createObjectURL(blob);
+      //   // a.href = url;
+      //   // a.download =
+      //   //   "SVA " +
+      //   //   moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+      //   //   " to " +
+      //   //   moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
+      //   //   ".xlsx";
+      //   // a.click();
+      //   // window.URL.revokeObjectURL(url);
+      //   // this.excel.export_sva.confirm = false;
+      //   if(res.code == 200){
+      //     this.$message({
+      //       type:"success",
+      //       message: res.title
+      //     });
+      //   }
+      // });
+      this.exportSvaReport(params);
     },
-    generateSvaReport() {
-      let query = this.excel.export_sva.model,
-        url =
-          "api/v1/schedules/work/report?start=" +
-          query.start +
-          "&end=" +
-          query.end,
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      let data = [];
-      let header = [""];
-      let header1 = ["Agent"];
+    // generateSvaReport() {
+    //   let query = this.excel.export_sva.model,
+    //     url =
+    //       "api/v1/schedules/work/report?start=" +
+    //       query.start +
+    //       "&end=" +
+    //       query.end,
+    //     options = {
+    //       headers: {
+    //         Authorization: "Bearer " + this.token
+    //       }
+    //     };
+    //   let data = [];
+    //   let header = [""];
+    //   let header1 = ["Agent"];
 
-      axios
-        .get(url, options)
-        .then(res => {
-          // console.log(res.data.meta.agent_schedules)
-          const range = moment.range(query.start, query.end);
-          const dates = Array.from(range.by("day")).map(m =>
-            m.format("YYYY-MM-DD")
-          );
-          res.data.meta.agent_schedules.forEach(
-            ((v, i) => {
-              // get agent info
-              let obj = [];
-              obj.push(v.full_name);
-              dates.forEach(
-                ((v1, i1) => {
-                  // get per date info
-                  header.push(
-                    moment(v1).format("ddd MM-DD-YYYY"),
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                  );
-                  header1.push(
-                    "OM",
-                    "TL",
-                    "SCHED",
-                    "TIME_IN",
-                    "TIME_OUT",
-                    "CONFORMANCE"
-                  );
-                  if (v.schedule.length > 0) {
-                    let tmp = v.schedule.filter(
-                      i =>
-                        moment(v1).format("YYYY-MM-DD") ==
-                          moment(i.start_event.date).format("YYYY-MM-DD") &&
-                        i.overtime_id == null
-                    );
-                    if (tmp.length > 0) {
-                      tmp = tmp[0];
-                      obj.push(tmp.om.full_name);
-                      obj.push(tmp.tl.full_name);
-                      obj.push(
-                        moment(tmp.start_event.date).format("hh:mm a") +
-                          "-" +
-                          moment(tmp.end_event.date).format("hh:mm a")
-                      );
-                      switch (tmp.remarks.toLowerCase()) {
-                        case "present":
-                          obj.push(
-                            moment(tmp.time_in.date).format(
-                              "YYYY-MM-DD hh:mm a"
-                            )
-                          );
-                          obj.push(
-                            moment(tmp.time_out.date).format(
-                              "YYYY-MM-DD hh:mm a"
-                            )
-                          );
-                          break;
-                        case "ncns":
-                        case "absent":
-                          obj.push(tmp.remarks);
-                          obj.push(tmp.remarks);
-                          break;
-                        case "on-leave":
-                          obj.push(tmp.leave.leave_type);
-                          obj.push(tmp.leave.leave_type);
-                          break;
-                        case "upcoming":
-                          obj.push("NO STAMP");
-                          obj.push("NO STAMP");
-                          break;
-                      }
-                      obj.push(tmp.conformance + "%");
-                    } else {
-                      // return off
-                      obj.push("NA");
-                      obj.push("NA");
-                      obj.push("OFF");
-                      obj.push("OFF");
-                      obj.push("OFF");
-                      obj.push("0%");
-                    }
-                  } else {
-                    // return off
-                    // obj.om = null;
-                    // obj.tl = null;
-                    // obj.rop = v.full_name;
-                    obj.push("NA");
-                    obj.push("NA");
-                    obj.push("OFF");
-                    obj.push("OFF");
-                    obj.push("OFF");
-                    obj.push("0%");
-                  }
-                }).bind(this)
-              );
-              data.push(obj);
-            }).bind(this)
-          );
-          data.unshift([]);
-          data.unshift(header1);
-          data.unshift([]);
-          data.unshift(header);
-          // console.log(data)
+    //   axios
+    //     .get(url, options)
+    //     .then(res => {
+    //       // console.log(res.data.meta.agent_schedules)
+    //       const range = moment.range(query.start, query.end);
+    //       const dates = Array.from(range.by("day")).map(m =>
+    //         m.format("YYYY-MM-DD")
+    //       );
+    //       res.data.meta.agent_schedules.forEach(
+    //         ((v, i) => {
+    //           // get agent info
+    //           let obj = [];
+    //           obj.push(v.full_name);
+    //           dates.forEach(
+    //             ((v1, i1) => {
+    //               // get per date info
+    //               header.push(
+    //                 moment(v1).format("ddd MM-DD-YYYY"),
+    //                 "",
+    //                 "",
+    //                 "",
+    //                 "",
+    //                 ""
+    //               );
+    //               header1.push(
+    //                 "OM",
+    //                 "TL",
+    //                 "SCHED",
+    //                 "TIME_IN",
+    //                 "TIME_OUT",
+    //                 "CONFORMANCE"
+    //               );
+    //               if (v.schedule.length > 0) {
+    //                 let tmp = v.schedule.filter(
+    //                   i =>
+    //                     moment(v1).format("YYYY-MM-DD") ==
+    //                       moment(i.start_event.date).format("YYYY-MM-DD") &&
+    //                     i.overtime_id == null
+    //                 );
+    //                 if (tmp.length > 0) {
+    //                   tmp = tmp[0];
+    //                   obj.push(tmp.om.full_name);
+    //                   obj.push(tmp.tl.full_name);
+    //                   obj.push(
+    //                     moment(tmp.start_event.date).format("hh:mm a") +
+    //                       "-" +
+    //                       moment(tmp.end_event.date).format("hh:mm a")
+    //                   );
+    //                   switch (tmp.remarks.toLowerCase()) {
+    //                     case "present":
+    //                       obj.push(
+    //                         moment(tmp.time_in.date).format(
+    //                           "YYYY-MM-DD hh:mm a"
+    //                         )
+    //                       );
+    //                       obj.push(
+    //                         moment(tmp.time_out.date).format(
+    //                           "YYYY-MM-DD hh:mm a"
+    //                         )
+    //                       );
+    //                       break;
+    //                     case "ncns":
+    //                     case "absent":
+    //                       obj.push(tmp.remarks);
+    //                       obj.push(tmp.remarks);
+    //                       break;
+    //                     case "on-leave":
+    //                       obj.push(tmp.leave.leave_type);
+    //                       obj.push(tmp.leave.leave_type);
+    //                       break;
+    //                     case "upcoming":
+    //                       obj.push("NO STAMP");
+    //                       obj.push("NO STAMP");
+    //                       break;
+    //                   }
+    //                   obj.push(tmp.conformance + "%");
+    //                 } else {
+    //                   // return off
+    //                   obj.push("NA");
+    //                   obj.push("NA");
+    //                   obj.push("OFF");
+    //                   obj.push("OFF");
+    //                   obj.push("OFF");
+    //                   obj.push("0%");
+    //                 }
+    //               } else {
+    //                 // return off
+    //                 // obj.om = null;
+    //                 // obj.tl = null;
+    //                 // obj.rop = v.full_name;
+    //                 obj.push("NA");
+    //                 obj.push("NA");
+    //                 obj.push("OFF");
+    //                 obj.push("OFF");
+    //                 obj.push("OFF");
+    //                 obj.push("0%");
+    //               }
+    //             }).bind(this)
+    //           );
+    //           data.push(obj);
+    //         }).bind(this)
+    //       );
+    //       data.unshift([]);
+    //       data.unshift(header1);
+    //       data.unshift([]);
+    //       data.unshift(header);
+    //       // console.log(data)
 
-          // convertToExcel
-          let excel = {
-            fileName: "Something.xlxs",
-            content: []
-          };
+    //       // convertToExcel
+    //       let excel = {
+    //         fileName: "Something.xlxs",
+    //         content: []
+    //       };
 
-          excel.content.push({
-            sheet_data: data,
-            sheet_title:
-              "SVA " +
-              moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-              " to " +
-              moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")
-          });
-          this.createMultisheetExcel(excel);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
+    //       excel.content.push({
+    //         sheet_data: data,
+    //         sheet_title:
+    //           "SVA " +
+    //           moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
+    //           " to " +
+    //           moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")
+    //       });
+    //       this.createMultisheetExcel(excel);
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     });
+    // },
     createMultisheetExcel(data) {
       let url = "api/v1/excel/create_multisheet_excel",
         formData = new FormData(),

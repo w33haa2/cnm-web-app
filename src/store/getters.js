@@ -280,7 +280,7 @@ const getters = {
   // export_sva_report
   exportSvaReportState: state => state.export_sva_report.state,
   exportSvaReportData: state => state.export_sva_report.data,
-  exportSvaReportError: state => state.export_sva_report.errors,
+  exportSvaReportTitle: state => state.export_sva_report.title,
   // bulk_create_leave_credits
   bulkCreateLeaveCreditsState: state => state.bulk_create_leave_credits.state,
   bulkCreateLeaveCreditsData: state => state.bulk_create_leave_credits.data,
