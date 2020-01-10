@@ -207,25 +207,56 @@
         </el-col>
       </el-row>
       <!-- <el-tag slot="reference" :type="tag.type" :effect="tag.effect">{{ tag.label }}</el-tag> -->
-      <div slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer">
+      <div slot="reference" style="width:100%;padding:0px;margin:0px;cursor:pointer;">
         <!-- <span :style="'padding:3px;font-size:.85em;background-color:'+ (popup.data.schedule.type == 1? 'blue':'purple') +';color:white'">{{ popup.data.schedule.type == 1 ? "REG":"OT" }}
         </span>-->
         <div
-          :style="'border-radius:5px;padding:3px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
+          :style="'text-align:center;display:flex;align-items:center;height:45px;font-size:.85em;background-color:'+tag.bc+';color:'+tag.fc"
         >
-          <el-row>
-            <template v-if="tag.label=='PRESENT'">
-              <el-col :sm="{span:12}">
-                <div>{{ tag.label}}</div>
-              </el-col>
-              <el-col :sm="{span:12}">
+          <template v-if="tag.label=='PRESENT'">
+            <div style="width:100%;text-align:center">
+              <span>{{ tag.label }}</span>
+              <template v-if="schedule.log_status.length>0">
+                <template v-if="view=='hours'">
+                  <div :style="'background-color:'+(missed_log?'orange':'green')+';color:white'">
+                    <el-tooltip class="item" effect="dark" content="Hours" placement="top-start">
+                      <span
+                        :style="'color:white;padding-right:5px;'"
+                      >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
+                    </el-tooltip>
+                    <!-- &nbsp;| -->
+                    <el-tooltip
+                      class="item"
+                      effect="dark"
+                      content="Night Difference"
+                      placement="top-start"
+                    >
+                      <span
+                        :style="'color:white;padding-left:5px;'"
+                      >{{ schedule.rendered_hours.night_difference }}</span>
+                    </el-tooltip>
+                  </div>
+                </template>
+                <template v-else>
+                  <div :style="'background-color:'+(missed_log?'orange':'green')+';color:white'">
+                    <template v-if="missed_log">
+                      <span style="color:red;font-weight:lighter">MISSED LOG</span>
+                    </template>
+                    <template v-else>
+                      <span style="color:white;">TIMED OUT</span>
+                    </template>
+                  </div>
+                </template>
+              </template>
+            </div>
+            <!-- <el-col :sm="{span:12}">
                 <div>
                   <template v-if="schedule.log_status.length>0">
                     <template v-if="view=='hours'">
                       <el-tooltip class="item" effect="dark" content="Hours" placement="top-start">
                         <span
-                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
-                        >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(2) }}</span>
+                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;'"
+                        >{{ (schedule.rendered_hours.billable.second / 60 / 60).toFixed(1) }}</span>
                       </el-tooltip>
                       <el-tooltip
                         class="item"
@@ -234,30 +265,25 @@
                         placement="top-start"
                       >
                         <span
-                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;'"
+                          :style="'background-color:'+(missed_log?'orange':'green')+';color:white;'"
                         >{{ schedule.rendered_hours.night_difference }}</span>
                       </el-tooltip>
                     </template>
                     <template v-else>
                       <template v-if="missed_log">
-                        <span
-                          style="background-color:orange;color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;"
-                        >MISSED LOG</span>
+                        <span style="background-color:orange;color:white;">ML</span>
                       </template>
                       <template v-else>
-                        <span
-                          style="background-color:green;color:white;padding-top:3px;padding-bottom:3px;padding-left:6px;padding-right:6px;border-radius:4px;"
-                        >TIMED OUT</span>
+                        <span style="background-color:green;color:white;">TO</span>
                       </template>
                     </template>
                   </template>
                 </div>
-              </el-col>
-            </template>
-            <template v-else>
-              <div>{{ tag.label}}</div>
-            </template>
-          </el-row>
+            </el-col>-->
+          </template>
+          <template v-else>
+            <div style="width:100%;text-align:center">{{ tag.label}}</div>
+          </template>
         </div>
       </div>
     </el-popover>

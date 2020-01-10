@@ -9,8 +9,7 @@ const getters = {
   gender: state => state.user.userDetails.gender,
   name: state => state.user.userDetails.full_name,
   user_id: state => state.user.userDetails.id,
-  head_access_id: state => state.user.userDetails.head,
-  head_id: state => state.user.userDetails.parent_id,
+  head: state => state.user.userDetails.head,
   introduction: state => state.user.introduction,
   roles: state => [state.user.userDetails.position],
   position_id: state => state.user.userDetails.position_id,
@@ -281,7 +280,7 @@ const getters = {
   // export_sva_report
   exportSvaReportState: state => state.export_sva_report.state,
   exportSvaReportData: state => state.export_sva_report.data,
-  exportSvaReportError: state => state.export_sva_report.errors,
+  exportSvaReportTitle: state => state.export_sva_report.title,
   // bulk_create_leave_credits
   bulkCreateLeaveCreditsState: state => state.bulk_create_leave_credits.state,
   bulkCreateLeaveCreditsData: state => state.bulk_create_leave_credits.data,
@@ -346,6 +345,17 @@ const getters = {
   // delete_access_level
   deleteAccessLevelState: state => state.delete_access_level.state,
   deleteAccessLevelData: state => state.delete_access_level.data,
-  deleteAccessLevelTitle: state => state.delete_access_level.title
+  deleteAccessLevelTitle: state => state.delete_access_level.title,
+  // fetch_user_approved_leaves
+  fetchUserApprovedLeavesState: state => state.fetch_user_approved_leaves.state,
+  fetchUserApprovedLeavesData: state => state.fetch_user_approved_leaves.data,
+  fetchUserApprovedLeavesTitle: state => state.fetch_user_approved_leaves.title,
+  // fetch_user_weekly_leave_requests
+  fetchUserWeeklyLeaveRequestsState: state =>
+    state.fetch_user_weekly_leave_requests.state,
+  fetchUserWeeklyLeaveRequestsData: state =>
+    state.fetch_user_weekly_leave_requests.data,
+  fetchUserWeeklyLeaveRequestsTitle: state =>
+    state.fetch_user_weekly_leave_requests.title
 };
 export default getters;

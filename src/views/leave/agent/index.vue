@@ -7,7 +7,7 @@
         <el-col :md="{span:6}">
           <div>
             <!-- <el-tag size="mini" type="success">VL Credits: {{ vl_credits }}</el-tag>
-            <el-tag size="mini" type="warning">SL Credits: {{ 
+            <el-tag size="mini" type="warning">SL Credits: {{
             }}s}}</el-tag>-->
             <slots-calendar></slots-calendar>
           </div>
@@ -129,9 +129,9 @@
 import logger from "../../time_logger";
 import { mapActions, mapGetters } from "vuex";
 import Moment from "moment/moment";
-import tz from "moment-timezone";
+// import tz from "moment-timezone";
 import { extendMoment } from "moment-range";
-const moment = extendMoment(Moment, tz);
+const moment = extendMoment(Moment);
 import leaveTable from "./components/leaveTable";
 import slotsCalendar from "@/components/SlotsCalendar";
 import countTo from "vue-count-to";

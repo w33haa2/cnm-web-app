@@ -1,8 +1,8 @@
 import { STATE_API } from "@/utils/api/api-helper";
 import { generateMutationTypes } from "@/utils/api/state-mutation";
-const FETCH_HIERARCHY_LOG = generateMutationTypes(
+const FETCH_USER_APPROVED_LEAVES = generateMutationTypes(
   "LOGS",
-  "FETCH_HIERARCHY_LOG"
+  "FETCH_USER_APPROVED_LEAVES"
 );
 
 /**
@@ -24,10 +24,10 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for FETCH INCOMING OT
+   * Commits initial state for fetch approved leaves
    * @param state
    */
-  [FETCH_HIERARCHY_LOG.initial](state) {
+  [FETCH_USER_APPROVED_LEAVES.initial](state) {
     state.state = {
       initial: true,
       success: false,
@@ -35,10 +35,10 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for FETCH INCOMING OT
+   * Commits success state for fetch approved leaves
    * @param state
    */
-  [FETCH_HIERARCHY_LOG.success](state, payload) {
+  [FETCH_USER_APPROVED_LEAVES.success](state, payload) {
     state.state = {
       initial: false,
       success: true,
@@ -48,10 +48,10 @@ const mutations = {
     state.title = payload.title;
   },
   /**
-   * Commits fail state for FETCH INCOMING OT
+   * Commits fail state for fetch approved leaves
    * @param state
    */
-  [FETCH_HIERARCHY_LOG.fail](state, payload) {
+  [FETCH_USER_APPROVED_LEAVES.fail](state, payload) {
     state.state = {
       initial: false,
       success: false,
@@ -63,16 +63,18 @@ const mutations = {
 
 const actions = {
   /**
-   * Action for FETCH INCOMING OT
+   * Action for fetch approved leaves
    * @param commit
    * @param params
    */
-  fetchHierarchyLogs({ commit }, params) {
-    const slug = "api.hierarchy_log.fetchAll";
+  fetchUserApprovedLeaves({ commit }, params) {
+    const slug = "api.user.fetchAll";
+    params.status = "approved";
+    params.leaves = true;
     STATE_API({ slug, params }, commit, [
-      FETCH_HIERARCHY_LOG.initial,
-      FETCH_HIERARCHY_LOG.success,
-      FETCH_HIERARCHY_LOG.fail
+      FETCH_USER_APPROVED_LEAVES.initial,
+      FETCH_USER_APPROVED_LEAVES.success,
+      FETCH_USER_APPROVED_LEAVES.fail
     ]);
   }
 };

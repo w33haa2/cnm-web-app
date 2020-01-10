@@ -37,7 +37,8 @@ export default {
           om: null,
           tl: null,
           start_date: null,
-          end_date: null
+          end_date: null,
+          no_relations:true,
         },
         placeholder: "Select...",
         multiple: false,

@@ -16,7 +16,7 @@ const state = {
     fail: false
   },
   data: [],
-  errors: null
+  title: null
 };
 
 /**
@@ -24,7 +24,7 @@ const state = {
  */
 const mutations = {
   /**
-   * Commits initial state for FETCH INCOMING OT
+   * Commits initial state for EXPORT SVA
    * @param state
    */
   [EXPORT_SVA_REPORT.initial](state) {
@@ -35,7 +35,7 @@ const mutations = {
     };
   },
   /**
-   * Commits success state for FETCH INCOMING OT
+   * Commits success state for EXPORT SVA
    * @param state
    */
   [EXPORT_SVA_REPORT.success](state, payload) {
@@ -45,9 +45,10 @@ const mutations = {
       fail: false
     };
     state.data = payload;
+    state.title = payload.title;
   },
   /**
-   * Commits fail state for FETCH INCOMING OT
+   * Commits fail state for EXPORT SVA
    * @param state
    */
   [EXPORT_SVA_REPORT.fail](state, payload) {
@@ -56,7 +57,7 @@ const mutations = {
       success: false,
       fail: true
     };
-    state.errors = payload.response.data.title;
+    state.title = payload.response.data.title;
   }
 };
 
@@ -68,8 +69,7 @@ const actions = {
    */
   exportSvaReport({ commit }, params) {
     const slug = "api.excel.export_sva";
-    const headers = {responseType:"blob"};
-    STATE_API({ slug, params, headers }, commit, [
+    STATE_API({ slug, params }, commit, [
       EXPORT_SVA_REPORT.initial,
       EXPORT_SVA_REPORT.success,
       EXPORT_SVA_REPORT.fail

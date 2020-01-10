@@ -152,19 +152,19 @@ const mutations = {
     state.userDetails.position_id = payload.meta.user.access.id;
     state.userDetails.login_flag = payload.meta.user.loginFlag;
     state.userDetails.head =
-      payload.meta.user.access.parent !== null
-        ? payload.meta.user.access.parent
+      payload.meta.user.info.current_head !== null
+        ? payload.meta.user.info.current_head
         : "N/A";
-    state.userDetails.parent_id =
-      payload.meta.user.access.parent !== null
-        ? payload.meta.user.access_hierarchy.parent_id
-        : "N/A";
+    // state.userDetails.parent_id =
+    //   payload.meta.user.access.parent !== null
+    //     ? payload.meta.user.access_hierarchy.parent_id
+    //     : "N/A";
     state.userDetails.hired_date = payload.meta.user.info.hired_date;
     state.userDetails.c_email = payload.meta.user.email;
     state.userDetails.firstname = payload.meta.user.info.firstname;
     state.userDetails.middlename = payload.meta.user.info.middlename;
     state.userDetails.lastname = payload.meta.user.info.lastname;
-    state.userDetails.id = payload.meta.user.info.id;
+    state.userDetails.id = payload.meta.user.uid;
     state.userDetails.contract = payload.meta.user.contract;
     ls.set("token", { access_token: state.token });
     ls.set("token_info", {

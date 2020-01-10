@@ -148,7 +148,7 @@ export default {
       if(this.position.toLowerCase() == "operations manager"){
         this.query.om_id = this.user_id
       }else if(this.position.toLowerCase() == "team leader"){
-        this.query.om_id = this.head_id
+        this.query.om_id = this.head.id
       }
     }
   },
@@ -171,7 +171,7 @@ export default {
             if(this.position.toLowerCase() == "operations manager"){
               this.query.om_id = this.user_id
             }else if(this.position.toLowerCase() == "team leader"){
-              this.query.om_id = this.head_id
+              this.query.om_id = this.head.id
             }
           }else{
             this.query.tl_id = this.data.filter_tl;
@@ -213,7 +213,7 @@ export default {
             if(this.position.toLowerCase() == "operations manager"){
               this.query.om_id = this.user_id
             }else if(this.position.toLowerCase() == "team leader"){
-              this.query.om_id = this.head_id
+              this.query.om_id = this.head.id
             }
           }else{
             this.query.tl_id = v.filter_tl;

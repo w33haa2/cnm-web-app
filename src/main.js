@@ -105,6 +105,17 @@ Vue.mixin({
       }
       return result;
     },
+    isOP() {
+      let result = false;
+      if (
+        store.getters.position.toLowerCase() == "operations manager" ||
+        store.getters.position.toLowerCase() == "team leader"
+      ) {
+        result = true;
+      }
+      return result;
+    },
+
     isADMIN() {
       let result = false;
       if (store.getters.position.toLowerCase() == "admin") {

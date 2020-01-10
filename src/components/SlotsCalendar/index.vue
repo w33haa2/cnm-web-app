@@ -37,7 +37,6 @@
             <template v-if="fetchLeaveSlotsState.success">
               <div
                 style="height:100%;width:100%;text-align:center;padding:10px;"
-                :style="(data.type=='current-month'?'background-color:'+(sufficientSlots(data)?'':'#fff8e6'):'')"
               >
                 <div
                   :style="'font-size:.8em;'+(highlightSunday(data))"
@@ -155,7 +154,7 @@ export default {
         let position = this.position.toLowerCase();
         switch (position) {
           case "representative - order placer":
-            this.request.slots.user_id = this.fetchHierarchyLogsData.hierarchy_log[0].parent_details.current_head_id;
+            this.request.slots.user_id = this.fetchHierarchyLogsData.hierarchy_log[0].parent_details.current_head.id;
             this.fetchLeaveSlots(this.request.slots);
             break;
         }
