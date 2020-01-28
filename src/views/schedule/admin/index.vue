@@ -5,14 +5,14 @@
         Agent Schedule
         <small
           style="font-weight:lighter"
-        >{{ "("+ formatDate(week.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(week.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
+        >{{ "("+ formatDate(query.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(query.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
       </h4>
 
       <el-row :gutter="5" style="margin-top:10px;">
         <el-col :md="{span:4}">
           <el-date-picker
-            v-model="week.start"
             size="mini"
+            v-model="week.start"
             type="week"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
@@ -31,7 +31,7 @@
             style="float:right"
             :page-sizes="[10, 25, 50]"
             :page-size="query.limit"
-            :current-page.sync="table_config.page"
+            :current-page.sync="table_page"
             layout="total, sizes, prev, pager, next"
             :total="agentsWorkReports.count"
             background
@@ -53,10 +53,10 @@
               <el-col :md="{span:16}">
                 <el-tooltip content="Filter By">
                   <template v-if="isRTA() || isHR() || isADMIN()">
-                    <remote-filter-head :range="week" @filter="filterTable"></remote-filter-head>
+                    <remote-filter-head :range="{start:query.start,end:query.end}" @filter="filterTable"></remote-filter-head>
                   </template>
                   <template v-if="position.toLowerCase() == 'operations manager'">
-                    <tl-filter :range="week" @filter="filterTable" :om_id="user_id"></tl-filter>
+                    <tl-filter :range="{start:query.start,end:query.end}" @filter="filterTable" :om_id="user_id"></tl-filter>
                   </template>
                 </el-tooltip>
               </el-col>
@@ -635,6 +635,9 @@ import tlFilter from "./components/TeamLeaderFilter";
 export default {
   components: { cellContent, remoteSearch, remoteFilterHead, tlFilter },
   computed: {
+    table_page(){
+      return this.query.offset/this.query.limit + 1;
+    },
     ...mapGetters([
       "agentsWorkReports",
       "agentsWorkReportsfetchState",
@@ -643,7 +646,6 @@ export default {
       "position",
       "token",
       "user_id",
-      "head_id",
       "createScheduleBulkState",
       "createScheduleBulkData",
       "createLeaveState",
@@ -695,6 +697,10 @@ export default {
     agentTimeOutState({ initial, success, fail }) {
       if (success) {
         this.weekChange(this.week.start);
+        const data = this.query;
+        this.fetchAgentsWorkReports({
+          data
+        });
         this.$message({
           type: "success",
           message: this.agentTimeOutTitle,
@@ -859,22 +865,12 @@ export default {
       if (v != "") {
         this.query["target[]"] = "full_name";
         this.query.query = v;
-        this.weekChange(
-          moment(this.week.start)
-            // .subtract(7, "days")
-            // .startOf("isoweek")
-            .format("YYYY-MM-DD")
-        );
       } else {
-        delete this.query["target[]"];
-        delete this.query.query;
-        this.weekChange(
-          moment(this.week.start)
-            // .subtract(7, "days")
-            // .startOf("isoweek")
-            .format("YYYY-MM-DD")
-        );
+        this.query["target[]"]=null;
+        this.query.query=null;
       }
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
@@ -958,11 +954,7 @@ export default {
       });
     }
 
-    this.weekChange(
-      moment()
-        .isoWeekday(2)
-        .format("YYYY-MM-DD")
-    );
+    this.weekChange(moment());
   },
   data() {
     return {
@@ -1082,10 +1074,16 @@ export default {
       tableHeader: [],
       tableData: [],
       query: {
-        offset: 0,
         limit: 10,
+        offset: 0,
+        start: null,
+        end: null,
         sort: null,
-        order: null
+        order: null,
+        target:null,
+        query:null,
+        om_id:null,
+        tl_id:null,
       },
       table_config: {
         page: 1,
@@ -1134,12 +1132,23 @@ export default {
       this.query.sort = order ? prop : null;
       this.query.order =
         order != null ? (order == "ascending" ? "asc" : "desc") : null;
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     filterTable(v) {
-      this.filter_table.om_id = v.om_id;
-      this.filter_table.tl_id = v.tl_id;
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+      // console.log(v);
+      this.query.offset=0;
+      // this.filter_table.om_id = v.om_id;
+      // this.filter_table.tl_id = v.tl_id;
+      this.query.tl_id = null;
+      this.query.om_id = null;
+      if(v.om_id){
+        this.query.om_id = v.om_id;
+      }else if(v.tl_id){
+        this.query.tl_id = v.tl_id;
+      }
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     excelCluster(v) {
       this.excel.export_sva.field.clusters = v;
@@ -1712,9 +1721,9 @@ export default {
         "api/v1/users?" +
         position[query.query] +
         "=true&start_date=" +
-        query.start +
+        query.start+" 00:00:00" +
         "&end_date=" +
-        query.end;
+        query.end+ " 23:59:59";
       const options = {
         headers: {
           Authorization: "Bearer " + this.token
@@ -1760,20 +1769,38 @@ export default {
       this.form[type].show = true;
     },
     weekChange(e) {
-      // console.log(moment().day("tuesday"))
-      const start = moment(e)
-        .isoWeekday(2)
-        .format("YYYY-MM-DD");
-      const end = moment(start)
-        .add(6, "days")
-        .format("YYYY-MM-DD");
-      this.week.start = start;
-      this.week.end = end;
+      // console.log(e);
+      this.query.offset=0;
+      this.query.om_id=null;
+      this.query.tl_id=null;
+      this.query.start = moment(moment(e)
+        .isoWeekday(2)).startOf("day")
+        .format("YYYY-MM-DD HH:mm:ss");
+      this.query.end = moment(moment(this.query.start)
+        .add(6, "days")).endOf("day")
+        .format("YYYY-MM-DD HH:mm:ss");
+      
+      this.week.start = this.query.start;
 
-      this.generateHeader(start, end);
+      const range = moment.range(this.query.start, this.query.end);
+      const dates = Array.from(range.by("day")).map(m =>
+        m.format("YYYY-MM-DD")
+      );
+
+      this.tableHeader = dates.map(d => ({
+        day: moment(d).format("ddd"),
+        date: moment(d).format("YYYY-MM-DD"),
+        date1: moment(d).format("MMM Do")
+      }));   
+
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     filterTl(v) {
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+      // this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
+      // this.query.om_id = null;s
+      // this.query.tl_id = v;
+      console.log(v);
     },
     filterOm(v) {
       if (
@@ -1806,38 +1833,31 @@ export default {
         date: moment(d).format("YYYY-MM-DD"),
         date1: moment(d).format("MMM Do")
       }));
-      let data = {
-        limit: this.query.limit,
-        offset: this.query.offset,
-        start: this.week.start,
-        end: this.week.end,
-        sort: this.query.order ? this.query.sort : null,
-        order: this.query.order
-      };
-      if (this.searchQuery != "") {
-        data["target[]"] = "full_name";
-        data.query = this.searchQuery;
-      }
+      // if (this.searchQuery != "") {
+      //   data["target[]"] = "full_name";
+      //   data.query = this.searchQuery;
+      // }
 
-      if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
-      ) {
-        data.om_id = this.filter_table.om_id;
-        data.tl_id = this.filter_table.tl_id;
-      } else {
-        if (this.position == "Team Leader") {
-          data.tl_id = this.user_id;
-          data.om_id = null;
-        } else if (this.position == "Operations Manager") {
-          data.om_id = this.user_id;
-          data.tl_id = null;
-        }
-      }
-      data.sort = this.query.sort;
-      data.order = this.query.order;
-      data = this.unsetNull(data);
-      this.fetchAgentsWorkReports({ data });
+      // if (
+      //   this.position != "Operations Manager" &&
+      //   this.position != "Team Leader"
+      // ) {
+      //   data.om_id = this.filter_table.om_id;
+      //   data.tl_id = this.filter_table.tl_id;
+      // } else {
+      //   if (this.position == "Team Leader") {
+      //     data.tl_id = this.user_id;
+      //     data.om_id = null;
+      //   } else if (this.position == "Operations Manager") {
+      //     data.om_id = this.user_id;
+      //     data.tl_id = null;
+      //   }
+      // }
+      // data.sort = this.query.sort;
+      // data.order = this.query.order;
+      // data = this.unsetNull(data);
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     tableSizeChange(value) {
       this.query.limit = value;
@@ -1849,11 +1869,14 @@ export default {
       //   end: this.week.end
       // };
       // this.fetchAgentsWorkReports({ data });
-      this.weekChange(this.week.start);
+      // this.weekChange(this.week.start);
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      this.weekChange(this.week.start);
+      const data = this.query;
+      this.fetchAgentsWorkReports({data});
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
