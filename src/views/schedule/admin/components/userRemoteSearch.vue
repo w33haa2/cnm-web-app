@@ -2,12 +2,12 @@
   <div style="width:100%">
     <el-select
       size="mini"
-      remote
+      remote="remote"
       :filterable="filterable"
       :multiple="multiple"
       :placeholder="placeholder"
       v-model="select"
-      :remote-method="remoteMethod"
+      :remote-method="remote===true?remoteMethod:null"
       :loading="loading"
       style="width:100%"
       :disabled="disabled"
@@ -29,13 +29,14 @@ export default {
     "disabled",
     "clear",
     "fetch",
-    "filterable"
+    "filterable",
+    "remote"
   ],
   data() {
     return {
       select: null,
       options: [],
-      loading: false
+      loading: false,
     };
   },
   watch: {

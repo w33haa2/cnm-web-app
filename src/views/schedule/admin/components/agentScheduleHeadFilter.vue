@@ -16,6 +16,7 @@
           :clear="user_remote_config.clear"
           :params="user_remote_config.params"
           :fetch="fetch"
+          :remote="false"
           @selected="remote_selection"
         ></user-remote>
       </el-col>
@@ -52,9 +53,11 @@ export default {
   },
   watch: {
     "range.start": function(v) {
-      this.user_remote_config.params.start_date = this.range.start;
-      this.user_remote_config.params.end_date = this.range.end;
-      3;
+      this.filter="all";
+      this.selectFilter(this.filter);
+      this.user_remote_config.params.start_date = this.range.start + " 00:00:00";
+      this.user_remote_config.params.end_date = this.range.end + " 23:59:59";
+      // 3;
       this.fetch = !this.fetch;
     }
   },
@@ -98,8 +101,8 @@ export default {
     init() {
       this.filter = "all";
       this.disable_remote = true;
-      this.user_remote_config.params.start_date = this.range.start;
-      this.user_remote_config.params.end_date = this.range.end;
+      this.user_remote_config.params.start_date = this.range.start + " 00:00:00";
+      this.user_remote_config.params.end_date = this.range.end + " 23:59:59";
     }
   }
 };
