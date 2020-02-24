@@ -627,7 +627,6 @@ export default {
     excelAddUser(arr) {
       let count = arr.length;
       this.excel.import.arr_length = arr.length;
-      this.excel.import.dialog = true;
       this.excel.import.importing = true;
       let tmp_arr = [],
         loop_count = 0;
@@ -687,6 +686,7 @@ export default {
           }
         };
       formData.append("file", e.target.files[0]);
+      this.excel.import.dialog = true;
       axios
         .post("api/v1/users/excel_to_array", formData, options)
         .then(res => {
