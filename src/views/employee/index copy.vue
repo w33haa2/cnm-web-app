@@ -226,14 +226,9 @@
       ></el-alert>
 
       <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-        <template v-if="excel.import.arr_length==0">
-          Initializing data, Please wait...
-        </template>
-        <template v-else>
-          Progress
-          <span>( {{ excel.import.loop_index }}</span>/
-          <span>{{ excel.import.arr_length }} )</span>
-        </template>
+        Progress
+        <span>( {{ excel.import.loop_index }}</span>/
+        <span>{{ excel.import.arr_length }} )</span>
       </div>
       <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
       <div style="padding-bottom:15px;  ">
@@ -319,7 +314,7 @@ export default {
           progress: 0,
           dialog: false,
           loop_index: 0,
-          arr_length: 0,
+          arr_length: 100,
           data: [],
           importing: false,
           report: {
@@ -632,6 +627,7 @@ export default {
     excelAddUser(arr) {
       let count = arr.length;
       this.excel.import.arr_length = arr.length;
+      this.excel.import.dialog = true;
       this.excel.import.importing = true;
       let tmp_arr = [],
         loop_count = 0;
@@ -691,7 +687,6 @@ export default {
           }
         };
       formData.append("file", e.target.files[0]);
-      this.excel.import.dialog = true;
       axios
         .post("api/v1/users/excel_to_array", formData, options)
         .then(res => {

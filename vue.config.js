@@ -33,7 +33,7 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    proxy: "http://127.0.0.11:9000"
+    proxy: "http://127.0.0.1:8000"
     // proxy: "http://cnm.compraindustria.com"
     // proxy: process.env.VUE_APP_BASE_API
     // proxy: "http://localhost:8000"

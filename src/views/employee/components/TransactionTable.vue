@@ -116,7 +116,7 @@
         <div style="width:100%;text-align:center">{{ row.birthdate }}</div>
       </template>
     </el-table-column>
-    <el-table-column label="Address" width="200" sortable="custom" prop="user_infos.address">
+    <el-table-column label="Address" width="400" sortable="custom" prop="user_infos.address">
       <template slot-scope="{row}">
         <div style="width:100%;text-align:center">{{ row.address }}</div>
       </template>
