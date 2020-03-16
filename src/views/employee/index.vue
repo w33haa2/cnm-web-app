@@ -698,7 +698,7 @@ export default {
 
 
         this.excel.import.importing = true;
-         this.excel.import.arr_length = body.length;
+        this.excel.import.arr_length = body.length;
         // this.excel.import.loop_index = this.excel.import.report.data.all.list.length;
         this.excel.import.progress =
           (this.excel.import.report.data.all.list.length / this.excel.import.arr_length) *

@@ -24,7 +24,7 @@ module.exports = {
   publicPath: "/",
   outputDir: "dist",
   assetsDir: "static",
-  lintOnSave: process.env.NODE_ENV === "development",
+  // lintOnSave: process.env.NODE_ENV === "development",
   productionSourceMap: false,
   devServer: {
     port: port,
@@ -33,7 +33,7 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    proxy: "http://127.0.0.1:8000"
+    proxy: "http://127.0.0.3"
     // proxy: "http://cnm.compraindustria.com"
     // proxy: process.env.VUE_APP_BASE_API
     // proxy: "http://localhost:8000"

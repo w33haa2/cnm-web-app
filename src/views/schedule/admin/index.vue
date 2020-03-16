@@ -112,7 +112,7 @@
               ref="importScheduleInput"
               accept=".xlsx"
               style="display:none"
-              @change="importScheduleFileChange"
+              @change="importScheduleFileChangeV2"
             />
           </el-row>
         </el-col>
@@ -313,7 +313,7 @@
                 v-for="item in agents.agents"
                 :key="item.uid"
                 :label="item.full_name"
-                :value="item.uid"
+                :value="item.email"
               />
             </el-select>
             <span
@@ -358,7 +358,7 @@
                 v-for="item in form.addSchedule.options.operationsManager.data"
                 :key="item.id"
                 :label="item.full_name"
-                :value="item.id"
+                :value="item.email"
               />
             </el-select>
           </el-col>
@@ -380,7 +380,7 @@
                 v-for="(item,index) in form.addSchedule.options.teamLeader.data"
                 :key="index"
                 :label="item.full_name"
-                :value="item.id"
+                :value="item.email"
               />
             </el-select>
           </el-col>
@@ -544,7 +544,7 @@
         :close-on-press-escape="false"
         :show-close="false"
         title="Importing Schedule..."
-        width="50%"
+        width="70%"
         top="5vh"
       >
         <el-alert
@@ -555,15 +555,16 @@
         ></el-alert>
 
         <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-          Progress
-          <span>( {{ excel.import.loop_index }}</span>/
-          <span>{{ excel.import.arr_length }} )</span>
+          <template v-if="excel.import.arr_length == 0">
+            Initializing data, Please wait...
+          </template>
+          <template v-else>
+            Progress
+            <span>( {{ excel.import.report.data.all.list.length }}</span>/
+            <span>{{ excel.import.arr_length }} )</span>
+          </template>
         </div>
-        <el-progress
-          :percentage="excel.import.progress=='0.0'? 0:parseFloat(excel.import.progress)"
-          :text-inside="true"
-          :stroke-width="18"
-        ></el-progress>
+        <el-progress :percentage="excel.import.arr_length!=0?excel.import.report.data.all.list.length / excel.import.arr_length * 100: 0" :text-inside="true" :stroke-width="18"></el-progress>
         <div style="padding-bottom:15px;  ">
           <el-tabs
             v-model="excel.import.report.active_tab"
@@ -575,39 +576,40 @@
                 <el-table-column label="Email" width="350">
                   <template scope="scope">{{scope.row.email}}</template>
                 </el-table-column>
-                <!-- <el-table-column label="Schedule" width="100">
-                <template scope="scope">{{+" To "+}}</template>
-                </el-table-column>-->
-                <el-table-column label="Status">
+                <el-table-column label="Schedule" width="400">
+                <template scope="scope">{{ scope.row.start_event +" To "+ scope.row.end_event}}</template>
+                </el-table-column>
+                <el-table-column label="Status" width="500">
                   <template scope="scope">
-                    <template v-if="scope.row.status_code==200">
-                      <el-tag size="mini" type="success">UPLOADED</el-tag>
+                    <template v-if="scope.row.import_result.code==200">
+                      <el-tag size="mini" type="success">{{ scope.row.import_result.action == "create"? "Created": "Updated"}}</el-tag>
                     </template>
                     <template v-else>
-                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                      <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
                     </template>
                   </template>
                 </el-table-column>
               </el-table>
             </el-tab-pane>
             <el-tab-pane
-              :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code != 200).length"
+              :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.import_result.code != 200).length"
               name="errors"
             >
               <el-table
-                :data="excel.import.report.data.all.list.filter(i=> i.status_code != 200)"
+                :data="excel.import.report.data.all.list.filter(i=> i.import_result.code != 200)"
                 height="350px"
               >
                 <el-table-column label="Email" width="350">
                   <template scope="scope">{{scope.row.email}}</template>
                 </el-table-column>
-                <el-table-column label="Status">
+                
+                <el-table-column label="Schedule" width="400">
+                <template scope="scope">{{ scope.row.start_event +" To "+ scope.row.end_event}}</template>
+                </el-table-column>
+                <el-table-column label="Status" width="500">
                   <template scope="scope">
-                    <template v-if="scope.row.status_code==200">
-                      <el-tag size="mini" type="success">UPLOADED</el-tag>
-                    </template>
-                    <template v-else>
-                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                    <template>
+                      <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
                     </template>
                   </template>
                 </el-table-column>
@@ -631,6 +633,10 @@ import cellContent from "./components/cellContent";
 import remoteSearch from "./components/userRemoteSearch";
 import remoteFilterHead from "./components/agentScheduleHeadFilter";
 import tlFilter from "./components/TeamLeaderFilter";
+import readXlsxFile from "read-excel-file";
+import { getJsDateFromExcel } from "excel-date-to-js";
+import tz from "moment-timezone";
+
 
 export default {
   components: { cellContent, remoteSearch, remoteFilterHead, tlFilter },
@@ -745,10 +751,13 @@ export default {
         this.form.addSchedule.remote_loader = false;
       }
     },
-    "excel.import.loop_index": function(v) {
-      if (v == this.excel.import.arr_length) {
+    "excel.import.report.data.all.list": function(v) {
+      if (v.length == this.excel.import.arr_length) {
         this.excel.import.importing = false;
         this.weekChange(this.week.start);
+        if(this.excel.import.inapp){
+          this.form.addSchedule.show = false;
+        }
       }
     },
     exportSvaReportState({ initial, success, fail }) {
@@ -1201,150 +1210,6 @@ export default {
       // });
       this.exportSvaReport(params);
     },
-    // generateSvaReport() {
-    //   let query = this.excel.export_sva.model,
-    //     url =
-    //       "api/v1/schedules/work/report?start=" +
-    //       query.start +
-    //       "&end=" +
-    //       query.end,
-    //     options = {
-    //       headers: {
-    //         Authorization: "Bearer " + this.token
-    //       }
-    //     };
-    //   let data = [];
-    //   let header = [""];
-    //   let header1 = ["Agent"];
-
-    //   axios
-    //     .get(url, options)
-    //     .then(res => {
-    //       // console.log(res.data.meta.agent_schedules)
-    //       const range = moment.range(query.start, query.end);
-    //       const dates = Array.from(range.by("day")).map(m =>
-    //         m.format("YYYY-MM-DD")
-    //       );
-    //       res.data.meta.agent_schedules.forEach(
-    //         ((v, i) => {
-    //           // get agent info
-    //           let obj = [];
-    //           obj.push(v.full_name);
-    //           dates.forEach(
-    //             ((v1, i1) => {
-    //               // get per date info
-    //               header.push(
-    //                 moment(v1).format("ddd MM-DD-YYYY"),
-    //                 "",
-    //                 "",
-    //                 "",
-    //                 "",
-    //                 ""
-    //               );
-    //               header1.push(
-    //                 "OM",
-    //                 "TL",
-    //                 "SCHED",
-    //                 "TIME_IN",
-    //                 "TIME_OUT",
-    //                 "CONFORMANCE"
-    //               );
-    //               if (v.schedule.length > 0) {
-    //                 let tmp = v.schedule.filter(
-    //                   i =>
-    //                     moment(v1).format("YYYY-MM-DD") ==
-    //                       moment(i.start_event.date).format("YYYY-MM-DD") &&
-    //                     i.overtime_id == null
-    //                 );
-    //                 if (tmp.length > 0) {
-    //                   tmp = tmp[0];
-    //                   obj.push(tmp.om.full_name);
-    //                   obj.push(tmp.tl.full_name);
-    //                   obj.push(
-    //                     moment(tmp.start_event.date).format("hh:mm a") +
-    //                       "-" +
-    //                       moment(tmp.end_event.date).format("hh:mm a")
-    //                   );
-    //                   switch (tmp.remarks.toLowerCase()) {
-    //                     case "present":
-    //                       obj.push(
-    //                         moment(tmp.time_in.date).format(
-    //                           "YYYY-MM-DD hh:mm a"
-    //                         )
-    //                       );
-    //                       obj.push(
-    //                         moment(tmp.time_out.date).format(
-    //                           "YYYY-MM-DD hh:mm a"
-    //                         )
-    //                       );
-    //                       break;
-    //                     case "ncns":
-    //                     case "absent":
-    //                       obj.push(tmp.remarks);
-    //                       obj.push(tmp.remarks);
-    //                       break;
-    //                     case "on-leave":
-    //                       obj.push(tmp.leave.leave_type);
-    //                       obj.push(tmp.leave.leave_type);
-    //                       break;
-    //                     case "upcoming":
-    //                       obj.push("NO STAMP");
-    //                       obj.push("NO STAMP");
-    //                       break;
-    //                   }
-    //                   obj.push(tmp.conformance + "%");
-    //                 } else {
-    //                   // return off
-    //                   obj.push("NA");
-    //                   obj.push("NA");
-    //                   obj.push("OFF");
-    //                   obj.push("OFF");
-    //                   obj.push("OFF");
-    //                   obj.push("0%");
-    //                 }
-    //               } else {
-    //                 // return off
-    //                 // obj.om = null;
-    //                 // obj.tl = null;
-    //                 // obj.rop = v.full_name;
-    //                 obj.push("NA");
-    //                 obj.push("NA");
-    //                 obj.push("OFF");
-    //                 obj.push("OFF");
-    //                 obj.push("OFF");
-    //                 obj.push("0%");
-    //               }
-    //             }).bind(this)
-    //           );
-    //           data.push(obj);
-    //         }).bind(this)
-    //       );
-    //       data.unshift([]);
-    //       data.unshift(header1);
-    //       data.unshift([]);
-    //       data.unshift(header);
-    //       // console.log(data)
-
-    //       // convertToExcel
-    //       let excel = {
-    //         fileName: "Something.xlxs",
-    //         content: []
-    //       };
-
-    //       excel.content.push({
-    //         sheet_data: data,
-    //         sheet_title:
-    //           "SVA " +
-    //           moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-    //           " to " +
-    //           moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")
-    //       });
-    //       this.createMultisheetExcel(excel);
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
-    // },
     createMultisheetExcel(data) {
       let url = "api/v1/excel/create_multisheet_excel",
         formData = new FormData(),
@@ -1447,159 +1312,70 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    generateAgentHLogs(agent, array) {
-      let result = [];
-      agent.forEach(
-        ((v, i) => {
-          if(this.form.addSchedule.inapp){
-          result.push(array.filter(fi => fi.user_id == v)[0]);
-          }else{
-          result.push(array.filter(fi => fi.email == v)[0]);
-          }
-        }).bind(this)
-      );
-      return result;
-    },
-    generateTLHLogs(tl, array) {
-      let result = [];
-      tl.forEach(
-        ((v, i) => {
-          result.push(array.filter(fi => fi.tl_id == v)[0]);
-        }).bind(this)
-      );
-      return result;
-    },
-    createHierarchyObject(data) {
-      let agent = this.form.addSchedule.inapp ?[...new Set(data.map(i => i.user_id))]:[...new Set(data.map(i => i.email))],
-        tl = [...new Set(data.map(i => i.tl_id))],
-        start = moment(moment.min(data.map(i => moment(i.start_event))))
-          .startOf("day")
-          .format("YYYY-MM-DD HH:mm:ss");
-      if(this.form.addSchedule.inapp){
-        agent = this.generateAgentHLogs(agent, data).map(i => ({
-          parent_id: i.tl_id,
-          child_id: i.user_id,
-          start_date: start
-        }));
-        tl = this.generateTLHLogs(tl, data).map(i => ({
-          parent_id: i.om_id,
-          child_id: i.tl_id,
-          start_date: start
-        }));
-      }else{
-        agent = this.generateAgentHLogs(agent, data).map(i => ({
-          parent_email: i.tl_id,
-          child_email: i.email,
-          start_date: start
-        }));
-        tl = this.generateTLHLogs(tl, data).map(i => ({
-          parent_email: i.om_id,
-          child_email: i.tl_id,
-          start_date: start
-        }));
-      }
-      // let result = {
-      //   data: data,
-      //   start_date: start,
-      //   agent: agent,
-      //   tl:tl,
-      //   final: agent.concat(tl),
-      // };
-      // console.log(result)
-      return agent.concat(tl);
-    },
-    loopCreateSchedule(data) {
-      let hierarchy_data = null;
+    scheduleChunk(data, size){
+        var i,j,tmparray=[], chunk = size;
+        
+        var array_report=[];
 
-      if (this.form.addSchedule.replicate) {
-        hierarchy_data = this.createHierarchyObject(data);
-      }
+        for(i=0,j=data.length; i<j; i+=chunk){
+          tmparray.push(data.slice(i,i+chunk));
+        }
 
-      this.form.addSchedule.show = false;
-      this.excel.import.importing = true;
+        return tmparray;
+    },
+    importArray(data){
+      let tmp = this.excel.import.report.data.all.list;
+      axios
+        .post("api/v1/schedules/import", data)
+        .then(res => {
+          console.log(res);
+          tmp.push(...res.data.parameters.report);
+          this.excel.import.report.data.all.list = tmp;
+        })
+        .catch(err => console.log(err));
+    },
+    importScheduleFileChangeV2(e) {
+      
       this.excel.import.dialog = true;
-      this.excel.import.arr_length =
-        data.length + (hierarchy_data ? hierarchy_data.length : 0);
-      let tmp_arr = [],
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      this.excel.import.loop_index = 0;
-      this.excel.import.progress = 0;
-      // hierarchy logs insertion
-      if (this.form.addSchedule.replicate) {
-        hierarchy_data.forEach(
-          ((v, i) => {
-            let tmp_data = {};
-            axios
-              .post("api/v1/hierarchy_log/create", this.unsetNull(v), options)
-              .then(res => {
-                console.log(res);
-                this.excel.import.loop_index += 1;
-                this.excel.import.progress = (
-                  (this.excel.import.loop_index /
-                    this.excel.import.arr_length) *
-                  100
-                ).toFixed(2);
-                tmp_data.email = res.data.parameters.email;
-                tmp_data.status_code = res.status;
-                tmp_data.title = res.data.title;
-                tmp_arr.push(tmp_data);
-                this.excel.import.report.data.all.list = tmp_arr;
-              })
-              .catch(err => {
-                this.excel.import.loop_index += 1;
-                this.excel.import.progress = (
-                  (this.excel.import.loop_index /
-                    this.excel.import.arr_length) *
-                  100
-                ).toFixed(2);
-                tmp_data.email = err.response.data.parameters.email;
-                tmp_data.status_code = err.response.data.code;
-                tmp_data.title = err.response.data.title;
-                tmp_arr.push(tmp_data);
-                this.excel.import.report.data.all.list = tmp_arr;
-              });
+      readXlsxFile(e.target.files[0]).then((rows) => {
+        let body= rows.slice(1,rows.length).filter(i=> moment(i[5]).isValid()==true),data=[];
+        
+        this.excel.import.importing = true;
+        this.excel.import.arr_length = body.length;
+
+        this.excel.import.progress =
+          (this.excel.import.report.data.all.list.length / this.excel.import.arr_length) *
+          100;
+
+        body.forEach(((v,i)=>{
+          // insert replicate value
+          // cell format for index 5 & 6 must be custom => m/d/yyyy h:mm
+          v[5] = moment(v[5]).subtract(20,"hours").format("YYYY-MM-DD HH:mm:ss");
+          v[6] = moment(v[6]).subtract(20,"hours").format("YYYY-MM-DD HH:mm:ss");
+
+          v.push(this.form.addSchedule.replicate);
+          data.push(v)
           }).bind(this)
         );
-      }
-      // schedule insertion
-      data.forEach(
-        ((v, i) => {
-          let tmp_data = {};
-          axios
-            .post("api/v1/schedules/create", this.unsetNull(v), options)
-            .then(res => {
-              console.log(res);
-              this.excel.import.loop_index += 1;
-              this.excel.import.progress = (
-                (this.excel.import.loop_index / this.excel.import.arr_length) *
-                100
-              ).toFixed(2);
-              tmp_data.email = res.data.parameters.email;
-              tmp_data.status_code = res.status;
-              tmp_data.title = res.data.title;
-              tmp_arr.push(tmp_data);
-              this.excel.import.report.data.all.list = tmp_arr;
-            })
-            .catch(err => {
-              this.excel.import.loop_index += 1;
-              this.excel.import.progress = (
-                (this.excel.import.loop_index / this.excel.import.arr_length) *
-                100
-              ).toFixed(2);
-              tmp_data.email = err.response.data.parameters.email;
-              tmp_data.status_code = err.response.data.code;
-              tmp_data.title = err.response.data.title;
-              tmp_arr.push(tmp_data);
-              this.excel.import.report.data.all.list = tmp_arr;
-            });
-        }).bind(this)
-      );
-      this.excel.import.report.data.all.list = tmp_arr;
+
+        // console.log(this.scheduleChunk(data, 30));
+        
+        let arr_data = this.scheduleChunk(data, 10);
+
+        arr_data.forEach(((v,i)=>{
+          let delay = i * 15000;
+          setTimeout(function(){
+            this.importArray(v);
+          }.bind(this),delay);
+        }).bind(this));
+      })
+
+      this.importScheduleReset = false;
+      this.$nextTick(() => {
+        this.importScheduleReset = true;
+      });
     },
+    
     processAddScheduleData() {
       let form = this.form.addSchedule.model;
       let data = [];
@@ -1616,25 +1392,36 @@ export default {
           ).diff(moment().startOf("day"), "seconds");
           // alert(v1+" "+start+" "+duration)
           // alert(start + ' ' + duration)
-          data.push({
-            user_id: v,
-            tl_id: form.teamLeader,
-            om_id: form.operationsManager,
-            title_id: 1,
-            start_event: start,
-            end_event: moment(moment(start).add(duration, "s")).format(
+          let row = [
+            null,v, form.operationsManager,
+            form.teamLeader,null, start,moment(moment(start).add(duration, "s")).format(
               "YYYY-MM-DD HH:mm:ss"
-            ),
-            replicate: this.form.addSchedule.replicate
-          });
+            ),this.form.addSchedule.replicate];
+          data.push(
+            row
+          );
         });
       });
-      return data;
+
+      // initialize
+      this.excel.import.dialog = true;
+      this.excel.import.importing = true;
+      this.excel.import.arr_length = data.length;
+      this.excel.import.progress = (this.excel.import.report.data.all.list.length / this.excel.import.arr_length) * 100;
+
+      let arr_data = this.scheduleChunk(data,10);
+      
+      arr_data.forEach(((v,i)=>{
+        let delay = i * 15000;
+        setTimeout(function(){
+          this.importArray(v);
+        }.bind(this),delay);
+      }).bind(this));
     },
     submitAddSchedule() {
       if (this.validateAddSchedule()) {
         this.form.addSchedule.inapp=true;
-        this.loopCreateSchedule(this.processAddScheduleData());
+        this.processAddScheduleData();
       } else {
         this.$message({
           type: "warning",

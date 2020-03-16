@@ -52,6 +52,7 @@
     "dropzone": "5.5.1",
     "echarts": "4.2.1",
     "element-ui": "^2.11.1",
+    "excel-date-to-js": "^1.0.2",
     "fecha": "^3.0.3",
     "file-saver": "2.0.1",
     "fuse.js": "3.4.4",
