@@ -577,12 +577,17 @@
                   <template scope="scope">{{scope.row.email}}</template>
                 </el-table-column>
                 <el-table-column label="Schedule" width="400">
-                <template scope="scope">{{ scope.row.start_event +" To "+ scope.row.end_event}}</template>
+                <template scope="scope">{{ scope.row.start_event +(scope.row.end_event?" To "+ scope.row.end_event:"")}}</template>
                 </el-table-column>
                 <el-table-column label="Status" width="500">
                   <template scope="scope">
                     <template v-if="scope.row.import_result.code==200">
-                      <el-tag size="mini" type="success">{{ scope.row.import_result.action == "create"? "Created": "Updated"}}</el-tag>
+                      <template v-if="scope.row.import_result.action!='delete'">
+                        <el-tag size="mini" type="success">{{ scope.row.import_result.action == "create"? "Created": "Updated"}}</el-tag>
+                      </template>
+                      <template v-else>
+                        <el-tag size="mini" type="warning">Cleared</el-tag>
+                      </template>
                     </template>
                     <template v-else>
                       <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
