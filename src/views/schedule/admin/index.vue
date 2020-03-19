@@ -1339,11 +1339,31 @@ export default {
         })
         .catch(err => console.log(err));
     },
+    templateToInputRows(rows){
+    let result=[];
+      rows.forEach(((row,index)=>{
+        if(index != 0){
+          for(let l=0; l<7;l++){
+            result.push([
+              null,
+              row[1],
+              row[2],
+              row[3],
+              row[(l*3)+4], // schedule
+              row[(l*3)+5], // timein
+              row[(l*3)+6], // timeout
+            ])
+          }
+        }
+        
+      }).bind(this));
+    return result;
+    },
     importScheduleFileChangeV2(e) {
-      
       this.excel.import.dialog = true;
       readXlsxFile(e.target.files[0]).then((rows) => {
-        let body= rows.slice(1,rows.length).filter(i=> moment(i[5]).isValid()==true),data=[];
+        let d_rows = this.templateToInputRows(rows);
+        let body= d_rows.filter(i=> moment(i[5]).isValid()==true),data=[];
         
         this.excel.import.importing = true;
         this.excel.import.arr_length = body.length;
@@ -1363,7 +1383,6 @@ export default {
           }).bind(this)
         );
 
-        // console.log(this.scheduleChunk(data, 30));
         
         let arr_data = this.scheduleChunk(data, 10);
 
