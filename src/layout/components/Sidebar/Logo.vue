@@ -65,11 +65,11 @@ export default {
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color:white;
+      color:crimson;
       font-weight: 900;
       line-height: 50px;
       font-size: 14px;
-      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+      font-family: Montserrat, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }
   }

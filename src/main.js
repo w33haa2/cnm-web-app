@@ -21,7 +21,11 @@ import "./utils/error-log"; // error log
 import VueSweetalert2 from "vue-sweetalert2"; // sweetalert
 import axios from "axios";
 import VueTimers from "vue-timers";
-
+import Donut from 'vue-css-donut-chart';
+import 'vue-css-donut-chart/dist/vcdonut.css';
+ 
+Vue.use(Donut);
+ 
 import * as filters from "./filters"; // global filters
 
 import locale from "element-ui/lib/locale/lang/en"; // internationalization for element-ui
@@ -44,6 +48,9 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
+    adjustColorTone(color,amount){
+        return '#' + color.replace(/^#/, '').replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+    },
     split(string, del) {
       return string.split(del);
     },
