@@ -49,7 +49,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div style="position:relative">
+                            <div style="position:relative;">
                                 <div style="position:absolute;bottom:0px;right:0px;text-align:right;">
                                 </div>
                             </div>

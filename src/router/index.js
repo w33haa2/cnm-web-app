@@ -187,7 +187,7 @@ export const asyncRoutes = [
                name: "Schedules",
                meta: {
                  title: "Schedules",
-                 icon: "calendar"
+                 icon: "dashboard"
                }
              }
            ]
@@ -228,6 +228,7 @@ export const asyncRoutes = [
            children: [
              {
                path: "/work_force",
+              //  component: () => import("@/views/work_force_v1"), under development
                component: () => import("@/views/work_force"),
                name: "Work Force",
                meta: {

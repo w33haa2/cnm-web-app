@@ -7,7 +7,7 @@
         :append-to-body="false"
         :show-close="false"
         :withHeader="false"
-        :size="200"
+        :size="230"
         custom-class="time-logger-drawer">
             <time-logger></time-logger>
             <!-- work history -->
@@ -17,7 +17,7 @@
             <!-- contents -->
             <previous-work :toggle="toggle.previous_work"></previous-work>
         </el-drawer>
-        <div class="drawer-button-wrapper" :class="drawer?'active':''">
+        <div class="drawer-button-wrapper" :class="drawer?'active':''" :style="drawer?'display:none':''">
             <div class="drawer-button" @click="drawer=!drawer">
                 <i class="el-icon-timer drawer-button-icon" />
             </div>
@@ -47,6 +47,7 @@ export default {
     position:fixed;
     right:0px;
     bottom:15px;
+    z-index:9999;
 }
 
 .drawer-button{
@@ -73,5 +74,6 @@ export default {
 
 .time-logger-drawer{
     background-color:white;
+    width:300px !important;
 }
 </style>
