@@ -1162,6 +1162,15 @@ export default {
         case 'team leader':
             this.query.tl_id = this.user_id;
           break;
+          default:
+            if(v.tl_id){
+              this.query.tl_id = v.tl_id;
+              this.query.om_id = null;
+            }else if(v.om_id){
+              this.query.tl_id = null;
+              this.query.om_id = v.om_id;
+            }
+            break;
       }
       const data = this.query;
       this.fetchAgentsWorkReports({data});
