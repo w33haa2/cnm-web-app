@@ -36,6 +36,14 @@ export default {
             drawer:true,
             toggle:{
                 previous_work:true,
+            },
+            refresh:false
+        }
+    },
+    watch:{
+        drawer(v){
+            if(v){
+                this.refresh = !this.refresh;
             }
         }
     }

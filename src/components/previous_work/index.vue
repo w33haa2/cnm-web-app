@@ -1,6 +1,6 @@
 <template>
     <div style="width:300px;">
-        <template>
+        <template v-if="fetch_state=='success' && schedules.length>0">
             <template v-for="(item,index) in schedules"> 
                 <div :key="index" class="hover-eee" style="border-bottom:#eee 1px solid">
                     <div style="display:flex;color:gray;border-left:solid 4px #F56C6C;" class="pl-10">
@@ -35,6 +35,11 @@
                 </div>
             </template>
         </template>
+        <template v-else>
+            <div style="width:100%;padding-top:20px;text-align:center;font-style:italic;color:gray">
+                {{fetch_state == "initial"? "Loading...":"No results found."}}
+            </div>
+        </template>
     </div>
 </template>
 
@@ -52,6 +57,7 @@ export default {
     data(){
         return {
             schedules:null,
+            fetch_state:"initial"
         }
     },
     watch:{
@@ -61,13 +67,19 @@ export default {
     },
     methods:{
         fetchPreviousSchedules(){
-            this.axiosRequest('get',"api/v1/schedules/previous?user_id="+393,{})
+            this.fetch_state = "initial";
+            this.axiosRequest('get',"api/v1/schedules/previous?user_id="+this.user_id,{})
             .then(res=>{
                 if(res.code == 200){
+                    this.fetch_state = "success";
                     this.schedules = res.meta;
                 }else{
+                    this.fetch_state = "fail";
                     this.schedules = null;
                 }
+            })
+            .catch(err=>{
+                this.fetch_state ="fail";
             });
         }
     }

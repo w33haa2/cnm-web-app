@@ -883,8 +883,7 @@ export default {
         this.query["target[]"]=null;
         this.query.query=null;
       }
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
       if (success) {
@@ -1146,8 +1145,7 @@ export default {
       this.query.sort = order ? prop : null;
       this.query.order =
         order != null ? (order == "ascending" ? "asc" : "desc") : null;
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     filterTable(v) {
       // console.log(v);
@@ -1161,7 +1159,6 @@ export default {
       }else if(v.tl_id){
         this.query.tl_id = v.tl_id;
       }
-      const data = this.query;
       this.fetchAgentsWorkReports({data});
     },
     excelCluster(v) {
@@ -1179,40 +1176,6 @@ export default {
       ) {
         params.om_id = this.excel.export_sva.field.clusters;
       }
-      // let url = "api/v1/excel/export_sva" + this.toUrlParams(params),
-      //   options = {
-      //     headers: {
-      //       Authorization: "Bearer " + this.token
-      //     }
-      //   };
-      // axios.get(url, options).then(res => {
-      //   // var a = document.createElement("a");
-      //   // document.body.appendChild(a);
-      //   // a.style = "display: none";
-      //   // // console.log(res);
-      //   // var // json = JSON.stringify(res.data),
-      //   //   blob = new Blob([res.data], {
-      //   //     type:
-      //   //       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      //   //   }),
-      //   //   url = window.URL.createObjectURL(blob);
-      //   // a.href = url;
-      //   // a.download =
-      //   //   "SVA " +
-      //   //   moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-      //   //   " to " +
-      //   //   moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
-      //   //   ".xlsx";
-      //   // a.click();
-      //   // window.URL.revokeObjectURL(url);
-      //   // this.excel.export_sva.confirm = false;
-      //   if(res.code == 200){
-      //     this.$message({
-      //       type:"success",
-      //       message: res.title
-      //     });
-      //   }
-      // });
       this.exportSvaReport(params);
     },
     createMultisheetExcel(data) {
@@ -1484,45 +1447,6 @@ export default {
       }
       return result;
     },
-    // for add schedule form options
-    // getFormOptions(query) {
-    //   const url = 'api/v1/users/remote?list=heads&'
-    //   const options = {
-    //     headers: {
-    //       Authorization: 'Bearer ' + this.token
-    //     }
-    //   }
-    //   axios
-    //     .get(url, options)
-    //     .then(res => {
-    //       let result = res.data.meta.users
-    //       if (query.query == 'team leader') {
-    //         result = result.filter(
-    //           i => i.parent_id == this.form.addSchedule.model.operationsManager
-    //         )
-
-    //         this.form.addSchedule.options[query.var] = result.length>0 ? result: [{value:null,label:"No Data"}];
-
-    //         if (this.form.addSchedule.options[query.var].length < 1) {
-    //           this.form.addSchedule.options[query.var] = []
-    //         } else {
-    //           this.form.addSchedule.model[
-    //             query.var
-    //           ] = this.form.addSchedule.options[query.var][0].id
-    //         }
-    //       } else {
-    //         this.form.addSchedule.options[query.var] = result
-    //         this.form.addSchedule.model[
-    //           query.var
-    //         ] = this.form.addSchedule.options[query.var][0].id
-    //       }
-    //     })
-    //     .catch(err => {
-    //       console.log(err.response.data)
-    //       this.form.addSchedule.options[query.var] = []
-    //     })
-    // },
-    // for filter options
     getUsersByPosition(query) {
       const position = {
         "operations manager": "om",
@@ -1604,90 +1528,16 @@ export default {
         date1: moment(d).format("MMM Do")
       }));   
 
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
-    },
-    filterTl(v) {
-      // this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
-      // this.query.om_id = null;s
-      // this.query.tl_id = v;
-      console.log(v);
-    },
-    filterOm(v) {
-      if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
-      ) {
-        if (v == "all") {
-          this.disable_select.teamLeader = true;
-          this.select.teamLeader = "all";
-        } else {
-          this.disable_select.teamLeader = false;
-          this.getUsersByPosition({
-            query: "team leader",
-            var: "teamLeader",
-            start: this.week.start,
-            end: this.week.end
-          });
-        }
-      }
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
-    },
-    generateHeader(start, end) {
-      const range = moment.range(start, end);
-      const dates = Array.from(range.by("day")).map(m =>
-        m.format("YYYY-MM-DD")
-      );
-
-      this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
-      }));
-      // if (this.searchQuery != "") {
-      //   data["target[]"] = "full_name";
-      //   data.query = this.searchQuery;
-      // }
-
-      // if (
-      //   this.position != "Operations Manager" &&
-      //   this.position != "Team Leader"
-      // ) {
-      //   data.om_id = this.filter_table.om_id;
-      //   data.tl_id = this.filter_table.tl_id;
-      // } else {
-      //   if (this.position == "Team Leader") {
-      //     data.tl_id = this.user_id;
-      //     data.om_id = null;
-      //   } else if (this.position == "Operations Manager") {
-      //     data.om_id = this.user_id;
-      //     data.tl_id = null;
-      //   }
-      // }
-      // data.sort = this.query.sort;
-      // data.order = this.query.order;
-      // data = this.unsetNull(data);
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     tableSizeChange(value) {
       this.query.limit = value;
       this.query.offset = 0;
-      // const data = {
-      //   limit: this.query.limit,
-      //   offset: this.query.offset,
-      //   start: this.week.start,
-      //   end: this.week.end
-      // };
-      // this.fetchAgentsWorkReports({ data });
-      // this.weekChange(this.week.start);
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
@@ -1698,6 +1548,20 @@ export default {
       } else {
         return schedule;
       }
+    },
+    refetchSchedules(){
+      data == this.query;
+      switch(this.position.toLowerCase()){
+        case "operations manager": 
+          data.om_id = this.user_id;
+        break;
+        case "team leader": 
+          data.tl_id = this.user_id;
+        break;
+        default: 
+        break;
+      }
+        this.fetchAgentsWorkReports({data});
     },
     dateToday(date) {
       if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {

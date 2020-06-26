@@ -66,6 +66,7 @@ import moment from "moment";
 import {mapActions, mapGetters}  from "vuex";
 export default {
     name: "ScheduleBoard",
+    props:["refresh"],
     computed: {
         ...mapGetters([
         "user_id",
@@ -163,6 +164,9 @@ export default {
                 this.evaluateSchedule();
             }
         },
+        refresh(v){
+            this.fetchTodaysSchedule({userid:this.user_id});
+        }
     },
     data(){
         return {
@@ -185,7 +189,7 @@ export default {
         }
     },
     mounted() {
-        this.fetchTodaysSchedule({userid:393});
+        this.fetchTodaysSchedule({userid:this.user_id});
     },
     methods:{
         ...mapActions([
