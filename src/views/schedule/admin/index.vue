@@ -1148,17 +1148,22 @@ export default {
       this.refetchSchedules();
     },
     filterTable(v) {
-      // console.log(v);
       this.query.offset=0;
-      // this.filter_table.om_id = v.om_id;
-      // this.filter_table.tl_id = v.tl_id;
       this.query.tl_id = null;
       this.query.om_id = null;
-      if(v.om_id){
-        this.query.om_id = v.om_id;
-      }else if(v.tl_id){
-        this.query.tl_id = v.tl_id;
+      switch(this.position.toLowerCase()){
+        case 'operations manager':
+            this.query.om_id = v.om_id;
+            if(v.tl_id){
+              this.query.tl_id = v.tl_id;
+              this.query.om_id = null;
+            }
+          break;
+        case 'team leader':
+            this.query.tl_id = this.user_id;
+          break;
       }
+      const data = this.query;
       this.fetchAgentsWorkReports({data});
     },
     excelCluster(v) {
@@ -1550,18 +1555,20 @@ export default {
       }
     },
     refetchSchedules(){
-      data == this.query;
+      let data = this.query;
       switch(this.position.toLowerCase()){
         case "operations manager": 
-          data.om_id = this.user_id;
+          if(!this.query.tl_id){
+            this.query.om_id = this.user_id;
+          }
         break;
         case "team leader": 
-          data.tl_id = this.user_id;
+          this.query.tl_id = this.user_id;
         break;
         default: 
         break;
       }
-        this.fetchAgentsWorkReports({data});
+      this.fetchAgentsWorkReports({data});
     },
     dateToday(date) {
       if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
