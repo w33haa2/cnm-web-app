@@ -646,8 +646,13 @@ import tz from "moment-timezone";
 export default {
   components: { cellContent, remoteSearch, remoteFilterHead, tlFilter },
   computed: {
-    table_page(){
+    table_page: {
+      get() {
       return this.query.offset/this.query.limit + 1;
+    },
+      set(newValue) {
+        return newValue
+      }
     },
     ...mapGetters([
       "agentsWorkReports",
