@@ -1069,9 +1069,9 @@ export default {
       this.refetchSchedules();
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
-      if(initial){
+      if (initial) {
         this.isFetchingWorkReports = true;
-      }else if (success) {
+      } else if (success) {
         this.tableData = this.agentsWorkReports.agent_schedules;
         let tmp = [].concat(
           this.agentsWorkReports.agent_schedules.map(i => i.schedule)
@@ -1080,7 +1080,7 @@ export default {
         tmp = tmp.filter(i => i.overtime_id == null);
         this.sched_array = tmp;
         this.isFetchingWorkReports = false;
-      }else if (fail) {
+      } else if (fail) {
         this.tableData = [];
         this.isFetchingWorkReports = false;
       }
