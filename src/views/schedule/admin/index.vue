@@ -24,6 +24,7 @@
             :clearable="false"
             style="width:100%"
             @change="weekChange"
+            :disabled="isFetchingWorkReports"
           />
         </el-col>
         <el-col :md="{ span: 4 }">
@@ -172,7 +173,7 @@
         >
           <el-table
             class="monday"
-            v-loading="agentsWorkReportsfetchState.initial"
+            v-loading="isFetchingWorkReports"
             :data="tableData"
             @sort-change="columnSort"
           >
@@ -209,7 +210,7 @@
               prop="full_name"
               fixed
             >
-              <template slot="header" slot-scope="scope">
+              <template slot="header">
                 <span style="font-weight:normal;font-size:.8em">Name</span>
               </template>
               <template slot-scope="scope">
@@ -262,7 +263,7 @@
             </el-table-column>
             <template v-for="(thead, index1) in tableHeader">
               <el-table-column align="center" :key="index1">
-                <template slot="header" slot-scope="scope">
+                <template slot="header">
                   <!-- <h4
                     :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
                     style="margin-bottom:5px"
@@ -1068,7 +1069,9 @@ export default {
       this.refetchSchedules();
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
-      if (success) {
+      if(initial){
+        this.isFetchingWorkReports = true;
+      }else if (success) {
         this.tableData = this.agentsWorkReports.agent_schedules;
         let tmp = [].concat(
           this.agentsWorkReports.agent_schedules.map(i => i.schedule)
@@ -1076,12 +1079,10 @@ export default {
         tmp = [].concat(...tmp.map(i => i));
         tmp = tmp.filter(i => i.overtime_id == null);
         this.sched_array = tmp;
-
-        // console.log(this.sched_array.filter(i=> i.user_info.id==20 && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[0])
-        // console.log(this.sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length)
-      }
-      if (fail) {
+        this.isFetchingWorkReports = false;
+      }else if (fail) {
         this.tableData = [];
+        this.isFetchingWorkReports = false;
       }
     },
     // 'select.operationsManager': function(v) {
@@ -1122,7 +1123,6 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.token)
     this.axios.options.headers.Authorization = "Bearer " + this.token;
     if (
       this.position == "Admin" ||
@@ -1153,6 +1153,7 @@ export default {
   },
   data() {
     return {
+      isFetchingWorkReports: false,
       importScheduleReset: true,
       show_option: true,
       blank: [{}],
