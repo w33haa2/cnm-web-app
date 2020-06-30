@@ -1,6 +1,5 @@
 <template>
   <div>
-    <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div class="dashboard-editor-container" :style="'background-color:'+bgColor">
       <div class="clearfix">
         <pan-thumb v-if="avatar!=null" :image="avatar" style="float: left" />
@@ -23,11 +22,10 @@
 <script>
 import { mapGetters } from "vuex";
 import PanThumb from "@/components/PanThumb";
-import logger from "../../time_logger";
 
 export default {
   name: "DashboardEditor",
-  components: { PanThumb, logger },
+  components: { PanThumb },
   data() {
     return {
       emptyGif: "tmp-img.gif",
