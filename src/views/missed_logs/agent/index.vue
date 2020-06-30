@@ -1,6 +1,5 @@
 <template>
   <div>
-    <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div class="app-container">
       <h4 style="color:#646464">Missed Logs</h4>
       <div class="filter-container">
@@ -295,12 +294,10 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import logger from "../../time_logger";
 
 import axios from "axios";
 export default {
   name: "RTA-MissedLogs",
-  components: { logger },
   data() {
     return {
       axios: {

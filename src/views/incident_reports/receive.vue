@@ -1,6 +1,5 @@
 <template>
   <div>
-    <logger v-if="position =='Representative - Order Placer'"></logger>
     <div class="app-container">
       <h4 style="color:#646464">Received Reports</h4>
 
@@ -161,10 +160,8 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import logger from "../time_logger";
 
 export default {
-  components: { logger },
   data() {
     return {
       form: {

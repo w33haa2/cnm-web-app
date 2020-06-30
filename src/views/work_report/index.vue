@@ -1,7 +1,6 @@
 
 <template>
   <div>
-    <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div v-if="show_fetch_error" style="margin-top:25px;padding:20px;">
       <el-alert title="There is an error fetching your data." type="error" show-icon></el-alert>
     </div>
@@ -179,13 +178,12 @@
 
 <script>
 import agentCard from "./components/AgentCard";
-import logger from "../time_logger";
 import moment from "moment";
 import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "AgentWorkReports",
-  components: { agentCard, logger },
+  components: { agentCard },
   data() {
     return {
       tag: {
