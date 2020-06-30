@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <time-logger></time-logger>
+    <time-logger v-if="$route.path!='/login'"></time-logger>
     <router-view />
   </div>
 </template>
