@@ -504,14 +504,19 @@ $status in $status-badge {
         }
     }
     .hideSidebar {
-        .main-container {
-            margin-left: 75px !important;
-        }
-        .fixed-header {
-            left: 75px;
+        @media only screen and (min-width: 995px) {
+            .main-container {
+                margin-left: 75px;
+            }
+            .fixed-header {
+                margin-left: 75px;
+                width: calc(100% - 75px);
+            }
         }
         .sidebar-container {
-            width: 75px !important;
+            @media only screen and (min-width: 995px) {
+                width: 75px !important;
+            }
             .menu-wrapper {
                 padding-left: 15px;
                 .el-tooltip .svg-icon {
@@ -586,32 +591,7 @@ $status in $status-badge {
                     height:45px;
                     line-height:45px;
                     color:black;
-                    // &.el-submenu{
-                    //   border-top-left-radius:5px;
-                    //   border-bottom-left-radius:5px;
-                    //   border-top-right-radius:0px;
-                    //   border-bottom-right-radius:0px;
-                    //   .el-submenu__title{
-                    //     background-color:transparent !important;
-                    //     height:45px;
-                    //     line-height:45px;
-                    //     &:hover{
-                    //       background-color:#cacaca !important;
-                    //     }
-                    //   }
-                    // }
                 }
-                // .el-menu-item{
-                //     a li:hover, .el-submenu__title:hover{
-                //       -webkit-box-shadow: inset 1px 1px 34px -25px rgb(5, 4, 4);
-                //       -moz-box-shadow: inset 1px 1px 34px -25px rgba(92,92,92,1);
-                //       box-shadow: inset 1px 1px 34px -25px rgba(92,92,92,1);
-                //     }
-                //   }
-                // }
-                // .el-submenu{
-                //    
-                // }
             }
         }
     }
