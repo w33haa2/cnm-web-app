@@ -75,11 +75,11 @@
       v-loading="fetchHierarchyLogsState.initial"
       @sort-change="customSort"
     >
-      <el-table-column align="center" label="ID" sortable="custom" prop="id">
+      <!-- <el-table-column align="center" label="ID" sortable="custom" prop="id">
         <template slot-scope="scope">{{ scope.row.id }}</template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
-        align="center"
+        align="left"
         label="Head"
         sortable="custom"
         prop="parent_details.full_name"
@@ -87,17 +87,17 @@
         <template slot-scope="scope">{{ scope.row.parent_details.full_name }}</template>
       </el-table-column>
       <el-table-column
-        align="center"
+        align="left"
         label="Subordinate"
         sortable="custom"
         prop="child_details.full_name"
       >
         <template slot-scope="scope">{{ scope.row.child_details.full_name }}</template>
       </el-table-column>
-      <el-table-column align="center" label="Start date" sortable="custom" prop="start_date">
+      <el-table-column align="center" label="Start date" sortable="custom" prop="start_date" width="120">
         <template slot-scope="scope">{{ formatDate(scope.row.start_date,"","MMM Do YYYY") }}</template>
       </el-table-column>
-      <el-table-column align="center" label="End date" sortable="custom" prop="end_date">
+      <el-table-column align="center" label="End date" sortable="custom" prop="end_date" width="120">
         <template slot-scope="scope">
           <template v-if="scope.row.end_date">{{ formatDate(scope.row.end_date,"","MMM Do YYYY") }}</template>
           <template v-else>
@@ -105,7 +105,7 @@
           </template>
         </template>
       </el-table-column>
-      <el-table-column align="right" label="Delete" width="100">
+      <el-table-column label="Delete" width="120" align="center">
         <template slot-scope="scope">
           <el-button type="danger" plain size="mini" @click="deleteRow(scope.row)">
             <i class="el-icon-delete" />
