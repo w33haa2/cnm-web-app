@@ -156,7 +156,6 @@ export const asyncRoutes = [
            component: Layout,
            redirect: "/leave_credits",
            //  alwaysShow: true, // will always show the root menu
-           name: "Leave Credits",
            meta: {
              title: "Leave Credits",
              icon: "leave-credits",
@@ -166,6 +165,7 @@ export const asyncRoutes = [
              {
                path: "/leave_credits",
                component: () => import("@/views/leave_credits/index"),
+               name: "Leave Credits",
                meta: {
                  title: "Leave Credits",
                  noCache: false
@@ -176,7 +176,6 @@ export const asyncRoutes = [
          {
            path: "/schedules",
            component: Layout,
-           name: "Schedules",
            meta: {
              roles: ["Representative - Order Placer"]
            },
@@ -195,7 +194,6 @@ export const asyncRoutes = [
          {
            path: "/leaves",
            component: Layout,
-           name: "Leaves",
            meta: {
              roles: ["Representative - Order Placer"]
            },
@@ -214,7 +212,6 @@ export const asyncRoutes = [
          {
            path: "/work_force",
            component: Layout,
-           name: "Work Force",
            meta: {
              roles: [
                "RTA Manager",
@@ -242,7 +239,6 @@ export const asyncRoutes = [
          {
            path: "/cluster_log",
            component: Layout,
-           name: "Cluster Log",
            meta: {
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
@@ -262,7 +258,6 @@ export const asyncRoutes = [
          {
            path: "/work_report",
            component: Layout,
-           name: "Work Report",
            meta: {
              roles: ["Representative - Order Placer"]
            },
@@ -281,7 +276,6 @@ export const asyncRoutes = [
          {
            path: "/incident_reports",
            component: Layout,
-           name: "Incident Reports",
            meta: {
              roles: [
                "Representative - Order Placer",
@@ -313,7 +307,6 @@ export const asyncRoutes = [
            component: Layout,
            redirect: "/incident_reports/recieved",
            //  alwaysShow: true, // will always show the root menu
-           name: "Incident Reports",
            meta: {
              title: "Incident Reports",
              icon: "documentation",
@@ -350,7 +343,6 @@ export const asyncRoutes = [
          {
            path: "/agent_schedules",
            component: Layout,
-           name: "Agent Schedules",
            meta: {
              roles: [
                "Operations Manager",
@@ -378,7 +370,6 @@ export const asyncRoutes = [
          {
            path: "/agent_leaves",
            component: Layout,
-           name: "Agent Leave",
            meta: {
              roles: [
                "Operations Manager",
@@ -406,7 +397,6 @@ export const asyncRoutes = [
          {
            path: "/agent_leave_slots",
            component: Layout,
-           name: "Agent Leave Slots",
            meta: {
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
@@ -428,7 +418,6 @@ export const asyncRoutes = [
          {
            path: "/agent_vto",
            component: Layout,
-           name: "Agent VTO",
            meta: {
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
            },
@@ -448,7 +437,6 @@ export const asyncRoutes = [
          {
            path: "/missed_logs",
            component: Layout,
-           name: "Missed Logs",
            meta: {
              roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst","Operations Manager","Team Leader","Representative - Order Placer"]
            },
@@ -468,7 +456,6 @@ export const asyncRoutes = [
         //  {
         //    path: "/missed_logs",
         //    component: Layout,
-        //    name: "Agent Missed Logs",
         //    meta: {
         //      roles: ["Operations Manager", "Team Leader"]
         //    },
