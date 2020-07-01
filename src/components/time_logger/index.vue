@@ -96,7 +96,7 @@ export default {
     watch:{
         agentTimeOutState({ initial, success, fail }) {
             if (success) {
-                this.fetchTodaysSchedule({userid:393});
+                this.fetchTodaysSchedule({userid:this.user_id});
                 this.$message({
                     type: "success",
                     message: this.agentTimeOutTitle,
@@ -104,7 +104,7 @@ export default {
                 });
             }
             if (fail) {
-                this.fetchTodaysSchedule(this.today.query);
+                this.fetchTodaysSchedule({userid:this.user_id});
                 this.$message({
                     type: "error",
                     message: this.agentTimeOutTitle,
@@ -122,7 +122,7 @@ export default {
                     message: this.agentTimeInTitle,
                     duration: 5000
                 });
-                this.fetchTodaysSchedule({userid:393});
+                this.fetchTodaysSchedule({userid:this.user_id});
             }
             if (fail) {
                 this.button.start = false;
@@ -134,7 +134,7 @@ export default {
                 if (
                     this.agentTimeInTitle.toLowerCase() == "schedule no longer available."
                 ) {
-                    this.fetchTodaysSchedule(this.today.query);
+                    this.fetchTodaysSchedule({userid:this.user_id});
                 }
             }
         },
