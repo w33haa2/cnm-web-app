@@ -10,7 +10,7 @@
       :remote-method="remote===true?remoteMethod:null"
       :loading="loading"
       style="width:100%"
-      :disabled="disabled"
+      :disabled="isDisabled"
     >
       <template v-for="(option,index) in options">
         <el-option :key="index" :value="option.id" :label="option.full_name" />
@@ -37,6 +37,7 @@ export default {
       select: null,
       options: [],
       loading: false,
+      isDisabled: false
     };
   },
   watch: {
@@ -44,7 +45,7 @@ export default {
       if (this.params.om || this.params.tl) {
         this.select = null;
         this.options = [];
-        this.disabled = true;
+        this.isDisabled = true;
         let url = "api/v1/users" + this.toUrlParams(this.params),
           options = {
             headers: {
@@ -55,11 +56,11 @@ export default {
         this.axiosRequest("get", url, options).then(res => {
           this.loading = false;
           if (res.code == 200) {
-            this.disabled = false;
+            this.isDisabled = false;
             this.options = res.meta.metadata;
             this.select = res.meta.metadata[0].id;
           } else {
-            this.disabled = true;
+            this.isDisabled = true;
             this.options = [];
           }
         });
@@ -73,6 +74,9 @@ export default {
     },
     select(v) {
       this.$emit("selected", v);
+    },
+    disabled(newData){
+      this.isDisabled = newData;
     }
   },
   computed: {

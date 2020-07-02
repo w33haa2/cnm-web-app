@@ -100,7 +100,7 @@
                   </div>
                   <div style="display:flex;align-items:center;justify-content:center">
                     <div
-                      style="background-color:white;border-radius:50%;width:31px;height:31px;display:flex"
+                      style="background-color:white;border-radius:50%;width:31px;height:31px;display:flex;justify-content:center"
                       :style="
                         'background-color:' +
                           (headerToday(datum.date) ? 'white' : '#1d1e3d')

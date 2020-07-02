@@ -37,6 +37,7 @@
               <input
                 type="file"
                 ref="importEmployeeInput"
+                v-if="importEmployeeReset"
                 accept=".xlsx"
                 style="display:none"
                 @change="importEmployeeFileChange"
@@ -215,7 +216,7 @@
       :close-on-press-escape="false"
       :show-close="false"
       title="Importing Employee..."
-      width="50%"
+      width="70%"
       top="5vh"
     >
       <el-alert
@@ -226,11 +227,16 @@
       ></el-alert>
 
       <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-        Progress
-        <span>( {{ excel.import.loop_index }}</span>/
-        <span>{{ excel.import.arr_length }} )</span>
+        <template v-if="excel.import.arr_length==0">
+          Initializing data, Please wait...
+        </template>
+        <template v-else>
+          Progress
+          <span>( {{ excel.import.report.data.all.list.length }}</span>/
+          <span>{{ excel.import.arr_length }} )</span>
+        </template>
       </div>
-      <el-progress :percentage="excel.import.progress" :text-inside="true" :stroke-width="18"></el-progress>
+      <el-progress :percentage="excel.import.arr_length!=0?excel.import.report.data.all.list.length / excel.import.arr_length * 100: 0" :text-inside="true" :stroke-width="18"></el-progress>
       <div style="padding-bottom:15px;  ">
         <el-tabs
           v-model="excel.import.report.active_tab"
@@ -240,44 +246,41 @@
           <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
             <el-table :data="excel.import.report.data.all.list" height="350px">
               <el-table-column label="CID" width="100">
-                <template scope="scope">{{scope.row.company_id}}</template>
+                <template scope="scope">{{scope.row["0"]}}</template>
               </el-table-column>
-              <el-table-column label="Full Name" width="350">
-                <template scope="scope">{{scope.row.full_name}}</template>
+              <el-table-column label="Email" width="350">
+                <template scope="scope">{{scope.row["9"]}}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
-                  <template v-if="scope.row.status_code==200">
-                    <el-tag size="mini" type="success">UPLOADED</el-tag>
+                  <template v-if="scope.row.import_result.code==200">
+                    <el-tag size="mini" type="success">{{ scope.row.import_result.action == "create"? "Created":"Updated"}}</el-tag>
                   </template>
                   <template v-else>
-                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                    <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
                   </template>
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code!=200).length "
+            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.import_result.code!=200).length "
             name="errors"
           >
             <el-table
-              :data="excel.import.report.data.all.list.filter(i=> i.status_code!=200)"
+              :data="excel.import.report.data.all.list.filter(i=> i.import_result.code!=200)"
               height="350px"
             >
               <el-table-column label="CID" width="100">
-                <template scope="scope">{{scope.row.company_id}}</template>
+                <template scope="scope">{{scope.row["0"]}}</template>
               </el-table-column>
-              <el-table-column label="Full Name" width="350">
-                <template scope="scope">{{scope.row.full_name}}</template>
+              <el-table-column label="Email" width="350">
+                <template scope="scope">{{scope.row["9"]}}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
-                  <template v-if="scope.row.status_code==200">
-                    <el-tag size="mini" type="success">UPLOADED</el-tag>
-                  </template>
-                  <template v-else>
-                    <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                  <template>
+                    <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
                   </template>
                 </template>
               </el-table-column>
@@ -299,6 +302,7 @@ import { Message } from "element-ui";
 import excel from "xlsx";
 import axios from "axios";
 import moment from "moment";
+import readXlsxFile from "read-excel-file";
 export default {
   name: "DashboardHR",
   components: {
@@ -308,13 +312,14 @@ export default {
   },
   data() {
     return {
+      importEmployeeReset:true,
       excel: {
         import: {
           status: null,
           progress: 0,
           dialog: false,
           loop_index: 0,
-          arr_length: 100,
+          arr_length: 0,
           data: [],
           importing: false,
           report: {
@@ -447,8 +452,12 @@ export default {
         this.change_status.remote_loader = false;
       }
     },
-    "excel.import.loop_index": function(v) {
-      if (v == this.excel.import.arr_length) {
+    "excel.import.report.data.all.list": function(v) {
+      if (v.length == this.excel.import.arr_length) {
+        this.importEmployeeReset = false;
+        this.$nextTick(() => {
+          this.importEmployeeReset = true;
+        });
         this.excel.import.importing = false;
         this.query.offset = 0;
         let data = this.query;
@@ -627,7 +636,6 @@ export default {
     excelAddUser(arr) {
       let count = arr.length;
       this.excel.import.arr_length = arr.length;
-      this.excel.import.dialog = true;
       this.excel.import.importing = true;
       let tmp_arr = [],
         loop_count = 0;
@@ -679,19 +687,50 @@ export default {
       }
     },
     importEmployeeFileChange(e) {
-      let file = e.target.files[0],
-        formData = new FormData(),
-        options = {
-          headers: {
-            Authorizaion: "Bearer " + this.token
-          }
-        };
-      formData.append("file", e.target.files[0]);
+      this.excel.import.dialog = true;
+      
+      readXlsxFile(e.target.files[0]).then((rows) => {
+        let header=rows[0], body= rows.slice(1,rows.length);
+
+        var i,j,tmparray=[], chunk = 30;
+
+        var array_report=[];
+
+
+        this.excel.import.importing = true;
+        this.excel.import.arr_length = body.length;
+        // this.excel.import.loop_index = this.excel.import.report.data.all.list.length;
+        this.excel.import.progress =
+          (this.excel.import.report.data.all.list.length / this.excel.import.arr_length) *
+          100;
+
+
+        for(i=0,j=body.length; i<j; i+=chunk){
+          tmparray.push(body.slice(i,i+chunk));
+        }
+
+        let tmp = tmparray.map(i=>i.unshift(header))
+
+        for(let x=0;x<=tmparray.length-1;x++){
+          let delay = x*5000;
+          setTimeout(function(){
+            this.excelAddRow(tmparray[x]);
+          }.bind(this), delay);
+        }
+      })
+    },
+    excelAddRow(row){
+      let tmp = this.excel.import.report.data.all.list;
       axios
-        .post("api/v1/users/excel_to_array", formData, options)
+        .post("api/v1/users/import_user_v2", row, {
+          headers:{
+            Authorization: "Bearer " + this.token
+          }
+        })
         .then(res => {
-          // console.log(res.data.meta.user);
-          this.excelAddUser(res.data.meta.user);
+          console.log(res);
+          tmp.push(...res.data.meta.report);
+          this.excel.import.report.data.all.list = tmp;
         })
         .catch(err => console.log(err));
     },

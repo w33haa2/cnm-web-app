@@ -1,6 +1,5 @@
 <template>
   <div>
-    <logger v-if="position == 'Representative - Order Placer'"></logger>
     <div class="app-container">
       <h4 style="color:#646464">Agent Leave</h4>
       <el-row :gutter="10">
@@ -126,7 +125,6 @@
 </template>
 
 <script>
-import logger from "../../time_logger";
 import { mapActions, mapGetters } from "vuex";
 import Moment from "moment/moment";
 // import tz from "moment-timezone";
@@ -140,7 +138,7 @@ import countTo from "vue-count-to";
 
 // import { mkdir } from "fs";
 export default {
-  components: { leaveTable, slotsCalendar, logger, countTo },
+  components: { leaveTable, slotsCalendar, countTo },
   data() {
     return {
       month: [],

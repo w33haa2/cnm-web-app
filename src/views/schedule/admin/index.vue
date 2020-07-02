@@ -3,30 +3,35 @@
     <div class="app-container">
       <h4 style="color:#646464">
         Agent Schedule
-        <small
-          style="font-weight:lighter"
-        >{{ "("+ formatDate(query.start,"YYYY-MM-DD","MMM Do")+ " - "+ formatDate(query.end,"YYYY-MM-DD","MMM Do") + ")" }}</small>
+        <small style="font-weight:lighter">{{
+          "(" +
+            formatDate(query.start, "YYYY-MM-DD", "MMM Do") +
+            " - " +
+            formatDate(query.end, "YYYY-MM-DD", "MMM Do") +
+            ")"
+        }}</small>
       </h4>
 
       <el-row :gutter="5" style="margin-top:10px;">
-        <el-col :md="{span:4}">
+        <el-col :md="{ span: 4 }">
           <el-date-picker
             size="mini"
             v-model="week.start"
             type="week"
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
-            :picker-options="{firstDayOfWeek:2}"
+            :picker-options="{ firstDayOfWeek: 2 }"
             :clearable="false"
             style="width:100%"
             @change="weekChange"
+            :disabled="isFetchingWorkReports"
           />
         </el-col>
-        <el-col :md="{span:4}">
+        <el-col :md="{ span: 4 }">
           <el-input v-model="searchQuery" size="mini" placeholder="Search..." />
         </el-col>
 
-        <el-col :md="{span:16}" style="margin-top:10px;">
+        <el-col :md="{ span: 16 }" style="margin-top:10px;">
           <el-pagination
             style="float:right"
             :page-sizes="[10, 25, 50]"
@@ -41,52 +46,88 @@
           />
         </el-col>
 
-        <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}">
-          <el-switch v-model="show_option" active-text="Show more options"></el-switch>
+        <el-col :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }">
+          <el-switch
+            v-model="show_option"
+            active-text="Show more options"
+          ></el-switch>
         </el-col>
-        <el-col :xs="{span:12}" :sm="{span:12}" :md="{span:12}" style="margin-top:10px;">
+        <el-col
+          :xs="{ span: 12 }"
+          :sm="{ span: 12 }"
+          :md="{ span: 12 }"
+          style="margin-top:10px;"
+        >
           <el-row :gutter="5" v-show="show_option">
             <template v-if="position.toLowerCase() != 'team leader'">
-              <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+              <el-col
+                :md="{ span: 8 }"
+                style="font-size:.8em;color:grey;padding-top:5px;"
+              >
                 <label>Advance Filter</label>
               </el-col>
-              <el-col :md="{span:16}">
+              <el-col :md="{ span: 16 }">
                 <el-tooltip content="Filter By">
                   <template v-if="isRTA() || isHR() || isADMIN()">
-                    <remote-filter-head :range="{start:query.start,end:query.end}" @filter="filterTable"></remote-filter-head>
+                    <remote-filter-head
+                      :range="{ start: query.start, end: query.end }"
+                      @filter="filterTable"
+                    ></remote-filter-head>
                   </template>
-                  <template v-if="position.toLowerCase() == 'operations manager'">
-                    <tl-filter :range="{start:query.start,end:query.end}" @filter="filterTable" :om_id="user_id"></tl-filter>
+                  <template
+                    v-if="position.toLowerCase() == 'operations manager'"
+                  >
+                    <tl-filter
+                      :range="{ start: query.start, end: query.end }"
+                      @filter="filterTable"
+                      :om_id="user_id"
+                    ></tl-filter>
                   </template>
                 </el-tooltip>
               </el-col>
             </template>
-            <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+            <el-col
+              :md="{ span: 8 }"
+              style="font-size:.8em;color:grey;padding-top:5px;"
+            >
               <label>Preview</label>
             </el-col>
-            <el-col :md="{span:16}" style="margin-top:5px">
+            <el-col :md="{ span: 16 }" style="margin-top:5px">
               <el-tooltip content="Display preview">
                 <template>
-                  <el-select size="mini" v-model="table_config.view" style="float:right">
+                  <el-select
+                    size="mini"
+                    v-model="table_config.view"
+                    style="float:right"
+                  >
                     <el-option value="hours" label="Hours" />
                     <el-option value="log_status" label="Log status" />
                   </el-select>
                 </template>
               </el-tooltip>
             </el-col>
-            <el-col :md="{span:8}" style="font-size:.8em;color:grey;padding-top:5px;">
+            <el-col
+              :md="{ span: 8 }"
+              style="font-size:.8em;color:grey;padding-top:5px;"
+            >
               <label>Functions</label>
             </el-col>
-            <el-col :md="{span:16}" style="margin-top:5px">
+            <el-col :md="{ span: 16 }" style="margin-top:5px">
               <div style="float:right">
                 <template v-if="isRTA()">
                   <el-button
                     size="mini"
-                    @click="showModal('addSchedule'), form.addSchedule.model.auto_assign=false"
-                  >Add Schedule</el-button>
+                    @click="
+                      showModal('addSchedule'),
+                        (form.addSchedule.model.auto_assign = false)
+                    "
+                    >Add Schedule</el-button
+                  >
                 </template>
                 <template v-if="isHR()">
-                  <el-button size="mini" @click="showModal('addLeave')">Add Leave</el-button>
+                  <el-button size="mini" @click="showModal('addLeave')"
+                    >Add Leave</el-button
+                  >
                 </template>
                 <template>
                   <el-dropdown @command="handleCommand">
@@ -95,12 +136,17 @@
                       <i class="el-icon-arrow-down el-icon--right" />
                     </el-button>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item v-if="isRTA()" command="importSchedule">Import Schedule</el-dropdown-item>
+                      <el-dropdown-item v-if="isRTA()" command="importSchedule"
+                        >Import Schedule</el-dropdown-item
+                      >
                       <el-dropdown-item
                         v-if="isRTA()"
                         command="importScheduleQuarterly"
-                      >Import Schedule(Quarterly)</el-dropdown-item>
-                      <el-dropdown-item command="exportSVA">Export SVA Report</el-dropdown-item>
+                        >Import Schedule(Quarterly)</el-dropdown-item
+                      >
+                      <el-dropdown-item command="exportSVA"
+                        >Export SVA Report</el-dropdown-item
+                      >
                     </el-dropdown-menu>
                   </el-dropdown>
                 </template>
@@ -112,16 +158,22 @@
               ref="importScheduleInput"
               accept=".xlsx"
               style="display:none"
-              @change="importScheduleFileChange"
+              @change="importScheduleFileChangeV2"
             />
           </el-row>
         </el-col>
       </el-row>
       <el-row style="margin-top:10px;">
-        <el-col :xs="{span:24}" :sm="{span:24}" :md="{span:24}" :lg="{span:24}" :xl="{span:24}">
+        <el-col
+          :xs="{ span: 24 }"
+          :sm="{ span: 24 }"
+          :md="{ span: 24 }"
+          :lg="{ span: 24 }"
+          :xl="{ span: 24 }"
+        >
           <el-table
             class="monday"
-            v-loading="agentsWorkReportsfetchState.initial"
+            v-loading="isFetchingWorkReports"
             :data="tableData"
             @sort-change="columnSort"
           >
@@ -151,45 +203,56 @@
                 </div>
               </template>
             </el-table-column>-->
-            <el-table-column width="250" label="Name"  sortable="custom" prop="full_name" fixed
+            <el-table-column
+              width="250"
+              label="Name"
+              sortable="custom"
+              prop="full_name"
+              fixed
             >
-              <template slot="header" slot-scope="scope">
-                <span
-                  style="font-weight:normal;font-size:.8em"
-                >Name</span>
+              <template slot="header">
+                <span style="font-weight:normal;font-size:.8em">Name</span>
               </template>
               <template slot-scope="scope">
                 <div style="height:45px;border-left:red 7px solid;display:flex">
                   <el-tooltip :content="scope.row.email">
                     <div
                       style="width:100%;align-self:center;padding-left:20px;"
-                    >{{ scope.row.full_name }}</div>
+                    >
+                      {{ scope.row.full_name }}
+                    </div>
                   </el-tooltip>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column align="center" width="50" fixed
-            >
-            <!-- sortable="custom" prop="full_name" -->
+            <el-table-column align="center" width="50" fixed>
+              <!-- sortable="custom" prop="full_name" -->
 
               <template slot-scope="scope">
                 <div class="user-block">
                   <div v-if="scope.row.image_url" style="width:100%;">
                     <div style="margin:0 auto;height:30px;width:30px;">
-                      <img class="img-circle" style="margin:0 auto;" :src="scope.row.image_url" />
+                      <img
+                        class="img-circle"
+                        style="margin:0 auto;"
+                        :src="scope.row.image_url"
+                      />
                     </div>
                   </div>
                   <div v-else class="text-muted" style="width:100%;">
-                    <div class="img-circle" style="background-color:white;margin:0 auto;">
+                    <div
+                      class="img-circle"
+                      style="background-color:white;margin:0 auto;"
+                    >
                       <div style="display:flex;height:30px;width:30px;">
                         <div
                           style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
                         >
                           {{
-                          getAvatarLetters(
-                          scope.row.info.firstname,
-                          scope.row.info.lastname
-                          )
+                            getAvatarLetters(
+                              scope.row.info.firstname,
+                              scope.row.info.lastname
+                            )
                           }}
                         </div>
                       </div>
@@ -198,32 +261,75 @@
                 </div>
               </template>
             </el-table-column>
-            <template v-for="(thead,index1) in tableHeader">
+            <template v-for="(thead, index1) in tableHeader">
               <el-table-column align="center" :key="index1">
-                <template slot="header" slot-scope="scope">
+                <template slot="header">
                   <!-- <h4
                     :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
                     style="margin-bottom:5px"
                   >{{ tableHeader[index1].day }}</h4> -->
                   <span
                     style="font-weight:normal;font-size:.8em"
-                    :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
-                  >{{ tableHeader[index1].day+', '+tableHeader[index1].date1 }}</span>
+                    :class="[
+                      dateToday(tableHeader[index1].date) ? 'today-header' : ''
+                    ]"
+                    >{{
+                      tableHeader[index1].day + ", " + tableHeader[index1].date1
+                    }}</span
+                  >
                 </template>
-                <template slot-scope="{row}">
+                <template slot-scope="{ row }">
                   <template
-                    v-if="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length>0"
+                    v-if="
+                      sched_array.filter(
+                        i =>
+                          i.user_info.id == row.uid &&
+                          formatDate(
+                            i.start_event.date,
+                            'YYYY-MM-DD HH:mm:ss',
+                            'YYYY-MM-DD'
+                          ) == tableHeader[index1].date
+                      ).length > 0
+                    "
                   >
                     <template
-                      v-for="(schedule,index) in sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)"
+                      v-for="(schedule, index) in sched_array.filter(
+                        i =>
+                          i.user_info.id == row.uid &&
+                          formatDate(
+                            i.start_event.date,
+                            'YYYY-MM-DD HH:mm:ss',
+                            'YYYY-MM-DD'
+                          ) == tableHeader[index1].date
+                      )"
                     >
                       <template
-                        v-if="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
+                        v-if="
+                          sched_array.filter(
+                            i =>
+                              i.user_info.id == row.uid &&
+                              formatDate(
+                                i.start_event.date,
+                                'YYYY-MM-DD HH:mm:ss',
+                                'YYYY-MM-DD'
+                              ) == tableHeader[index1].date
+                          )[index]
+                        "
                       >
                         <cell-content
                           @refreshTable="weekChange(week.start)"
                           :key="index"
-                          :schedule="sched_array.filter(i=> i.user_info.id==row.uid && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date)[index]"
+                          :schedule="
+                            sched_array.filter(
+                              i =>
+                                i.user_info.id == row.uid &&
+                                formatDate(
+                                  i.start_event.date,
+                                  'YYYY-MM-DD HH:mm:ss',
+                                  'YYYY-MM-DD'
+                                ) == tableHeader[index1].date
+                            )[index]
+                          "
                           :date="tableHeader[index1].date"
                           :info="row.info"
                           :view="table_config.view"
@@ -237,7 +343,9 @@
                     <div style="width:100%;padding:0px;margin:0px;">
                       <div
                         style="padding:3px;font-size:.85em;color:#909399;height:inherit"
-                      >OFF</div>
+                      >
+                        OFF
+                      </div>
                     </div>
                   </template>
                 </template>
@@ -269,7 +377,8 @@
             />
             <span
               style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px"
-            >count: {{ form.addSchedule.model.dates.length }}</span>
+              >count: {{ form.addSchedule.model.dates.length }}</span
+            >
           </el-col>
           <el-col>
             <label>Time in</label>
@@ -313,15 +422,19 @@
                 v-for="item in agents.agents"
                 :key="item.uid"
                 :label="item.full_name"
-                :value="item.uid"
+                :value="item.email"
               />
             </el-select>
             <span
               style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
-            >count: {{ form.addSchedule.model.agents.length }}</span>
+              >count: {{ form.addSchedule.model.agents.length }}</span
+            >
           </el-col>
           <el-col>
-            <el-switch v-model="form.addSchedule.replicate" active-text="Week to Quarterly"></el-switch>
+            <el-switch
+              v-model="form.addSchedule.replicate"
+              active-text="Week to Quarterly"
+            ></el-switch>
             <el-alert
               type="info"
               title="Activating WTQ will automatically apply schedules quarterly."
@@ -358,7 +471,7 @@
                 v-for="item in form.addSchedule.options.operationsManager.data"
                 :key="item.id"
                 :label="item.full_name"
-                :value="item.id"
+                :value="item.email"
               />
             </el-select>
           </el-col>
@@ -377,22 +490,26 @@
               :disabled="form.addSchedule.model.auto_assign"
             >
               <el-option
-                v-for="(item,index) in form.addSchedule.options.teamLeader.data"
+                v-for="(item, index) in form.addSchedule.options.teamLeader
+                  .data"
                 :key="index"
                 :label="item.full_name"
-                :value="item.id"
+                :value="item.email"
               />
             </el-select>
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="(form.addSchedule.show=false)">Cancel</el-button>
+          <el-button size="mini" @click="form.addSchedule.show = false"
+            >Cancel</el-button
+          >
           <el-button
             type="danger"
             size="mini"
             :loading="form.addSchedule.btn_loader"
             @click="submitAddSchedule"
-          >Confirm</el-button>
+            >Confirm</el-button
+          >
         </span>
       </el-dialog>
 
@@ -458,13 +575,16 @@
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="form.addLeave.show=false">Cancel</el-button>
+          <el-button size="mini" @click="form.addLeave.show = false"
+            >Cancel</el-button
+          >
           <el-button
             type="danger"
             :loading="createLeaveState.initial"
             size="mini"
             @click="onSubmit"
-          >Confirm</el-button>
+            >Confirm</el-button
+          >
         </span>
       </el-dialog>
 
@@ -483,10 +603,15 @@
             <el-radio-group
               size="mini"
               v-model="excel.export_sva.field.radio_select"
-              @change="excel.export_sva.clear_cluster_field != excel.export_sva.clear_cluster_field"
+              @change="
+                excel.export_sva.clear_cluster_field !=
+                  excel.export_sva.clear_cluster_field
+              "
             >
               <el-radio-button label="all">All</el-radio-button>
-              <el-radio-button label="multiCluster">Selected Clusters</el-radio-button>
+              <el-radio-button label="multiCluster"
+                >Selected Clusters</el-radio-button
+              >
             </el-radio-group>
           </el-col>
           <el-col style="margin-top:10px;">
@@ -512,19 +637,29 @@
               :multiple="true"
               :filterable="true"
               :params="{
-              om:true,
-              start_date:formatDate(excel.export_sva.field.dates[0],'','YYYY-MM-DD'),
-              end_date:formatDate(excel.export_sva.field.dates[1],'','YYYY-MM-DD')
+                om: true,
+                start_date: formatDate(
+                  excel.export_sva.field.dates[0],
+                  '',
+                  'YYYY-MM-DD'
+                ),
+                end_date: formatDate(
+                  excel.export_sva.field.dates[1],
+                  '',
+                  'YYYY-MM-DD'
+                )
               }"
               :placeholder="'Select Cluster...'"
               style="width:100%"
-              :disabled="excel.export_sva.field.radio_select =='all'"
+              :disabled="excel.export_sva.field.radio_select == 'all'"
               :clear="excel.export_sva.clear_cluster_field"
             ></remote-search>
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="excel.export_sva.dialog=false">Cancel</el-button>
+          <el-button size="mini" @click="excel.export_sva.dialog = false"
+            >Cancel</el-button
+          >
           <!-- frontend way of exporting sva -->
           <!-- <el-button type="danger" :loading="false" size="mini" @click="generateSvaReport">Confirm</el-button> -->
           <!-- backend way -->
@@ -533,7 +668,8 @@
             size="mini"
             @click="generateSvaReport()"
             :loading="excel.export_sva.confirm"
-          >Download</el-button>
+            >Download</el-button
+          >
         </span>
       </el-dialog>
 
@@ -544,7 +680,7 @@
         :close-on-press-escape="false"
         :show-close="false"
         title="Importing Schedule..."
-        width="50%"
+        width="70%"
         top="5vh"
       >
         <el-alert
@@ -555,12 +691,24 @@
         ></el-alert>
 
         <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-          Progress
-          <span>( {{ excel.import.loop_index }}</span>/
-          <span>{{ excel.import.arr_length }} )</span>
+          <template v-if="excel.import.arr_length == 0">
+            Initializing data, Please wait...
+          </template>
+          <template v-else>
+            Progress
+            <span>( {{ excel.import.report.data.all.list.length }}</span
+            >/
+            <span>{{ excel.import.arr_length }} )</span>
+          </template>
         </div>
         <el-progress
-          :percentage="excel.import.progress=='0.0'? 0:parseFloat(excel.import.progress)"
+          :percentage="
+            excel.import.arr_length != 0
+              ? (excel.import.report.data.all.list.length /
+                  excel.import.arr_length) *
+                100
+              : 0
+          "
           :text-inside="true"
           :stroke-width="18"
         ></el-progress>
@@ -570,51 +718,89 @@
             type="border-card"
             style="margin-top:15px;margin-bottom:10px;"
           >
-            <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
-              <el-table :data="excel.import.report.data.all.list" height="350px">
+            <el-tab-pane
+              :label="'All: ' + excel.import.report.data.all.list.length"
+              name="all"
+            >
+              <el-table
+                :data="excel.import.report.data.all.list"
+                height="350px"
+              >
                 <el-table-column label="Email" width="350">
-                  <template scope="scope">{{scope.row.email}}</template>
+                  <template scope="scope">{{ scope.row.email }}</template>
                 </el-table-column>
-                <!-- <el-table-column label="Schedule" width="100">
-                <template scope="scope">{{+" To "+}}</template>
-                </el-table-column>-->
-                <el-table-column label="Status">
+                <el-table-column label="Schedule" width="400">
+                  <template scope="scope">{{
+                    scope.row.start_event +
+                      (scope.row.end_event ? " To " + scope.row.end_event : "")
+                  }}</template>
+                </el-table-column>
+                <el-table-column label="Status" width="500">
                   <template scope="scope">
-                    <template v-if="scope.row.status_code==200">
-                      <el-tag size="mini" type="success">UPLOADED</el-tag>
+                    <template v-if="scope.row.import_result.code == 200">
+                      <template
+                        v-if="scope.row.import_result.action != 'delete'"
+                      >
+                        <el-tag size="mini" type="success">{{
+                          scope.row.import_result.action == "create"
+                            ? "Created"
+                            : "Updated"
+                        }}</el-tag>
+                      </template>
+                      <template v-else>
+                        <el-tag size="mini" type="warning">Cleared</el-tag>
+                      </template>
                     </template>
                     <template v-else>
-                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                      <el-tag size="mini" type="danger">{{
+                        scope.row.import_result.description
+                      }}</el-tag>
                     </template>
                   </template>
                 </el-table-column>
               </el-table>
             </el-tab-pane>
             <el-tab-pane
-              :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.status_code != 200).length"
+              :label="
+                'Errors: ' +
+                  excel.import.report.data.all.list.filter(
+                    i => i.import_result.code != 200
+                  ).length
+              "
               name="errors"
             >
               <el-table
-                :data="excel.import.report.data.all.list.filter(i=> i.status_code != 200)"
+                :data="
+                  excel.import.report.data.all.list.filter(
+                    i => i.import_result.code != 200
+                  )
+                "
                 height="350px"
               >
                 <el-table-column label="Email" width="350">
-                  <template scope="scope">{{scope.row.email}}</template>
+                  <template scope="scope">{{ scope.row.email }}</template>
                 </el-table-column>
-                <el-table-column label="Status">
+
+                <el-table-column label="Schedule" width="400">
+                  <template scope="scope">{{
+                    scope.row.start_event + " To " + scope.row.end_event
+                  }}</template>
+                </el-table-column>
+                <el-table-column label="Status" width="500">
                   <template scope="scope">
-                    <template v-if="scope.row.status_code==200">
-                      <el-tag size="mini" type="success">UPLOADED</el-tag>
-                    </template>
-                    <template v-else>
-                      <el-tag size="mini" type="danger">{{ scope.row.title }}</el-tag>
+                    <template>
+                      <el-tag size="mini" type="danger">{{
+                        scope.row.import_result.description
+                      }}</el-tag>
                     </template>
                   </template>
                 </el-table-column>
               </el-table>
             </el-tab-pane>
           </el-tabs>
-          <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+          <el-button size="mini" @click="closeImportReport" style="float:right"
+            >Close</el-button
+          >
         </div>
       </el-dialog>
     </div>
@@ -631,12 +817,20 @@ import cellContent from "./components/cellContent";
 import remoteSearch from "./components/userRemoteSearch";
 import remoteFilterHead from "./components/agentScheduleHeadFilter";
 import tlFilter from "./components/TeamLeaderFilter";
+import readXlsxFile from "read-excel-file";
+import { getJsDateFromExcel } from "excel-date-to-js";
+import tz from "moment-timezone";
 
 export default {
   components: { cellContent, remoteSearch, remoteFilterHead, tlFilter },
   computed: {
-    table_page(){
-      return this.query.offset/this.query.limit + 1;
+    table_page: {
+      get() {
+        return this.query.offset / this.query.limit + 1;
+      },
+      set(newValue) {
+        return newValue;
+      }
     },
     ...mapGetters([
       "agentsWorkReports",
@@ -745,14 +939,17 @@ export default {
         this.form.addSchedule.remote_loader = false;
       }
     },
-    "excel.import.loop_index": function(v) {
-      if (v == this.excel.import.arr_length) {
+    "excel.import.report.data.all.list": function(v) {
+      if (v.length == this.excel.import.arr_length) {
         this.excel.import.importing = false;
         this.weekChange(this.week.start);
+        if (this.excel.import.inapp) {
+          this.form.addSchedule.show = false;
+        }
       }
     },
     exportSvaReportState({ initial, success, fail }) {
-      if(initial){
+      if (initial) {
         this.excel.export_sva.confirm = true;
       }
 
@@ -760,15 +957,15 @@ export default {
         this.excel.export_sva.dialog = false;
         this.$message({
           type: "success",
-          message: this.exportSvaReportTitle,
+          message: this.exportSvaReportTitle
         });
         this.excel.export_sva.confirm = false;
       }
-      if(fail){
+      if (fail) {
         this.excel.export_sva.confirm = false;
         this.$message({
           type: "error",
-          message: this.exportSvaReportTitle,
+          message: this.exportSvaReportTitle
         });
       }
     },
@@ -866,14 +1063,15 @@ export default {
         this.query["target[]"] = "full_name";
         this.query.query = v;
       } else {
-        this.query["target[]"]=null;
-        this.query.query=null;
+        this.query["target[]"] = null;
+        this.query.query = null;
       }
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     agentsWorkReportsfetchState({ initial, success, fail }) {
-      if (success) {
+      if (initial) {
+        this.isFetchingWorkReports = true;
+      } else if (success) {
         this.tableData = this.agentsWorkReports.agent_schedules;
         let tmp = [].concat(
           this.agentsWorkReports.agent_schedules.map(i => i.schedule)
@@ -881,12 +1079,10 @@ export default {
         tmp = [].concat(...tmp.map(i => i));
         tmp = tmp.filter(i => i.overtime_id == null);
         this.sched_array = tmp;
-
-        // console.log(this.sched_array.filter(i=> i.user_info.id==20 && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[2].date)[0])
-        // console.log(this.sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'','YYYY-MM-DD')==tableHeader[index1].date).length)
-      }
-      if (fail) {
+        this.isFetchingWorkReports = false;
+      } else if (fail) {
         this.tableData = [];
+        this.isFetchingWorkReports = false;
       }
     },
     // 'select.operationsManager': function(v) {
@@ -927,7 +1123,6 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.token)
     this.axios.options.headers.Authorization = "Bearer " + this.token;
     if (
       this.position == "Admin" ||
@@ -958,6 +1153,7 @@ export default {
   },
   data() {
     return {
+      isFetchingWorkReports: false,
       importScheduleReset: true,
       show_option: true,
       blank: [{}],
@@ -1006,7 +1202,7 @@ export default {
       creatingFlag: false,
       form: {
         addSchedule: {
-          inapp:true,
+          inapp: true,
           replicate: false,
           disabled_auto_assign: false,
           remote_loader: false,
@@ -1080,10 +1276,10 @@ export default {
         end: null,
         sort: null,
         order: null,
-        target:null,
-        query:null,
-        om_id:null,
-        tl_id:null,
+        target: null,
+        query: null,
+        om_id: null,
+        tl_id: null
       },
       table_config: {
         page: 1,
@@ -1132,23 +1328,35 @@ export default {
       this.query.sort = order ? prop : null;
       this.query.order =
         order != null ? (order == "ascending" ? "asc" : "desc") : null;
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     filterTable(v) {
-      // console.log(v);
-      this.query.offset=0;
-      // this.filter_table.om_id = v.om_id;
-      // this.filter_table.tl_id = v.tl_id;
+      this.query.offset = 0;
       this.query.tl_id = null;
       this.query.om_id = null;
-      if(v.om_id){
-        this.query.om_id = v.om_id;
-      }else if(v.tl_id){
-        this.query.tl_id = v.tl_id;
+      switch (this.position.toLowerCase()) {
+        case "operations manager":
+          this.query.om_id = v.om_id;
+          if (v.tl_id) {
+            this.query.tl_id = v.tl_id;
+            this.query.om_id = null;
+          }
+          break;
+        case "team leader":
+          this.query.tl_id = this.user_id;
+          break;
+        default:
+          if (v.tl_id) {
+            this.query.tl_id = v.tl_id;
+            this.query.om_id = null;
+          } else if (v.om_id) {
+            this.query.tl_id = null;
+            this.query.om_id = v.om_id;
+          }
+          break;
       }
       const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.fetchAgentsWorkReports({ data });
     },
     excelCluster(v) {
       this.excel.export_sva.field.clusters = v;
@@ -1165,186 +1373,8 @@ export default {
       ) {
         params.om_id = this.excel.export_sva.field.clusters;
       }
-      // let url = "api/v1/excel/export_sva" + this.toUrlParams(params),
-      //   options = {
-      //     headers: {
-      //       Authorization: "Bearer " + this.token
-      //     }
-      //   };
-      // axios.get(url, options).then(res => {
-      //   // var a = document.createElement("a");
-      //   // document.body.appendChild(a);
-      //   // a.style = "display: none";
-      //   // // console.log(res);
-      //   // var // json = JSON.stringify(res.data),
-      //   //   blob = new Blob([res.data], {
-      //   //     type:
-      //   //       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      //   //   }),
-      //   //   url = window.URL.createObjectURL(blob);
-      //   // a.href = url;
-      //   // a.download =
-      //   //   "SVA " +
-      //   //   moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-      //   //   " to " +
-      //   //   moment(this.excel.export_sva.model.end).format("YYYY-MM-DD") +
-      //   //   ".xlsx";
-      //   // a.click();
-      //   // window.URL.revokeObjectURL(url);
-      //   // this.excel.export_sva.confirm = false;
-      //   if(res.code == 200){
-      //     this.$message({
-      //       type:"success",
-      //       message: res.title
-      //     });
-      //   }
-      // });
       this.exportSvaReport(params);
     },
-    // generateSvaReport() {
-    //   let query = this.excel.export_sva.model,
-    //     url =
-    //       "api/v1/schedules/work/report?start=" +
-    //       query.start +
-    //       "&end=" +
-    //       query.end,
-    //     options = {
-    //       headers: {
-    //         Authorization: "Bearer " + this.token
-    //       }
-    //     };
-    //   let data = [];
-    //   let header = [""];
-    //   let header1 = ["Agent"];
-
-    //   axios
-    //     .get(url, options)
-    //     .then(res => {
-    //       // console.log(res.data.meta.agent_schedules)
-    //       const range = moment.range(query.start, query.end);
-    //       const dates = Array.from(range.by("day")).map(m =>
-    //         m.format("YYYY-MM-DD")
-    //       );
-    //       res.data.meta.agent_schedules.forEach(
-    //         ((v, i) => {
-    //           // get agent info
-    //           let obj = [];
-    //           obj.push(v.full_name);
-    //           dates.forEach(
-    //             ((v1, i1) => {
-    //               // get per date info
-    //               header.push(
-    //                 moment(v1).format("ddd MM-DD-YYYY"),
-    //                 "",
-    //                 "",
-    //                 "",
-    //                 "",
-    //                 ""
-    //               );
-    //               header1.push(
-    //                 "OM",
-    //                 "TL",
-    //                 "SCHED",
-    //                 "TIME_IN",
-    //                 "TIME_OUT",
-    //                 "CONFORMANCE"
-    //               );
-    //               if (v.schedule.length > 0) {
-    //                 let tmp = v.schedule.filter(
-    //                   i =>
-    //                     moment(v1).format("YYYY-MM-DD") ==
-    //                       moment(i.start_event.date).format("YYYY-MM-DD") &&
-    //                     i.overtime_id == null
-    //                 );
-    //                 if (tmp.length > 0) {
-    //                   tmp = tmp[0];
-    //                   obj.push(tmp.om.full_name);
-    //                   obj.push(tmp.tl.full_name);
-    //                   obj.push(
-    //                     moment(tmp.start_event.date).format("hh:mm a") +
-    //                       "-" +
-    //                       moment(tmp.end_event.date).format("hh:mm a")
-    //                   );
-    //                   switch (tmp.remarks.toLowerCase()) {
-    //                     case "present":
-    //                       obj.push(
-    //                         moment(tmp.time_in.date).format(
-    //                           "YYYY-MM-DD hh:mm a"
-    //                         )
-    //                       );
-    //                       obj.push(
-    //                         moment(tmp.time_out.date).format(
-    //                           "YYYY-MM-DD hh:mm a"
-    //                         )
-    //                       );
-    //                       break;
-    //                     case "ncns":
-    //                     case "absent":
-    //                       obj.push(tmp.remarks);
-    //                       obj.push(tmp.remarks);
-    //                       break;
-    //                     case "on-leave":
-    //                       obj.push(tmp.leave.leave_type);
-    //                       obj.push(tmp.leave.leave_type);
-    //                       break;
-    //                     case "upcoming":
-    //                       obj.push("NO STAMP");
-    //                       obj.push("NO STAMP");
-    //                       break;
-    //                   }
-    //                   obj.push(tmp.conformance + "%");
-    //                 } else {
-    //                   // return off
-    //                   obj.push("NA");
-    //                   obj.push("NA");
-    //                   obj.push("OFF");
-    //                   obj.push("OFF");
-    //                   obj.push("OFF");
-    //                   obj.push("0%");
-    //                 }
-    //               } else {
-    //                 // return off
-    //                 // obj.om = null;
-    //                 // obj.tl = null;
-    //                 // obj.rop = v.full_name;
-    //                 obj.push("NA");
-    //                 obj.push("NA");
-    //                 obj.push("OFF");
-    //                 obj.push("OFF");
-    //                 obj.push("OFF");
-    //                 obj.push("0%");
-    //               }
-    //             }).bind(this)
-    //           );
-    //           data.push(obj);
-    //         }).bind(this)
-    //       );
-    //       data.unshift([]);
-    //       data.unshift(header1);
-    //       data.unshift([]);
-    //       data.unshift(header);
-    //       // console.log(data)
-
-    //       // convertToExcel
-    //       let excel = {
-    //         fileName: "Something.xlxs",
-    //         content: []
-    //       };
-
-    //       excel.content.push({
-    //         sheet_data: data,
-    //         sheet_title:
-    //           "SVA " +
-    //           moment(this.excel.export_sva.model.start).format("YYYY-MM-DD") +
-    //           " to " +
-    //           moment(this.excel.export_sva.model.end).format("YYYY-MM-DD")
-    //       });
-    //       this.createMultisheetExcel(excel);
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
-    // },
     createMultisheetExcel(data) {
       let url = "api/v1/excel/create_multisheet_excel",
         formData = new FormData(),
@@ -1447,159 +1477,104 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    generateAgentHLogs(agent, array) {
+    scheduleChunk(data, size) {
+      var i,
+        j,
+        tmparray = [],
+        chunk = size;
+
+      var array_report = [];
+
+      for (i = 0, j = data.length; i < j; i += chunk) {
+        tmparray.push(data.slice(i, i + chunk));
+      }
+
+      return tmparray;
+    },
+    importArray(data) {
+      let tmp = this.excel.import.report.data.all.list;
+      axios
+        .post("api/v1/schedules/import", data)
+        .then(res => {
+          console.log(res);
+          tmp.push(...res.data.parameters.report);
+          this.excel.import.report.data.all.list = tmp;
+        })
+        .catch(err => console.log(err));
+    },
+    templateToInputRows(rows) {
       let result = [];
-      agent.forEach(
-        ((v, i) => {
-          if(this.form.addSchedule.inapp){
-          result.push(array.filter(fi => fi.user_id == v)[0]);
-          }else{
-          result.push(array.filter(fi => fi.email == v)[0]);
+      rows.forEach(
+        ((row, index) => {
+          if (index != 0) {
+            for (let l = 0; l < 7; l++) {
+              result.push([
+                null,
+                row[1],
+                row[2],
+                row[3],
+                row[l * 3 + 4], // schedule
+                row[l * 3 + 5], // timein
+                row[l * 3 + 6] // timeout
+              ]);
+            }
           }
         }).bind(this)
       );
       return result;
     },
-    generateTLHLogs(tl, array) {
-      let result = [];
-      tl.forEach(
-        ((v, i) => {
-          result.push(array.filter(fi => fi.tl_id == v)[0]);
-        }).bind(this)
-      );
-      return result;
-    },
-    createHierarchyObject(data) {
-      let agent = this.form.addSchedule.inapp ?[...new Set(data.map(i => i.user_id))]:[...new Set(data.map(i => i.email))],
-        tl = [...new Set(data.map(i => i.tl_id))],
-        start = moment(moment.min(data.map(i => moment(i.start_event))))
-          .startOf("day")
-          .format("YYYY-MM-DD HH:mm:ss");
-      if(this.form.addSchedule.inapp){
-        agent = this.generateAgentHLogs(agent, data).map(i => ({
-          parent_id: i.tl_id,
-          child_id: i.user_id,
-          start_date: start
-        }));
-        tl = this.generateTLHLogs(tl, data).map(i => ({
-          parent_id: i.om_id,
-          child_id: i.tl_id,
-          start_date: start
-        }));
-      }else{
-        agent = this.generateAgentHLogs(agent, data).map(i => ({
-          parent_email: i.tl_id,
-          child_email: i.email,
-          start_date: start
-        }));
-        tl = this.generateTLHLogs(tl, data).map(i => ({
-          parent_email: i.om_id,
-          child_email: i.tl_id,
-          start_date: start
-        }));
-      }
-      // let result = {
-      //   data: data,
-      //   start_date: start,
-      //   agent: agent,
-      //   tl:tl,
-      //   final: agent.concat(tl),
-      // };
-      // console.log(result)
-      return agent.concat(tl);
-    },
-    loopCreateSchedule(data) {
-      let hierarchy_data = null;
-
-      if (this.form.addSchedule.replicate) {
-        hierarchy_data = this.createHierarchyObject(data);
-      }
-
-      this.form.addSchedule.show = false;
-      this.excel.import.importing = true;
+    importScheduleFileChangeV2(e) {
       this.excel.import.dialog = true;
-      this.excel.import.arr_length =
-        data.length + (hierarchy_data ? hierarchy_data.length : 0);
-      let tmp_arr = [],
-        options = {
-          headers: {
-            Authorization: "Bearer " + this.token
-          }
-        };
-      this.excel.import.loop_index = 0;
-      this.excel.import.progress = 0;
-      // hierarchy logs insertion
-      if (this.form.addSchedule.replicate) {
-        hierarchy_data.forEach(
+      readXlsxFile(e.target.files[0]).then(rows => {
+        let d_rows = this.templateToInputRows(rows);
+        let body = d_rows.filter(i => moment(i[5]).isValid() == true),
+          data = [];
+
+        this.excel.import.importing = true;
+        this.excel.import.arr_length = body.length;
+
+        this.excel.import.progress =
+          (this.excel.import.report.data.all.list.length /
+            this.excel.import.arr_length) *
+          100;
+
+        body.forEach(
           ((v, i) => {
-            let tmp_data = {};
-            axios
-              .post("api/v1/hierarchy_log/create", this.unsetNull(v), options)
-              .then(res => {
-                console.log(res);
-                this.excel.import.loop_index += 1;
-                this.excel.import.progress = (
-                  (this.excel.import.loop_index /
-                    this.excel.import.arr_length) *
-                  100
-                ).toFixed(2);
-                tmp_data.email = res.data.parameters.email;
-                tmp_data.status_code = res.status;
-                tmp_data.title = res.data.title;
-                tmp_arr.push(tmp_data);
-                this.excel.import.report.data.all.list = tmp_arr;
-              })
-              .catch(err => {
-                this.excel.import.loop_index += 1;
-                this.excel.import.progress = (
-                  (this.excel.import.loop_index /
-                    this.excel.import.arr_length) *
-                  100
-                ).toFixed(2);
-                tmp_data.email = err.response.data.parameters.email;
-                tmp_data.status_code = err.response.data.code;
-                tmp_data.title = err.response.data.title;
-                tmp_arr.push(tmp_data);
-                this.excel.import.report.data.all.list = tmp_arr;
-              });
+            // insert replicate value
+            // cell format for index 5 & 6 must be custom => m/d/yyyy h:mm
+            v[5] = moment(v[5])
+              .subtract(20, "hours")
+              .format("YYYY-MM-DD HH:mm:ss");
+            v[6] = moment(v[6])
+              .subtract(20, "hours")
+              .format("YYYY-MM-DD HH:mm:ss");
+
+            v.push(this.form.addSchedule.replicate);
+            data.push(v);
           }).bind(this)
         );
-      }
-      // schedule insertion
-      data.forEach(
-        ((v, i) => {
-          let tmp_data = {};
-          axios
-            .post("api/v1/schedules/create", this.unsetNull(v), options)
-            .then(res => {
-              console.log(res);
-              this.excel.import.loop_index += 1;
-              this.excel.import.progress = (
-                (this.excel.import.loop_index / this.excel.import.arr_length) *
-                100
-              ).toFixed(2);
-              tmp_data.email = res.data.parameters.email;
-              tmp_data.status_code = res.status;
-              tmp_data.title = res.data.title;
-              tmp_arr.push(tmp_data);
-              this.excel.import.report.data.all.list = tmp_arr;
-            })
-            .catch(err => {
-              this.excel.import.loop_index += 1;
-              this.excel.import.progress = (
-                (this.excel.import.loop_index / this.excel.import.arr_length) *
-                100
-              ).toFixed(2);
-              tmp_data.email = err.response.data.parameters.email;
-              tmp_data.status_code = err.response.data.code;
-              tmp_data.title = err.response.data.title;
-              tmp_arr.push(tmp_data);
-              this.excel.import.report.data.all.list = tmp_arr;
-            });
-        }).bind(this)
-      );
-      this.excel.import.report.data.all.list = tmp_arr;
+
+        let arr_data = this.scheduleChunk(data, 10);
+
+        arr_data.forEach(
+          ((v, i) => {
+            let delay = i * 15000;
+            setTimeout(
+              function() {
+                this.importArray(v);
+              }.bind(this),
+              delay
+            );
+          }).bind(this)
+        );
+      });
+
+      this.importScheduleReset = false;
+      this.$nextTick(() => {
+        this.importScheduleReset = true;
+      });
     },
+
     processAddScheduleData() {
       let form = this.form.addSchedule.model;
       let data = [];
@@ -1616,25 +1591,49 @@ export default {
           ).diff(moment().startOf("day"), "seconds");
           // alert(v1+" "+start+" "+duration)
           // alert(start + ' ' + duration)
-          data.push({
-            user_id: v,
-            tl_id: form.teamLeader,
-            om_id: form.operationsManager,
-            title_id: 1,
-            start_event: start,
-            end_event: moment(moment(start).add(duration, "s")).format(
+          let row = [
+            null,
+            v,
+            form.operationsManager,
+            form.teamLeader,
+            null,
+            start,
+            moment(moment(start).add(duration, "s")).format(
               "YYYY-MM-DD HH:mm:ss"
             ),
-            replicate: this.form.addSchedule.replicate
-          });
+            this.form.addSchedule.replicate
+          ];
+          data.push(row);
         });
       });
-      return data;
+
+      // initialize
+      this.excel.import.dialog = true;
+      this.excel.import.importing = true;
+      this.excel.import.arr_length = data.length;
+      this.excel.import.progress =
+        (this.excel.import.report.data.all.list.length /
+          this.excel.import.arr_length) *
+        100;
+
+      let arr_data = this.scheduleChunk(data, 10);
+
+      arr_data.forEach(
+        ((v, i) => {
+          let delay = i * 15000;
+          setTimeout(
+            function() {
+              this.importArray(v);
+            }.bind(this),
+            delay
+          );
+        }).bind(this)
+      );
     },
     submitAddSchedule() {
       if (this.validateAddSchedule()) {
-        this.form.addSchedule.inapp=true;
-        this.loopCreateSchedule(this.processAddScheduleData());
+        this.form.addSchedule.inapp = true;
+        this.processAddScheduleData();
       } else {
         this.$message({
           type: "warning",
@@ -1673,45 +1672,6 @@ export default {
       }
       return result;
     },
-    // for add schedule form options
-    // getFormOptions(query) {
-    //   const url = 'api/v1/users/remote?list=heads&'
-    //   const options = {
-    //     headers: {
-    //       Authorization: 'Bearer ' + this.token
-    //     }
-    //   }
-    //   axios
-    //     .get(url, options)
-    //     .then(res => {
-    //       let result = res.data.meta.users
-    //       if (query.query == 'team leader') {
-    //         result = result.filter(
-    //           i => i.parent_id == this.form.addSchedule.model.operationsManager
-    //         )
-
-    //         this.form.addSchedule.options[query.var] = result.length>0 ? result: [{value:null,label:"No Data"}];
-
-    //         if (this.form.addSchedule.options[query.var].length < 1) {
-    //           this.form.addSchedule.options[query.var] = []
-    //         } else {
-    //           this.form.addSchedule.model[
-    //             query.var
-    //           ] = this.form.addSchedule.options[query.var][0].id
-    //         }
-    //       } else {
-    //         this.form.addSchedule.options[query.var] = result
-    //         this.form.addSchedule.model[
-    //           query.var
-    //         ] = this.form.addSchedule.options[query.var][0].id
-    //       }
-    //     })
-    //     .catch(err => {
-    //       console.log(err.response.data)
-    //       this.form.addSchedule.options[query.var] = []
-    //     })
-    // },
-    // for filter options
     getUsersByPosition(query) {
       const position = {
         "operations manager": "om",
@@ -1721,9 +1681,11 @@ export default {
         "api/v1/users?" +
         position[query.query] +
         "=true&start_date=" +
-        query.start+" 00:00:00" +
+        query.start +
+        " 00:00:00" +
         "&end_date=" +
-        query.end+ " 23:59:59";
+        query.end +
+        " 23:59:59";
       const options = {
         headers: {
           Authorization: "Bearer " + this.token
@@ -1770,16 +1732,16 @@ export default {
     },
     weekChange(e) {
       // console.log(e);
-      this.query.offset=0;
-      this.query.om_id=null;
-      this.query.tl_id=null;
-      this.query.start = moment(moment(e)
-        .isoWeekday(2)).startOf("day")
+      this.query.offset = 0;
+      this.query.om_id = null;
+      this.query.tl_id = null;
+      this.query.start = moment(moment(e).isoWeekday(2))
+        .startOf("day")
         .format("YYYY-MM-DD HH:mm:ss");
-      this.query.end = moment(moment(this.query.start)
-        .add(6, "days")).endOf("day")
+      this.query.end = moment(moment(this.query.start).add(6, "days"))
+        .endOf("day")
         .format("YYYY-MM-DD HH:mm:ss");
-      
+
       this.week.start = this.query.start;
 
       const range = moment.range(this.query.start, this.query.end);
@@ -1791,92 +1753,18 @@ export default {
         day: moment(d).format("ddd"),
         date: moment(d).format("YYYY-MM-DD"),
         date1: moment(d).format("MMM Do")
-      }));   
-
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
-    },
-    filterTl(v) {
-      // this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
-      // this.query.om_id = null;s
-      // this.query.tl_id = v;
-      console.log(v);
-    },
-    filterOm(v) {
-      if (
-        this.position != "Operations Manager" &&
-        this.position != "Team Leader"
-      ) {
-        if (v == "all") {
-          this.disable_select.teamLeader = true;
-          this.select.teamLeader = "all";
-        } else {
-          this.disable_select.teamLeader = false;
-          this.getUsersByPosition({
-            query: "team leader",
-            var: "teamLeader",
-            start: this.week.start,
-            end: this.week.end
-          });
-        }
-      }
-      this.weekChange(moment(this.week.start).format("YYYY-MM-DD"));
-    },
-    generateHeader(start, end) {
-      const range = moment.range(start, end);
-      const dates = Array.from(range.by("day")).map(m =>
-        m.format("YYYY-MM-DD")
-      );
-
-      this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
       }));
-      // if (this.searchQuery != "") {
-      //   data["target[]"] = "full_name";
-      //   data.query = this.searchQuery;
-      // }
 
-      // if (
-      //   this.position != "Operations Manager" &&
-      //   this.position != "Team Leader"
-      // ) {
-      //   data.om_id = this.filter_table.om_id;
-      //   data.tl_id = this.filter_table.tl_id;
-      // } else {
-      //   if (this.position == "Team Leader") {
-      //     data.tl_id = this.user_id;
-      //     data.om_id = null;
-      //   } else if (this.position == "Operations Manager") {
-      //     data.om_id = this.user_id;
-      //     data.tl_id = null;
-      //   }
-      // }
-      // data.sort = this.query.sort;
-      // data.order = this.query.order;
-      // data = this.unsetNull(data);
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     tableSizeChange(value) {
       this.query.limit = value;
       this.query.offset = 0;
-      // const data = {
-      //   limit: this.query.limit,
-      //   offset: this.query.offset,
-      //   start: this.week.start,
-      //   end: this.week.end
-      // };
-      // this.fetchAgentsWorkReports({ data });
-      // this.weekChange(this.week.start);
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchAgentsWorkReports({data});
+      this.refetchSchedules();
     },
     plotSchedulePerDay(schedules, date) {
       const schedule = schedules.filter(
@@ -1887,6 +1775,22 @@ export default {
       } else {
         return schedule;
       }
+    },
+    refetchSchedules() {
+      let data = this.query;
+      switch (this.position.toLowerCase()) {
+        case "operations manager":
+          if (!this.query.tl_id) {
+            this.query.om_id = this.user_id;
+          }
+          break;
+        case "team leader":
+          this.query.tl_id = this.user_id;
+          break;
+        default:
+          break;
+      }
+      this.fetchAgentsWorkReports({ data });
     },
     dateToday(date) {
       if (moment(date).isSame(moment().format("YYYY-MM-DD"))) {
@@ -2028,6 +1932,6 @@ export default {
 
 th >>> .cell {
   font-weight: normal !important;
-  font-size:.8em !important;
+  font-size: 0.8em !important;
 }
 </style>

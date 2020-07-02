@@ -19,7 +19,7 @@
             style="line-height:2"
           >{{ formatDate(curMonthDate,"","MMMM YYYY") }}</el-col>
           <el-col :sm="{span:12}">
-            <el-button-group style="float:right">
+            <el-button-group style="float:right" class="e-btn-group">
               <el-button size="mini" @click="prev">
                 <i class="el-icon-arrow-left" />
               </el-button>
@@ -136,8 +136,7 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.token);
-    // this.request.slots.leave_type = "vacation_leave";
+    this.date = moment()._d;
     this.fetchHierarchyLogs({
       child_id: this.user_id,
       date: moment().format("YYYY-MM-DD")
@@ -223,7 +222,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .el-calendar >>> .el-calendar-day {
   height: 50px;
   padding: 0px !important;
@@ -257,5 +256,11 @@ export default {
 
 .el-calendar >>> .is-selected {
   /* border: rgb(100, 193, 255) 2px solid !important; */
+}
+
+.e-btn-group{
+  .el-button{
+    padding: 6px 3px 6px 3px;
+  }
 }
 </style>

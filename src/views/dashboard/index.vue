@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div>
     <component :is="currentRole" />
   </div>
 </template>
@@ -8,11 +8,12 @@
 import { mapGetters } from "vuex";
 import adminDashboard from "./admin";
 import hrDashboard from "./hr";
+import rtaDashboard from "./rta";
 import agentDashboard from "./agent";
 
 export default {
   name: "Dashboard",
-  components: { adminDashboard, agentDashboard, hrDashboard },
+  components: { adminDashboard, agentDashboard, hrDashboard, rtaDashboard },
   data() {
     return {
       currentRole: "hrDashboard"
@@ -22,10 +23,13 @@ export default {
     ...mapGetters(["position"])
   },
   created() {
-    switch (this.position) {
-      case "Representative - Order Placer":
+    switch (this.position.toLowerCase()) {
+      case "representative - order placer":
         this.currentRole = "agentDashboard";
-        break;
+      break;
+      case "rta manager":
+        this.currentRole = "adminDashboard";
+      break;
       default:
         this.currentRole = "adminDashboard";
         break;
