@@ -18,7 +18,7 @@
       <el-col :md="{ span:12, offset:8 }">
         <el-pagination
           style="float:right"
-          :pager-count="4"
+          :pager-count="5"
           :page-sizes="[10,25,50]"
           :page-size="table_config.query.perpage"
           layout="total, sizes, prev, pager, next"
@@ -192,7 +192,7 @@ export default {
           perpage: this.table_config.query.perpage,
           page: this.table_config.query.page
         };
-        if (this.table_config.remoteFilter.by == "head") {
+        if (this.table_config.remoteFilter.by == "parent_details") {
           data.parent_id = v;
         } else {
           data.child_id = v;

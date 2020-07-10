@@ -411,12 +411,12 @@ export default {
             }
           })
           .then(res => {
-            console.log(res);
+            // console.log(res);
             resolve(res.data.meta);
             // params.loader = false;
           })
           .catch(err => {
-            console.log(err.response.data);
+            // console.log(err.response.data);
             // params.loader = false;
           });
       });
@@ -451,6 +451,7 @@ export default {
     },
     processRequestUrl(obj, url) {
       // returns endpoint
+      if(obj){
       let tmp = obj,
         base_url = url,
         keys = Object.keys(tmp),
@@ -463,6 +464,7 @@ export default {
         }).bind(this)
       );
       return base_url + "?" + url_params.slice(1);
+      }
     }
   }
 };
