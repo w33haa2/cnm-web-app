@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-row :gutter="10" style="margin-bottom:5px;">
       <el-col :md="{ span:4}">
-        <el-select
+        <!-- <el-select
           v-model="table_config.remoteFilter.select"
           class="form-input"
           style="width:100%;padding-bottom:2px"
@@ -20,17 +20,17 @@
             :label="option.child_details.full_name"
             :value="option.child_details.id"
           />
-        </el-select>
+        </el-select> -->
       </el-col>
       <el-col :md="{ span:12, offset:8 }">
         <el-pagination
           style="float:right"
-          :pager-count="4"
+          :pager-count="5"
           :page-sizes="[10,25,50]"
-          :page-size="table_config.query.perpage"
+          :page-size="table_config.query.limit"
           layout="total, sizes, prev, pager, next"
           :total="table_config.count"
-          :current-page.sync="table_config.query.page"
+          :current-page.sync="table_config.page"
           background
           small
           @current-change="tablePageChange"
@@ -42,11 +42,11 @@
     <el-table
       :data="table_config.data"
       style="width: 100%;margin-top:30px;"
-      v-loading="fetchHierarchyLogsState.initial"
+      v-loading="fetchSubordinatesState.initial"
     >
       <el-table-column label="Name">
         <template slot-scope="scope">
-          <router-link :to="'/profile/index/'+scope.row.id">{{ scope.row.child_details.full_name }}</router-link>
+          <router-link :to="'/profile/index/'+scope.row.child_id">{{ scope.row.child_details.full_name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Email">
@@ -70,6 +70,7 @@ export default {
   data() {
     return {
       table_config: {
+        page:1,
         data: [],
         dummy: [],
         count: 0,
@@ -77,8 +78,9 @@ export default {
         query: {
           date: moment().format(ymdHms),
           parent_id: this.$route.params.id,
-          page: 1,
-          perpage: 10
+          offset: null,
+          limit: 10,
+          search:''
         },
         remoteFilter: {
           select: null,
@@ -92,71 +94,40 @@ export default {
   computed: {
     ...mapGetters([
       "token",
-      "fetchHierarchyLogsState",
-      "fetchHierarchyLogsData",
-      "fetchHierarchyLogsTitle"
-    ])
+      "fetchSubordinatesState",
+      "fetchSubordinatesData",
+      "fetchSubordinatesTitle"
+    ]),
+    offset(){
+      return (this.table_config.page - 1) * this.table_config.query.limit; 
+    }
   },
   watch: {
     "table_config.query.parent_id": function() {
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.fetchSubordinates(this.table_config.query);
     },
-    "table_config.remoteFilter.select": function(v) {
-      if (v) {
-        this.table_config.query.child_id = v;
-      } else {
-        delete this.table_config.query.child_id;
-      }
-      this.fetchHierarchyLogs(this.table_config.query);
-    },
-    fetchHierarchyLogsState({ initial, success, fail }) {
+    fetchSubordinatesState({ initial, success, fail }) {
       if (success) {
-        this.table_config.data = this.fetchHierarchyLogsData.hierarchy_log.data;
-        this.table_config.count = this.fetchHierarchyLogsData.count;
-        this.table_config.page = this.fetchHierarchyLogsData.hierarchy_log.current_page;
+        this.table_config.data = this.fetchSubordinatesData.subordinates;
+        this.table_config.count = this.fetchSubordinatesData.count;
+        this.table_config.page = this.fetchSubordinatesData.hierarchy_log.current_page;
       }
     }
   },
   created() {
-    this.fetchHierarchyLogs(this.table_config.query);
+    this.fetchSubordinates(this.table_config.query);
   },
   methods: {
-    ...mapActions(["fetchHierarchyLogs", "deleteHierarchyLog"]),
-    getTableFilterOptions(url) {
-      let options = {
-        headers: {
-          Authorization: "Bearer " + this.token
-        }
-      };
-
-      axios
-        .get(url, options)
-        .then(res => {
-          this.table_config.remoteFilter.options = res.data.meta.hierarchy_log;
-        })
-        .catch(err => console.log(err.response.data));
-    },
+    ...mapActions(["fetchSubordinates"]),
     tableSizeChange(v) {
-      this.table_config.query.page = 1;
-      this.table_config.query.perpage = v;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.table_config.page = 1;
+      this.table_config.query.limit = v;
+      this.fetchSubordinates(this.table_config.query);
     },
     tablePageChange(v) {
-      this.table_config.query.page = v;
-      this.fetchHierarchyLogs(this.table_config.query);
+      this.table_config.page = v;
+      this.fetchSubordinates(this.table_config.query);
     },
-    remoteSearch(query) {
-      let url =
-        "api/v1/hierarchy_log?list=true&date=" +
-        moment(this.table_config.query.date).format(ymdHms) +
-        "&parent_id=" +
-        this.table_config.query.parent_id +
-        "&filter_by=child_details";
-      if (query != "") {
-        url += "&target[]=full_name&query=" + query;
-      }
-      this.getTableFilterOptions(url);
-    }
   }
 };
 </script>

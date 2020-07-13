@@ -1,14 +1,14 @@
 <template>
   <div class="container">
     <el-row :gutter="5">
-      <el-col :md="{span:12}">
+      <el-col :md="{span:24}">
         <el-select size="mini" v-model="filter" @change="selectFilter" style="width:100%">
           <el-option value="all" label="All"></el-option>
           <el-option value="om" label="Operations Manager"></el-option>
           <el-option value="tl" label="Team Leader"></el-option>
         </el-select>
       </el-col>
-      <el-col :md="{span:12}">
+      <el-col :md="{span:24}" style="margin-top:5px;">
         <user-remote
           :placeholder="user_remote_config.placeholder"
           :multiple="user_remote_config.multiple"

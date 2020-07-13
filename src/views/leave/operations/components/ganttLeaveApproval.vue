@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="gantt-container shadow">
     <div
       v-loading="table.loader"
       :style="
@@ -43,6 +43,7 @@
             <el-table-column width="70" fixed sortable="custom" class="gantt-table">
               <template slot-scope="scope">
                 <div class="user-block">
+                  <el-tooltip :content="scope.row.full_name" placement="top">
                   <div v-if="scope.row.image_url" style="width:100%;">
                     <div style="margin:0 auto;height:30px;width:30px;">
                       <img class="img-circle" style="margin:0 auto;" :src="scope.row.image_url" />
@@ -64,6 +65,7 @@
                       </div>
                     </div>
                   </div>
+                  </el-tooltip>
                 </div>
               </template>
             </el-table-column>

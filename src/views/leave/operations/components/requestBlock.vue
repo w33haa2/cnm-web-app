@@ -79,17 +79,23 @@ export default {
     allowAction() {
       let result = false;
 
-      if (
-        this.leave.leave_type == "leave_of_absence" ||
-        this.leave.leave_type == "vacation_leave"
-      ) {
-        if (this.position.toLowerCase() == "operations manager") {
+      // if (
+      //   this.leave.leave_type == "leave_of_absence" ||
+      //   this.leave.leave_type == "vacation_leave"
+      // ) {
+      //   if (this.position.toLowerCase() == "operations manager") {
+      //     result = true;
+      //   } else if (this.position.toLowerCase() == "team leader") {
+      //     // if(){
+      //     result = false;
+      //     // }
+      //   }
+      // }
+      switch(this.position.toLowerCase()){
+        case "operations manager":
+        case "team leader":
           result = true;
-        } else if (this.position.toLowerCase() == "team leader") {
-          // if(){
-          result = false;
-          // }
-        }
+          break;
       }
       return result;
     },
@@ -146,6 +152,8 @@ export default {
                 message: res.data.title
               });
             }
+          }).catch(err=>{
+            alert(err.response.data.title)
           });
       }
     },

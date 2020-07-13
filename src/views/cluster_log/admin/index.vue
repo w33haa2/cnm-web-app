@@ -10,7 +10,7 @@
           size="mini"
           type="date"
           format="yyyy-MM-dd"
-          value-format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd HH:mm:ss"
           :clearable="false"
           style="width:100%"
         />
@@ -157,7 +157,8 @@ export default {
       "fetchHierarchyLogsTitle",
       "deleteHierarchyLogState",
       "deleteHierarchyLogData",
-      "deleteHierarchyLogTitle"
+      "deleteHierarchyLogTitle",
+      "position"
     ])
   },
   watch: {
@@ -180,15 +181,34 @@ export default {
     },
     "table_config.query.date": function(v) {
       this.table_config.query.page = 1;
-      this.table_config.remoteFilter.select = null;
-      this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
-      this.getTableFilterOptions();
+      // this.table_config.remoteFilter.select = null;
+      if(this.table_config.remoteFilter.by == 'all'){
+        this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
+        this.getTableFilterOptions();
+      }else{
+        if (this.table_config.remoteFilter.select) {
+          let data = {
+            operations: this.isOperations(),
+            date: v,
+            perpage: this.table_config.query.perpage,
+            page: this.table_config.query.page
+          };
+          if (this.table_config.remoteFilter.by == "parent_details") {
+            data.parent_id = this.table_config.remoteFilter.select;
+          } else {
+            data.child_id = this.table_config.remoteFilter.select;
+          }
+          this.fetchHierarchyLogs(data);
+        } else {
+          this.fetchHierarchyLogs(this.unsetNull(this.table_config.query));
+        }
+      }
     },
     "table_config.remoteFilter.select": function(v) {
       if (v) {
         let data = {
-          operations: true,
-          data: this.table_config.query.date,
+          operations: this.isOperations(),
+          date: this.table_config.query.date,
           perpage: this.table_config.query.perpage,
           page: this.table_config.query.page
         };
@@ -277,16 +297,19 @@ export default {
         url += "&target[]=full_name&query=" + query;
       }
       this.getTableFilterOptions(url);
-      // let filtered = null;
-      // this.table_config.remoteFilter.options = [];
-      // this.table_config.remoteFilter.loader = true;
-      // if (query !== null) {
-      //   filtered = this.table_config.dummy.filter(i=> i[this.table_config.remoteFilter.by].full_name.toLowerCase().includes(query));
-      // } else {
-      //   filtered = this.table_config.dummy;
-      // }
-      // this.table_config.remoteFilter.options = filtered;
-      // this.table_config.remoteFilter.loader = false;
+    },
+    isOperations(){
+      let result = false;
+      switch(this.position.toLowerCase()){
+        case 'operations manager':
+          case 'team leader':
+            result=true;
+            break;
+            default:
+              result =false;
+              break
+      }
+      return result;
     }
   }
 };

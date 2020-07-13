@@ -658,7 +658,7 @@ export default {
           this.popup.data.schedule.out
         ).format("YYYY-MM-DD HH:mm:ss");
 
-        if (schedule.user_status.status == "active") {
+        if (schedule.user_status.status.toLowerCase() == "active") {
           if (
             schedule.remarks.toLowerCase() == "on-leave" &&
             schedule.leave.status == "approved"

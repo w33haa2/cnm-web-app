@@ -103,7 +103,7 @@
       </el-table-column>
       <el-table-column align="center" label="Response" width="220">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.response" type="success">Responded</el-tag>
+          <el-tag v-if="scope.row.report_details.agent_response" type="success">{{scope.row.report_details.agent_response.commitment}}</el-tag>
           <el-tag v-else type="danger">No Response</el-tag>
         </template>
       </el-table-column>

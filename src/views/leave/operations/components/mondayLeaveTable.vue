@@ -1,10 +1,29 @@
 <template>
-  <div>
+  <div class="table-container shadow">
     <el-row :gutter="20">
-      <el-col :md="{ span: 24 }">
-        <h4 style="color:red">Requests</h4>
+      <el-col :md="{ span: 6 }">
+        <div class="text-header">Requests</div>
       </el-col>
-      <el-col :md="{ span: 4 }">
+      <el-col :md="{ span: 18 }">
+        <el-pagination
+          style="float:right"
+          small
+          background
+          :pager-count="5"
+          :page-sizes="[10, 25, 50]"
+          :page-size="table.request.limit"
+          layout="total, sizes, prev, pager, next"
+          :total="table.count"
+          @size-change="tableSizeChange"
+          @current-change="tablePageChange"
+        />
+      </el-col>
+      <el-col :md="{ span: 7 }" style="margin-top:10px">
+        <el-tooltip content="Name Search">
+          <el-input size="mini" v-model="table.request.query" placeholder="Search..."></el-input>
+        </el-tooltip>
+      </el-col>
+      <el-col :md="{ span: 6, offset:11 }" style="margin-top:10px;">
         <el-tooltip content="Request Week">
           <el-date-picker
             size="mini"
@@ -17,24 +36,6 @@
             v-model="table.request.created_start_date"
             @change="weekChange"
           />
-        </el-tooltip>
-      </el-col>
-      <el-col :md="{ span: 20 }">
-        <el-pagination
-          style="float:right"
-          small
-          background
-          :page-sizes="[10, 25, 50]"
-          :page-size="table.request.limit"
-          layout="total, sizes, prev, pager, next"
-          :total="table.count"
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-        />
-      </el-col>
-      <el-col :md="{ span: 4, offset: 20 }" style="margin-top:10px">
-        <el-tooltip content="Name Search">
-          <el-input size="mini" v-model="table.request.query" placeholder="Search..."></el-input>
         </el-tooltip>
       </el-col>
       <el-col style="margin-top:10px">

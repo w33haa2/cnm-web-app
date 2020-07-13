@@ -34,7 +34,7 @@ export default {
   components: { timeLogger, previousWork },
   data() {
     return {
-      drawer: true,
+      drawer: false,
       toggle: {
         previous_work: true
       },

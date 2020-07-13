@@ -4,13 +4,29 @@ import Cookies from 'js-cookie'
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets
 
-import Element from 'element-ui'
-import './styles/element-variables.scss'
+import Element from 'element-ui';
+import './styles/element-variables.scss';
 
-import moment from 'moment'
+import moment from 'moment';
+
+// material icons
+import TuneIcon from 'vue-material-design-icons/Tune.vue';
+Vue.component('tune-icon', TuneIcon);
+import PlusIcon from 'vue-material-design-icons/Plus.vue';
+Vue.component('plus-icon', PlusIcon);
+import FileImportIcon from 'vue-material-design-icons/FileImportOutline.vue';
+Vue.component('file-import-icon', FileImportIcon);
+import FileExportIcon from 'vue-material-design-icons/FileExportOutline.vue';
+Vue.component('file-export-icon', FileExportIcon);
+import EmailSendIcon from 'vue-material-design-icons/EmailSendOutline.vue';
+Vue.component('email-send-icon', EmailSendIcon);
+import CalendarIcon from 'vue-material-design-icons/CalendarOutline.vue';
+Vue.component('calendar-icon', CalendarIcon);
+import CalendarMultipleIcon from 'vue-material-design-icons/CalendarMultiple.vue';
+Vue.component('calendar-multiple-icon', CalendarMultipleIcon);
+import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
-
 import App from './App'
 import store from './store'
 import router from './router'

@@ -157,6 +157,11 @@ export default {
         this.table_config.count = this.sanctionTypesSearch.count;
         this.table_config.loader = false;
       }
+      if(fail){
+        this.table_config.data = this.sanctionTypesSearch.sanction_types;
+        this.table_config.count = this.sanctionTypesSearch.count;
+        this.table_config.loader = false;
+      }
     },
     createSanctionTypeState({ initial, success, fail }) {
       if (initial) {

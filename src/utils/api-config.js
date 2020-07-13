@@ -301,6 +301,10 @@ const api = {
             $method: "DELETE",
             $requires: ["id"],
             $format: Template(() => `delete/${id}`)
+          },
+          subordinates:{
+            $url: "subordinates",
+            $method: "GET"
           }
         },
         // endregion heirarchy_log

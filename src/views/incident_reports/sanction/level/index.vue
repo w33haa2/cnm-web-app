@@ -161,6 +161,11 @@ export default {
         this.table_config.count = this.sanctionLevelsSearch.count;
         this.table_config.loader = false;
       }
+      if (fail) {
+        this.table_config.data = [];
+        this.table_config.count = 0;
+        this.table_config.loader = false;
+      }
     },
     searchQuery: function(newData) {
       if (newData !== "") {

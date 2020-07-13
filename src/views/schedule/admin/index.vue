@@ -1,157 +1,147 @@
 <template>
   <div>
     <div class="app-container">
-      <h4 style="color:#646464">
-        Agent Schedule
-        <small style="font-weight:lighter">{{
-          "(" +
-            formatDate(query.start, "YYYY-MM-DD", "MMM Do") +
-            " - " +
-            formatDate(query.end, "YYYY-MM-DD", "MMM Do") +
-            ")"
-        }}</small>
-      </h4>
-
-      <el-row :gutter="5" style="margin-top:10px;">
-        <el-col :md="{ span: 4 }">
-          <el-date-picker
-            size="mini"
-            v-model="week.start"
-            type="week"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
-            :picker-options="{ firstDayOfWeek: 2 }"
-            :clearable="false"
-            style="width:100%"
-            @change="weekChange"
-            :disabled="isFetchingWorkReports"
-          />
-        </el-col>
-        <el-col :md="{ span: 4 }">
-          <el-input v-model="searchQuery" size="mini" placeholder="Search..." />
-        </el-col>
-
-        <el-col :md="{ span: 16 }" style="margin-top:10px;">
-          <el-pagination
-            style="float:right"
-            :page-sizes="[10, 25, 50]"
-            :page-size="query.limit"
-            :current-page.sync="table_page"
-            layout="total, sizes, prev, pager, next"
-            :total="agentsWorkReports.count"
-            background
-            small
-            @size-change="tableSizeChange"
-            @current-change="tablePageChange"
-          />
-        </el-col>
-
-        <el-col :xs="{ span: 24 }" :sm="{ span: 24 }" :md="{ span: 24 }">
-          <el-switch
-            v-model="show_option"
-            active-text="Show more options"
-          ></el-switch>
-        </el-col>
-        <el-col
-          :xs="{ span: 12 }"
-          :sm="{ span: 12 }"
-          :md="{ span: 12 }"
-          style="margin-top:10px;"
-        >
-          <el-row :gutter="5" v-show="show_option">
-            <template v-if="position.toLowerCase() != 'team leader'">
-              <el-col
-                :md="{ span: 8 }"
-                style="font-size:.8em;color:grey;padding-top:5px;"
+      <div class="title-bar shadow">
+        <el-row :gutter="8">
+          <el-col :md="{ span: 8 }">
+            <div style="display:flex;">
+              <div class="title-wrapper" style="margin-right:10px">
+                Agent Schedule
+              </div>
+              <!-- add leave HR -->
+              <template v-if="isHR()">
+                <div
+                  class="button-icon round active"
+                  style="display:flex;justify-content:center;margin-right:5px;"
+                  @click="showModal('addLeave')"
+                >
+                  <el-tooltip content="Add Leave">
+                    <plus-icon></plus-icon>
+                  </el-tooltip>
+                </div>
+              </template>
+              <!-- add schedule RTA -->
+              <template v-if="isRTA()">
+                <div
+                  class="button-icon round active"
+                  style="display:flex;justify-content:center;margin-right:5px;"
+                  @click="
+                    showModal('addSchedule'),
+                      (form.addSchedule.model.auto_assign = false)
+                  "
+                >
+                  <el-tooltip content="Add Schedule">
+                    <plus-icon></plus-icon>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template v-if="isRTA()">
+                <div
+                  class="button-icon round excel"
+                  style="display:flex;justify-content:center;margin-right:5px;"
+                  @click="handleCommand('importSchedule')"
+                >
+                  <el-tooltip content="Import Schedule">
+                    <calendar-icon></calendar-icon>
+                  </el-tooltip>
+                </div>
+              </template>
+              <template v-if="isRTA()">
+                <div
+                  class="button-icon round excel"
+                  style="display:flex;justify-content:center;margin-right:5px;"
+                  @click="handleCommand('importScheduleQuarterly')"
+                >
+                  <el-tooltip content="Import Schedule Quarterly">
+                    <calendar-multiple-icon></calendar-multiple-icon>
+                  </el-tooltip>
+                </div>
+              </template>
+              <div
+                class="button-icon round excel"
+                style="display:flex;justify-content:center;margin-right:5px;"
+                @click="handleCommand('exportSVA')"
               >
-                <label>Advance Filter</label>
-              </el-col>
-              <el-col :md="{ span: 16 }">
-                <el-tooltip content="Filter By">
+                <el-tooltip content="Send SVA to mail">
+                  <email-send-icon></email-send-icon>
+                </el-tooltip>
+              </div>
+            </div>
+          </el-col>
+          <el-col :md="{ span: 6, offset: 6 }">
+            <el-input v-model="searchQuery" placeholder="Search..." />
+          </el-col>
+          <el-col :md="{ span: 3 }">
+            <el-date-picker
+              v-model="week.start"
+              type="week"
+              format="yyyy-MM-dd"
+              value-format="yyyy-MM-dd"
+              :picker-options="{ firstDayOfWeek: 2 }"
+              :clearable="false"
+              style="width:100%"
+              @change="weekChange"
+              :disabled="isFetchingWorkReports"
+            />
+          </el-col>
+          <el-col :md="{ span: 1 }">
+            <el-popover
+              placement="left"
+              width="200"
+              trigger="manual"
+              content="this is content, this is content, this is content"
+              v-model="show_option"
+            >
+              <div>
+                <div style="font-weight:700;margin-bottom:20px;">Options</div>
+                <div stle="margin-top:20px;">
+                  <div style="font-weight:500;font-size:.9em">Filter By</div>
                   <template v-if="isRTA() || isHR() || isADMIN()">
-                    <remote-filter-head
-                      :range="{ start: query.start, end: query.end }"
-                      @filter="filterTable"
-                    ></remote-filter-head>
+                    <div>
+                      <remote-filter-head
+                        :range="{ start: query.start, end: query.end }"
+                        @filter="filterTable"
+                      ></remote-filter-head>
+                    </div>
                   </template>
                   <template
                     v-if="position.toLowerCase() == 'operations manager'"
                   >
-                    <tl-filter
-                      :range="{ start: query.start, end: query.end }"
-                      @filter="filterTable"
-                      :om_id="user_id"
-                    ></tl-filter>
+                    <div>
+                      <tl-filter
+                        :range="{ start: query.start, end: query.end }"
+                        @filter="filterTable"
+                        :om_id="user_id"
+                      ></tl-filter>
+                    </div>
                   </template>
-                </el-tooltip>
-              </el-col>
-            </template>
-            <el-col
-              :md="{ span: 8 }"
-              style="font-size:.8em;color:grey;padding-top:5px;"
-            >
-              <label>Preview</label>
-            </el-col>
-            <el-col :md="{ span: 16 }" style="margin-top:5px">
-              <el-tooltip content="Display preview">
-                <template>
-                  <el-select
-                    size="mini"
-                    v-model="table_config.view"
-                    style="float:right"
-                  >
-                    <el-option value="hours" label="Hours" />
-                    <el-option value="log_status" label="Log status" />
-                  </el-select>
-                </template>
-              </el-tooltip>
-            </el-col>
-            <el-col
-              :md="{ span: 8 }"
-              style="font-size:.8em;color:grey;padding-top:5px;"
-            >
-              <label>Functions</label>
-            </el-col>
-            <el-col :md="{ span: 16 }" style="margin-top:5px">
-              <div style="float:right">
-                <template v-if="isRTA()">
-                  <el-button
-                    size="mini"
-                    @click="
-                      showModal('addSchedule'),
-                        (form.addSchedule.model.auto_assign = false)
-                    "
-                    >Add Schedule</el-button
-                  >
-                </template>
-                <template v-if="isHR()">
-                  <el-button size="mini" @click="showModal('addLeave')"
-                    >Add Leave</el-button
-                  >
-                </template>
-                <template>
-                  <el-dropdown @command="handleCommand">
-                    <el-button type="success" :plain="true" size="mini">
-                      Excel
-                      <i class="el-icon-arrow-down el-icon--right" />
-                    </el-button>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item v-if="isRTA()" command="importSchedule"
-                        >Import Schedule</el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        v-if="isRTA()"
-                        command="importScheduleQuarterly"
-                        >Import Schedule(Quarterly)</el-dropdown-item
-                      >
-                      <el-dropdown-item command="exportSVA"
-                        >Export SVA Report</el-dropdown-item
-                      >
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </template>
+                </div>
+                <div style="margin-top:10px;">
+                  <div style="font-weight:500;font-size:.9em">View</div>
+                  <div>
+                    <el-select size="mini" v-model="table_config.view">
+                      <el-option value="hours" label="Hours" />
+                      <el-option value="log_status" label="Log status" />
+                    </el-select>
+                  </div>
+                </div>
               </div>
-            </el-col>
+              <div
+                slot="reference"
+                class="button-icon round"
+                :class="filter.active ? 'active' : ''"
+                style="display:flex;justify-content:center;width:32px;height:32px;"
+                @click="show_option = !show_option"
+              >
+                <el-tooltip content="Filters">
+                  <tune-icon></tune-icon>
+                </el-tooltip>
+              </div>
+            </el-popover>
+          </el-col>
+        </el-row>
+
+        <!-- import file -->
             <input
               type="file"
               v-if="importScheduleReset"
@@ -160,166 +150,155 @@
               style="display:none"
               @change="importScheduleFileChangeV2"
             />
-          </el-row>
-        </el-col>
-      </el-row>
-      <el-row style="margin-top:10px;">
-        <el-col
-          :xs="{ span: 24 }"
-          :sm="{ span: 24 }"
-          :md="{ span: 24 }"
-          :lg="{ span: 24 }"
-          :xl="{ span: 24 }"
-        >
-          <el-table
-            class="monday"
-            v-loading="isFetchingWorkReports"
-            :data="tableData"
-            @sort-change="columnSort"
-          >
-            <!-- <el-table-column
-              label="Employee"
-              min-width="200"
-              prop="full_name"
-              fixed
-              sortable="custom"
-            >
-              <template slot-scope="scope">
-                <div class="user-block">
-                  <img v-if="scope.row.image" class="img-circle" :src="scope.row.image" />
-                  <div
-                    v-else
-                    class="img-circle text-muted"
-                    style="background-color:#d9d9d9;display:flex"
-                  >
-                    <div
-                      style="align-self:center;width:100%;text-align:center;"
-                      class="text-point-eight-em"
-                    >{{ getAvatarLetters(scope.row.info.firstname,scope.row.info.lastname) }}</div>
-                  </div>
-                  <span>
-                    <span class="el-dropdown-link" style="font-weight:600">{{ scope.row.full_name }}</span>
-                  </span>
-                </div>
-              </template>
-            </el-table-column>-->
-            <el-table-column
-              width="250"
-              label="Name"
-              sortable="custom"
-              prop="full_name"
-              fixed
-            >
-              <template slot="header">
-                <span style="font-weight:normal;font-size:.8em">Name</span>
-              </template>
-              <template slot-scope="scope">
-                <div style="height:45px;border-left:red 7px solid;display:flex">
-                  <el-tooltip :content="scope.row.email">
-                    <div
-                      style="width:100%;align-self:center;padding-left:20px;"
-                    >
-                      {{ scope.row.full_name }}
-                    </div>
-                  </el-tooltip>
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column align="center" width="50" fixed>
-              <!-- sortable="custom" prop="full_name" -->
+      </div>
 
-              <template slot-scope="scope">
-                <div class="user-block">
-                  <div v-if="scope.row.image_url" style="width:100%;">
-                    <div style="margin:0 auto;height:30px;width:30px;">
-                      <img
-                        class="img-circle"
-                        style="margin:0 auto;"
-                        :src="scope.row.image_url"
-                      />
-                    </div>
+      <div
+        style="background-color:white;border-radius:10px;padding:15px;margin-top:10px"
+        class="shadow"
+      >
+        <el-row>
+          <el-col :md="{ span: 8 }" style="margin-bottom:5px;">
+            {{
+              formatDate(query.start, "YYYY-MM-DD", "MMM Do") +
+                " - " +
+                formatDate(query.end, "YYYY-MM-DD", "MMM Do")
+            }}
+          </el-col>
+          <el-col :md="{ span: 16 }" style="margin-bottom:5px;text-align:right">
+            <el-pagination
+              style="float:right"
+              :page-sizes="[10, 25, 50]"
+              :page-size="query.limit"
+              :current-page.sync="table_page"
+              layout="total, sizes, prev, pager, next"
+              :total="agentsWorkReports.count"
+              background
+              small
+              @size-change="tableSizeChange"
+              @current-change="tablePageChange"
+            />
+          </el-col>
+          <el-col
+            :xs="{ span: 24 }"
+            :sm="{ span: 24 }"
+            :md="{ span: 24 }"
+            :lg="{ span: 24 }"
+            :xl="{ span: 24 }"
+          >
+            <el-table
+              class="monday"
+              v-loading="isFetchingWorkReports"
+              :data="tableData"
+              @sort-change="columnSort"
+            >
+              <el-table-column
+                width="250"
+                label="Name"
+                sortable="custom"
+                prop="full_name"
+                fixed
+              >
+                <template slot="header">
+                  <span style="font-weight:normal;font-size:.8em">Name</span>
+                </template>
+                <template slot-scope="scope">
+                  <div
+                    style="height:45px;border-left:red 7px solid;display:flex"
+                  >
+                    <el-tooltip :content="scope.row.email">
+                      <div
+                        style="width:100%;align-self:center;padding-left:20px;"
+                      >
+                        {{ scope.row.full_name }}
+                      </div>
+                    </el-tooltip>
                   </div>
-                  <div v-else class="text-muted" style="width:100%;">
-                    <div
-                      class="img-circle"
-                      style="background-color:white;margin:0 auto;"
-                    >
-                      <div style="display:flex;height:30px;width:30px;">
-                        <div
-                          style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
-                        >
-                          {{
-                            getAvatarLetters(
-                              scope.row.info.firstname,
-                              scope.row.info.lastname
-                            )
-                          }}
+                </template>
+              </el-table-column>
+              <el-table-column align="center" width="50" fixed>
+                <!-- sortable="custom" prop="full_name" -->
+
+                <template slot-scope="scope">
+                  <div class="user-block">
+                    <div v-if="scope.row.image_url" style="width:100%;">
+                      <div style="margin:0 auto;height:30px;width:30px;">
+                        <img
+                          class="img-circle"
+                          style="margin:0 auto;"
+                          :src="scope.row.image_url"
+                        />
+                      </div>
+                    </div>
+                    <div v-else class="text-muted" style="width:100%;">
+                      <div
+                        class="img-circle"
+                        style="background-color:white;margin:0 auto;"
+                      >
+                        <div style="display:flex;height:30px;width:30px;">
+                          <div
+                            style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                          >
+                            {{
+                              getAvatarLetters(
+                                scope.row.info.firstname,
+                                scope.row.info.lastname
+                              )
+                            }}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </template>
-            </el-table-column>
-            <template v-for="(thead, index1) in tableHeader">
-              <el-table-column align="center" :key="index1">
-                <template slot="header">
-                  <!-- <h4
+                </template>
+              </el-table-column>
+              <template v-for="(thead, index1) in tableHeader">
+                <el-table-column align="center" :key="index1">
+                  <template slot-scope="scope" slot="header">
+                    <!-- <h4
                     :class="[dateToday(tableHeader[index1].date)?'today-header':'']"
                     style="margin-bottom:5px"
                   >{{ tableHeader[index1].day }}</h4> -->
-                  <span
-                    style="font-weight:normal;font-size:.8em"
-                    :class="[
-                      dateToday(tableHeader[index1].date) ? 'today-header' : ''
-                    ]"
-                    >{{
-                      tableHeader[index1].day + ", " + tableHeader[index1].date1
-                    }}</span
-                  >
-                </template>
-                <template slot-scope="{ row }">
-                  <template
-                    v-if="
-                      sched_array.filter(
-                        i =>
-                          i.user_info.id == row.uid &&
-                          formatDate(
-                            i.start_event.date,
-                            'YYYY-MM-DD HH:mm:ss',
-                            'YYYY-MM-DD'
-                          ) == tableHeader[index1].date
-                      ).length > 0
-                    "
-                  >
+                    <span
+                      style="font-weight:normal;font-size:.8em"
+                      :class="[
+                        dateToday(tableHeader[index1].date)
+                          ? 'today-header'
+                          : ''
+                      ]"
+                      >{{
+                        tableHeader[index1].day +
+                          ", " +
+                          tableHeader[index1].date1
+                      }}</span
+                    >
+                  </template>
+                  <template slot-scope="{ row }">
                     <template
-                      v-for="(schedule, index) in sched_array.filter(
-                        i =>
-                          i.user_info.id == row.uid &&
-                          formatDate(
-                            i.start_event.date,
-                            'YYYY-MM-DD HH:mm:ss',
-                            'YYYY-MM-DD'
-                          ) == tableHeader[index1].date
-                      )"
+                      v-if="
+                        sched_array.filter(
+                          i =>
+                            i.user_info.id == row.uid &&
+                            formatDate(
+                              i.start_event.date,
+                              'YYYY-MM-DD HH:mm:ss',
+                              'YYYY-MM-DD'
+                            ) == tableHeader[index1].date
+                        ).length > 0
+                      "
                     >
                       <template
-                        v-if="
-                          sched_array.filter(
-                            i =>
-                              i.user_info.id == row.uid &&
-                              formatDate(
-                                i.start_event.date,
-                                'YYYY-MM-DD HH:mm:ss',
-                                'YYYY-MM-DD'
-                              ) == tableHeader[index1].date
-                          )[index]
-                        "
+                        v-for="(schedule, index) in sched_array.filter(
+                          i =>
+                            i.user_info.id == row.uid &&
+                            formatDate(
+                              i.start_event.date,
+                              'YYYY-MM-DD HH:mm:ss',
+                              'YYYY-MM-DD'
+                            ) == tableHeader[index1].date
+                        )"
                       >
-                        <cell-content
-                          @refreshTable="weekChange(week.start)"
-                          :key="index"
-                          :schedule="
+                        <template
+                          v-if="
                             sched_array.filter(
                               i =>
                                 i.user_info.id == row.uid &&
@@ -330,30 +309,46 @@
                                 ) == tableHeader[index1].date
                             )[index]
                           "
-                          :date="tableHeader[index1].date"
-                          :info="row.info"
-                          :view="table_config.view"
-                        />
+                        >
+                          <cell-content
+                            @refreshTable="weekChange(week.start)"
+                            :key="index"
+                            :schedule="
+                              sched_array.filter(
+                                i =>
+                                  i.user_info.id == row.uid &&
+                                  formatDate(
+                                    i.start_event.date,
+                                    'YYYY-MM-DD HH:mm:ss',
+                                    'YYYY-MM-DD'
+                                  ) == tableHeader[index1].date
+                              )[index]
+                            "
+                            :date="tableHeader[index1].date"
+                            :info="row.info"
+                            :view="table_config.view"
+                          />
+                        </template>
                       </template>
                     </template>
-                  </template>
-                  <!-- v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length===0" -->
+                    <!-- v-else-if="sched_array.filter(i=> i.user_info.id==row.id && formatDate(i.start_event.date,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD')==tableHeader[index1].date).length===0" -->
 
-                  <template v-else>
-                    <div style="width:100%;padding:0px;margin:0px;">
-                      <div
-                        style="padding:3px;font-size:.85em;color:#909399;height:inherit"
-                      >
-                        OFF
+                    <template v-else>
+                      <div style="width:100%;padding:0px;margin:0px;">
+                        <div
+                          style="padding:3px;font-size:.85em;color:#909399;height:inherit"
+                        >
+                          OFF
+                        </div>
                       </div>
-                    </div>
+                    </template>
                   </template>
-                </template>
-              </el-table-column>
-            </template>
-          </el-table>
-        </el-col>
-      </el-row>
+                </el-table-column>
+              </template>
+            </el-table>
+          </el-col>
+        </el-row>
+      </div>
 
       <!-- Create and Update Dialog -->
       <el-dialog
@@ -1155,7 +1150,7 @@ export default {
     return {
       isFetchingWorkReports: false,
       importScheduleReset: true,
-      show_option: true,
+      show_option: false,
       blank: [{}],
       axios: { options: { headers: { Authorization: null } } },
       sched_array: [],
@@ -1256,7 +1251,8 @@ export default {
       },
       filter: {
         by: "all",
-        options: []
+        options: [],
+        active: false
       },
       week: {
         start: moment()
@@ -1349,9 +1345,13 @@ export default {
           if (v.tl_id) {
             this.query.tl_id = v.tl_id;
             this.query.om_id = null;
+            this.filter.active = true;
           } else if (v.om_id) {
             this.query.tl_id = null;
             this.query.om_id = v.om_id;
+            this.filter.active = true;
+          } else {
+            this.filter.active = false;
           }
           break;
       }
@@ -1722,7 +1722,7 @@ export default {
           this.select[query.var] = "all";
         })
         .catch(err => {
-          console.log(err.response.data);
+          // console.log(err.response.data);
           this.options[query.var].unshift({ value: "all", label: "All" });
           this.select[query.var] = "all";
         });
@@ -1744,16 +1744,6 @@ export default {
 
       this.week.start = this.query.start;
 
-      const range = moment.range(this.query.start, this.query.end);
-      const dates = Array.from(range.by("day")).map(m =>
-        m.format("YYYY-MM-DD")
-      );
-
-      this.tableHeader = dates.map(d => ({
-        day: moment(d).format("ddd"),
-        date: moment(d).format("YYYY-MM-DD"),
-        date1: moment(d).format("MMM Do")
-      }));
 
       this.refetchSchedules();
     },
@@ -1777,6 +1767,21 @@ export default {
       }
     },
     refetchSchedules() {
+      // table header update
+      const range = moment.range(this.query.start, this.query.end);
+      const dates = Array.from(range.by("day")).map(m =>
+        m.format("YYYY-MM-DD")
+      );
+
+      let header = dates.map(d => ({
+        day: moment(d).format("ddd"),
+        date: moment(d).format("YYYY-MM-DD"),
+        date1: moment(d).format("MMM Do")
+      }));
+
+      this.tableHeader = header;
+
+
       let data = this.query;
       switch (this.position.toLowerCase()) {
         case "operations manager":

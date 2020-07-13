@@ -600,3 +600,79 @@ $status in $status-badge {
 .el-drawer__wrapper {
     z-index: 9999 !important;
 }
+
+.gantt-container {
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #1d1e3d;
+    margin-top: 10px;
+}
+
+.table-container {
+    border-radius: 10px;
+    background-color: white;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.shadow {
+    box-shadow: 0 0 3px 2px rgba(92, 92, 92, .2);
+}
+
+.text-header {
+    color: gray;
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+.title-bar {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    .title-wrapper {
+        align-self: center;
+        color: #646464;
+        font-weight: 700;
+        font-size: 1.2em;
+        padding: 5px 0px 5px 0px;
+    }
+}
+
+.material-design-icon {
+    height: .8em !important;
+    width: 1em;
+}
+
+.button-icon {
+    background-color: white;
+    cursor: pointer;
+    height: 32px;
+    width: 32px;
+    &.round {
+        border-radius: 50px
+    }
+    &:hover {
+        box-shadow: 0 0 2px 2px rgba(100, 100, 100, .1);
+    }
+    &.active {
+        box-shadow: 0 0 3px 2px rgba(182, 18, 18, 0.2);
+        background-color: crimson;
+        &:hover {
+            background-color: rgb(231, 29, 70);
+        }
+        .material-design-icon {
+            color: white;
+        }
+    }
+    &.excel {
+        box-shadow: 0 0 3px 2px rgba(51, 182, 18, 0.2);
+        background-color: #349e64;
+        &:hover {
+            background-color: #41be79;
+        }
+        .material-design-icon {
+            color: white;
+        }
+    }
+}

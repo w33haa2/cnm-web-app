@@ -233,10 +233,10 @@ export default {
       if (success) {
         console.log(this.fetchLeaveCreditsData);
         let tmp = this.fetchLeaveCreditsData.leave_credits,
-          vl = tmp.filter(i => i.leave_type == "vacation_leave")[0].value,
-          sl = tmp.filter(i => i.leave_type == "sick_leave")[0].value;
-        this.vl_credits = vl;
-        this.sl_credits = sl;
+          vl = tmp.filter(i => i.leave_type == "vacation_leave"),
+          sl = tmp.filter(i => i.leave_type == "sick_leave");
+        this.vl_credits = vl.length>0? vl[0].value:0;
+        this.sl_credits = sl.length>0? sl[0].value:0;
       }
       if (fail) {
         this.$message({

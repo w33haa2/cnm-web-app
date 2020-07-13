@@ -156,11 +156,9 @@
 
 <script>
 const avatarPrefix = "?imageView2/1/w/80/h/80";
-import TableExpansion from "./TableExpansion";
 import moment from "moment";
 import { mapGetters, mapActions } from "vuex";
 export default {
-  components: { TableExpansion },
   props: ["tableData"],
   computed: {
     ...mapGetters(["allPosition", "employeeFetchState"]),

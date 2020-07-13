@@ -317,6 +317,10 @@ const getters = {
     fetchHierarchyLogsState: state => state.fetch_hierarchy_log.state,
     fetchHierarchyLogsData: state => state.fetch_hierarchy_log.data,
     fetchHierarchyLogsTitle: state => state.fetch_hierarchy_log.title,
+    // fetch_subordinates
+    fetchSubordinatesState: state => state.fetch_subordinates.state,
+    fetchSubordinatesData: state => state.fetch_subordinates.data,
+    fetchSubordinatesTitle: state => state.fetch_subordinates.title,
     // delete_hierarchy_log
     deleteHierarchyLogState: state => state.delete_hierarchy_log.state,
     deleteHierarchyLogData: state => state.delete_hierarchy_log.data,
