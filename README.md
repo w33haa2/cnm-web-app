@@ -1,6 +1,6 @@
 ```bash
 # Install dependencies
-npm run install
+npm install
 
 # Update submodules
 git submodule update --init --recursive
