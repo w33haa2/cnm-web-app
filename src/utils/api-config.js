@@ -3,784 +3,792 @@ const version = "v1";
  * API routes mapping consuming the provided backend API.
  */
 const api = {
-  $children: {
-    // region Auth
-    auth: {
-      $prefix: "auth",
+    $children: {
+        // region Auth
+        auth: {
+            $prefix: "auth",
 
-      login: {
-        $url: "login",
-        $method: "POST"
-      },
-      logout: {
-        $url: "logout",
-        $method: "GET"
-      },
-      user: {
-        $url: "user",
-        $method: "GET"
-      }
-      // endregion Auth
-    },
-    api: {
-      // region API paths
-      $prefix: `api/${version}`,
-      $children: {
-        // region attendance
-        attendance: {
-          $prefix: "attendance",
-
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          create: {
-            // $url: "create",
-            // $method: "POST"
-            $prefix: "create",
-            single: {
-              $url: "",
-              $method: "POST"
+            login: {
+                $url: "login",
+                $method: "POST"
             },
-            $children: {
-              // region bulk creation
-              bulk: {
-                $prefix: "bulk",
-                data: {
-                  $url: "",
-                  $method: "POST"
-                },
-                excel: {
-                  $url: "excel",
-                  $method: "POST"
-                }
-              }
-              // end region bulk creation
-            }
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          agent_timein: {
-            $url: "time_in",
-            $method: "POST"
-          },
-          agent_timeout: {
-            $url: "time_out",
-            $method: "POST"
-          },
-          remove_timeout: {
-            $url: "time_out/remove",
-            $method: "POST"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          }
-        },
-        // endregion attendance
-
-        // region schedules
-        schedules: {
-          $prefix: "schedules",
-
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          agents: {
-            $url: "agents",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "agents",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          missed_logs: {
-            $url: "missed_logs",
-            $method: "GET"
-          },
-          create: {
-            // $url: "create",
-            // $method: "POST"
-            $prefix: "create",
-            single: {
-              $url: "",
-              $method: "POST"
+            logout: {
+                $url: "logout",
+                $method: "GET"
             },
-            $children: {
-              // region bulk creation
-              bulk: {
-                $prefix: "bulk",
-                data: {
-                  $url: "",
-                  $method: "POST"
-                },
-                excel: {
-                  $url: "excel",
-                  $method: "POST"
-                }
-              }
-              // end region bulk creation
+            user: {
+                $url: "user",
+                $method: "GET"
             }
-          },
-          create_bulk: {
-            $url: "create/bulk",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          stats: {
-            $url: "stats",
-            $method: "GET"
-          },
-          fetchSchedule: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          excel_to_array: {
-            $url: "excel_to_array",
-            $method: "POST"
-          },
-          report: {
-            $url: "work/report",
-            $method: "GET"
-          },
-          today: {
-            $url: "today",
-            $method: "GET"
-          },
-          join_ot: {
-            $url: "overtime/join",
-            $method: "POST"
-          },
-          approve_ot: {
-            $url: "overtime/approve",
-            $method: "POST"
-          },
-          revert_ot: {
-            $url: "overtime/approve/revert",
-            $method: "POST"
-          }
+            // endregion Auth
         },
-        // endregion schedules
+        api: {
+            // region API paths
+            $prefix: `api/${version}`,
+            $children: {
+                // region attendance
+                attendance: {
+                    $prefix: "attendance",
 
-        // region request schedules
-        request_schedules: {
-          $prefix: "request_schedules",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    create: {
+                        // $url: "create",
+                        // $method: "POST"
+                        $prefix: "create",
+                        single: {
+                            $url: "",
+                            $method: "POST"
+                        },
+                        $children: {
+                            // region bulk creation
+                            bulk: {
+                                $prefix: "bulk",
+                                data: {
+                                    $url: "",
+                                    $method: "POST"
+                                },
+                                excel: {
+                                    $url: "excel",
+                                    $method: "POST"
+                                }
+                            }
+                            // end region bulk creation
+                        }
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    agent_timein: {
+                        $url: "time_in",
+                        $method: "POST"
+                    },
+                    agent_timeout: {
+                        $url: "time_out",
+                        $method: "POST"
+                    },
+                    remove_timeout: {
+                        $url: "time_out/remove",
+                        $method: "POST"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    }
+                },
+                // endregion attendance
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          applicant: {
-            $url: "applicant",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          requested_by: {
-            $url: "requested_by",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          managed_by: {
-            $url: "managed_by",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          }
-        },
-        // endregion request schedules
+                // region schedules
+                schedules: {
+                    $prefix: "schedules",
 
-        // region access levels
-        access_level: {
-          $prefix: "position",
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST"
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST"
-          }
-        },
-        // endregion access levels
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    agents: {
+                        $url: "agents",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "agents",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    missed_logs: {
+                        $url: "missed_logs",
+                        $method: "GET"
+                    },
+                    create: {
+                        // $url: "create",
+                        // $method: "POST"
+                        $prefix: "create",
+                        single: {
+                            $url: "",
+                            $method: "POST"
+                        },
+                        $children: {
+                            // region bulk creation
+                            bulk: {
+                                $prefix: "bulk",
+                                data: {
+                                    $url: "",
+                                    $method: "POST"
+                                },
+                                excel: {
+                                    $url: "excel",
+                                    $method: "POST"
+                                }
+                            }
+                            // end region bulk creation
+                        }
+                    },
+                    create_bulk: {
+                        $url: "create/bulk",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    stats: {
+                        $url: "stats",
+                        $method: "GET"
+                    },
+                    fetchSchedule: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    excel_to_array: {
+                        $url: "excel_to_array",
+                        $method: "POST"
+                    },
+                    report: {
+                        $url: "work/report",
+                        $method: "GET"
+                    },
+                    today: {
+                        $url: "today",
+                        $method: "GET"
+                    },
+                    join_ot: {
+                        $url: "overtime/join",
+                        $method: "POST"
+                    },
+                    approve_ot: {
+                        $url: "overtime/approve",
+                        $method: "POST"
+                    },
+                    revert_ot: {
+                        $url: "overtime/approve/revert",
+                        $method: "POST"
+                    }
+                },
+                // endregion schedules
 
-        // region coaching
-        coaching: {
-          $prefix: "coaching",
-          create: {
-            $url: "create",
-            $method: "POST"
-          }
-        },
-        // endregion coaching
+                // region request schedules
+                request_schedules: {
+                    $prefix: "request_schedules",
 
-        // region heirarchy_log
-        hierarchy_log: {
-          $prefix: "hierarchy_log",
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          delete: {
-            $url: "delete",
-            $method: "DELETE",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          subordinates:{
-            $url: "subordinates",
-            $method: "GET"
-          }
-        },
-        // endregion heirarchy_log
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    applicant: {
+                        $url: "applicant",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    requested_by: {
+                        $url: "requested_by",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    managed_by: {
+                        $url: "managed_by",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    }
+                },
+                // endregion request schedules
 
-        // region overtime
-        overtime: {
-          $prefix: "overtime",
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          current: {
-            $url: "current",
-            $method: "GET"
-          }
-        },
-        // endregion overtime
+                // region access levels
+                access_level: {
+                    $prefix: "position",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST"
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST"
+                    }
+                },
+                // endregion access levels
 
-        // region access levels
-        logs: {
-          $prefix: "logs",
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          }
-        },
-        // endregion access levels
+                // region coaching
+                coaching: {
+                    $prefix: "coaching",
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    }
+                },
+                // endregion coaching
 
-        // region access levels
-        clusters: {
-          $prefix: "clusters",
-          create: {
-            $url: "create",
-            $method: "POST"
-          }
-        },
-        // endregion access levels
+                // region heirarchy_log
+                hierarchy_log: {
+                    $prefix: "hierarchy_log",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "DELETE",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    subordinates: {
+                        $url: "subordinates",
+                        $method: "GET"
+                    },
+                    supervisor: {
+                        $url: "supervisor",
+                        $method: "GET"
+                    },
+                    table: {
+                        $url: "table",
+                        $method: "GET"
+                    }
+                },
+                // endregion heirarchy_log
 
-        // region reports
-        reports: {
-          $prefix: "reports",
+                // region overtime
+                overtime: {
+                    $prefix: "overtime",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    current: {
+                        $url: "current",
+                        $method: "GET"
+                    }
+                },
+                // endregion overtime
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          IR: {
-            $url: "IR",
-            $method: "GET"
-          },
-          issuedTo: {
-            $url: "issued_to",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `issued_to/${id}`)
-          },
-          issuedBy: {
-            $url: "issued_by",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `issued_by/${id}`)
-          },
-          allUsers: {
-            $url: "all_users",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `all_users/${id}`)
-          },
-          allReports: {
-            $url: "IR",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          issued_to_search: {
-            $url: "issuedto/search",
-            $method: "GET"
-          },
-          issued_byf_search: {
-            $url: "issuedby/search",
-            $method: "GET"
-          },
-          create_response: {
-            $url: "user_response",
-            $method: "POST"
-          },
-          update_response: {
-            $url: "update_response",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update_response/${id}`)
-          }
-        },
-        // endregion reports
+                // region access levels
+                logs: {
+                    $prefix: "logs",
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    }
+                },
+                // endregion access levels
 
-        // region users
-        users: {
-          $prefix: "users",
+                // region access levels
+                clusters: {
+                    $prefix: "clusters",
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    }
+                },
+                // endregion access levels
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          statusList: {
-            $url: "status_list",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          bulk_change_status: {
-            $url: "bulk_change_status",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          change_pass: {
-            $url: "change_pass",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `change_pass/${id}`)
-          },
-          reset_pass: {
-            $url: "reset_pass",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `reset_pass/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["user_id"],
-            $format: Template(() => `delete/${user_id}`)
-          },
-          remote: {
-            $url: "remote",
-            $method: "GET"
-          }
-        },
-        // endregion users
+                // region reports
+                reports: {
+                    $prefix: "reports",
 
-        // startregion user status
-        user_status: {
-          $prefix: "users",
-          create: {
-            $url: "add_user_status",
-            $method: "POST"
-          },
-          update: {
-            $url: "update_user_status",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update_user_status/${id}`)
-          },
-          delete: {
-            $url: "delete_user_status",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete_user_status/${id}`)
-          }
-        },
-        // endregion user status
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    IR: {
+                        $url: "IR",
+                        $method: "GET"
+                    },
+                    issuedTo: {
+                        $url: "issued_to",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `issued_to/${id}`)
+                    },
+                    issuedBy: {
+                        $url: "issued_by",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `issued_by/${id}`)
+                    },
+                    allUsers: {
+                        $url: "all_users",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `all_users/${id}`)
+                    },
+                    allReports: {
+                        $url: "IR",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    issued_to_search: {
+                        $url: "issuedto/search",
+                        $method: "GET"
+                    },
+                    issued_byf_search: {
+                        $url: "issuedby/search",
+                        $method: "GET"
+                    },
+                    create_response: {
+                        $url: "user_response",
+                        $method: "POST"
+                    },
+                    update_response: {
+                        $url: "update_response",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update_response/${id}`)
+                    }
+                },
+                // endregion reports
 
-        // startregion user status
-        vto: {
-          $prefix: "schedules/vto",
-          list: {
-            $url: "list",
-            $method: "GET"
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          cancel: {
-            $url: "create/revert",
-            $method: "POST"
-          },
-          update: {
-            $url: "update_user_status",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update_user_status/${id}`)
-          },
-          delete: {
-            $url: "delete_user_status",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete_user_status/${id}`)
-          }
-        },
-        // endregion user status
+                // region users
+                users: {
+                    $prefix: "users",
 
-        // region sanction levels
-        sanction_levels: {
-          $prefix: "sanction_level",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    statusList: {
+                        $url: "status_list",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    bulk_change_status: {
+                        $url: "bulk_change_status",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    change_pass: {
+                        $url: "change_pass",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `change_pass/${id}`)
+                    },
+                    reset_pass: {
+                        $url: "reset_pass",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `reset_pass/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["user_id"],
+                        $format: Template(() => `delete/${user_id}`)
+                    },
+                    remote: {
+                        $url: "remote",
+                        $method: "GET"
+                    }
+                },
+                // endregion users
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          }
-        },
-        // endregion sanction levels
+                // startregion user status
+                user_status: {
+                    $prefix: "users",
+                    create: {
+                        $url: "add_user_status",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update_user_status",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update_user_status/${id}`)
+                    },
+                    delete: {
+                        $url: "delete_user_status",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete_user_status/${id}`)
+                    }
+                },
+                // endregion user status
 
-        // region sanction types
-        sanction_types: {
-          $prefix: "sanction_type",
+                // startregion user status
+                vto: {
+                    $prefix: "schedules/vto",
+                    list: {
+                        $url: "list",
+                        $method: "GET"
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    cancel: {
+                        $url: "create/revert",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update_user_status",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update_user_status/${id}`)
+                    },
+                    delete: {
+                        $url: "delete_user_status",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete_user_status/${id}`)
+                    }
+                },
+                // endregion user status
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch_sanction_types: {
-            $url: "sanction_types",
-            $method: "GET"
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          }
-        },
-        // endregion sanction types
+                // region sanction levels
+                sanction_levels: {
+                    $prefix: "sanction_level",
 
-        // region leave
-        leaves: {
-          $prefix: "leaves",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    }
+                },
+                // endregion sanction levels
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          approve: {
-            $url: "approve",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `approve/${id}`)
-          },
-          reject: {
-            $url: "reject",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `reject/${id}`)
-          },
-          cancel: {
-            $url: "cancel",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `cancel/${id}`)
-          }
-        },
-        // endregion leave
+                // region sanction types
+                sanction_types: {
+                    $prefix: "sanction_type",
 
-        // region leave credits
-        leave_credits: {
-          $prefix: "leaves/credits",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch_sanction_types: {
+                        $url: "sanction_types",
+                        $method: "GET"
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    }
+                },
+                // endregion sanction types
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          bulk_create: {
-            $url: "create/agents",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          }
-        },
-        // endregion leave credits
+                // region leave
+                leaves: {
+                    $prefix: "leaves",
 
-        // region leave slots
-        leave_slots: {
-          $prefix: "leaves/slots",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    approve: {
+                        $url: "approve",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `approve/${id}`)
+                    },
+                    reject: {
+                        $url: "reject",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `reject/${id}`)
+                    },
+                    cancel: {
+                        $url: "cancel",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `cancel/${id}`)
+                    }
+                },
+                // endregion leave
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          },
-          create: {
-            $url: "create",
-            $method: "POST"
-          },
-          create_bulk: {
-            $url: "create/bulk",
-            $method: "POST"
-          },
-          update: {
-            $url: "update",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `update/${id}`)
-          },
-          delete: {
-            $url: "delete",
-            $method: "POST",
-            $requires: ["id"],
-            $format: Template(() => `delete/${id}`)
-          },
-          search: {
-            $url: "search",
-            $method: "GET"
-          }
-        },
-        // endregion leave slots
+                // region leave credits
+                leave_credits: {
+                    $prefix: "leaves/credits",
 
-        // region agents
-        agents: {
-          $prefix: "agents",
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    bulk_create: {
+                        $url: "create/agents",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    }
+                },
+                // endregion leave credits
 
-          fetchAll: {
-            $url: "",
-            $method: "GET"
-          },
-          fetch: {
-            $url: "fetch",
-            $method: "GET",
-            $requires: ["id"],
-            $format: Template(() => `fetch/${id}`)
-          }
-        },
-        // endregion agents
+                // region leave slots
+                leave_slots: {
+                    $prefix: "leaves/slots",
 
-        // startregion excel
-        excel: {
-          $prefix: "excel",
-          employeeTemplate: {
-            $url: "export_add_template",
-            $method: "GET"
-          },
-          employeeList: {
-            $url: "export_report",
-            $method: "GET"
-          },
-          reassignTemplate: {
-            $url: "reassign_template",
-            $method: "GET"
-          },
-          multisheet: {
-            $url: "create_multisheet_excel",
-            $method: "GET"
-          },
-          export_sva: {
-            $url: "export_sva",
-            $method: "GET"
-          }
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    },
+                    create: {
+                        $url: "create",
+                        $method: "POST"
+                    },
+                    create_bulk: {
+                        $url: "create/bulk",
+                        $method: "POST"
+                    },
+                    update: {
+                        $url: "update",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `update/${id}`)
+                    },
+                    delete: {
+                        $url: "delete",
+                        $method: "POST",
+                        $requires: ["id"],
+                        $format: Template(() => `delete/${id}`)
+                    },
+                    search: {
+                        $url: "search",
+                        $method: "GET"
+                    }
+                },
+                // endregion leave slots
+
+                // region agents
+                agents: {
+                    $prefix: "agents",
+
+                    fetchAll: {
+                        $url: "",
+                        $method: "GET"
+                    },
+                    fetch: {
+                        $url: "fetch",
+                        $method: "GET",
+                        $requires: ["id"],
+                        $format: Template(() => `fetch/${id}`)
+                    }
+                },
+                // endregion agents
+
+                // startregion excel
+                excel: {
+                    $prefix: "excel",
+                    employeeTemplate: {
+                        $url: "export_add_template",
+                        $method: "GET"
+                    },
+                    employeeList: {
+                        $url: "export_report",
+                        $method: "GET"
+                    },
+                    reassignTemplate: {
+                        $url: "reassign_template",
+                        $method: "GET"
+                    },
+                    multisheet: {
+                        $url: "create_multisheet_excel",
+                        $method: "GET"
+                    },
+                    export_sva: {
+                        $url: "export_sva",
+                        $method: "GET"
+                    }
+                }
+            }
         }
-      }
+        // endregion API paths
     }
-    // endregion API paths
-  }
 };
 
 /**
@@ -790,16 +798,16 @@ const api = {
  * return function
  */
 function Template(cb) {
-  return function(data) {
-    const dataKeys = [];
-    const dataVals = [];
-    for (const key in data) {
-      dataKeys.push(key);
-      dataVals.push(data[key]);
-    }
-    const func = new Function(...dataKeys, "return (" + cb + ")();");
-    return func(...dataVals);
-  };
+    return function(data) {
+        const dataKeys = [];
+        const dataVals = [];
+        for (const key in data) {
+            dataKeys.push(key);
+            dataVals.push(data[key]);
+        }
+        const func = new Function(...dataKeys, "return (" + cb + ")();");
+        return func(...dataVals);
+    };
 }
 
 /**

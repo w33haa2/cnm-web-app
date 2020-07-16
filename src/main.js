@@ -24,6 +24,20 @@ import CalendarIcon from 'vue-material-design-icons/CalendarOutline.vue';
 Vue.component('calendar-icon', CalendarIcon);
 import CalendarMultipleIcon from 'vue-material-design-icons/CalendarMultiple.vue';
 Vue.component('calendar-multiple-icon', CalendarMultipleIcon);
+import UpdateIcon from 'vue-material-design-icons/Update.vue';
+Vue.component('update-icon', UpdateIcon);
+import PencilIcon from 'vue-material-design-icons/Pencil.vue';
+Vue.component('pencil-icon', PencilIcon);
+import BadgeAccountAlertIcon from 'vue-material-design-icons/BadgeAccountAlertOutline.vue';
+Vue.component('badge-account-alert-icon', BadgeAccountAlertIcon);
+import CommentEyeIcon from 'vue-material-design-icons/CommentEyeOutline.vue';
+Vue.component('comment-eye-icon', CommentEyeIcon);
+import SquareEditIcon from 'vue-material-design-icons/SquareEditOutline.vue';
+Vue.component('square-edit-icon', SquareEditIcon);
+import TooltipEditIcon from 'vue-material-design-icons/TooltipEditOutline.vue';
+Vue.component('tooltip-edit-icon', TooltipEditIcon);
+import CancelIcon from 'vue-material-design-icons/Cancel.vue';
+Vue.component('cancel-icon', CancelIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
@@ -53,7 +67,14 @@ Vue.use(Element, {
 
 Vue.use(VueSweetalert2)
 Vue.use(VueTimers)
-    // register global utility filters
+    // scroll bar
+import PerfectScrollbar from 'vue2-perfect-scrollbar'
+import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+
+Vue.use(PerfectScrollbar);
+
+
+// register global utility filters
 Object.keys(filters).forEach(key => {
     Vue.filter(key, filters[key])
 })

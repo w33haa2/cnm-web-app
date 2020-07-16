@@ -375,7 +375,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .user-block >>> .img-circle {
   border-radius: 50%;
   width: 30px;
@@ -451,6 +451,7 @@ tbody >>> tr {
 .gantt-table >>> .el-table__body-wrapper,
 .el-table__fixed-body-wrapper {
   background-color: #1d1e3d !important;
+  
 }
 .gantt-table >>> .el-table__fixed:before {
   background-color: #1d1e3d !important;
@@ -498,4 +499,6 @@ tbody >>> tr {
   background-color: darkgrey;
   outline: 1px solid slategrey;
 } */
+
+
 </style>

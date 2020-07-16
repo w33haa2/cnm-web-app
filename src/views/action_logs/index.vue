@@ -1,60 +1,74 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Action Logs</h4>
+    <div class="title-bar shadow">
+      <el-row :gutter="8">
+        <el-col :md="{ span: 12 }">
+          <div class="title-wrapper">
+            Action Logs
+          </div>
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <el-input placeholder="Search..." v-model="searchQuery">
+            <el-select
+              slot="prepend"
+              placeholder="Select"
+              v-model="searchTarget"
+              style="width:100px;"
+            >
+              <el-option value="full_name" label="User" />
+              <el-option value="position" label="Position" />
+              <el-option value="date" label="Date" />
+            </el-select>
+          </el-input>
+        </el-col>
+      </el-row>
+    </div>
 
-    <!-- Search and Pagination -->
-    <el-row style="width: 100%;margin-top:30px;">
-      <el-col :md="{ span:8 }">
-        <el-input placeholder="Search..." v-model="searchQuery" size="mini">
-          <el-select
-            slot="prepend"
-            placeholder="Select"
-            v-model="searchTarget"
-            style="width:150px;"
+    <div class="table-container shadow">
+      <el-row style="width: 100%;margin-top:5px;">
+        <el-col :md="{ span: 24 }">
+          <!-- Search and Pagination -->
+
+          <el-pagination
+            style="float:right"
+            :page-sizes="[10, 25, 50]"
+            :page-size="100"
+            :pager-count="5"
+            layout="total, sizes, prev, pager, next"
+            :total="table_config.count"
+            background
+            small
+            @size-change="tableSizeChange"
+            @current-change="tablePageChange"
+          />
+        </el-col>
+        <el-col :md="{ span: 24 }">
+          <!-- Table -->
+          <el-table
+            :data="table_config.data"
+            v-loading="table_config.loader"
+            style="width: 100%;margin-top:5px;"
           >
-            <el-option value="full_name" label="User" />
-            <el-option value="position" label="Position" />
-            <el-option value="date" label="Date" />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>
-      <el-col :md="{ span:16 }">
-        <el-pagination
-          style="float:right"
-          :page-sizes="[10, 25, 50]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          background
-          small
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-        />
-      </el-col>
-    </el-row>
-
-    <!-- Table -->
-    <el-table
-      :data="table_config.data"
-      v-loading="table_config.loader"
-      style="width: 100%;margin-top:30px;"
-    >
-      <el-table-column align="center" label="User">
-        <template slot-scope="scope">{{ scope.row.full_name }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Position">
-        <template slot-scope="scope">{{ scope.row.position }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Log">
-        <template slot-scope="scope">{{ scope.row.affected_data }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Date">
-        <template slot-scope="scope">{{ formatDate(scope.row.created_at,"", "LL") }}</template>
-      </el-table-column>
-    </el-table>
+            <el-table-column align="center" label="User">
+              <template slot-scope="scope">{{ scope.row.full_name }}</template>
+            </el-table-column>
+            <el-table-column align="center" label="Position">
+              <template slot-scope="scope">{{ scope.row.position }}</template>
+            </el-table-column>
+            <el-table-column align="center" label="Log">
+              <template slot-scope="scope">{{
+                scope.row.affected_data
+              }}</template>
+            </el-table-column>
+            <el-table-column align="center" label="Date">
+              <template slot-scope="scope">{{
+                formatDate(scope.row.created_at, "", "LL")
+              }}</template>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
@@ -160,5 +174,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

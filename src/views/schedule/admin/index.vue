@@ -15,7 +15,7 @@
                   style="display:flex;justify-content:center;margin-right:5px;"
                   @click="showModal('addLeave')"
                 >
-                  <el-tooltip content="Add Leave">
+                  <el-tooltip placement="top" content="Add Leave">
                     <plus-icon></plus-icon>
                   </el-tooltip>
                 </div>
@@ -30,7 +30,7 @@
                       (form.addSchedule.model.auto_assign = false)
                   "
                 >
-                  <el-tooltip content="Add Schedule">
+                  <el-tooltip placement="top" content="Add Schedule">
                     <plus-icon></plus-icon>
                   </el-tooltip>
                 </div>
@@ -41,7 +41,7 @@
                   style="display:flex;justify-content:center;margin-right:5px;"
                   @click="handleCommand('importSchedule')"
                 >
-                  <el-tooltip content="Import Schedule">
+                  <el-tooltip placement="top" content="Import Schedule">
                     <calendar-icon></calendar-icon>
                   </el-tooltip>
                 </div>
@@ -52,7 +52,10 @@
                   style="display:flex;justify-content:center;margin-right:5px;"
                   @click="handleCommand('importScheduleQuarterly')"
                 >
-                  <el-tooltip content="Import Schedule Quarterly">
+                  <el-tooltip
+                    placement="top"
+                    content="Import Schedule Quarterly"
+                  >
                     <calendar-multiple-icon></calendar-multiple-icon>
                   </el-tooltip>
                 </div>
@@ -62,27 +65,31 @@
                 style="display:flex;justify-content:center;margin-right:5px;"
                 @click="handleCommand('exportSVA')"
               >
-                <el-tooltip content="Send SVA to mail">
+                <el-tooltip placement="top" content="Send SVA to mail">
                   <email-send-icon></email-send-icon>
                 </el-tooltip>
               </div>
             </div>
           </el-col>
           <el-col :md="{ span: 6, offset: 6 }">
-            <el-input v-model="searchQuery" placeholder="Search..." />
+            <el-tooltip content="Name Search" placement="top">
+              <el-input v-model="searchQuery" placeholder="Search..." />
+            </el-tooltip>
           </el-col>
           <el-col :md="{ span: 3 }">
-            <el-date-picker
-              v-model="week.start"
-              type="week"
-              format="yyyy-MM-dd"
-              value-format="yyyy-MM-dd"
-              :picker-options="{ firstDayOfWeek: 2 }"
-              :clearable="false"
-              style="width:100%"
-              @change="weekChange"
-              :disabled="isFetchingWorkReports"
-            />
+            <el-tooltip placement="top" content="Week">
+              <el-date-picker
+                v-model="week.start"
+                type="week"
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd"
+                :picker-options="{ firstDayOfWeek: 2 }"
+                :clearable="false"
+                style="width:100%"
+                @change="weekChange"
+                :disabled="isFetchingWorkReports"
+              />
+            </el-tooltip>
           </el-col>
           <el-col :md="{ span: 1 }">
             <el-popover
@@ -133,7 +140,7 @@
                 style="display:flex;justify-content:center;width:32px;height:32px;"
                 @click="show_option = !show_option"
               >
-                <el-tooltip content="Filters">
+                <el-tooltip placement="top" content="Filters">
                   <tune-icon></tune-icon>
                 </el-tooltip>
               </div>
@@ -142,14 +149,14 @@
         </el-row>
 
         <!-- import file -->
-            <input
-              type="file"
-              v-if="importScheduleReset"
-              ref="importScheduleInput"
-              accept=".xlsx"
-              style="display:none"
-              @change="importScheduleFileChangeV2"
-            />
+        <input
+          type="file"
+          v-if="importScheduleReset"
+          ref="importScheduleInput"
+          accept=".xlsx"
+          style="display:none"
+          @change="importScheduleFileChangeV2"
+        />
       </div>
 
       <div
@@ -520,13 +527,12 @@
       >
         <el-row>
           <el-col>
-            <el-col>
-              <label>Agent</label>
+            <div class="form-label">Agent</div>
+            <div class="form-item">
               <el-select
                 v-model="form.addLeave.model.user_id"
                 class="form-input"
-                style="width:100%;padding-bottom:2px;margin-bottom:10px"
-                size="mini"
+                style="width:100%;"
                 filterable
                 remote
                 reserve-keyword
@@ -541,32 +547,36 @@
                   :value="item.uid"
                 />
               </el-select>
-            </el-col>
-            <label>Dates</label>
-            <el-date-picker
-              v-model="form.addLeave.model.dates"
-              size="mini"
-              type="daterange"
-              style="width:100%;padding-bottom:2px;margin-bottom:10px;"
-              class="form-input"
-              placeholder="Range picker..."
-            />
+            </div>
           </el-col>
           <el-col>
-            <label>Leave Type</label>
-            <el-select
-              v-model="form.addLeave.leave_type"
-              size="mini"
-              class="form-input"
-              style="width:100%;margin-bottom:10px;"
-            >
-              <el-option
-                v-for="(type, index) in options.leave_type"
-                :key="index"
-                :value="type.value"
-                :label="type.label"
+            <div class="form-label" style="margin-top:10px;">Dates</div>
+            <div class="form-item">
+              <el-date-picker
+                v-model="form.addLeave.model.dates"
+                type="daterange"
+                style="width:100%;"
+                class="form-input"
+                placeholder="Range picker..."
               />
-            </el-select>
+            </div>
+          </el-col>
+          <el-col>
+            <div class="form-label" style="margin-top:10px">Leave Type</div>
+            <div class="form-item">
+              <el-select
+                v-model="form.addLeave.leave_type"
+                class="form-input"
+                style="width:100%;"
+              >
+                <el-option
+                  v-for="(type, index) in options.leave_type"
+                  :key="index"
+                  :value="type.value"
+                  :label="type.label"
+                />
+              </el-select>
+            </div>
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
@@ -609,46 +619,44 @@
               >
             </el-radio-group>
           </el-col>
-          <el-col style="margin-top:10px;">
-            <label>Dates</label>
+          <el-col>
+            <div class="form-label" style="margin-top:10px;">Dates</div>
+            <div class="form-item">
+              <el-date-picker
+                v-model="excel.export_sva.field.dates"
+                type="daterange"
+                style="width:100%;"
+                class="form-input"
+                placeholder="Range picker..."
+              />
+            </div>
           </el-col>
-          <el-col style="margin-top:5px">
-            <el-date-picker
-              v-model="excel.export_sva.field.dates"
-              size="mini"
-              type="daterange"
-              style="width:100%;"
-              class="form-input"
-              placeholder="Range picker..."
-            />
-          </el-col>
-          <el-col style="margin-top:10px;">
-            <label>Clusters</label>
-          </el-col>
-          <el-col style="margin-top:5px">
-            <!-- component here -->
-            <remote-search
-              @selected="excelCluster"
-              :multiple="true"
-              :filterable="true"
-              :params="{
-                om: true,
-                start_date: formatDate(
-                  excel.export_sva.field.dates[0],
-                  '',
-                  'YYYY-MM-DD'
-                ),
-                end_date: formatDate(
-                  excel.export_sva.field.dates[1],
-                  '',
-                  'YYYY-MM-DD'
-                )
-              }"
-              :placeholder="'Select Cluster...'"
-              style="width:100%"
-              :disabled="excel.export_sva.field.radio_select == 'all'"
-              :clear="excel.export_sva.clear_cluster_field"
-            ></remote-search>
+          <el-col>
+            <div class="form-label" style="margin-top:10px;">Clusters</div>
+            <div class="form-item">
+              <remote-search
+                @selected="excelCluster"
+                :multiple="true"
+                :filterable="true"
+                :params="{
+                  om: true,
+                  start_date: formatDate(
+                    excel.export_sva.field.dates[0],
+                    '',
+                    'YYYY-MM-DD'
+                  ),
+                  end_date: formatDate(
+                    excel.export_sva.field.dates[1],
+                    '',
+                    'YYYY-MM-DD'
+                  )
+                }"
+                :placeholder="'Select Cluster...'"
+                style="width:100%"
+                :disabled="excel.export_sva.field.radio_select == 'all'"
+                :clear="excel.export_sva.clear_cluster_field"
+              ></remote-search>
+            </div>
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
@@ -1744,7 +1752,6 @@ export default {
 
       this.week.start = this.query.start;
 
-
       this.refetchSchedules();
     },
     tableSizeChange(value) {
@@ -1780,7 +1787,6 @@ export default {
       }));
 
       this.tableHeader = header;
-
 
       let data = this.query;
       switch (this.position.toLowerCase()) {

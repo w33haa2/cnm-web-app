@@ -1,191 +1,177 @@
 <template>
   <div>
     <div class="app-container">
-      <h4 style="color:#646464">Received Reports</h4>
-
-      <!-- Search and Pagination -->
-      <el-row>
-        <el-col :md="{ span:8 }">
-          <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-            <!-- <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-            </el-select>-->
-            <el-button slot="append">
-              <i class="el-icon-search" />
-            </el-button>
-          </el-input>
-        </el-col>
-        <el-col :md="{ span:16 }">
-          <el-pagination
-            style="float:right
-          "
-            :page-sizes="[10, 25, 50]"
-            :page-size="100"
-            layout="total, sizes, prev, pager, next"
-            :total="incidentReportsTotal"
-            background
-            small
-            @size-change="tableSizeChange"
-            @current-change="tablePageChange"
-          />
-        </el-col>
-      </el-row>
-
-      <!-- Table -->
-      <el-table
-        v-loading="fetchingReceivedIncidentReports.initial"
-        :data="incidentReports"
-        style="width: 100%;margin-top:30px;"
-      >
-        <el-table-column align="center" label="Action" fixed>
-          <template slot-scope="scope">
-            <el-dropdown @command="handleCommand">
-              <span class="el-dropdown-link">
-                <i class="el-icon-more" />
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item :command="'response||'+scope.row.report_details.id">Response</el-dropdown-item>
-                <!-- <el-dropdown-item icon="el-icon-printer" divided>Print</el-dropdown-item> -->
-              </el-dropdown-menu>
-            </el-dropdown>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="Status" width="220">
-          <template slot-scope="scope">
-            <el-tag v-if="scope.row.report_details.status == '0'" type="success">Closed</el-tag>
-            <el-tag v-else type="danger">Open</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="Issued by" width="220">
-          <template slot-scope="scope">
-            <div class="td-image-name-container">
-              <img
-                v-if="scope.row.issued_by.image"
-                :src="scope.row.issued_by.image"
-                class="td-image"
-              />
-              <div v-else class="td-name-avatar">
-                <span>{{ getAvatarLetters(scope.row.issued_by.fname,scope.row.issued_by.lname) }}</span>
-              </div>
-              <div class="td-name">{{ scope.row.issued_by.full_name }}</div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="Sanction Type" width="220">
-          <template slot-scope="scope">{{ scope.row.report_details.sanction_type.type_description }}</template>
-        </el-table-column>
-        <el-table-column align="center" label="Sanction Level" width="220">
-          <template
-            slot-scope="scope"
-          >{{ scope.row.report_details.sanction_level.level_description }}</template>
-        </el-table-column>
-        <el-table-column align="center" label="Response" width="220">
-          <template slot-scope="scope">
-            <el-tag v-if="scope.row.report_details.agent_response" type="success">Responded</el-tag>
-            <el-tag v-else type="danger">No Response</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="Incident Date" width="150">
-          <template slot-scope="scope">{{ fromNow(scope.row.report_details.incident_date) }}</template>
-        </el-table-column>
-        <el-table-column align="header-center" label="Description" width="350">
-          <template slot-scope="scope">{{ scope.row.report_details.description }}</template>
-        </el-table-column>
-        <el-table-column align="center" label="Date Filed" width="220">
-          <template slot-scope="scope">{{ scope.row.report_details.created_at.date }}</template>
-        </el-table-column>
-      </el-table>
-
-      <!-- Create and Update Dialog -->
-      <el-dialog
-        :visible.sync="form.response.dialog"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :title="'Update Response'"
-        width="30%"
-      >
-        <el-row style="margin-bottom:10px;">
-          <el-col>
-            <div style="margin-bottom:20px;">
-              <span style="font-weight:600;color:grey;">Incident Date:</span>
-              {{form.response.content.incident_date}}
-            </div>
+      <!-- <h4 style="color:#646464">Received Reports</h4> -->
+      <div class="title-bar shadow">
+        <el-row :gutter="8">
+          <el-col :md="{ span: 12 }">
+            <div class="title-wrapper">Incident Reports</div>
           </el-col>
-          <el-col>
-            <div style="margin-bottom:10px;">
-              <span style="font-weight:600;color:grey;">Sanction Type:</span>
-              {{ form.response.content.sanction_type }}
-            </div>
-            <div style="margin-bottom:10px;">
-              <span style="font-weight:600;color:grey;">Sanction Level:</span>
-              {{form.response.content.sanction_level }}
-            </div>
-          </el-col>
-          <el-col>
-            <div style="margin-bottom:10px;">
-              <span style="font-weight:600;color:grey;">Description:</span>
-            </div>
-          </el-col>
-          <el-col style="padding:10px;background-color:#f4f4f5">
-            <p style="color:grey;text-align:center;">{{ form.response.content.description }}</p>
+          <el-col :md="{ span: 12 }">
+            <el-tooltip placement="top" content="Search">
+              <el-input v-model="searchQuery" placeholder="Search..." />
+            </el-tooltip>
           </el-col>
         </el-row>
-        <el-row style="margin-top: 5px; margin-bottom:3px;">
-          <div style="margin-bottom:20px;">
-            <span style="font-weight:600;color:grey;">Response:</span>
-          </div>
-          <el-col>
-            <el-input
-              v-model="form.response.data.commitment"
-              type="textarea"
-              placeholder="Response..."
-              size="mini"
+      </div>
+
+      <div class="table-container shadow">
+        <el-row :gutter="8">
+          <el-col :md="{ span: 12 }">
+            Received
+          </el-col>
+          <!-- Search and Pagination -->
+          <el-col :md="{ span: 12 }">
+            <el-pagination
+              style="float:right"
+              :page-sizes="[10, 25, 50]"
+              :page-size="100"
+              layout="total, sizes, prev, pager, next"
+              :total="incidentReportsTotal"
+              background
+              small
+              @size-change="tableSizeChange"
+              @current-change="tablePageChange"
             />
           </el-col>
+          <el-col :md="{ span: 24 }">
+            <!-- Table -->
+            <el-table
+              v-loading="fetchingReceivedIncidentReports.initial"
+              :data="incidentReports"
+              style="width: 100%;margin-top:5px;"
+              class="monday"
+            >
+              <el-table-column
+                label="Issued by"
+                sortable="custom"
+                align="left"
+                width="350"
+                fixed
+              >
+                <template slot-scope="scope">
+                  <div
+                    style="height:45px;border-left:red 7px solid;display:flex"
+                  >
+                    <el-tooltip :content="scope.row.issued_by.email" placement="top">
+                      <div
+                        style="width:100%;align-self:center;padding-left:20px;"
+                      >
+                        {{ scope.row.issued_by.full_name }}
+                      </div>
+                    </el-tooltip>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" width="50" fixed>
+                <template slot-scope="scope">
+                  <div class="user-block">
+                    <div
+                      v-if="scope.row.issued_by.image_url"
+                      style="width:100%;"
+                    >
+                      <div style="margin:0 auto;height:30px;width:30px;">
+                        <img
+                          class="img-circle"
+                          style="margin:0 auto;"
+                          :src="scope.row.issued_by.image_url"
+                        />
+                      </div>
+                    </div>
+                    <div v-else class="text-muted" style="width:100%;">
+                      <div
+                        class="img-circle"
+                        style="background-color:white;margin:0 auto;"
+                      >
+                        <div style="display:flex;height:30px;width:30px;">
+                          <div
+                            style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                          >
+                            {{
+                              getAvatarLetters(
+                                scope.row.issued_by.fname,
+                                scope.row.issued_by.lname
+                              )
+                            }}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="Status" width="100" fixed>
+                <template slot-scope="scope">
+                  <template v-if="scope.row.report_details.status == '0'">
+                    <div
+                      style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;"
+                    >
+                      <div style="align-self:center">CLOSED</div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div
+                      style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;height:45px;border:1px solid #ff4545;"
+                    >
+                      <div style="align-self:center">OPEN</div>
+                    </div>
+                  </template>
+                </template>
+              </el-table-column>
+              <el-table-column align="center" label="Sanction Type" width="170">
+                <template slot-scope="scope">{{
+                  scope.row.report_details.sanction_type.type_description
+                }}</template>
+              </el-table-column>
+              <el-table-column
+                align="center"
+                label="Sanction Level"
+                width="170"
+              >
+                <template slot-scope="scope">{{
+                  scope.row.report_details.sanction_level.level_description
+                }}</template>
+              </el-table-column>
+
+              <el-table-column align="center" label="Filed">
+                <template slot-scope="scope">
+                  <el-tooltip
+                    placement="top"
+                    :content="fromNow(scope.row.report_details.created_at.date)"
+                  >
+                  <div>
+                    {{
+                      formatDate(
+                        scope.row.report_details.created_at.date,
+                        "",
+                        "ddd. MMM Do, YYYY"
+                      )
+                    }}
+                  </div>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+              <el-table-column label="View" width="50">
+                <template slot-scope="scope">
+                  <update-response :data="scope.row"></update-response>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
         </el-row>
-        <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="cancelFormResponse">Cancel</el-button>
-          <el-button
-            type="danger"
-            size="mini"
-            @click="submitFormResponse"
-            :loading="form.response.confirm"
-          >Confirm</el-button>
-        </span>
-      </el-dialog>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-
+import updateResponse from "./components/update_response";
 export default {
+  name: "recievedIRPage",
+  components: { updateResponse },
   data() {
     return {
-      form: {
-        response: {
-          editable: true,
-          dialog: false,
-          action: "Create",
-          report_id: null,
-          response_id: null,
-          confirm: false,
-          // user data directly to pass as params..
-          data: {
-            user_response_id: null,
-            status: null,
-            commitment: null
-          },
-          content: {
-            sanction_level: null,
-            sanction_type: null,
-            description: null,
-            incident_date: null
-          }
-        }
-      },
       query: {
         limit: 10,
         offset: 0,
@@ -202,14 +188,51 @@ export default {
       "incidentReportsTotal",
       "irErrors",
       "userDetails",
+      "position",
       "updateReportResponseData",
       "createReportResponseData",
       "updateReportResponseState",
       "createReportResponseState",
-      "position"
+    
     ])
   },
   watch: {
+    updateReportResponseState({ initial, success, fail }) {
+      if (success) {
+        this.fetchReceivedReports(this.query);
+        this.$message({
+          type: "success",
+          message: "You have successfuly updated a response.",
+          duration: 2500
+        });
+      }
+
+      if (fail) {
+        this.$message({
+          type: "error",
+          message: "There is an error updating a response.",
+          duration: 2500
+        });
+      }
+    },
+    createReportResponseState({ initial, success, fail }) {
+      if (success) {
+        this.fetchReceivedReports(this.query);
+        this.$message({
+          type: "success",
+          message: "You have successfuly updated a response.",
+          duration: 2500
+        });
+      }
+
+      if (fail) {
+        this.$message({
+          type: "error",
+          message: "There is an error updating a response.",
+          duration: 2500
+        });
+      }
+    },
     searchQuery(newData) {
       if (newData !== "") {
         this.query.offset = 0;
@@ -221,58 +244,6 @@ export default {
         delete this.query.query;
         this.fetchReceivedReports(this.query);
       }
-    },
-    updateReportResponseState({ initial, success, fail }) {
-      if (initial) {
-        this.form.response.confirm = true;
-      }
-      if (success) {
-        this.form.response.confirm = false;
-        this.form.response.dialog = false;
-        this.query.offset = 0;
-        this.fetchReceivedReports(this.query);
-        this.$message({
-          type: "success",
-          message: "You have successfuly updated a response.",
-          duration: 2500
-        });
-      }
-
-      if (fail) {
-        this.form.response.confirm = false;
-        this.form.response.dialog = false;
-        this.$message({
-          type: "error",
-          message: "There is an error updating a response.",
-          duration: 2500
-        });
-      }
-    },
-    createReportResponseState({ initial, success, fail }) {
-      if (initial) {
-        this.form.response.confirm = true;
-      }
-      if (success) {
-        this.form.response.confirm = false;
-        this.form.response.dialog = false;
-        this.query.offset = 0;
-        this.fetchReceivedReports(this.query);
-        this.$message({
-          type: "success",
-          message: "You have successfuly updated a response.",
-          duration: 2500
-        });
-      }
-
-      if (fail) {
-        this.form.response.confirm = false;
-        this.form.response.dialog = false;
-        this.$message({
-          type: "error",
-          message: "There is an error updating a response.",
-          duration: 2500
-        });
-      }
     }
   },
   mounted() {
@@ -280,35 +251,7 @@ export default {
     this.fetchReceivedReports(this.query);
   },
   methods: {
-    ...mapActions([
-      "fetchReceivedReports",
-      "createReportResponse",
-      "updateReportResponse"
-    ]),
-    submitFormResponse() {
-      if (this.form.response.editable) {
-        if (this.form.response.action == "Update") {
-          const data = {
-            id: this.form.response.response_id,
-            user_response_id: this.form.response.report_id,
-            commitment: this.form.response.data.commitment
-          };
-          this.updateReportResponse(data);
-        } else {
-          const data = {
-            user_response_id: this.form.response.report_id,
-            commitment: this.form.response.data.commitment
-          };
-          this.createReportResponse(data);
-        }
-      } else {
-        this.$message({
-          type: "warning",
-          message: "Update to closed report is not allowed.",
-          duration: 2500
-        });
-      }
-    },
+    ...mapActions(["fetchReceivedReports"]),
     tableSizeChange(value) {
       this.query.limit = value;
       this.fetchReceivedReports(this.query);
@@ -316,35 +259,6 @@ export default {
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
       this.fetchReceivedReports(this.query);
-    },
-    cancelFormResponse() {
-      this.form.response.dialog = false;
-    },
-    clearFormResponse() {
-      this.form.response = {};
-    },
-    fillResponseForm(id) {
-      let ir = this.incidentReports.filter(i => i.report_details.id == id)[0];
-      this.form.response.report_id = ir.report_details.id;
-      if (ir.report_details.status == 1) {
-        this.form.response.editable = true;
-      } else {
-        this.form.response.editable = false;
-      }
-      if (ir.report_details.agent_response) {
-        this.form.response.response_id = ir.report_details.agent_response.id;
-        this.form.response.action = "Update";
-        this.form.response.data.commitment =
-          ir.report_details.agent_response.commitment;
-      } else {
-        this.form.response.action = "Create";
-      }
-      this.form.response.content = {
-        sanction_type: ir.report_details.sanction_type.type_description,
-        sanction_level: ir.report_details.sanction_level.level_description,
-        description: ir.report_details.description,
-        incident_date: ir.report_details.incident_date
-      };
     },
     handleCommand(command) {
       const id = command.split("||")[1];
@@ -360,13 +274,60 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  /* border-left: 5px solid red !important; */
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

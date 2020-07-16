@@ -1,231 +1,402 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Work Force</h4>
-
-    <!-- Search and Pagination -->
-    <el-row>
-      <el-col :md="{span:8}">
-        <el-date-picker
-          type="date"
-          size="mini"
-          :clearable="false"
-          v-model="query.start_date"
-          placeholder="Select date..."
-        ></el-date-picker>
-      </el-col>
-    </el-row>
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 20 }">
+          <div class="title-wrapper">
+            Work Force
+          </div>
+        </el-col>
+        <el-col :md="{ span: 4 }">
+          <!-- Search and Pagination -->
+          <el-date-picker
+            type="date"
+            style="width:100%"
+            :clearable="false"
+            v-model="query.start_date"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            placeholder="Select date..."
+          ></el-date-picker>
+        </el-col>
+      </el-row>
+    </div>
 
     <!-- Table -->
-    <el-table
-      :data="table_config.data"
-      style="width: 100%;margin-top:30px;"
-      v-loading="table_config.loader"
-      @sort-change="columnSort"
-    >
-      <el-table-column align="center" label="Team Leader" sortable="custom" prop="full_name">
-        <template slot-scope="scope">
-          <div class="user-block">
-            <img v-if="scope.row.image_url" class="img-circle" :src="scope.row.image_url" />
-            <div v-else class="img-circle text-muted" style="background-color:#d9d9d9;display:flex">
-              <div
-                style="align-self:center;width:100%;text-align:center;"
-                class="text-point-eight-em"
-              >{{ getAvatarLetters(scope.row.firstname,scope.row.lastname) }}</div>
+    <div class="table-container work-force-container shadow">
+      <div>
+        {{
+          formatDate(
+            query.start_date,
+            "",
+            "ddd. MMM Do, YYYY"
+          )
+        }}
+      </div>
+      <el-table
+        :data="table_config.data"
+        class="monday"
+        style="width: 100%;"
+        v-loading="table_config.loader"
+        @sort-change="columnSort"
+      >
+        <el-table-column
+          label="Team Leader"
+          sortable="custom"
+          prop="full_name"
+          fixed
+        >
+          <template slot-scope="scope">
+            <div style="height:45px;border-left:red 7px solid;display:flex">
+              <el-tooltip :content="scope.row.email">
+                <div style="width:100%;align-self:center;padding-left:20px;">
+                  {{ scope.row.full_name }}
+                </div>
+              </el-tooltip>
             </div>
-            <span>{{ scope.row.full_name }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          Scheduled
-          <span
-            style="color:white;background-color:grey;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.scheduled }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table :data="scope.row.tl_schedules" width="100%" max-height="300px">
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span slot="reference">{{scope.row.tl_schedules.length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          Present
-          <span
-            style="color:white;background-color:#67C23A;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.present }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='present')"
-              width="100%"
-              max-height="300px"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="present").length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          On-leave
-          <span
-            style="color:white;background-color:#E6A23C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.onleave }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='on-leave')"
-              width="100%"
-              max-height="300px"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="on-leave").length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          Absent
-          <span
-            style="color:white;background-color:#909399;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.absent }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='absent')"
-              width="100%"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="absent").length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          NCNS
-          <span
-            style="color:white;background-color:#F56C6C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.ncns }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='ncns' && i.user_status.status == 'active')"
-              width="100%"
-              max-height="300px"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="ncns" && i.user_status.status == "active").length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          Upcoming
-          <span
-            style="color:white;background-color:#0072ff;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.upcoming }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=='upcoming'  && i.user_status.status == 'active')"
-              width="100%"
-              max-height="300px"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=>i.remarks.toLowerCase()=="upcoming" && i.user_status.status == "active").length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-      <el-table-column align="center">
-        <template slot="header" slot-scope="scope">
-          Inactive
-          <span
-            style="color:white;background-color:rgb(143, 2, 2);padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
-          >
-            <small>{{ table_config.col_count.inactive }}</small>
-          </span>
-        </template>
-        <template slot-scope="scope">
-          <el-popover width="300" trigger="click">
-            <el-table
-              :data="scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=='ncns'|| i.remarks.toLowerCase() == 'upcoming')  && i.user_status.status == 'inactive' )"
-              width="100%"
-              max-height="300px"
-            >
-              <el-table-column label="Name">
-                <template slot-scope="scope1">
-                  <span>{{ scope1.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <span
-              slot="reference"
-            >{{scope.row.tl_schedules.filter(i=> (i.remarks.toLowerCase()=="ncns"|| i.remarks.toLowerCase() == "upcoming") && i.user_status.status == "inactive" ).length}}</span>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="50" fixed>
+          <!-- sortable="custom" prop="full_name" -->
+
+          <template slot-scope="scope">
+            <div class="user-block">
+              <div v-if="scope.row.image_url" style="width:100%;">
+                <div style="margin:0 auto;height:30px;width:30px;">
+                  <img
+                    class="img-circle"
+                    style="margin:0 auto;"
+                    :src="scope.row.image_url"
+                  />
+                </div>
+              </div>
+              <div v-else class="text-muted" style="width:100%;">
+                <div
+                  class="img-circle"
+                  style="background-color:white;margin:0 auto;"
+                >
+                  <div style="display:flex;height:30px;width:30px;">
+                    <div
+                      style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                    >
+                      {{
+                        getAvatarLetters(
+                          scope.row.firstname,
+                          scope.row.lastname
+                        )
+                      }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <!-- <el-table-column
+          align="left"
+          label="Team Leader"
+          sortable="custom"
+          prop="full_name"
+        >
+          <template slot-scope="scope">
+            <div class="user-block">
+              <img
+                v-if="scope.row.image_url"
+                class="img-circle"
+                :src="scope.row.image_url"
+              />
+              <div
+                v-else
+                class="img-circle text-muted"
+                style="background-color:#d9d9d9;display:flex"
+              >
+                <div
+                  style="align-self:center;width:100%;text-align:center;"
+                  class="text-point-eight-em"
+                >
+                  {{
+                    getAvatarLetters(scope.row.firstname, scope.row.lastname)
+                  }}
+                </div>
+              </div>
+              <span>{{ scope.row.full_name }}</span>
+            </div>
+          </template>
+        </el-table-column> -->
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            Scheduled
+            <div style="padding:0px 5px">
+              <div
+                style="color:white;background-color:grey;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.scheduled }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="scope.row.tl_schedules"
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{ scope.row.tl_schedules.length }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            Present
+            <div style="padding: 0px 5px;">
+              <div
+                style="color:white;background-color:#67C23A;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.present }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i => i.remarks.toLowerCase() == 'present'
+                  )
+                "
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i => i.remarks.toLowerCase() == "present"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            On-leave
+            <div style="padding:0px 5px">
+              <div
+                style="color:white;background-color:#E6A23C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.onleave }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i => i.remarks.toLowerCase() == 'on-leave'
+                  )
+                "
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i => i.remarks.toLowerCase() == "on-leave"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            Absent
+            <div style="padding:0px 5px;">
+              <div
+                style="color:white;background-color:#909399;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.absent }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i => i.remarks.toLowerCase() == 'absent'
+                  )
+                "
+                width="100%"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i => i.remarks.toLowerCase() == "absent"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            NCNS
+            <div style="padding:0px 5px">
+              <div
+                style="color:white;background-color:#F56C6C;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.ncns }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i =>
+                      i.remarks.toLowerCase() == 'ncns' &&
+                      i.user_status.status == 'active'
+                  )
+                "
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i =>
+                    i.remarks.toLowerCase() == "ncns" &&
+                    i.user_status.status == "active"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            Upcoming
+            <div style="padding:0px 5px">
+              <div
+                style="color:white;background-color:#0072ff;padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.upcoming }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i =>
+                      i.remarks.toLowerCase() == 'upcoming' &&
+                      i.user_status.status == 'active'
+                  )
+                "
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i =>
+                    i.remarks.toLowerCase() == "upcoming" &&
+                    i.user_status.status == "active"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" width="110" class="attr-count">
+          <template slot="header" slot-scope="scope">
+            inactive
+            <div style="padding:0px 5px">
+              <div
+                style="color:white;background-color:rgb(143, 2, 2);padding:1px;border-radius:5px;padding-left:10px;padding-right:10px;"
+              >
+                <!-- <small> -->
+                {{ table_config.col_count.inactive }}
+                <!-- </small> -->
+              </div>
+            </div>
+          </template>
+          <template slot-scope="scope">
+            <el-popover width="300" trigger="click">
+              <el-table
+                :data="
+                  scope.row.tl_schedules.filter(
+                    i =>
+                      (i.remarks.toLowerCase() == 'ncns' ||
+                        i.remarks.toLowerCase() == 'upcoming') &&
+                      i.user_status.status == 'inactive'
+                  )
+                "
+                width="100%"
+                max-height="300px"
+              >
+                <el-table-column label="Name">
+                  <template slot-scope="scope1">
+                    <span>{{ scope1.row.user_info.full_name }}</span>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <span slot="reference">{{
+                scope.row.tl_schedules.filter(
+                  i =>
+                    (i.remarks.toLowerCase() == "ncns" ||
+                      i.remarks.toLowerCase() == "upcoming") &&
+                    i.user_status.status == "inactive"
+                ).length
+              }}</span>
+            </el-popover>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 
@@ -328,7 +499,7 @@ export default {
       this.query.end_date = moment(v)
         .endOf("day")
         .format("YYYY-MM-DD HH:mm:ss");
-
+        
       this.query.tl = true;
 
       switch (this.position.toLowerCase()) {
@@ -461,39 +632,66 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.user-block {
-  .username,
-  .description {
-    display: block;
-    margin-left: 50px;
-    padding: 2px 0;
-  }
-  .username {
-    // font-size: 0.8em;
-    color: #777;
-  }
-  :after {
-    clear: both;
-  }
-  .img-circle {
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    float: left;
-  }
-  span {
-    font-weight: 500;
-    margin-left: 10px;
-    // font-size: 0.8em;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
 }
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+
+.monday >>> td:first-child {
+  /* border-left: 5px solid red !important; */
+}
+
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>
