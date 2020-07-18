@@ -50,6 +50,7 @@ export const constantRoutes = [{
     },
     {
         path: "/login",
+        name: "Login",
         component: () =>
             import ("@/views/login/index"),
         hidden: true
@@ -93,7 +94,8 @@ export const constantRoutes = [{
             component: () =>
                 import ("@/views/profile/index")
         }]
-    }
+    },
+
 ];
 
 /**
@@ -142,12 +144,12 @@ export const asyncRoutes = [{
                 }
             },
             {
-                path: "/employee/reassign",
+                path: "/employee/assignment",
                 component: () =>
                     import ("@/views/cluster_log/admin"),
-                name: "Reassign",
+                name: "Assignment",
                 meta: {
-                    title: "Reassign"
+                    title: "Assignment"
                 }
             }
         ]
@@ -513,14 +515,15 @@ export const asyncRoutes = [{
 
     // 404 page must be placed at the end !!!
     { path: "*", redirect: "/404", hidden: true }
+
 ];
 
 const createRouter = () =>
-  new Router({
-    // mode: 'history', // require service support
-    scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes.concat(asyncRoutes)
-  });
+    new Router({
+        // mode: 'history', // require service support
+        scrollBehavior: () => ({ y: 0 }),
+        routes: constantRoutes.concat(asyncRoutes)
+    });
 
 const router = createRouter();
 
