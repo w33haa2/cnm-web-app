@@ -41,17 +41,19 @@
               :data="incidentReports"
               style="width: 100%;margin-top:5px;"
               class="monday"
+              @sort-change="customSort"
             >
               <el-table-column
                 label="Issued by"
                 sortable="custom"
                 align="left"
                 width="350"
+                prop="issued_by.full_name"
                 fixed
               >
                 <template slot-scope="scope">
                   <div
-                    style="height:45px;border-left:red 7px solid;display:flex"
+                    style="display:flex"
                   >
                     <el-tooltip :content="scope.row.issued_by.email" placement="top">
                       <div
@@ -104,14 +106,14 @@
                 <template slot-scope="scope">
                   <template v-if="scope.row.report_details.status == '0'">
                     <div
-                      style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;"
+                      class="tag tag-success"
                     >
                       <div style="align-self:center">CLOSED</div>
                     </div>
                   </template>
                   <template v-else>
                     <div
-                      style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;height:45px;border:1px solid #ff4545;"
+                      class="tag tag-danger"
                     >
                       <div style="align-self:center">OPEN</div>
                     </div>
@@ -252,6 +254,15 @@ export default {
   },
   methods: {
     ...mapActions(["fetchReceivedReports"]),
+    customSort({ column, prop, order }) {
+      this.query.sort = null;
+      this.query.order = null;
+      if (order) {
+        this.query.sort = prop;
+        this.query.order = order == "ascending" ? "asc" : "desc";
+      }
+      this.fetchReceivedReports(this.query);
+    },
     tableSizeChange(value) {
       this.query.limit = value;
       this.fetchReceivedReports(this.query);
@@ -296,7 +307,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

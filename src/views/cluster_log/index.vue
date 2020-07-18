@@ -93,7 +93,7 @@
               >
                 <template slot-scope="scope">
                   <div
-                    style="height:45px;border-left:red 7px solid;display:flex"
+                    style="display:flex"
                   >
                     <el-tooltip :content="scope.row.parent_user_details.email">
                       <div
@@ -365,6 +365,11 @@ export default {
         this.table_config.dummy = this.fetchHierarchyLogsTableData.hierarchy_log;
         this.table_config.count = this.fetchHierarchyLogsTableData.count;
       }
+      if(fail){
+        this.table_config.data=[];
+        this.table_config.dummy = [];
+        this.table_config.count=0;
+      }
     }
   },
   created() {
@@ -462,7 +467,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

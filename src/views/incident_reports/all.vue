@@ -1,128 +1,242 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">All Reports</h4>
-
-    <!-- Search and Pagination -->
-    <el-row>
-      <el-col :md="{ span:8 }">
-        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-select
-            slot="prepend"
-            placeholder="Select"
-            v-model="searchTarget"
-            style="width:150px;"
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper">
+              Incident Reports
+            </div>
+          </div>
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <el-input v-model="searchQuery" placeholder="Search...">
+            <el-select
+              slot="prepend"
+              placeholder="Select"
+              v-model="searchTarget"
+              style="width:150px;"
+            >
+              <el-option value="issued_to" label="Issued To" selected />
+              <el-option value="issued_by" label="Issued By" />
+            </el-select>
+          </el-input>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="table-container shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          All
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <!-- Search and Pagination -->
+          <el-pagination
+            style="float:right"
+            :page-sizes="[10, 25, 50]"
+            :page-size="100"
+            layout="total, sizes, prev, pager, next"
+            :total="table_config.count"
+            background
+            small
+            :v-model="5"
+            @size-change="tableSizeChange"
+            @current-change="tablePageChange"
+          />
+        </el-col>
+        <el-col>
+          <!-- Table -->
+          <el-table
+            v-loading="table_config.loader"
+            :data="table_config.data"
+            style="margin-top:5px;"
+            class="monday"
+            @sort-change="customSort"
           >
-            <el-option value="issued_to" label="Issued To" selected />
-            <el-option value="issued_by" label="Issued By" />
-          </el-select>
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>
-      <el-col :md="{ span:16 }">
-        <el-pagination
-          style="float:right
-          "
-          :page-sizes="[10, 25, 50]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          background
-          small
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-        />
-      </el-col>
-    </el-row>
+            <el-table-column align="center" label="Status" width="80" fixed>
+              <template slot-scope="scope">
+                <div style="border-left:red 7px solid;padding-left:1px">
+                  <template v-if="scope.row.report_details.status == 0">
+                    <el-tooltip content="Reopen this Report" placement="top">
+                      <div
+                        class="tag tag-success cursor-pointer"
+                        @click="handleCommand('open||' + scope.row.report_details.id)"
+                      >
+                        <div style="align-self:center">CLOSED</div>
+                      </div>
+                    </el-tooltip>
+                  </template>
+                  <template v-else>
+                    <el-tooltip content="Close this Report" placement="top">
+                      <div
+                      class="tag tag-danger cursor-pointer"
+                        style=""
+                        @click="handleCommand('close||' + scope.row.report_details.id)"
+                      >
+                        <div style="align-self:center">OPEN</div>
+                      </div>
+                    </el-tooltip>
+                  </template>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Issued to"
+              sortable="custom"
+              align="left"
+              width="350"
+              prop="issued_to.full_name"
+              fixed
+            >
+              <template slot-scope="scope">
+                <div style="height:45px;display:flex">
+                  <el-tooltip
+                    :content="scope.row.issued_to.email"
+                    placement="top"
+                  >
+                    <div
+                      style="width:100%;align-self:center;padding-left:20px;"
+                    >
+                      {{ scope.row.issued_to.full_name }}
+                    </div>
+                  </el-tooltip>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" width="50" fixed>
+              <template slot-scope="scope">
+                <div class="user-block">
+                  <div v-if="scope.row.issued_to.image_url" style="width:100%;">
+                    <div style="margin:0 auto;height:30px;width:30px;">
+                      <img
+                        class="img-circle"
+                        style="margin:0 auto;"
+                        :src="scope.row.issued_to.image_url"
+                      />
+                    </div>
+                  </div>
+                  <div v-else class="text-muted" style="width:100%;">
+                    <div
+                      class="img-circle"
+                      style="background-color:white;margin:0 auto;"
+                    >
+                      <div style="display:flex;height:30px;width:30px;">
+                        <div
+                          style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                        >
+                          {{
+                            getAvatarLetters(
+                              scope.row.issued_to.fname,
+                              scope.row.issued_to.lname
+                            )
+                          }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
 
-    <!-- Table -->
-    <br />
-    <el-alert
-      v-if="fetchingAllIncidentReports.fail"
-      title="Error!"
-      type="error"
-      :description="irErrors"
-    />
-    <el-table v-loading="table_config.loader" :data="table_config.data" style="margin-top:30px;">
-      <el-table-column align="center" label="Action">
-        <template slot-scope="scope">
-          <el-dropdown @command="handleCommand">
-            <span class="el-dropdown-link">
-              <i class="el-icon-more" />
-            </span>
-            <el-dropdown-menu slot="dropdown">
-              <!-- <el-dropdown-item icon="el-icon-edit" :command="'update||'+scope.row.id">Update</el-dropdown-item> -->
-              <el-dropdown-item :command="'close||'+scope.row.report_details.id">Close</el-dropdown-item>
-              <el-dropdown-item :command="'open||'+scope.row.report_details.id" divided>Open</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Issued To" width="300">
-        <template slot-scope="scope">
-          <div class="td-image-name-container">
-            <img v-if="scope.row.issued_to.image" :src="scope.row.issued_to.image" class="td-image" />
-            <div v-else class="td-name-avatar">
-              <span>{{ getAvatarLetters(scope.row.issued_to.fname,scope.row.issued_to.lname) }}</span>
-            </div>
-            <div class="td-name">{{ scope.row.issued_to.full_name }}</div>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Issued By" width="300">
-        <template slot-scope="scope">
-          <div class="td-image-name-container">
-            <img v-if="scope.row.issued_by.image" :src="scope.row.issued_by.image" class="td-image" />
-            <div v-else class="td-name-avatar">
-              <span>{{ getAvatarLetters(scope.row.issued_by.fname,scope.row.issued_by.lname) }}</span>
-            </div>
-            <div class="td-name">{{ scope.row.issued_by.full_name }}</div>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Sanction Type" width="150">
-        <template slot-scope="scope">{{ scope.row.report_details.sanction_type.type_description }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Sanction Level" width="150">
-        <template slot-scope="scope">{{ scope.row.report_details.sanction_level.level_description }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Incident Date" width="150">
-        <template slot-scope="scope">
-          {{ fromNow(scope.row.report_details.incident_date) }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Status" width="220">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.report_details.status=='0'" type="success">Closed</el-tag>
-          <el-tag v-else type="danger">Open</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="header-center" label="Description" width="350">
-        <template slot-scope="scope">{{ scope.row.report_details.description }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Response" width="220">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.report_details.agent_response" type="success">{{scope.row.report_details.agent_response.commitment}}</el-tag>
-          <el-tag v-else type="danger">No Response</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Date Filed" width="220">
-        <template slot-scope="scope">{{ fromNow(scope.row.report_details.created_at.date) }}</template>
-      </el-table-column>
-    </el-table>
+            <el-table-column
+              label="Issued by"
+              sortable="custom"
+              align="left"
+              width="350"
+              prop="issued_by.full_name"
+            >
+              <template slot-scope="scope">
+                <div style="height:45px;display:flex">
+                  <el-tooltip
+                    :content="scope.row.issued_by.email"
+                    placement="top"
+                  >
+                    <div
+                      style="width:100%;align-self:center;padding-left:20px;"
+                    >
+                      {{ scope.row.issued_by.full_name }}
+                    </div>
+                  </el-tooltip>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" width="50">
+              <template slot-scope="scope">
+                <div class="user-block">
+                  <div v-if="scope.row.issued_by.image_url" style="width:100%;">
+                    <div style="margin:0 auto;height:30px;width:30px;">
+                      <img
+                        class="img-circle"
+                        style="margin:0 auto;"
+                        :src="scope.row.issued_by.image_url"
+                      />
+                    </div>
+                  </div>
+                  <div v-else class="text-muted" style="width:100%;">
+                    <div
+                      class="img-circle"
+                      style="background-color:white;margin:0 auto;"
+                    >
+                      <div style="display:flex;height:30px;width:30px;">
+                        <div
+                          style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                        >
+                          {{
+                            getAvatarLetters(
+                              scope.row.issued_by.fname,
+                              scope.row.issued_by.lname
+                            )
+                          }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column align="center" label="Filed">
+              <template slot-scope="scope">
+                <el-tooltip
+                  placement="top"
+                  :content="fromNow(scope.row.report_details.created_at.date)"
+                >
+                  <div>
+                    {{
+                      formatDate(
+                        scope.row.report_details.created_at.date,
+                        "",
+                        "ddd. MMM Do, YYYY"
+                      )
+                    }}
+                  </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column label="View" width="50">
+              <template slot-scope="scope">
+                <view-report :data="scope.row"></view-report>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import viewReport from "./components/view-incident-report";
 export default {
+  name:"allIRpage",
+  components:{viewReport},
   data() {
     return {
       query: {
         offset: 0,
         limit: 10,
-        sort: "created_at",
+        sort: "updated_at",
         order: "desc"
       },
       searchQuery: null,
@@ -218,8 +332,17 @@ export default {
       "searchIssuedToIr",
       "searchIssuedByIr"
     ]),
+    customSort({ column, prop, order }) {
+      this.query.sort = null;
+      this.query.order = null;
+      if (order) {
+        this.query.sort = prop;
+        this.query.order = order == "ascending" ? "asc" : "desc";
+      }
+      this.tableSearch();
+    },
     tableSearch() {
-      if (this.searchQuery !== "") {
+      if (this.searchQuery !== "" && this.searchQuery !==null) {
         this.query.offset = 0;
         this.query["target[]"] = "full_name";
         this.query.query = this.searchQuery;
@@ -233,6 +356,7 @@ export default {
             break;
         }
       } else {
+        delete this.query["target[]"];
         this.query.offset = 0;
         const data = this.query;
         this.fetchAllReports(data);
@@ -253,27 +377,85 @@ export default {
       switch (action) {
         case "open":
           status = 1;
+          if(confirm("Are you sure you want to reopen this report?")){
+            this.updateIncidentReport({
+              id: id,
+              status: status
+            });
+          }
           break;
         case "close":
           status = 0;
+          if(confirm("Are you sure you want to close this report?")){
+            this.updateIncidentReport({
+              id: id,
+              status: status
+            });
+          }
+          break;
+        case "view":
+          this.previewReport();
           break;
       }
-      this.updateIncidentReport({
-        id: id,
-        status: status
-      });
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

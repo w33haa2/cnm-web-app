@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div v-if="show_profile">
-      <el-row :gutter="20">
+      <el-row :gutter="5">
         <el-col :span="6" :xs="24">
           <user-card :user="userDetails" />
         </el-col>

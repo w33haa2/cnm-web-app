@@ -47,7 +47,7 @@
           fixed
         >
           <template slot-scope="scope">
-            <div style="height:45px;border-left:red 7px solid;display:flex">
+            <div style="display:flex">
               <el-tooltip :content="scope.row.email">
                 <div style="width:100%;align-self:center;padding-left:20px;">
                   {{ scope.row.full_name }}
@@ -477,6 +477,7 @@ export default {
         this.query.tl = true;
         this.fetchWorkForce(this.unsetNull(this.query));
         break;
+
     }
 
     // if(this.position != "Team Leader"){
@@ -511,6 +512,9 @@ export default {
           this.getOmBySelectedDate();
           break;
         case "rta manager":
+        case "hr manager":
+        case "hr assistant":
+        case "admin":
         case "rta supervisor":
         case "rta analyst":
           this.fetchWorkForce(this.unsetNull(this.query));
@@ -656,7 +660,7 @@ export default {
 }
 
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 
 .monday >>> .el-table__row tr {

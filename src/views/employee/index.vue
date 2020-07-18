@@ -1,65 +1,73 @@
 <template>
   <div class="app-container">
-    <h4>Employee</h4>
-    <div class="filter-container">
-      <!-- ADD EMPLOYEE BUTTON & EXCEL EXPORT/IMPORT BUTTTONS -->
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
-        <el-col :md="{span: 24}">
-          <!-- <el-button
-            size="mini"
-            @click="form.toggle = true, form.action_data={action:'Create',data:null}"
-          >Create Employee</el-button>
-          <el-button-group>
-            <el-button size="mini" @click="$refs.excelInput.click()">Import</el-button>
-            <input
-              ref="excelInput"
-              type="file"
-              style="display:none"
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              @change="excelChanged"
-            >
-            <el-button size="mini">Export</el-button>
-          </el-button-group>
-          <el-button size="mini" @click="changeStatus">Change Status</el-button>-->
+    <!-- hidden element -->
+    <input
+      type="file"
+      ref="importEmployeeInput"
+      v-if="importEmployeeReset"
+      accept=".xlsx"
+      style="display:none"
+      @change="importEmployeeFileChange"
+    />
 
-          <div style="float:right">
-            <el-button
-              size="mini"
-              @click="form.toggle = true, form.action_data={action:'Create',data:null}"
-              style="margin-right:2px;"
-            >Create Employee</el-button>
-            <el-button size="mini" @click="changeStatus" style="margin-left:0px;">Change Status</el-button>
-            <el-dropdown @command="handleCommand">
-              <el-button type="success" :plain="true" size="mini">
-                Excel
-                <i class="el-icon-arrow-down el-icon--right" />
-              </el-button>
-              <input
-                type="file"
-                ref="importEmployeeInput"
-                v-if="importEmployeeReset"
-                accept=".xlsx"
-                style="display:none"
-                @change="importEmployeeFileChange"
-              />
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="importEmployee">Import Employee</el-dropdown-item>
-                <el-dropdown-item command="downloadEmployeeTemplate">Export Employee Template</el-dropdown-item>
-                <el-dropdown-item command="downloadEmployeeList">Export Employee List</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
+    <!-- title bar -->
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper" style="margin-right:5px;">
+              Employee
+            </div>
+            <div
+              class="button-icon round active"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="(form.toggle = true),(form.action_data = { action: 'Create', data: null })"
+            >
+              <el-tooltip placement="top" content="Add Employee">
+                <plus-icon></plus-icon>
+              </el-tooltip>
+            </div>
+            <div
+              class="button-icon round primary"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="changeStatus"
+            >
+              <el-tooltip placement="top" content="Change Employee Status">
+                <account-edit-icon></account-edit-icon>
+              </el-tooltip>
+            </div>
+            <div
+              class="button-icon round excel"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="handleCommand('importEmployee')"
+            >
+              <el-tooltip placement="top" content="Import Employee">
+                <file-import-icon></file-import-icon>
+              </el-tooltip>
+            </div>
+            <div
+              class="button-icon round excel"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="handleCommand('downloadEmployeeList')"
+            >
+              <el-tooltip placement="top" content="Export Employee">
+                <file-export-icon></file-export-icon>
+              </el-tooltip>
+            </div>
+            <div
+              class="button-icon round excel"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="handleCommand('downloadEmployeeTemplate')"
+            >
+              <el-tooltip placement="top" content="Export Template">
+                <export-icon></export-icon>
+              </el-tooltip>
+            </div>
           </div>
         </el-col>
-      </el-row>
-      <employee-form
-        :toggle="form.toggle"
-        :data="form.action_data"
-        @closeEmployeeModal="closeEmployeeModal"
-      />
-      <!-- DISPLAY RECORDS & PAGINATION -->
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
-        <el-col :md="{span: 8}">
-          <el-input v-model="searchQuery" placeholder="Search..." size="mini">
+        <el-col :md="{ span: 12 }">
+          <el-input v-model="searchQuery" placeholder="Search..." 
+                @input="debounceInput">
             <el-select
               slot="prepend"
               v-model="table_config.query.search.target"
@@ -67,20 +75,23 @@
               style="width:150px;"
             >
               <el-option
-                v-for="(option,index) in table_config.searchable_fields"
+                v-for="(option, index) in table_config.searchable_fields"
                 :key="index"
                 :label="option.label"
                 :value="option.value"
               />
             </el-select>
-            <el-button slot="append">
-              <i class="el-icon-search" />
-            </el-button>
           </el-input>
         </el-col>
-        <el-col :md="{span: 16}">
+      </el-row>
+    </div>
+
+    <div class="table-container shadow">
+      <el-row :gutter="8" style="padding-right:8px;margin-bottom:5px;">
+        <el-col :md="{ span: 24 }">
           <el-pagination
             style="float:right"
+            :pager-count="5"
             small
             background
             :page-sizes="[10, 25, 50]"
@@ -92,23 +103,16 @@
             @current-change="tablePageChange"
           />
         </el-col>
-      </el-row>
 
-      <el-row :gutter="8" style="padding-right:8px;margin-bottom:30px;">
         <el-col
-          :xs="{span: 24}"
-          :sm="{span: 24}"
-          :md="{span: 24}"
-          :lg="{span: 24}"
-          :xl="{span: 24}"
+          :xs="{ span: 24 }"
+          :sm="{ span: 24 }"
+          :md="{ span: 24 }"
+          :lg="{ span: 24 }"
+          :xl="{ span: 24 }"
+          style="margin-top:5px;"
         >
-          <el-alert
-            v-if="employeeFetchState.fail"
-            title="Error!"
-            type="error"
-            :description="employeeErrors"
-          />
-          <transaction-table
+          <employee-table
             :table-data="employeesData"
             @dropdownCommand="dropdownCommand"
             @sort="onColumnSort"
@@ -117,6 +121,13 @@
       </el-row>
     </div>
 
+
+
+      <employee-form
+        :toggle="form.toggle"
+        :data="form.action_data"
+        @closeEmployeeModal="closeEmployeeModal"
+      />
     <!-- Create and Update Dialog -->
     <el-dialog
       :visible.sync="change_status.dialog"
@@ -153,10 +164,14 @@
       <label>Status</label>
       <el-row style="margin-top: 7px; margin-bottom:5px;">
         <el-col>
-          <el-select v-model="change_status.form.status_id" size="mini" style="width:100%">
+          <el-select
+            v-model="change_status.form.status_id"
+            size="mini"
+            style="width:100%"
+          >
             <el-option
-              v-for="(status,index) in statusList"
-              :key="status.id"
+              v-for="(status, index) in statusList.statuses"
+              :key="index"
               :value="status.id"
               :label="status.type"
             />
@@ -182,7 +197,8 @@
           @click="confirmChangeStatus"
           :loading="change_status.confirm"
           size="mini"
-        >Confirm</el-button>
+          >Confirm</el-button
+        >
       </span>
     </el-dialog>
 
@@ -227,74 +243,107 @@
       ></el-alert>
 
       <div style="width:100%;margin-bottom:20px;margin-top:15px;">
-        <template v-if="excel.import.arr_length==0">
+        <template v-if="excel.import.arr_length == 0">
           Initializing data, Please wait...
         </template>
         <template v-else>
           Progress
-          <span>( {{ excel.import.report.data.all.list.length }}</span>/
+          <span>( {{ excel.import.report.data.all.list.length }}</span
+          >/
           <span>{{ excel.import.arr_length }} )</span>
         </template>
       </div>
-      <el-progress :percentage="excel.import.arr_length!=0?excel.import.report.data.all.list.length / excel.import.arr_length * 100: 0" :text-inside="true" :stroke-width="18"></el-progress>
+      <el-progress
+        :percentage="
+          excel.import.arr_length != 0
+            ? (excel.import.report.data.all.list.length /
+                excel.import.arr_length) *
+              100
+            : 0
+        "
+        :text-inside="true"
+        :stroke-width="18"
+      ></el-progress>
       <div style="padding-bottom:15px;  ">
         <el-tabs
           v-model="excel.import.report.active_tab"
           type="border-card"
           style="margin-top:15px;margin-bottom:10px;"
         >
-          <el-tab-pane :label="'All: '+excel.import.report.data.all.list.length" name="all">
+          <el-tab-pane
+            :label="'All: ' + excel.import.report.data.all.list.length"
+            name="all"
+          >
             <el-table :data="excel.import.report.data.all.list" height="350px">
               <el-table-column label="CID" width="100">
-                <template scope="scope">{{scope.row["0"]}}</template>
+                <template scope="scope">{{ scope.row["0"] }}</template>
               </el-table-column>
               <el-table-column label="Email" width="350">
-                <template scope="scope">{{scope.row["9"]}}</template>
+                <template scope="scope">{{ scope.row["9"] }}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
-                  <template v-if="scope.row.import_result.code==200">
-                    <el-tag size="mini" type="success">{{ scope.row.import_result.action == "create"? "Created":"Updated"}}</el-tag>
+                  <template v-if="scope.row.import_result.code == 200">
+                    <el-tag size="mini" type="success">{{
+                      scope.row.import_result.action == "create"
+                        ? "Created"
+                        : "Updated"
+                    }}</el-tag>
                   </template>
                   <template v-else>
-                    <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
+                    <el-tag size="mini" type="danger">{{
+                      scope.row.import_result.description
+                    }}</el-tag>
                   </template>
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +excel.import.report.data.all.list.filter(i=> i.import_result.code!=200).length "
+            :label="
+              'Errors: ' +
+                excel.import.report.data.all.list.filter(
+                  i => i.import_result.code != 200
+                ).length
+            "
             name="errors"
           >
             <el-table
-              :data="excel.import.report.data.all.list.filter(i=> i.import_result.code!=200)"
+              :data="
+                excel.import.report.data.all.list.filter(
+                  i => i.import_result.code != 200
+                )
+              "
               height="350px"
             >
               <el-table-column label="CID" width="100">
-                <template scope="scope">{{scope.row["0"]}}</template>
+                <template scope="scope">{{ scope.row["0"] }}</template>
               </el-table-column>
               <el-table-column label="Email" width="350">
-                <template scope="scope">{{scope.row["9"]}}</template>
+                <template scope="scope">{{ scope.row["9"] }}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
                   <template>
-                    <el-tag size="mini" type="danger">{{ scope.row.import_result.description }}</el-tag>
+                    <el-tag size="mini" type="danger">{{
+                      scope.row.import_result.description
+                    }}</el-tag>
                   </template>
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
         </el-tabs>
-        <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+        <el-button size="mini" @click="closeImportReport" style="float:right"
+          >Close</el-button
+        >
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import TransactionTable from "./components/TransactionTable";
+import EmployeeTable from "./components/employeeTable";
 import SelectSearch from "./components/select_search";
 import EmployeeForm from "./components/EmployeeForm";
 import { mapGetters, mapActions } from "vuex";
@@ -303,16 +352,17 @@ import excel from "xlsx";
 import axios from "axios";
 import moment from "moment";
 import readXlsxFile from "read-excel-file";
+import { debounce } from "debounce";
 export default {
   name: "DashboardHR",
   components: {
-    TransactionTable,
+    EmployeeTable,
     SelectSearch,
     EmployeeForm
   },
   data() {
     return {
-      importEmployeeReset:true,
+      importEmployeeReset: true,
       excel: {
         import: {
           status: null,
@@ -404,8 +454,7 @@ export default {
     this.fetchEmployees({ data });
     this.$root.$on("employee_table.refresh", this.refreshTable);
     this.fetchStatusList();
-    this.fetchRSEmployees();
-
+    this.fetchRSEmployees({});
     // setup filter select
   },
   beforeRouteLeave(to, from, next) {
@@ -505,22 +554,6 @@ export default {
         });
       }
     },
-    employeeData: function(v) {
-      // console.log(v);
-    },
-    searchQuery: function(newData) {
-      if (newData !== "") {
-        this.query["target[]"] = this.table_config.query.search.target;
-        this.query.query = newData;
-        const data = this.query;
-        this.fetchEmployees({ data });
-      } else {
-        this.query["target[]"] = "";
-        this.query.query = "";
-        const data = this.query;
-        this.fetchEmployees({ data });
-      }
-    },
     employeesFetchState({ initial, success, fail }) {
       if (fail) {
         Message.error({ message: this.irErrors, duration: "2500" });
@@ -538,13 +571,17 @@ export default {
       }
     },
     statusList(v) {
-      let row = v[0];
-      this.change_status.model.status = row.status;
-      this.change_status.model.type = row.type;
-      this.change_status.model.reason = row.type;
+    },
+    statusListState({ initial, success, fail }) {
+      if (success) {
+        let row = this.statusList[0];
+        this.change_status.model.status = row.status;
+        this.change_status.model.type = row.type;
+        this.change_status.model.reason = row.type;
+      }
     },
     "change_status.form.status_id": function(v) {
-      let row = this.statusList.filter(i => i.id == v)[0];
+      let row = this.statusList.statuses.filter(i => i.id == v)[0];
       this.change_status.model.status = row.status;
       this.change_status.model.type = row.type;
       this.change_status.model.reason = row.type;
@@ -583,6 +620,20 @@ export default {
       "fetchRSEmployees",
       "resetPassEmployee"
     ]),
+    debounceInput: debounce(function (e) {
+      let newData = this.searchQuery;
+      if (newData !== "") {
+        this.query["target[]"] = this.table_config.query.search.target;
+        this.query.query = newData;
+        const data = this.query;
+        this.fetchEmployees({ data });
+      } else {
+        this.query["target[]"] = "";
+        this.query.query = "";
+        const data = this.query;
+        this.fetchEmployees({ data });
+      }
+    }, 1000),
     confirmChangeStatus() {
       let data = {};
       // data.user_id = this.change_status.employees;
@@ -688,42 +739,48 @@ export default {
     },
     importEmployeeFileChange(e) {
       this.excel.import.dialog = true;
-      
-      readXlsxFile(e.target.files[0]).then((rows) => {
-        let header=rows[0], body= rows.slice(1,rows.length);
 
-        var i,j,tmparray=[], chunk = 30;
+      readXlsxFile(e.target.files[0]).then(rows => {
+        let header = rows[0],
+          body = rows.slice(1, rows.length);
 
-        var array_report=[];
+        var i,
+          j,
+          tmparray = [],
+          chunk = 30;
 
+        var array_report = [];
 
         this.excel.import.importing = true;
         this.excel.import.arr_length = body.length;
         // this.excel.import.loop_index = this.excel.import.report.data.all.list.length;
         this.excel.import.progress =
-          (this.excel.import.report.data.all.list.length / this.excel.import.arr_length) *
+          (this.excel.import.report.data.all.list.length /
+            this.excel.import.arr_length) *
           100;
 
-
-        for(i=0,j=body.length; i<j; i+=chunk){
-          tmparray.push(body.slice(i,i+chunk));
+        for (i = 0, j = body.length; i < j; i += chunk) {
+          tmparray.push(body.slice(i, i + chunk));
         }
 
-        let tmp = tmparray.map(i=>i.unshift(header))
+        let tmp = tmparray.map(i => i.unshift(header));
 
-        for(let x=0;x<=tmparray.length-1;x++){
-          let delay = x*5000;
-          setTimeout(function(){
-            this.excelAddRow(tmparray[x]);
-          }.bind(this), delay);
+        for (let x = 0; x <= tmparray.length - 1; x++) {
+          let delay = x * 5000;
+          setTimeout(
+            function() {
+              this.excelAddRow(tmparray[x]);
+            }.bind(this),
+            delay
+          );
         }
-      })
+      });
     },
-    excelAddRow(row){
+    excelAddRow(row) {
       let tmp = this.excel.import.report.data.all.list;
       axios
         .post("api/v1/users/import_user_v2", row, {
-          headers:{
+          headers: {
             Authorization: "Bearer " + this.token
           }
         })
@@ -790,9 +847,17 @@ export default {
       switch (command) {
         case "downloadEmployeeTemplate":
           this.exportEmployeeTemplate();
+          this.$message({
+            type:"info",
+            message:"A file will be downloaded in a moment. Please wait..."
+          })
           break;
         case "downloadEmployeeList":
           this.exportEmployeeList();
+          this.$message({
+            type:"info",
+            message:"A file will be downloaded in a moment. Please wait..."
+          })
           break;
         case "importEmployee":
           this.$refs.importEmployeeInput.click();
@@ -807,11 +872,11 @@ export default {
       if (query !== "") {
         data["target[]"] = "full_name";
         data.query = query;
-        this.fetchRSEmployees({ data });
+        this.fetchRSEmployees(data);
       } else {
         data["target[]"] = "";
         data.query = "";
-        this.fetchRSEmployees({ data });
+        this.fetchRSEmployees(data);
       }
     },
     cancelForm() {
@@ -902,29 +967,62 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.dashboard-editor-container {
-  padding: 32px;
-  background-color: rgb(240, 242, 245);
-  position: relative;
 
-  .github-corner {
-    position: absolute;
-    top: 0px;
-    border: 0;
-    right: 0;
-  }
 
-  .chart-wrapper {
-    background: #fff;
-    padding: 16px 16px 0;
-    margin-bottom: 32px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
 }
 
-@media (max-width: 1024px) {
-  .chart-wrapper {
-    padding: 8px;
-  }
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

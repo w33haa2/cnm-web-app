@@ -36,8 +36,14 @@ import SquareEditIcon from 'vue-material-design-icons/SquareEditOutline.vue';
 Vue.component('square-edit-icon', SquareEditIcon);
 import TooltipEditIcon from 'vue-material-design-icons/TooltipEditOutline.vue';
 Vue.component('tooltip-edit-icon', TooltipEditIcon);
+import AccountEditIcon from 'vue-material-design-icons/AccountEditOutline.vue';
+Vue.component('account-edit-icon', AccountEditIcon);
 import CancelIcon from 'vue-material-design-icons/Cancel.vue';
 Vue.component('cancel-icon', CancelIcon);
+import ExportIcon from 'vue-material-design-icons/Export.vue';
+Vue.component('export-icon', ExportIcon);
+import DeleteIcon from 'vue-material-design-icons/Delete.vue';
+Vue.component('delete-icon', DeleteIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css

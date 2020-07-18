@@ -148,7 +148,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

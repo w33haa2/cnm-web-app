@@ -210,7 +210,7 @@
                 </template>
                 <template slot-scope="scope">
                   <div
-                    style="height:45px;border-left:red 7px solid;display:flex"
+                    style="display:flex"
                   >
                     <el-tooltip :content="scope.row.email">
                       <div
@@ -1911,7 +1911,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left: 5px solid crimson !important;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

@@ -314,10 +314,12 @@ export default {
   props: ['toggle', 'data'],
   watch: {
     data(v) {
-      if (v.action == 'Update') {
-        this.fillUpdateForm(v.data)
-      } else if (v.action == 'Create') {
-        this.clearForm()
+      if(v){
+        if (v.action == 'Update') {
+          this.fillUpdateForm(v.data)
+        } else if (v.action == 'Create') {
+          this.clearForm()
+        }
       }
     },
     fetchStateStatusList({ initial, success, fail }) {
@@ -328,8 +330,8 @@ export default {
       if (success) {
         this.disable.status_select = false
         this.disable.form_confirm = false
-        this.form.employee.status_id = this.statusList[0].id
-        this.options.statusList = this.statusList.map(function(i) { return { value: i.id, label: i.full_name } })
+        this.form.employee.status_id = this.statusList.statuses[0].id
+        this.options.statusList = this.statusList.statuses;
       }
       if (fail) {
         this.disable.status_select = true
@@ -373,14 +375,14 @@ export default {
       }
     },
     'form.employee.status_id': function(v) {
-      this.form.employee.status = this.statusList.filter(i => i.id == v)[0].status
-      this.form.employee.type = this.statusList.filter(i => i.id == v)[0].type
+      this.form.employee.status = this.statusList.statuses.filter(i => i.id == v)[0].status
+      this.form.employee.type = this.statusList.statuses.filter(i => i.id == v)[0].type
     },
-    'statusList': function(v) {
-      this.options.statusList = v
-      this.form.employee.status = v.filter(i => i.id == this.form.employee.status_id)[0].status
-      this.form.employee.type = v.filter(i => i.id == this.form.employee.status_id)[0].type
-    },
+    // 'statusList.statuses': function(v) {
+    //   this.options.statusList = v
+    //   this.form.employee.status = v.filter(i => i.id == this.form.employee.status_id)[0].status
+    //   this.form.employee.type = v.filter(i => i.id == this.form.employee.status_id)[0].type
+    // },
     'vueCam.camera': function(id) {
       this.vueCam.deviceId = id
     },
@@ -396,10 +398,10 @@ export default {
       if(success){
         this.options.position = this.fetchAccessLevelsData.access_levels.map(i=> ({value:i.id, label: i.name}));
         if(this.data.action.toLowerCase() == "create"){
-          this.form.employee.access_id = 1; // admin
+          this.form.employee.access_id = 2; // admin
           const data = {
             'target[]': 'access_id',
-            query: this.fetchAccessLevelsData.access_levels.filter(i=>i.id===1)[0].parent.id
+            query: this.fetchAccessLevelsData.access_levels.filter(i=>i.id===2)[0].parent.id
           }
           this.fetchPotentialHead({ data })
         }
@@ -530,7 +532,7 @@ export default {
         p_email: data.p_email,
         hired_date: data.hired_date,
         company_id: data.company_id,
-        status_id: this.statusList.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,
+        status_id: this.statusList.statuses.filter(i => i.type.toLowerCase() == data.type.toLowerCase())[0].id,
         status: data.status,
         contract: data.contract,
         type: data.type
@@ -669,7 +671,7 @@ export default {
       keys.forEach((v, i) => {
         this.form.employee[v] = null
       })
-      const status = this.statusList.filter(i => i.id == 1)[0]
+      const status = this.statusList.statuses.filter(i => i.id == 1)[0]
 
       this.form.employee.gender = 'Male'
       this.form.employee.status_id = 1

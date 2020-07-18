@@ -1,93 +1,116 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Positions</h4>
-    <!--
-    <el-alert
-      title="This list is uneditable, Please contact service provider."
-      type="info"
-      show-icon
-    ></el-alert>-->
-
-    <!-- Search and Pagination -->
-    <el-row>
-      <el-col :md="{ span:4 }">
-        <el-input placeholder="Search..." size="mini" v-model="table.request.query">
-          <!-- <el-select slot="prepend" placeholder="Select" style="width:150px;">
-            <el-option />
-          </el-select>-->
-          <!-- <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>-->
-        </el-input>
-      </el-col>
-      <el-col :md="{ span:12,offset:8 }">
-        <el-pagination
-          style="float:right"
-          :pager-count="table.paginationCount"
-          :page-sizes="[10,25,50]"
-          :page-size="table.request.limit"
-          layout="total, sizes, prev, pager, next"
-          :total="fetchAccessLevelsData.count"
-          background
-          small
-          @current-change="tablePageChange"
-          @size-change="tableSizeChange"
-          :current-page.sync="table.page"
-        />
-      </el-col>
-      <el-col :md="{span:24}" style="padding-top:5px;">
-        <el-button
-          type="primary"
-          size="mini"
-          style="float:right"
-          @click="createForm"
-        >Create Position</el-button>
-      </el-col>
-    </el-row>
-    <!-- Table -->
-    <el-table
-      :data="fetchAccessLevelsData.access_levels"
-      style="width: 100%;margin-top:30px;"
-      v-loading="fetchAccessLevelsState.initial"
-      @sort-change="columnSort"
-    >
-      <el-table-column align="center" label="Code" sortable="custom" prop="code">
-        <template slot-scope="scope">{{ scope.row.code }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Description" sortable="custom" prop="name">
-        <template slot-scope="scope">{{ scope.row.name }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Head" sortable="custom" prop="parent.name">
-        <template slot-scope="scope">
-          <template v-if="scope.row.parent">{{ scope.row.parent.name }}</template>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Action">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            plain
-            type="warning"
-            :disabled="!scope.row.flag"
-            @click="updateRow(scope.row)"
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper" style="margin-right:10px;">
+              Positions
+            </div>
+            <!-- FUNCTIONING CREATE BUTTON DISABLED -->
+            <!-- <div
+              class="button-icon round active"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="createForm"
+            >
+              <el-tooltip placement="top" content="Add Sanction Type">
+                <plus-icon></plus-icon>
+              </el-tooltip>
+            </div> -->
+          </div>
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <el-input
+            placeholder="Search..."
+            v-model="table.request.query"
+          ></el-input>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="table-container shadow">
+      <el-row>
+        <el-col :md="{ span: 24 }">
+          <el-pagination
+            style="float:right"
+            :pager-count="5"
+            :page-sizes="[10, 25, 50]"
+            :page-size="table.request.limit"
+            layout="total, sizes, prev, pager, next"
+            :total="fetchAccessLevelsData.count"
+            background
+            small
+            @current-change="tablePageChange"
+            @size-change="tableSizeChange"
+            :current-page.sync="table.page"
+          />
+        </el-col>
+        <el-col :md="{ span: 24 }">
+          <!-- Table -->
+          <el-table
+            :data="fetchAccessLevelsData.access_levels"
+            style="width: 100%;margin-top:5px;"
+            v-loading="fetchAccessLevelsState.initial"
+            class="monday"
+            @sort-change="columnSort"
           >
-            <i class="el-icon-edit"></i>
-          </el-button>
-          <el-button
-            size="mini"
-            plain
-            type="danger"
-            :disabled="!scope.row.flag"
-            @click="deleteRow(scope.row)"
-          >
-            <i class="el-icon-delete"></i>
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+            <el-table-column
+              align="center"
+              label="Code"
+              sortable="custom"
+              prop="code"
+            >
+              <template slot-scope="scope">{{ scope.row.code }}</template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              label="Description"
+              sortable="custom"
+              prop="name"
+            >
+              <template slot-scope="scope">{{ scope.row.name }}</template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+              label="Head"
+              sortable="custom"
+              prop="parent.name"
+            >
+              <template slot-scope="scope">
+                <template v-if="scope.row.parent">{{
+                  scope.row.parent.name
+                }}</template>
+              </template>
+            </el-table-column>
+            <!-- FUNCTION AND DISABLED -->
+            <!-- <el-table-column align="center" label="Action">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  plain
+                  type="warning"
+                  :disabled="!scope.row.flag"
+                  @click="updateRow(scope.row)"
+                >
+                  <i class="el-icon-edit"></i>
+                </el-button>
+                <el-button
+                  size="mini"
+                  plain
+                  type="danger"
+                  :disabled="!scope.row.flag"
+                  @click="deleteRow(scope.row)"
+                >
+                  <i class="el-icon-delete"></i>
+                </el-button>
+              </template>
+            </el-table-column> -->
+          </el-table>
+        </el-col>
+      </el-row>
+    </div>
 
     <el-dialog
-      :title="form.position.action+' Position'"
+      :title="form.position.action + ' Position'"
       width="30%"
       :show-close="false"
       :close-on-press-escape="false"
@@ -110,9 +133,13 @@
           <label>Supervising Position</label>
         </el-col>
         <el-col style="margin-top:3px">
-          <el-select size="mini" style="width:100%" v-model="form.position.model.parent">
+          <el-select
+            size="mini"
+            style="width:100%"
+            v-model="form.position.model.parent"
+          >
             <el-option
-              v-for="(option,index) in form.position.options.parent.data"
+              v-for="(option, index) in form.position.options.parent.data"
               :key="index"
               :value="option.id"
               :label="option.name"
@@ -127,7 +154,8 @@
               type="danger"
               @click="submitPosition"
               :loading="form.position.submit"
-            >Confirm</el-button>
+              >Confirm</el-button
+            >
           </div>
         </el-col>
       </el-row>
@@ -173,7 +201,7 @@ export default {
           limit: 10,
           relations: ["parent"],
           sort: "created_at",
-          order:"desc",
+          order: "desc",
           target: null,
           query: "",
           name: null,
@@ -356,13 +384,61 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+  height:45px;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

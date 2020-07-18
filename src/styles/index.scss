@@ -658,9 +658,9 @@
                 box-shadow: 0 0 2px 2px rgba(100, 100, 100, .1);
             }
             &.active {
-                box-shadow: 0 0 3px 2px rgba(182, 18, 18, 0.2);
                 background-color: crimson;
                 &:hover {
+                    box-shadow: 0 0 3px 2px rgba(182, 18, 18, 0.2);
                     background-color: rgb(231, 29, 70);
                 }
                 .material-design-icon {
@@ -668,10 +668,20 @@
                 }
             }
             &.excel {
-                box-shadow: 0 0 3px 2px rgba(51, 182, 18, 0.2);
                 background-color: #349e64;
                 &:hover {
+                    box-shadow: 0 0 3px 2px rgba(51, 182, 18, 0.2);
                     background-color: #41be79;
+                }
+                .material-design-icon {
+                    color: white;
+                }
+            }
+            &.primary {
+                background-color: #1890ff;
+                &:hover {
+                    box-shadow: 0 0 3px 2px #0084ff3f;
+                    background-color: #42a4ff;
                 }
                 .material-design-icon {
                     color: white;
@@ -738,4 +748,28 @@
         
         .text-right {
             text-align: right;
+        }
+        
+        .tag {
+            display: flex;
+            justify-content: center;
+            height: 45px;
+            &.tag-success {
+                color: #13ce66;
+                background-color: #e7faf0;
+                border: 1px solid #13ce66;
+            }
+            &.tag-danger {
+                color: #ff4545;
+                background-color: #ffeded;
+                border: 1px solid #ff4545;
+            }
+        }
+        
+        .cursor-pointer {
+            cursor: pointer;
+        }
+        
+        .form-login-button {
+            margin-top: 50px;
         }

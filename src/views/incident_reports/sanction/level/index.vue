@@ -1,57 +1,97 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Sanction Level</h4>
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper" style="margin-right:10px;">
+              Sanction Level
+            </div>
+            <div
+              class="button-icon round active"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="modal_show = true"
+            >
+              <el-tooltip placement="top" content="Add Sanction Type">
+                <plus-icon></plus-icon>
+              </el-tooltip>
+            </div>
+          </div>
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <div>
+            <el-tooltip placement="top" content="Search">
+              <el-input v-model="searchQuery" placeholder="Search...">
+              </el-input>
+            </el-tooltip>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
 
-    <el-row>
-      <el-col>
-        <el-button :plain="true" size="mini" @click="modal_show = true">Create Saction Level</el-button>
-      </el-col>
-    </el-row>
-
-    <!-- Search and Pagination -->
-    <el-row style="width: 100%;margin-top:30px;">
-      <el-col :md="{ span:8 }">
-        <el-input v-model="searchQuery" placeholder="Search..." size="mini">
-          <el-button slot="append">
-            <i class="el-icon-search" />
-          </el-button>
-        </el-input>
-      </el-col>
-      <el-col :md="{ span:16 }">
-        <el-pagination
-          style="float:right"
-          :page-sizes="[10, 25, 50]"
-          :page-size="query.limit"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          background
-          small
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-        />
-      </el-col>
-    </el-row>
-
-    <!-- Table -->
-    <el-table
-      v-loading="table_config.loader"
-      :data="table_config.data"
-      style="width: 100%;margin-top:30px;"
-    >
-      <el-table-column align="center" label="Level Number">
-        <template slot-scope="scope">{{ scope.row.level_number }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Level Description">
-        <template slot-scope="scope">{{ scope.row.level_description }}</template>
-      </el-table-column>
-      <el-table-column align="center" label="Edit">
-        <template slot-scope="scope">
-          <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
-            <i class="el-icon-edit-outline" />
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="table-container shadow">
+      <el-row>
+        <el-col :md="{ span: 24 }">
+          <!-- Search and Pagination -->
+          <el-pagination
+            style="float:right"
+            :page-sizes="[10, 25, 50]"
+            :page-size="query.limit"
+            :pager-count="5"
+            layout="total, sizes, prev, pager, next"
+            :total="table_config.count"
+            background
+            small
+            @size-change="tableSizeChange"
+            @current-change="tablePageChange"
+          />
+        </el-col>
+        <el-col :md="{ span: 24 }">
+          <!-- Table -->
+          <el-table
+            v-loading="table_config.loader"
+            :data="table_config.data"
+            style="width: 100%;margin-top:5px;"
+            class="monday"
+          >
+            <el-table-column align="center" label="Number" width="150">
+              <template slot-scope="scope">
+                <div style="display:flex">
+                  <div style="width:100%;align-self:center;">
+                    {{ scope.row.level_number }}
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="Description">
+              <template slot-scope="scope">
+                <div class="d-flex">
+                  <div
+                    style="font-size:1.2em;font-weight:500;text-align:center;width:100%"
+                  >
+                    {{ scope.row.level_description }}
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="Edit" width="50">
+              <template slot-scope="scope">
+                <el-tooltip content="Update Type" placement="top">
+                  <div
+                    style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                    @click="updateRow(scope.row)"
+                  >
+                    <div style="align-self:center;color:gray;font-size:2em">
+                      <square-edit-icon></square-edit-icon>
+                    </div>
+                  </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+    </div>
 
     <!-- Create and Update Dialog -->
     <el-dialog
@@ -62,32 +102,40 @@
       :title="form.action + ' Sanction Level'"
       width="30%"
     >
-      <label width="100%">Level Number</label>
       <el-row>
         <el-col>
-          <el-input-number
-            v-model="form.level_number"
-            style="margin-top:3px; margin-bottom:10px;width:100%"
-            :step="1"
-            step-strictly
-            size="mini"
-          />
+          <div class="form-label">Level Number</div>
+          <div class="form-item">
+            <el-input-number
+              v-model="form.level_number"
+              style="margin-top:3px; margin-bottom:10px;width:100%"
+              :step="1"
+              step-strictly
+            />
+          </div>
         </el-col>
-      </el-row>
-      <label style="margin-top:5px; margin-bottom:3px">Level Description</label>
-      <el-row>
         <el-col>
-          <el-input
-            v-model="form.level_description"
-            type="text"
-            style="margin-top:3px; margin-bottom:5px;"
-            size="mini"
-          />
+          <div class="form-label" style="margin-top:10px">
+            Level Description
+          </div>
+          <div class="form-item">
+            <el-input
+              v-model="form.level_description"
+              type="text"
+              style="margin-top:3px; margin-bottom:5px;"
+            />
+          </div>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button type="danger" size="mini" :loading="form.confirm" @click="submitForm">Confirm</el-button>
+        <el-button
+          type="danger"
+          size="mini"
+          :loading="form.confirm"
+          @click="submitForm"
+          >Confirm</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -147,8 +195,7 @@ export default {
         this.table_config.data = this.sanctionLevels.options;
         this.table_config.count = this.sanctionLevels.count;
         this.table_config.loader = false;
-      }
-      else if(fail) {
+      } else if (fail) {
         this.table_config.loader = false;
       }
     },
@@ -279,13 +326,60 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

@@ -234,7 +234,7 @@ const mutations = {
             success: true,
             fail: false
         };
-        state.data.statusList = payload.meta.metadata;
+        state.data.statusList = payload.meta;
         state.count.statusList = payload.meta.count;
     },
     [FETCH_USER_STATUS_LIST.fail](state, payload) {

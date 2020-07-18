@@ -8,147 +8,202 @@
   >
     <!-- <el-table-column type="selection" width="55" fixed /> -->
     <el-table-column label="CNM ID" fixed class="">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center;height:100%">{{ row.company_id }}</div>
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center;height:100%">
+          {{ row.company_id }}
+        </div>
       </template>
     </el-table-column>
     <el-table-column align="center" width="50" fixed>
       <template slot-scope="scope">
+        <el-tooltip :content="scope.row.full_name" placement="top">
         <div class="user-block">
           <div v-if="scope.row.image_url" style="width:100%;">
             <div style="margin:0 auto;height:30px;width:30px;">
-              <img class="img-circle" style="margin:0 auto;" :src="scope.row.image_url" />
+              <img
+                class="img-circle"
+                style="margin:0 auto;"
+                :src="scope.row.image_url"
+              />
             </div>
           </div>
           <div v-else class="text-muted" style="width:100%;">
-            <div class="img-circle" style="background-color:white;margin:0 auto;">
+            <div
+              class="img-circle"
+              style="background-color:white;margin:0 auto;"
+            >
               <div style="display:flex;height:30px;width:30px;">
                 <div
                   style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
                 >
                   {{
-                  getAvatarLetters(
-                  scope.row.firstname,
-                  scope.row.lastname
-                  )
+                    getAvatarLetters(scope.row.firstname, scope.row.lastname)
                   }}
                 </div>
               </div>
             </div>
           </div>
         </div>
+        </el-tooltip>
       </template>
     </el-table-column>
     <el-table-column fixed>
       <template slot-scope="scope">
-      <div style="width:100%;text-align:center">
-        <svg-icon icon-class="edit" style="margin-left:2px;margin-right:2px;cursor:pointer;" @click="handleCommand('edit:'+scope.row.id)"/>
-        <svg-icon icon-class="link" style="margin-left:2px;margin-right:2px;cursor:pointer;" @click="handleCommand('preview:'+scope.row.id)"/>
-        <svg-icon icon-class="password" style="margin-left:2px;margin-right:2px;cursor:pointer;" @click="handleCommand('resetPass:'+scope.row.id)"/>
-      </div>
-      </template>
-    </el-table-column>
-    <el-table-column label="Employee" min-width="300" fixed sortable="custom" prop="full_name">
-      <template slot-scope="scope">
-        <div class="user-block">
-          <span style="margin-left:10px;">
-            <!-- <el-tag :type="scope.row.status.toLowerCase()=='active'?'success':'danger'">
-              <el-dropdown @command="handleCommand">
-                <span class="el-dropdown-link">
-                  {{ scope.row.full_name }}
-                  <i class="el-icon-arrow-down el-icon--right" />
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item :command="'edit:'+scope.row.id">Update</el-dropdown-item>
-                  <el-dropdown-item :command="'preview:'+scope.row.id">View Profile</el-dropdown-item>
-                  <el-dropdown-item :command="'resetPass:'+scope.row.id">Reset Password</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-tag> -->
-            {{ scope.row.full_name }}
-          </span>
+        <div style="width:100%;text-align:center">
+          <el-tooltip placement="top" content="Edit">
+            <svg-icon
+              icon-class="edit"
+              style="margin-left:2px;margin-right:2px;cursor:pointer;"
+              @click="handleCommand('edit:' + scope.row.id)"
+            />
+          </el-tooltip>
+          <el-tooltip placement="top" content="View Profile">
+            <svg-icon
+              icon-class="link"
+              style="margin-left:2px;margin-right:2px;cursor:pointer;"
+              @click="handleCommand('preview:' + scope.row.id)"
+            />
+          </el-tooltip>
+          <el-tooltip placement="top" content="Reset User Password">
+            <svg-icon
+              icon-class="password"
+              style="margin-left:2px;margin-right:2px;cursor:pointer;"
+              @click="handleCommand('resetPass:' + scope.row.id)"
+            />
+          </el-tooltip>
         </div>
       </template>
     </el-table-column>
-    <el-table-column label="Position" width="200" sortable="custom" prop="position">
-      <template slot-scope="{row}">
-        <div style='width:100;text-align:center'>{{ row.position }}</div>
+    <el-table-column
+      label="Employee"
+      min-width="300"
+      fixed
+      sortable="custom"
+      prop="full_name"
+    >
+      <template slot-scope="scope">
+        <el-tooltip :content="scope.row.email" placement="top">
+        <div class="user-block">
+          <span style="margin-left:10px;">
+            {{ scope.row.full_name }}
+          </span>
+        </div>
+        </el-tooltip>
+      </template>
+    </el-table-column>
+    
+    <el-table-column label="Status" width="100" align="center" fixed>
+      <template slot-scope="{ row }">
+        <el-tooltip placement="top" :content="row.type.toUpperCase()">
+          <div :class="row.status.toLowerCase()=='active'?'tag tag-success':'tag tag-danger'" style="justify-content:center;">
+            <div style="align-self:center">
+            {{ row.status.toUpperCase() }}
+            </div>
+          </div>
+        </el-tooltip>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="Position"
+      width="200"
+      sortable="custom"
+      prop="position"
+    >
+      <template slot-scope="{ row }">
+        <div style="width:100;text-align:center">{{ row.position }}</div>
       </template>
     </el-table-column>
     <el-table-column label="Head" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.head_name }}</div>
       </template>
     </el-table-column>
-    <el-table-column label="Email@cnmsolutions.net" width="200" sortable="custom" prop="email">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.email.split("@")[0] }}</div>
-      </template>
-    </el-table-column>
-    <el-table-column label="Status" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.status.toUpperCase() }}</div>
+    <el-table-column
+      label="Email@cnmsolutions.net"
+      width="250"
+      sortable="custom"
+      prop="email"
+    >
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.email.split("@")[0] }}
+        </div>
       </template>
     </el-table-column>
     <el-table-column label="type" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">
-        <!-- <el-tag
+          <!-- <el-tag
           :type="row.status.toLowerCase()=='active'?'success':'danger'"
         > -->
-        {{ row.type != '' ? row.type.toUpperCase() : 'N/A' }}
-        <!-- </el-tag> -->
+          {{ row.type != "" ? row.type.toUpperCase() : "N/A" }}
+          <!-- </el-tag> -->
         </div>
       </template>
     </el-table-column>
     <el-table-column label="Contract" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.contract }}</div>
       </template>
     </el-table-column>
     <el-table-column label="Gender" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.gender }}</div>
       </template>
     </el-table-column>
     <el-table-column label="Birthdate" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.birthdate }}</div>
       </template>
     </el-table-column>
-    <el-table-column label="Address" width="400" sortable="custom" prop="user_infos.address">
-      <template slot-scope="{row}">
+    <el-table-column
+      label="Address"
+      width="400"
+      sortable="custom"
+      prop="user_infos.address"
+    >
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.address }}</div>
       </template>
     </el-table-column>
     <el-table-column label="Hired Date" width="200">
-      <template slot-scope="{row}">
+      <template slot-scope="{ row }">
         <div style="width:100%;text-align:center">{{ row.hired_date }}</div>
       </template>
     </el-table-column>
     <el-table-column label="Separation Date" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.separation_date }}</div>
-      </template>
-    </el-table-column>-->
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.separation_date }}
+        </div>
+      </template> </el-table-column
+    >
     <el-table-column label="SSS #" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.benefits.length>0 ?row.benefits[0].id_number:"" }}</div>
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.benefits.length > 0 ? row.benefits[0].id_number : "" }}
+        </div>
       </template>
     </el-table-column>
     <el-table-column label="Philhealth #" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.benefits.length>0 ?row.benefits[1].id_number:"" }}</div>
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.benefits.length > 0 ? row.benefits[1].id_number : "" }}
+        </div>
       </template>
     </el-table-column>
     <el-table-column label="PagIbig #" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.benefits.length>0 ?row.benefits[2].id_number:"" }}</div>
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.benefits.length > 0 ? row.benefits[2].id_number : "" }}
+        </div>
       </template>
     </el-table-column>
     <el-table-column label="TIN #" width="200">
-      <template slot-scope="{row}">
-        <div style="width:100%;text-align:center">{{ row.benefits.length>0 ?row.benefits[3].id_number:"" }}</div>
+      <template slot-scope="{ row }">
+        <div style="width:100%;text-align:center">
+          {{ row.benefits.length > 0 ? row.benefits[3].id_number : "" }}
+        </div>
       </template>
     </el-table-column>
   </el-table>
@@ -239,7 +294,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .user-block >>> .img-circle {
   border-radius: 50%;
@@ -262,8 +316,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  border-left: 5px solid #67C23A !important;
-
+  border-left: 5px solid crimson !important;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;
@@ -295,9 +348,9 @@ export default {
 
 th >>> .cell {
   font-weight: normal !important;
-  font-size:.8em !important;
+  font-size: 0.8em !important;
 }
 .monday >>> tbody tr {
-  height:50px !important;
+  height: 50px !important;
 }
 </style>

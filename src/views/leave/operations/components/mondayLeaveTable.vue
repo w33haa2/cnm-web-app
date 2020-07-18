@@ -48,7 +48,7 @@
         >
           <el-table-column label="Name" width="250">
             <template slot-scope="scope">
-              <div style="height:45px;border-left:red 7px solid;display:flex">
+              <div style="display:flex">
                 <div
                   style="width:100%;align-self:center;padding-left:20px;"
                 >{{ scope.row.full_name }}</div>
@@ -298,7 +298,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

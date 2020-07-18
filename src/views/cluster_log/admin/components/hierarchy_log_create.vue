@@ -1,6 +1,14 @@
 <template>
   <div>
-    <el-button size="mini" style="float:right " :plain="true" @click="dialog=true">Reassign</el-button>
+    <div
+      class="button-icon round active"
+      style="display:flex;justify-content:center;margin-right:5px;"
+      @click="dialog = true"
+    >
+      <el-tooltip content="Add Assignment Log" placement="top">
+        <plus-icon></plus-icon>
+      </el-tooltip>
+    </div>
 
     <el-dialog
       width="300px"
@@ -8,95 +16,100 @@
       :close-on-press-escape="false"
       :close-on-click-modal="false"
       :visible.sync="dialog"
-      title="Reassign Form"
+      title="Assignment Form"
       top="5vh"
     >
       <el-row gutter="20">
         <!-- the form -->
-        <el-col :md="{span:24}">
+        <el-col :md="{ span: 24 }">
           <el-row>
             <el-col style="margin-bottom:10px;">
-              <label>Head</label>
-              <el-select
-                v-model="form.reassign.field.head"
-                class="form-input"
-                style="width:100%;margin-top:5px"
-                size="mini"
-                filterable
-                remote
-                reserve-keyword
-                placeholder="Head..."
-                :remote-method="remoteHead"
-                :loading="remote.head.loader"
-              >
-                <el-option
-                  v-for="item in remote.head.options"
-                  :key="item.id"
-                  :label="item.full_name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-col>
-            <el-col style="margin-bottom:10px;">
-              <label>{{ action=='reassign' ? 'Subordinates' : 'Employees' }}</label>
-              <template v-if="action=='reassign'">
+              <div class="form-label">Head</div>
+              <div class="form-item">
                 <el-select
-                  v-model="form.reassign.field.subordinates"
+                  v-model="form.reassign.field.head"
                   class="form-input"
                   style="width:100%;margin-top:5px"
-                  size="mini"
-                  multiple
                   filterable
                   remote
-                  :collapse-tags="false"
                   reserve-keyword
-                  placeholder="Subordinates..."
-                  :remote-method="remoteChild"
-                  :loading="remote.sub.loader"
-                  :disabled="!remote.sub.request.head_id"
+                  placeholder="Head..."
+                  :remote-method="remoteHead"
+                  :loading="remote.head.loader"
                 >
                   <el-option
-                    v-for="item in remote.sub.options"
+                    v-for="item in remote.head.options"
                     :key="item.id"
                     :label="item.full_name"
                     :value="item.id"
                   />
                 </el-select>
+              </div>
+            </el-col>
+            <el-col style="margin-bottom:10px;">
+              <div class="form-label">
+                {{ action == "reassign" ? "Subordinates" : "Employees" }}
+              </div>
+              <template v-if="action == 'reassign'">
+                <div class="form-item">
+                  <el-select
+                    v-model="form.reassign.field.subordinates"
+                    class="form-input"
+                    style="width:100%;"
+                    multiple
+                    filterable
+                    remote
+                    :collapse-tags="false"
+                    reserve-keyword
+                    placeholder="Subordinates..."
+                    :remote-method="remoteChild"
+                    :loading="remote.sub.loader"
+                    :disabled="!remote.sub.request.head_id"
+                  >
+                    <el-option
+                      v-for="item in remote.sub.options"
+                      :key="item.id"
+                      :label="item.full_name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </div>
               </template>
               <template v-else>
-                <el-input
-                  size="mini"
-                  style="width:100%;margin-top:5px;"
-                  v-model="form.promote.field.employees"
-                ></el-input>
+                <div class="form-item">
+                  <el-input
+                    style="width:100%;"
+                    v-model="form.promote.field.employees"
+                  ></el-input>
+                </div>
               </template>
             </el-col>
             <el-col style="margin-bottom:10px;">
-              <label>Start Date</label>
-              <el-date-picker
-                v-model="form.reassign.field.start_date"
-                size="mini"
-                type="date"
-                format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
-                :clearable="false"
-                style="width:100%;margin-top:5px;"
-              />
-            </el-col>
-            <el-col style="margin-top:20px;">
-              <div style="float:right">
-                <el-button size="mini" @click="closeForm">Close</el-button>
-                <el-button
-                  size="mini"
-                  type="danger"
-                  :loading="form.reassign.btn_loader"
-                  @click="submitForm"
-                >Submit</el-button>
+              <div class="form-label">Start Date</div>
+              <div class="form-item">
+                <el-date-picker
+                  v-model="form.reassign.field.start_date"
+                  type="date"
+                  format="yyyy-MM-dd"
+                  value-format="yyyy-MM-dd"
+                  :clearable="false"
+                  style="width:100%;"
+                />
               </div>
             </el-col>
           </el-row>
         </el-col>
       </el-row>
+      
+            <span slot="footer" class="dialog-footer">
+              <el-button size="mini" @click="closeForm">Close</el-button>
+              <el-button
+                size="mini"
+                type="danger"
+                :loading="form.reassign.btn_loader"
+                >Confirm</el-button
+              >
+            </span>
     </el-dialog>
 
     <!-- Create and Update Dialog -->
@@ -118,7 +131,8 @@
 
       <div style="width:100%;margin-bottom:20px;margin-top:15px;">
         Progress
-        <span>( {{ form.reassign.import_report.loop_index }}</span>/
+        <span>( {{ form.reassign.import_report.loop_index }}</span
+        >/
         <span>{{ form.reassign.import_report.arr_length }} )</span>
       </div>
       <el-progress
@@ -132,56 +146,83 @@
           type="border-card"
           style="margin-top:15px;margin-bottom:10px;"
         >
-          <el-tab-pane :label="'All: '+form.reassign.import_report.data_result.length" name="all">
-            <el-table :data="form.reassign.import_report.data_result" height="350px">
+          <el-tab-pane
+            :label="'All: ' + form.reassign.import_report.data_result.length"
+            name="all"
+          >
+            <el-table
+              :data="form.reassign.import_report.data_result"
+              height="350px"
+            >
               <el-table-column label="Head">
-                <template scope="scope">{{scope.row.head.full_name}}</template>
+                <template scope="scope">{{
+                  scope.row.head.full_name
+                }}</template>
               </el-table-column>
               <el-table-column label="Subordinate">
-                <template scope="scope">{{scope.row.subordinate.full_name}}</template>
+                <template scope="scope">{{
+                  scope.row.subordinate.full_name
+                }}</template>
               </el-table-column>
               <el-table-column label="Start date">
-                <template scope="scope">{{scope.row.start_date}}</template>
+                <template scope="scope">{{ scope.row.start_date }}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
                   <el-tag
                     size="mini"
-                    :type="scope.row.status==1?'success':'danger'"
-                  >{{ scope.row.title }}</el-tag>
+                    :type="scope.row.status == 1 ? 'success' : 'danger'"
+                    >{{ scope.row.title }}</el-tag
+                  >
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
           <el-tab-pane
-            :label="'Errors: ' +form.reassign.import_report.data_result.filter(i=> i.status_code!=200).length "
+            :label="
+              'Errors: ' +
+                form.reassign.import_report.data_result.filter(
+                  i => i.status_code != 200
+                ).length
+            "
             name="errors"
           >
             <el-table
-              :data="form.reassign.import_report.data_result.filter(i=> i.status_code!=200)"
+              :data="
+                form.reassign.import_report.data_result.filter(
+                  i => i.status_code != 200
+                )
+              "
               height="350px"
             >
               <el-table-column label="Head" width="100">
-                <template scope="scope">{{scope.row.head.full_name}}</template>
+                <template scope="scope">{{
+                  scope.row.head.full_name
+                }}</template>
               </el-table-column>
               <el-table-column label="Subordinate" width="350">
-                <template scope="scope">{{scope.row.subordinate.full_name}}</template>
+                <template scope="scope">{{
+                  scope.row.subordinate.full_name
+                }}</template>
               </el-table-column>
               <el-table-column label="Start date">
-                <template scope="scope">{{scope.row.start_date}}</template>
+                <template scope="scope">{{ scope.row.start_date }}</template>
               </el-table-column>
               <el-table-column label="Status">
                 <template scope="scope">
                   <el-tag
                     size="mini"
-                    :type="scope.row.status==1?'success':'danger'"
-                  >{{ scope.row.title }}</el-tag>
+                    :type="scope.row.status == 1 ? 'success' : 'danger'"
+                    >{{ scope.row.title }}</el-tag
+                  >
                 </template>
               </el-table-column>
             </el-table>
           </el-tab-pane>
         </el-tabs>
-        <el-button size="mini" @click="closeImportReport" style="float:right">Close</el-button>
+        <el-button size="mini" @click="closeImportReport" style="float:right"
+          >Close</el-button
+        >
       </div>
     </el-dialog>
   </div>
@@ -197,7 +238,7 @@ export default {
       urls: {
         remote: "api/v1/users/remote"
       },
-      dialog: false,
+      dialog: true,
       action: "reassign",
       form: {
         reassign: {
@@ -422,11 +463,13 @@ export default {
       });
     },
     remoteHead(q) {
+      this.remote.head.loader = true;
       if (q != "") {
         this.remote.head.request.full_name = q;
         this.fetchUserRemote(this.remote.head);
         this.remote.head.promise.then(res => {
           this.remote.head.options = res.remote;
+          this.remote.head.loader = false;
         });
       }
     },
@@ -451,19 +494,19 @@ export default {
     },
     processRequestUrl(obj, url) {
       // returns endpoint
-      if(obj){
-      let tmp = obj,
-        base_url = url,
-        keys = Object.keys(tmp),
-        url_params = "";
-      keys.forEach(
-        ((v, i) => {
-          if (tmp[v] != null) {
-            url_params += "&" + v + "=" + tmp[v];
-          }
-        }).bind(this)
-      );
-      return base_url + "?" + url_params.slice(1);
+      if (obj) {
+        let tmp = obj,
+          base_url = url,
+          keys = Object.keys(tmp),
+          url_params = "";
+        keys.forEach(
+          ((v, i) => {
+            if (tmp[v] != null) {
+              url_params += "&" + v + "=" + tmp[v];
+            }
+          }).bind(this)
+        );
+        return base_url + "?" + url_params.slice(1);
       }
     }
   }

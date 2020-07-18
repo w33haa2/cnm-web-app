@@ -49,16 +49,18 @@
             :data="incidentReports"
             style="width: 100%;"
             class="monday"
+            @sort-change="customSort"
           >
             <el-table-column
               label="Issued to"
               sortable="custom"
               align="left"
               width="350"
+              prop="issued_to.full_name"
               fixed
             >
               <template slot-scope="scope">
-                <div style="height:45px;border-left:red 7px solid;display:flex">
+                <div style="display:flex">
                   <el-tooltip
                     :content="scope.row.issued_to.email"
                     placement="top"
@@ -110,14 +112,14 @@
               <template slot-scope="scope">
                 <template v-if="scope.row.report_details.status == '0'">
                   <div
-                    style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;"
+                  class="tag tag-success"
                   >
                     <div style="align-self:center">CLOSED</div>
                   </div>
                 </template>
                 <template v-else>
                   <div
-                    style="display:flex;justify-content:center;color:#ff4545;background-color:#ffeded;height:45px;border:1px solid #ff4545;"
+                    class="tag tag-danger"
                   >
                     <div style="align-self:center">OPEN</div>
                   </div>
@@ -162,101 +164,6 @@
         </el-col>
       </el-row>
     </div>
-
-    <!-- Create and Update Dialog -->
-    <el-dialog
-      :visible.sync="form.show"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-      :title="form.action + ' Report'"
-      width="30%"
-    >
-      <label width="100%">To</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
-        <el-col>
-          <el-select
-            v-model="form.user_reports_id"
-            size="mini"
-            style="width:100%"
-          >
-            <el-option
-              v-for="(comrade, index) in comrades"
-              :key="index"
-              :value="comrade.id"
-              :label="comrade.full_name"
-            />
-          </el-select>
-        </el-col>
-      </el-row>
-      <label>Incident Date</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
-        <el-col>
-          <el-date-picker
-            size="mini"
-            type="date"
-            placeholder="Select date..."
-            v-model="form.incident_date"
-            style="width:100%"
-          ></el-date-picker>
-        </el-col>
-      </el-row>
-      <label>Sanction Type</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
-        <el-col>
-          <el-select
-            v-model="form.sanction_type_id"
-            size="mini"
-            style="width:100%"
-          >
-            <el-option
-              v-for="(types, index) in sanctionTypes.options"
-              :key="types.id"
-              :value="types.id"
-              :label="types.type_description"
-            />
-          </el-select>
-        </el-col>
-      </el-row>
-      <label>Sanction Level</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
-        <el-col>
-          <el-select
-            v-model="form.sanction_level_id"
-            size="mini"
-            style="width:100%"
-          >
-            <el-option
-              v-for="(levels, index) in sanctionLevels.options"
-              :key="levels.id"
-              :value="levels.id"
-              :label="levels.level_description"
-            />
-          </el-select>
-        </el-col>
-      </el-row>
-      <label>Description</label>
-      <el-row style="margin-top: 5px; margin-bottom:3px;">
-        <el-col>
-          <el-input
-            v-model="form.description"
-            type="textarea"
-            placeholder="Description..."
-            size="mini"
-          />
-        </el-col>
-      </el-row>
-      <span slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="cancelForm">Cancel</el-button>
-        <el-button
-          type="danger"
-          size="mini"
-          @click="submitForm"
-          :loading="confirm"
-          >Confirm</el-button
-        >
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -280,19 +187,6 @@ export default {
   data() {
     return {
       searchQuery: "",
-      confirm: false,
-      form: {
-        show: false,
-        action: "Create",
-        id: null,
-        incident_date: null,
-        sanction_type_id: null,
-        sanction_level_id: null,
-        description: null,
-        user_reports_id: null,
-        filed_by: null,
-        status: 1
-      },
       query: {
         limit: 10,
         offset: 0,
@@ -323,26 +217,13 @@ export default {
     updateIncidentReportState({ initial, success, fail }) {
       if (success) {
         this.fetchIssuedReports(this.query);
-        this.clearForm();
-        this.form.show = false;
-        this.confirm = false;
         Message.success({
           message: "Successfully updated report.",
           duration: "2500"
         });
       } else if (fail) {
-        this.confirm = false;
         Message.error({ message: this.irErrors, duration: "2500" });
       }
-    },
-    incidentReports(newData) {
-      // console.log(newData);
-    },
-    sanctionLevels(v) {
-      this.form.sanction_level_id = v.options[0].id;
-    },
-    sanctionTypes(v) {
-      this.form.sanction_type_id = v.options[0].id;
     },
     searchQuery(newData) {
       if (newData !== "") {
@@ -358,15 +239,11 @@ export default {
     creatingIncidentReports({ initial, success, fail }) {
       if (success) {
         this.fetchIssuedReports(this.query);
-        this.clearForm();
-        this.form.show = false;
-        this.confirm = false;
         Message.success({
           message: "Successfully submitted report",
           duration: "2500"
         });
       } else if (fail) {
-        this.confirm = false;
         Message.error({ message: this.irErrors, duration: "2500" });
       }
     }
@@ -385,88 +262,18 @@ export default {
       "fetchComrades",
       "fetchSanctionLevels",
       "fetchSanctionTypes",
-      "createReports",
-      "updateIncidentReport"
     ]),
+    customSort({ column, prop, order }) {
+      this.query.sort = null;
+      this.query.order = null;
+      if (order) {
+        this.query.sort = prop;
+        this.query.order = order == "ascending" ? "asc" : "desc";
+      }
+      this.fetchIssuedReports(this.query);
+    },
     beforeUnload(e) {
       alert("UNLOADING");
-    },
-    submitForm() {
-      this.confirm = true;
-      if (this.form.action == "Create") {
-        const data = {
-          incident_date: moment(this.form.incident_date).format("YYYY-MM-DD"),
-          sanction_type_id: this.form.sanction_type_id,
-          sanction_level_id: this.form.sanction_level_id,
-          description: this.form.description,
-          user_reports_id: this.form.user_reports_id,
-          filed_by: this.userDetails.id,
-          status: 1
-        };
-        this.createReports(data);
-      } else {
-        if (this.form.status == 0) {
-          Message.warning({
-            message: "Updates on closed reports is not allowed.",
-            duration: "2500"
-          });
-        } else {
-          const data = {
-            id: this.form.id,
-            incident_date: moment(this.form.incident_date).format("YYYY-MM-DD"),
-            sanction_type_id: this.form.sanction_type_id,
-            sanction_level_id: this.form.sanction_level_id,
-            description: this.form.description,
-            filed_by: this.userDetails.id
-          };
-          this.updateIncidentReport(data);
-        }
-      }
-    },
-    handleCommand(command) {
-      const action = command.split(":")[0];
-      const id = command.split(":")[1];
-      switch (action) {
-        case "Update":
-          const data = this.incidentReports.filter(
-            i => i.report_details.id == id
-          )[0];
-          this.form = {
-            show: true,
-            action: action,
-            id: data.report_details.id,
-            incident_date: data.report_details.incident_date,
-            sanction_type_id: data.report_details.sanction_type.id,
-            sanction_level_id: data.report_details.sanction_level.id,
-            description: data.report_details.description,
-            user_reports_id: data.issued_to.id,
-            filed_by: data.issued_by.id,
-            status: data.report_details.status
-          };
-          break;
-      }
-    },
-    createForm() {
-      this.clearForm();
-      this.form.show = true;
-      this.form.sanction_level_id = this.sanctionLevels.options[0].id;
-      this.form.sanction_type_id = this.sanctionTypes.options[0].id;
-    },
-    clearForm() {
-      this.form = {
-        action: "Create",
-        id: null,
-        sanction_type_id: null,
-        sanction_level_id: null,
-        description: null,
-        user_reports_id: null,
-        filed_by: null,
-        status: 1
-      };
-    },
-    cancelForm() {
-      this.clearForm();
-      this.form.show = false;
     },
     tableSizeChange(value) {
       this.query.limit = value;
@@ -502,7 +309,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;

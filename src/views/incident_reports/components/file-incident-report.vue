@@ -90,9 +90,11 @@
               <div class="form-item">
                 <template v-if="action == 'Update'">
                   <el-tag
-                    :type="data.report_details.status ? 'danger' : 'success'"
+                    :type="
+                      data.report_details.status == 1 ? 'danger' : 'success'
+                    "
                   >
-                    {{ data.report_details.status ? "OPEN" : "CLOSED" }}
+                    {{ data.report_details.status == 1 ? "OPEN" : "CLOSED" }}
                   </el-tag>
                 </template>
                 <template v-else>
@@ -119,18 +121,25 @@
               </template>
               <template v-if="action == 'Update'">
                 <!-- disable attr update on reports with response -->
-                <template
-                  v-if="
-                    !data.report_details.agent_response ||
-                      !data.report_details.status
-                  "
-                >
-                  <el-date-picker
-                    v-model="form.issue.content.incident_date"
-                    format="yyyy-MM-dd"
-                    :clearable="false"
-                    style="width:100%"
-                  />
+                <template v-if="data.report_details.status == 1">
+                  <template v-if="!data.report_details.agent_response">
+                    <el-date-picker
+                      v-model="form.issue.update.incident_date"
+                      format="yyyy-MM-dd"
+                      value-format="yyyy-MM-dd HH:mm:ss"
+                      :clearable="false"
+                      style="width:100%"
+                    />
+                  </template>
+                  <template v-else>
+                    {{
+                      formatDate(
+                        form.issue.content.incident_date,
+                        "",
+                        "ddd. MMM Do, YYYY"
+                      )
+                    }}
+                  </template>
                 </template>
                 <template v-else>
                   {{
@@ -164,24 +173,26 @@
                 </el-select>
               </template>
               <template v-if="action == 'Update'">
-                <template
-                  v-if="
-                    !data.report_details.agent_response ||
-                      !data.report_details.status
-                  "
-                >
-                  <el-select
-                    style="width:100%"
-                    v-model="form.issue.content.sanction_type"
-                  >
-                    <template v-for="(option, index) in sanctionTypes.options">
-                      <el-option
-                        :key="index"
-                        :value="option.id"
-                        :label="option.type_description"
-                      />
-                    </template>
-                  </el-select>
+                <template v-if="data.report_details.status == 1">
+                  <template v-if="!data.report_details.agent_response">
+                    <el-select
+                      style="width:100%"
+                      v-model="form.issue.update.sanction_type_id"
+                    >
+                      <template
+                        v-for="(option, index) in sanctionTypes.options"
+                      >
+                        <el-option
+                          :key="index"
+                          :value="option.id"
+                          :label="option.type_description"
+                        />
+                      </template>
+                    </el-select>
+                  </template>
+                  <template v-else>
+                    {{ form.issue.content.sanction_type }}
+                  </template>
                 </template>
                 <template v-else>
                   {{ form.issue.content.sanction_type }}
@@ -209,24 +220,26 @@
                 </el-select>
               </template>
               <template v-if="action == 'Update'">
-                <template
-                  v-if="
-                    !data.report_details.agent_response ||
-                      !data.report_details.status
-                  "
-                >
-                  <el-select
-                    style="width:100%"
-                    v-model="form.issue.content.sanction_level"
-                  >
-                    <template v-for="(option, index) in sanctionLevels.options">
-                      <el-option
-                        :key="index"
-                        :value="option.id"
-                        :label="option.level_description"
-                      />
-                    </template>
-                  </el-select>
+                <template v-if="data.report_details.status == 1">
+                  <template v-if="!data.report_details.agent_response">
+                    <el-select
+                      style="width:100%"
+                      v-model="form.issue.update.sanction_level_id"
+                    >
+                      <template
+                        v-for="(option, index) in sanctionLevels.options"
+                      >
+                        <el-option
+                          :key="index"
+                          :value="option.id"
+                          :label="option.level_description"
+                        />
+                      </template>
+                    </el-select>
+                  </template>
+                  <template v-else>
+                    {{ form.issue.content.sanction_level }}
+                  </template>
                 </template>
                 <template v-else>
                   {{ form.issue.content.sanction_level }}
@@ -244,7 +257,7 @@
             </span>
             <!-- action == Update => show description update button on status open or value = 1 -->
             <template
-              v-if="action == 'Update' ? data.report_details.status : false"
+              v-if="action == 'Update' ? data.report_details.status==1 : false"
             >
               <!-- action == Update => show description update button on agent_responce = null OR no agent_response yet -->
               <template v-if="!data.report_details.agent_response">
@@ -281,7 +294,7 @@
                 <div
                   style="color:grey;justify-text:inter-word;text-align:justify;text-indent:50px;"
                 >
-                  {{ form.issue.content.description }}
+                  {{ form.issue.update.description }}
                 </div>
               </div>
             </div>
@@ -291,7 +304,7 @@
             <div class="form-item">
               <template v-if="action == 'Update'">
                 <el-input
-                  v-model="form.issue.content.description"
+                  v-model="form.issue.update.description"
                   type="textarea"
                   :autosize="{ minRows: 5, maxRows: 10 }"
                   placeholder="Description..."
@@ -378,14 +391,21 @@ export default {
     return {
       form: {
         issue: {
-          create:{
-            status:1,
-            incident_date:null,
-            sanction_type_id:null,
-            sanction_level_id:null,
-            description:null,
+          create: {
+            status: 1,
+            incident_date: null,
+            sanction_type_id: null,
+            sanction_level_id: null,
+            description: null,
             user_reports_id: null,
-            filed_by: this.user_id,
+            filed_by: this.user_id
+          },
+          update: {
+            id: null,
+            sanction_type_id: null,
+            sanction_level_id: null,
+            description: null,
+            incident_date: null
           },
           editable: true,
           dialog: false,
@@ -410,41 +430,59 @@ export default {
           }
         },
         description: {
-          update: this.action == "Create"? true:false,
+          update: this.action == "Create" ? true : false
         }
       }
     };
   },
   computed: {
-    ...mapGetters(["sanctionTypes","sanctionLevels","comrades",
-      "creatingIncidentReports","user_id"])
+    ...mapGetters([
+      "sanctionTypes",
+      "sanctionLevels",
+      "comrades",
+      "creatingIncidentReports",
+      "updateIncidentReportState",
+      "user_id"
+    ])
   },
   watch: {
-    creatingIncidentReports({initial,success,fail}){
-      if(initial){
+    creatingIncidentReports({ initial, success, fail }) {
+      if (initial) {
         this.form.issue.confirm = true;
-      }else{
+      } else {
         this.form.issue.confirm = false;
       }
-      if(success){
+      if (success) {
         this.form.issue.dialog = false;
         this.clearCreateForm();
+      }
+    },
+    updateIncidentReportState({ initial, success, fail }) {
+      if (initial) {
+        this.form.issue.confirm = true;
+      } else {
+        this.form.issue.confirm = false;
+      }
+
+      if (success) {
+        this.form.issue.dialog = false;
+        this.clearUpdateForm();
       }
     }
   },
   methods: {
     // general functions
-    ...mapActions([
-      "createReports",
-    ]),
-    cancelDialog(){
+    ...mapActions(["createReports", "updateIncidentReport"]),
+    cancelDialog() {
       this.form.issue.dialog = false;
     },
     submit() {
-      if(this.action=="Update"){
-
-      }else if(this.action =="Create"){
-        if(confirm("Please Confirm creation of Incident Report")){
+      if (this.action == "Update") {
+        if (confirm("Please Confirm updating of Incident Report")) {
+          this.updateIncidentReport(this.form.issue.update);
+        }
+      } else if (this.action == "Create") {
+        if (confirm("Please Confirm creation of Incident Report")) {
           this.createReports(this.form.issue.create);
         }
       }
@@ -453,19 +491,12 @@ export default {
     fillData() {
       let ir = this.data;
       this.form.issue.report_id = ir.report_details.id;
-      if (ir.report_details.status == 1) {
-        this.form.issue.editable = true;
-      } else {
-        this.form.issue.editable = false;
-      }
       if (ir.report_details.agent_response) {
         this.form.issue.response_id = ir.report_details.agent_response.id;
-        this.form.issue.action = "Update";
         this.form.issue.data.commitment =
           ir.report_details.agent_response.commitment;
-      } else {
-        this.form.issue.action = "Create";
       }
+      // read only
       this.form.issue.content = {
         sanction_type: ir.report_details.sanction_type.type_description,
         sanction_level: ir.report_details.sanction_level.level_description,
@@ -476,24 +507,36 @@ export default {
           position: ir.issued_to.position
         }
       };
-    },
-    updateReport(){
-
+      // model
+      this.form.issue.update.id = ir.report_details.id;
+      this.form.issue.update.sanction_type_id =
+        ir.report_details.sanction_type.id;
+      this.form.issue.update.sanction_level_id =
+        ir.report_details.sanction_level.id;
+      this.form.issue.update.description = ir.report_details.description;
+      this.form.issue.update.incident_date = ir.report_details.incident_date;
     },
     cancelDescriptionUpdate() {
-      this.form.issue.content.description = this.data.report_details.description;
+      this.form.issue.update.description = this.data.report_details.description;
       this.form.description.update = false;
     },
-    // action == Create functions
-    clearCreateForm(){
-        this.form.issue.create.status=1;
-        this.form.issue.create.incident_date=null;
-        this.form.issue.create.sanction_type_id=null;
-        this.form.issue.create.sanction_level_id=null;
-        this.form.issue.create.description=null;
-        this.form.issue.create.user_reports_id= null;
-        this.form.issue.create.filed_by= this.user_id;
+    clearUpdateForm() {
+      this.form.issue.update.id = null;
+      this.form.issue.update.incident_date = null;
+      this.form.issue.update.sanction_type_id = null;
+      this.form.issue.update.sanction_level_id = null;
+      this.form.issue.update.description = null;
     },
+    // action == Create functions
+    clearCreateForm() {
+      this.form.issue.create.status = 1;
+      this.form.issue.create.incident_date = null;
+      this.form.issue.create.sanction_type_id = null;
+      this.form.issue.create.sanction_level_id = null;
+      this.form.issue.create.description = null;
+      this.form.issue.create.user_reports_id = null;
+      this.form.issue.create.filed_by = this.user_id;
+    }
   }
 };
 </script>

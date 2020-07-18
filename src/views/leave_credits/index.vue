@@ -83,7 +83,7 @@
               prop="user.firstname"
             >
               <template slot-scope="scope">
-                <div style="height:45px;border-left:red 7px solid;display:flex">
+                <div style="display:flex">
                   <el-tooltip :content="scope.row.user.email">
                     <div
                       style="width:100%;align-self:center;padding-left:20px;"
@@ -333,7 +333,7 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  /* border-left: 5px solid red !important; */
+  border-left:5px solid crimson;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;
