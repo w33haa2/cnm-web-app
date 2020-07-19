@@ -44,6 +44,10 @@ import ExportIcon from 'vue-material-design-icons/Export.vue';
 Vue.component('export-icon', ExportIcon);
 import DeleteIcon from 'vue-material-design-icons/Delete.vue';
 Vue.component('delete-icon', DeleteIcon);
+import SortAlphabeticalAscendingIcon from 'vue-material-design-icons/SortAlphabeticalAscending.vue';
+Vue.component('sort-alpha-asc-icon', SortAlphabeticalAscendingIcon);
+import SortAlphabeticalDescendingIcon from 'vue-material-design-icons/SortAlphabeticalDescending.vue';
+Vue.component('sort-alpha-desc-icon', SortAlphabeticalDescendingIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css

@@ -18,7 +18,7 @@
       <el-col>
         <el-table
           :data="tableData.leaves"
-          style="margin-top:10px;"
+          style="margin-top:5px;"
           v-loading="leavesfetchState.initial"
         >
           <el-table-column label="Employee" min-width="100" prop="full_name" fixed>
@@ -317,37 +317,60 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.fz-14px {
-  font-size: 14px;
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
 }
-.c-grey {
-  color: grey;
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
 }
-.user-block {
-  .username,
-  .description {
-    display: block;
-    margin-left: 50px;
-    padding: 2px 0;
-  }
-  .username {
-    // font-size: 0.8em;
-    color: #777;
-  }
-  :after {
-    clear: both;
-  }
-  .img-circle {
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    float: left;
-  }
-  span {
-    font-weight: 500;
-    margin-left: 10px;
-    // font-size: 0.8em;
-  }
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

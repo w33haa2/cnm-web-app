@@ -3,7 +3,6 @@
     <el-row>
       <el-col>
         <el-select
-          size="mini"
           v-model="request.slots.leave_type"
           style="width:100%"
           @change="leaveTypeChange"

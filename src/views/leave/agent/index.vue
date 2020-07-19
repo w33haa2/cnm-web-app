@@ -1,76 +1,107 @@
 <template>
   <div>
     <div class="app-container">
-      <h4 style="color:#646464">Agent Leave</h4>
-      <el-row :gutter="10">
-        <el-col :md="{span:6}">
-          <div>
-            <!-- <el-tag size="mini" type="success">VL Credits: {{ vl_credits }}</el-tag>
-            <el-tag size="mini" type="warning">SL Credits: {{
-            }}s}}</el-tag>-->
+      <div class="title-bar shadow">
+        <el-row>
+          <el-col :md="{ span: 12 }" :xs="{ span: 12 }" :sm="{ span: 12 }">
+            <div class="d-flex">
+              <div class="title-wrapper" style="margin-right:10px">
+                Agent Leaves
+              </div>
+
+              <div
+                class="button-icon round active"
+                style="display:flex;justify-content:center;margin-right:5px;"
+                @click="leaveForm({ action: 'create' })"
+              >
+                <el-tooltip placement="top" content="Report an Incident">
+                  <plus-icon></plus-icon>
+                </el-tooltip>
+              </div>
+            </div>
+          </el-col>
+          <el-col
+            :md="{ span: 2, offset: 8 }"
+            :xs="{ span: 4, offset: 4 }"
+            :sm="{ span: 3, offset: 6 }"
+            style="text-align:right"
+          >
+            <div style="cursor:default">
+              <div style="font-size:.6em;color:gray;justify-content:right">
+                <div>
+                  <div
+                    style="font-weight:500;border-radius:3px;background-color:#1890ff;padding:3px;display:inline-block;color:white;font-size:.8em;"
+                  >
+                    VL
+                  </div>
+                  CREDITS
+                </div>
+              </div>
+              <div>
+                <el-tooltip placement="bottom" content="Vacation Leave Credits">
+                  <div style="width:100%;font-size:1.3em;font-weight:600">
+                    <count-to
+                      :start-val="0"
+                      :end-val="vl_credits"
+                      :duration="4000"
+                      :decimals="0"
+                      separator=","
+                      :autoplay="true"
+                    />
+                  </div>
+                </el-tooltip>
+              </div>
+            </div>
+          </el-col>
+          <el-col
+            :md="{ span: 2 }"
+            :xs="{ span: 4 }"
+            :sm="{ span: 3 }"
+            style="text-align:right"
+          >
+            <div style="cursor:default">
+              <div style="font-size:.6em;color:gray;">
+                <div
+                  style="font-weight:500;border-radius:3px;background-color:#ffc107;padding:3px;display:inline-block;color:white;font-size:.8em;"
+                >
+                  SL
+                </div>
+                CREDITS
+              </div>
+              <div>
+                <el-tooltip placement="bottom" content="Sick Leave Credit">
+                  <div style="width:100%;font-size:1.3em;font-weight:600">
+                    <count-to
+                      :start-val="0"
+                      :end-val="sl_credits"
+                      :duration="4000"
+                      :decimals="0"
+                      separator=","
+                      :autoplay="true"
+                    />
+                  </div>
+                </el-tooltip>
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+
+
+      <el-row :gutter="20">
+        <el-col :md="{ span: 6 }">
+          <div class="table-container shadow">
             <slots-calendar></slots-calendar>
           </div>
         </el-col>
-        <el-col style="margin-bottom:20px;" :md="{span:18}">
-          <el-row gutter="20">
-            <el-col :sm="{span:6,offset:12}">
-              <el-card shadow="hover">
-                <el-row>
-                  <el-col>
-                    <span
-                      style="margin:0px !important;padding:0px !important;font-weight:light;font-size:.8em;"
-                    >Vacation Leave Credits</span>
-                  </el-col>
-                  <el-col style="margin-top:10px;">
-                    <div style="width:100%;text-align:right;font-size:1.3em;color:grey">
-                      <count-to
-                        :start-val="0"
-                        :end-val="vl_credits"
-                        :duration="4000"
-                        :decimals="0"
-                        separator=","
-                        :autoplay="true"
-                      />
-                    </div>
-                  </el-col>
-                </el-row>
-              </el-card>
-            </el-col>
-            <el-col :sm="{span:6}">
-              <el-card shadow="hover">
-                <el-row>
-                  <el-col>
-                    <span
-                      style="margin:0px !important;padding:0px !important;font-weight:light;font-size:.8em;"
-                    >Sick Leave Credits</span>
-                  </el-col>
-                  <el-col style="margin-top:10px;">
-                    <div style="width:100%;text-align:right;font-size:1.3em;color:grey">
-                      <count-to
-                        :start-val="0"
-                        :end-val="sl_credits"
-                        :duration="4000"
-                        :decimals="0"
-                        separator=","
-                        :autoplay="true"
-                      />
-                    </div>
-                  </el-col>
-                </el-row>
-              </el-card>
-            </el-col>
-            <el-col style="margin-top:10px;">
-              <el-button
-                size="mini"
-                @click="leaveForm({action:'create'})"
-                style="float:right"
-                type="primary"
-              >Create Request</el-button>
-            </el-col>
-            <el-col style="margin-top:10px;">
-              <leave-table :status="null" @on-update="leaveForm" :active-tab="null" />
-            </el-col>
-          </el-row>
+        <el-col style="margin-bottom:20px;" :md="{ span: 18 }">
+          <div class="table-container shadow">
+              <leave-table
+                :status="null"
+                @on-update="leaveForm"
+                :active-tab="null"
+              />
+          </div>
         </el-col>
       </el-row>
 
@@ -80,7 +111,7 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
-        title="Add Leave"
+        title="Request Leave"
         width="30%"
         top="5vh"
       >
@@ -111,13 +142,16 @@
           </el-col>
         </el-row>
         <span slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="form.leave.show=false">Cancel</el-button>
+          <el-button size="mini" @click="form.leave.show = false"
+            >Cancel</el-button
+          >
           <el-button
             type="danger"
             size="mini"
             :loading="form.leave.loading.confirm"
             @click="submitLeave"
-          >Confirm</el-button>
+            >Confirm</el-button
+          >
         </span>
       </el-dialog>
     </div>
@@ -235,8 +269,8 @@ export default {
         let tmp = this.fetchLeaveCreditsData.leave_credits,
           vl = tmp.filter(i => i.leave_type == "vacation_leave"),
           sl = tmp.filter(i => i.leave_type == "sick_leave");
-        this.vl_credits = vl.length>0? vl[0].value:0;
-        this.sl_credits = sl.length>0? sl[0].value:0;
+        this.vl_credits = vl.length > 0 ? vl[0].value : 0;
+        this.sl_credits = sl.length > 0 ? sl[0].value : 0;
       }
       if (fail) {
         this.$message({
@@ -306,7 +340,7 @@ export default {
       }
     },
     createLeaveState({ initial, success, fail }) {
-      if(initial){
+      if (initial) {
         this.form.leave.loading.confirm = true;
       }
       if (success) {
@@ -329,7 +363,7 @@ export default {
       }
     },
     updateLeaveState({ initial, success, fail }) {
-      if(initial){
+      if (initial) {
         this.form.leave.loading.confirm = true;
       }
       if (success) {
@@ -533,62 +567,60 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.tui-full-calendar-month-week-item {
-  height: 60px !important;
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
 }
-.is-today {
-  font-weight: 600;
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
 }
-.el-calendar__title {
-  width: 100% !important;
-  font-size: 0.8em;
-}
-.el-calendar__button-group {
-  button {
-    width: 100%;
-  }
-}
-.el-calendar-day {
-  padding: 8px !important;
-  height: auto !important;
-  width: auto !important;
-}
-.el-calendar-table {
-  thead {
-    th {
-      font-size: 0.8em;
-    }
-  }
-}
-.hide-picker-input {
-}
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
-}
-.is-selected {
-  color: #1989fa;
-}
-.list {
-  height: 85%;
-  overflow-y: scroll;
 
-  ul {
-    margin: 0;
-    padding: 0;
-    li {
-      padding: 10px;
-      border-bottom: #eeeeee solid 1px;
-      font-size: 12px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

@@ -1,34 +1,131 @@
 <template>
   <div class="app-container">
     <div v-if="show_profile">
-      <el-row :gutter="5">
-        <el-col :span="6" :xs="24">
-          <user-card :user="userDetails" />
-        </el-col>
-        <el-col :span="18" :xs="24">
-          <el-card>
-            <el-tabs v-model="activeTab">
-              <el-tab-pane label="About" name="about">
-                <about :user="userDetails" />
-              </el-tab-pane>
-              <el-tab-pane label="Company Details" name="company_details">
-                <company-details :user="userDetails" />
-              </el-tab-pane>
-              <template v-if="permission">
-                <el-tab-pane label="Benefit IDs" name="benefit_ids">
-                  <benefit-ids :user="userDetails" />
-                </el-tab-pane>
-              </template>
-              <!-- <el-tab-pane label="Timeline" name="timeline">
-                <timeline :timeline="user.status_logs" />
-              </el-tab-pane>-->
-              <el-tab-pane label="Subordinates" name="subordinates">
-                <subordinates :user="userDetails" />
-              </el-tab-pane>
-            </el-tabs>
-          </el-card>
+      <el-row :gutter="10">
+        <el-col :md="{ span: 24 }">
+          <!-- <user-card :user="userDetails" /> -->
+          <div class="banner-container shadow">
+            <div class="banner-image" style="background-image:url('bg.jpg')">
+              <div class="user-profile">
+                <div class="name">{{ userDetails.full_name }}</div>
+                <div class="position">{{ userDetails.position }}</div>
+              </div>
+            </div>
+            <div
+              v-if="!userDetails.image_url"
+              class="profile-image shadow"
+              style="background-image:url('default.gif')"
+            ></div>
+            <img
+              v-else
+              class="profile-image shadow"
+              :src="userDetails.image_url"
+              alt=""
+            />
+
+            <!-- <div class="profile-navigation">
+            </div> -->
+            <div class="send-mail-wrapper">
+              <a
+                :href="
+                  'https://mail.google.com/mail/u/0/?view=cm&fs=1&to=' +
+                    userDetails.email +
+                    '&tf=1'
+                "
+                target="_blank"
+                class="send-mail-button"
+              >
+                Send me an Email
+              </a>
+            </div>
+          </div>
         </el-col>
       </el-row>
+      <template v-if="permit">
+        <el-row :gutter="20" style="margin-top:20px;">
+          <el-col :md="8" style="padding-top:10px;padding-bottom:10px;">
+            <div class="custom-card shadow">
+              <div style="padding:15px;">
+                <div class="title">
+                  General Information
+                </div>
+                <div class="content">
+                  <div class="item">
+                    <div class="label">
+                      ID number
+                    </div>
+                    <div class="value">
+                      {{ userDetails.company_id }}
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="label">
+                      Email Address
+                    </div>
+                    <div class="value">
+                      {{ userDetails.email }}
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="label">
+                      Joined
+                    </div>
+                    <el-tooltip :content="fromNow(userDetails.hired_date)">
+                      <div class="value">
+                        {{
+                          formatDate(
+                            userDetails.hired_date,
+                            "",
+                            "ddd. MMM Do, YYYY"
+                          )
+                        }}
+                      </div>
+                    </el-tooltip>
+                  </div>
+                  <div class="item">
+                    <div class="label">
+                      Birth Date
+                    </div>
+                    <el-tooltip :content="fromNow(userDetails.hired_date)">
+                      <div class="value">
+                        {{
+                          formatDate(
+                            userDetails.birthdate,
+                            "",
+                            "ddd. MMM Do, YYYY"
+                          )
+                        }}
+                      </div>
+                    </el-tooltip>
+                  </div>
+
+                  <div class="item">
+                    <div class="label">
+                      Gender
+                    </div>
+                    <div class="value">
+                      {{ userDetails.gender }}
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div class="label">
+                      Supervisor
+                    </div>
+                    <div class="value">
+                      {{ userDetails.head_name? userDetails.head_name: "Not assigned" }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :md="16" style="padding-top:10px;padding-bottom:10px;">
+            <div>
+              <subordinates :user="userDetails" />
+            </div>
+          </el-col>
+        </el-row>
+      </template>
     </div>
   </div>
 </template>
@@ -69,7 +166,42 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["position"])
+    ...mapGetters(["position"]),
+    permit() {
+      let permit = false;
+      switch (this.position.toLowerCase()) {
+        case "admin":
+        case "hr manager":
+        case "hr assistant":
+          permit = true;
+          break;
+        case "rta manager":
+          permit = this.isPermitted([
+            "representative - order placer",
+            "rta supervisor",
+            "rta analyst"
+          ]);
+        case "rta supervisor":
+          permit = this.isPermitted([
+            "representative - order placer",
+            "rta analyst"
+          ]);
+          break;
+        case "rta analyst":
+          permit = this.isPermitted(["representative - order placer"]);
+          break;
+        case "operations manager":
+          permit = this.isPermitted([
+            "representative - order placer",
+            "team leader"
+          ]);
+          break;
+        case "team leader":
+          permit = this.isPermitted(["representative - order placer"]);
+          break;
+      }
+      return permit;
+    }
   },
   created() {
     this.getUser();
@@ -106,18 +238,12 @@ export default {
           });
         });
     },
-    permission() {
-      let result = false;
-      if (
-        this.position == "Admin" ||
-        this.position == "HR Manager" ||
-        this.position == "HR Assistant"
-      ) {
-        result = true;
-      } else {
-        result = false;
+    isPermitted(roles){
+      let permit = false;
+      if(roles.filter(i=> i == this.userDetails.position.toLowerCase()).length> 0){
+        permit = true;
       }
-      return result;
+      return permit;
     }
   }
 };

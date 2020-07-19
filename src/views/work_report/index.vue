@@ -1,175 +1,173 @@
-
 <template>
-  <div>
-    <div v-if="show_fetch_error" style="margin-top:25px;padding:20px;">
-      <el-alert title="There is an error fetching your data." type="error" show-icon></el-alert>
-    </div>
-    <div style="height:75vh;" v-loading="true" v-if="containerLoader"></div>
-    <div v-if="show_fetch_error == false && containerLoader == false" class="app-container">
+  <div class="app-container">
+    <div class="title-bar shadow">
       <el-row>
-        <el-col>
-          <h4 style="color:#646464">Work Reports</h4>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper">
+              Work Reports
+            </div>
+          </div>
+        </el-col>
+        <el-col :md="{ span: 5, offset: 7 }">
+          <el-date-picker
+            type="month"
+            style="width:100%"
+            v-model="work_report.month"
+            format="MMMM-yyyy"
+            :clearable="false"
+          ></el-date-picker>
         </el-col>
       </el-row>
-      <el-row>
-        <el-col :md="{span:6}">
-          <agent-card :stat="summary" :month="work_report.month"></agent-card>
+    </div>
+
+    <div class="table-container shadow">
+      <el-row :gutter="20">
+        <el-col :md="{span:24}">
+          <div class="d-flex" style="justify-content:space-between">
+            <div>
+              {{ formatDate(work_report.month,"", "MMMM YYYY") +" Reports"}}
+            </div>
+            <div>
+              
+            <!-- number of data display 0 or more-->
+              <template v-if="work_report.grid_data.length > 0">
+                  {{ work_report.grid_data.length }}
+                  Schedules
+              </template>
+              <!-- 0 number of data -->
+              <template v-if="work_report.grid_data.length == 0">
+                  No Schedules
+              </template>
+              </div>            
+          </div>
         </el-col>
-        <el-col :md="{span:18}" style="padding-left:30px;">
-          <!-- <el-row style="margin-bottom:10px;">
-            <el-col>
+        <el-col
+          class="schedule-container"
+          v-for="(datum, index) in work_report.grid_data"
+          :key="index"
+        >
+          <el-row>
+            <el-col :md="{ span: 2 }">
+              <div class="schedule-date">
+                {{ formatDate(datum.start_event.date, "", "DD") }}
+              </div>
+              <div class="schedule-day">
+                {{ formatDate(datum.start_event.date, "", "ddd") }}
+              </div>
             </el-col>
-          </el-row>-->
-          <el-card style="padding-bottom:15px;">
-            <el-col class="header" :md="{span:12}">
-              <el-date-picker
-                type="month"
-                size="mini"
-                v-model="work_report.month"
-                format="MMMM-yyyy"
-                :clearable="false"
-              ></el-date-picker>
+            <el-col :md="{ span: 5 }">
+              <div class="label">
+                <small>
+                  SCHEDULE
+                  <small
+                    v-if="datum.overtime_id"
+                    style="padding:2px;background-color:#F56C6C;color:white;"
+                    >OVERTIME</small
+                  >
+                  <small
+                    v-else
+                    style="padding:2px;background-color:#409EFF;color:white;"
+                    >REGULAR</small
+                  >
+                </small>
+              </div>
+              <div class="text">
+                {{
+                  formatDate(datum.start_event.date, "", "hh:mm a") +
+                    " - " +
+                    formatDate(datum.end_event.date, "", "hh:mm a")
+                }}
+              </div>
             </el-col>
-            <el-col :md="{span:12}">
-              <span style="float:right">
-                <template v-if="work_report.grid_data.length>1">
-                  <small>
-                    {{ work_report.grid_data.length }}
-                    <small>SCHEDULES</small>
-                  </small>
-                </template>
-                <template v-if="work_report.grid_data.length==1">
-                  <small>
-                    {{ work_report.grid_data.length }}
-                    <small>SCHEDULE</small>
-                  </small>
-                </template>
-                <template v-if="work_report.grid_data.length==0">
-                  <small>
-                    <small>NO SCHEDULE</small>
-                  </small>
-                </template>
-              </span>
-            </el-col>
-            <el-col v-if="show_report_noschedule">
-              <el-divider style="padding:5px;"></el-divider>
-              <el-alert title="There are no schedules found for this date." type="info" show-icon></el-alert>
-            </el-col>
-            <el-col v-if="show_report_error">
-              <el-divider style="padding:5px;"></el-divider>
-              <el-alert title="There is an error fetching your schedules." type="error" show-icon></el-alert>
-            </el-col>
-            <el-col
-              v-if="show_report"
-              class="schedule-container"
-              v-for="(datum,index) in work_report.grid_data"
-              :key="index"
-            >
-              <el-divider style="padding:5px;"></el-divider>
-              <el-row>
-                <el-col :md="{span:2}">
-                  <div class="schedule-date">{{ formatDate(datum.start_event.date,"", "DD") }}</div>
-                  <div class="schedule-day">{{ formatDate(datum.start_event.date,"","ddd") }}</div>
-                </el-col>
-                <el-col :md="{span:5}">
-                  <div class="label">
-                    <small>
-                      SCHEDULE
+            <el-col :md="{ span: 5 }">
+              <div class="label">
+                <small>
+                  ATTENDANCE
+                  <template v-if="datum.remarks.toLowerCase() == 'on-leave'">
+                    <span>
                       <small
-                        v-if="datum.overtime_id"
-                        style="padding:2px;background-color:#F56C6C;color:white;"
-                      >OVERTIME</small>
-                      <small
-                        v-else
-                        style="padding:2px;background-color:#409EFF;color:white;"
-                      >REGULAR</small>
-                    </small>
-                  </div>
-                  <div
-                    class="text"
-                  >{{ formatDate(datum.start_event.date,"","hh:mm a") + " - " + formatDate(datum.end_event.date,"","hh:mm a") }}</div>
-                </el-col>
-                <el-col :md="{span:5}">
-                  <div class="label">
-                    <small>
-                      ATTENDANCE
-                      <template v-if="datum.remarks.toLowerCase() == 'on-leave'">
-                        <span>
-                          <small
-                            style="padding:2px;background-color:#E6A23C;color:white"
-                          >{{ leave_label[datum.leave.leave_type.toLowerCase()].toUpperCase() }}</small>
-                        </span>
-                      </template>
-                      <template v-else>
-                        <span>
-                          <small
-                            :style="'padding:2px;background-color:'+tag[datum.remarks.toLowerCase()].bc+';color:'+tag[datum.remarks.toLowerCase()].fc"
-                          >{{ datum.remarks.toUpperCase() }}</small>
-                        </span>
-                      </template>
-                      <!-- <template v-else>
-                        <el-tag v-if="laterDate(datum.start_event.date)" size="mini">LATER DATE</el-tag>
-                        <el-tag v-else :type="tagType(datum.remarks)" size="mini">{{ datum.remarks }}</el-tag>
-                      </template>-->
-                    </small>
-                  </div>
-                  <div class="text" v-if="datum.remarks == 'Present'">
-                    {{ formatDate(datum.time_in.date,"","hh:mm a") + " - " }}
-                    <span
-                      v-if="datum.time_out"
-                    >{{ formatDate(datum.time_out.date,"","hh:mm a") }}</span>
-                    <span v-else>
-                      <span v-if="laterDate(datum.end_event.date)" style="color:#409EFF">ongoing..</span>
-                      <span v-else style="color:#F56C6C">no timeout</span>
+                        style="padding:2px;background-color:#E6A23C;color:white"
+                        >{{
+                          leave_label[
+                            datum.leave.leave_type.toLowerCase()
+                          ].toUpperCase()
+                        }}</small
+                      >
                     </span>
-                  </div>
-                  <div v-else class="text" style="color:grey">NO LOGS</div>
-                </el-col>
-                <el-col :md="{span:2}">
-                  <div class="label">
-                    <small>VTO</small>
-                  </div>
-                  <el-tag
-                    v-if="datum.vto_at"
-                    type="primary"
-                    size="mini"
-                  >{{ datum.vto_hours.second/60/60 +" hr/s" }}</el-tag>
-                  <el-tag v-else type="info" size="mini">0 hr/s</el-tag>
-                </el-col>
-                <el-col :md="{span:4}">
-                  <div class="label">
-                    <small>CONFORMANCE</small>
-                  </div>
-                  <div>
-                    <el-progress
-                      :percentage="(parseFloat(datum.conformance).toFixed(1))"
-                      color="#6f7ad3"
-                    ></el-progress>
-                  </div>
-                </el-col>
-                <el-col :md="{span:3}">
-                  <div class="label">
-                    <small>HOURS</small>
-                  </div>
-                  <div>
-                    <span
-                      style="color:grey"
-                    >{{ (datum.rendered_hours.billable.second/60/60).toFixed(1) }}</span>
-                  </div>
-                </el-col>
-                <el-col :md="{span:3}">
-                  <div class="label">
-                    <small>ND</small>
-                  </div>
-                  <div>
-                    <span
-                      style="color:grey"
-                    >{{ datum.rendered_hours.night_difference }}</span>
-                  </div>
-                </el-col>
-              </el-row>
+                  </template>
+                  <template v-else>
+                    <span>
+                      <small
+                        :style="
+                          'padding:2px;background-color:' +
+                            tag[datum.remarks.toLowerCase()].bc +
+                            ';color:' +
+                            tag[datum.remarks.toLowerCase()].fc
+                        "
+                        >{{ datum.remarks.toUpperCase() }}</small
+                      >
+                    </span>
+                  </template>
+                </small>
+              </div>
+              <div class="text" v-if="datum.remarks == 'Present'">
+                {{ formatDate(datum.time_in.date, "", "hh:mm a") + " - " }}
+                <span v-if="datum.time_out">{{
+                  formatDate(datum.time_out.date, "", "hh:mm a")
+                }}</span>
+                <span v-else>
+                  <span
+                    v-if="laterDate(datum.end_event.date)"
+                    style="color:#409EFF"
+                    >ongoing..</span
+                  >
+                  <span v-else style="color:#F56C6C">no timeout</span>
+                </span>
+              </div>
+              <div v-else class="text" style="color:grey">NO LOGS</div>
             </el-col>
-          </el-card>
+            <el-col :md="{ span: 2 }">
+              <div class="label">
+                <small>VTO</small>
+              </div>
+              <el-tag v-if="datum.vto_at" type="primary" size="mini">{{
+                datum.vto_hours.second / 60 / 60 + " hr/s"
+              }}</el-tag>
+              <el-tag v-else type="info" size="mini">0 hr/s</el-tag>
+            </el-col>
+            <el-col :md="{ span: 4 }">
+              <div class="label">
+                <small>CONFORMANCE</small>
+              </div>
+              <div>
+                <el-progress
+                  :percentage="parseFloat(datum.conformance).toFixed(1)"
+                  color="#6f7ad3"
+                ></el-progress>
+              </div>
+            </el-col>
+            <el-col :md="{ span: 3 }">
+              <div class="label">
+                <small>HOURS</small>
+              </div>
+              <div>
+                <span style="color:grey">{{
+                  (datum.rendered_hours.billable.second / 60 / 60).toFixed(1)
+                }}</span>
+              </div>
+            </el-col>
+            <el-col :md="{ span: 3 }">
+              <div class="label">
+                <small>ND</small>
+              </div>
+              <div>
+                <span style="color:grey">{{
+                  datum.rendered_hours.night_difference
+                }}</span>
+              </div>
+            </el-col>
+          </el-row>
         </el-col>
       </el-row>
     </div>
@@ -427,4 +425,3 @@ export default {
   }
 }
 </style>
-
