@@ -38,6 +38,10 @@ import TooltipEditIcon from 'vue-material-design-icons/TooltipEditOutline.vue';
 Vue.component('tooltip-edit-icon', TooltipEditIcon);
 import AccountEditIcon from 'vue-material-design-icons/AccountEditOutline.vue';
 Vue.component('account-edit-icon', AccountEditIcon);
+import FilterIcon from 'vue-material-design-icons/FilterOutline.vue';
+Vue.component('filter-icon', FilterIcon);
+import EyeIcon from 'vue-material-design-icons/EyeOutline.vue';
+Vue.component('eye-icon', EyeIcon);
 import CancelIcon from 'vue-material-design-icons/Cancel.vue';
 Vue.component('cancel-icon', CancelIcon);
 import ExportIcon from 'vue-material-design-icons/Export.vue';
@@ -50,6 +54,8 @@ import SortAlphabeticalDescendingIcon from 'vue-material-design-icons/SortAlphab
 Vue.component('sort-alpha-desc-icon', SortAlphabeticalDescendingIcon);
 import CheckBoldIcon from 'vue-material-design-icons/CheckBold.vue';
 Vue.component('check-bold-icon', CheckBoldIcon);
+import MicrosoftExcelIcon from 'vue-material-design-icons/MicrosoftExcel.vue';
+Vue.component('ms-excel-icon', MicrosoftExcelIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
