@@ -1,83 +1,160 @@
 <template>
   <div class="app-container">
-    <h4 style="color:#646464">Overtime Schedules</h4>
+    <div class="title-bar shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          <div class="d-flex">
+            <div class="title-wrapper" style="margin-right:10px">
+              Overtime Schedules
+            </div>
+            <div
+              class="button-icon round active"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="createForm"
+            >
+              <el-tooltip placement="top" content="Add VTO">
+                <plus-icon></plus-icon>
+              </el-tooltip>
+            </div>
+          </div>
+        </el-col>
+        <el-col :md="{ span: 5, offset: 7 }">
+          <div class="d-flex">
+            <div style="width:60px;">
+              <filter-or @filter="filterOr" :disabled="fetchOvertimeScheduleState.initial"></filter-or>
+            </div>
+            <div style="width:100%">
+              <el-tooltip content="Select Date">
+                <el-date-picker
+                  :disabled="!filter || searchOvertimeScheduleState.initial"
+                  type="date"
+                  v-model="searchQuery"
+                    format="yyyy-MM-dd"
+                    value-format="yyyy-MM-dd"
+                  placeholder="Select date..."
+                  :clearable="false"
+                  style="width:100%"
+                ></el-date-picker>
+              </el-tooltip>
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
 
-    <!-- <el-row style="padding-right:8px;margin-bottom:30px;">
-    </el-row>-->
-    <!-- Search and Pagination -->
-    <el-row style="margin-bottom:10px;">
-      <el-col :md="{span:8}">
-        <el-button :plain="true" size="mini" @click="createForm">Create Overtime Schedule</el-button>
-      </el-col>
-      <el-col :md="{span:16}"></el-col>
-    </el-row>
-    <!-- Search and Pagination -->
-    <el-row>
-      <el-col :md="{span:8}">
-        <el-date-picker
-          type="date"
-          size="mini"
-          v-model="searchQuery"
-          placeholder="Select date..."
-          :clearable="false"
-        ></el-date-picker>
-      </el-col>
-      <el-col :md="{span:16}">
-        <el-pagination
-          style="float:right"
-          :page-sizes="[10,25,50]"
-          :page-size="table_config.display_size"
-          layout="total, sizes, prev, pager, next"
-          :total="table_config.count"
-          :current-page.sync="table_config.page"
-          @size-change="tableSizeChange"
-          @current-change="tablePageChange"
-          background
-          small
-        />
-      </el-col>
-    </el-row>
-
-    <!-- Table -->
-    <el-table
-      :data="table_config.data"
-      style="width: 100%;margin-top:30px;"
-      v-loading="table_config.loader"
-    >
-      <el-table-column align="center" label="Schedule">
-        <template slot-scope="scope">
-          <span>{{ formatDate(scope.row.start_event,"","MMM Do, YYYY hh:mm a") + " - " + formatDate(scope.row.end_event,"","MMM Do, YYYY hh:mm a") }}</span>
-          <span v-if="ongoing(scope.row.start_event,scope.row.end_event)">
-            <small style="color:#409EFF">ONGOING</small>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Agents" width="100">
-        <template slot-scope="scope">
-          <span>{{ scope.row.schedules.length }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="View/Export" width="300">
-        <template slot-scope="scope">
-          <el-button :plain="true" size="mini" @click="previewSched(scope.row)">
-            <i class="el-icon-view" />
-          </el-button>
-          <el-button :plain="true" size="mini" @click="exportAgentOt(scope.row)">
-            <svg-icon icon-class="excel" />
-          </el-button>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="Update/Delete" width="300">
-        <template slot-scope="scope">
-          <el-button :plain="true" size="mini" @click="updateRow(scope.row)">
-            <i class="el-icon-edit-outline" />
-          </el-button>
-          <el-button :plain="true" size="mini" type="danger" @click="deleteRow(scope.row)">
-            <i class="el-icon-delete" />
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="table-container shadow">
+      <el-row>
+        <el-col :md="{ span: 12 }">
+          {{ formatDate(searchQuery,"","ddd. MMM Do, YYYY") }}
+        </el-col>
+        <el-col :md="{ span: 12 }">
+          <el-pagination
+            style="float:right"
+            :page-sizes="[10, 25, 50]"
+            :pager-count="5"
+            :page-size="table_config.display_size"
+            layout="total, sizes, prev, pager, next"
+            :total="table_config.count"
+            :current-page.sync="table_config.page"
+            @size-change="tableSizeChange"
+            @current-change="tablePageChange"
+            background
+            small
+          />
+        </el-col>
+        <el-col :md="{ span: 24 }">
+          <!-- Table -->
+          <el-table
+            :data="table_config.data"
+            style="width: 100%;margin-top:5px;"
+            v-loading="fetchOvertimeScheduleState.initial || searchOvertimeScheduleState.initial"
+            class="monday"
+          >
+            <el-table-column label="Schedule">
+              <template slot-scope="scope">
+                <span style="padding-left:20px;font-size:1.2em;">{{
+                  formatDate(
+                    scope.row.start_event,
+                    "",
+                    "MMM Do, YYYY hh:mm a"
+                  ) +
+                    " - " +
+                    formatDate(scope.row.end_event, "", "MMM Do, YYYY hh:mm a")
+                }}</span>
+                <span
+                  v-if="ongoing(scope.row.start_event, scope.row.end_event)"
+                >
+                  <small style="color:#409EFF">ONGOING</small>
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" label="Agents" width="200">
+              <template slot-scope="scope">
+                <span style="font-size:1.5em">{{ scope.row.schedules.length }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column width="50">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" content="Preview">
+                  
+                <div
+                  style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                  @click="previewSched(scope.row)"
+                >
+                  <div style="align-self:center;color:gray;font-size:2em">
+                    <eye-icon></eye-icon>
+                  </div>
+                </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column width="50">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" content="Export to excel">
+                  
+                <div
+                  style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                  @click="exportAgentOt(scope.row)"
+                >
+                  <div style="align-self:center;color:gray;font-size:2em">
+                    <ms-excel-icon></ms-excel-icon>
+                  </div>
+                </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column width="50">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" content="Update">
+                <div
+                  style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                  @click="updateRow(scope.row)"
+                >
+                  <div style="align-self:center;color:gray;font-size:2em">
+                    <square-edit-icon></square-edit-icon>
+                  </div>
+                </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+            <el-table-column width="50">
+              <template slot-scope="scope">
+                <el-tooltip placement="top" content="Delete">
+                  <div
+                    style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                    @click="deleteRow(scope.row)"
+                  >
+                    <div style="align-self:center;color:gray;font-size:2em">
+                      <delete-icon></delete-icon>
+                    </div>
+                  </div>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </el-row>
+    </div>
 
     <!-- Create and Update Dialog -->
     <el-dialog
@@ -86,27 +163,35 @@
       :close-on-press-escape="false"
       :show-close="false"
       :title="form.action + ' Overtime Schedule'"
-      width="40%"
+      width="35%"
     >
       <el-row>
-        <el-col style="margin-bottom:10px;">
-          <label width="100%">Schedule</label>
+        <el-col>
+          <div class="form-label">Schedule</div>
+          <div class="form-item">
+            <el-date-picker
+              style="width:100%"
+              type="datetimerange"
+              placeholder="Set schedule..."
+              v-model="form.schedule"
+              :editable="false"
+              :clearable="false"
+              size="mini"
+            ></el-date-picker>
+          </div>
         </el-col>
         <el-col>
-          <el-date-picker
-            style="width:100%"
-            type="datetimerange"
-            placeholder="Set schedule..."
-            v-model="form.schedule"
-            :editable="false"
-            :clearable="false"
-            size="mini"
-          ></el-date-picker>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelForm" size="mini">Cancel</el-button>
-        <el-button type="danger" @click="submitForm" size="mini" :loading="form.confirm">Confirm</el-button>
+        <el-button
+          type="danger"
+          @click="submitForm"
+          size="mini"
+          :loading="form.confirm"
+          >Confirm</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -115,11 +200,14 @@
 <script>
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
+import filterOr from "@/components/reusables/filter_button";
 import axios from "axios";
 export default {
+  components:{filterOr},
   data() {
     return {
-      searchQuery: "",
+      searchQuery: moment().format("YYYY-MM-DD"),
+      filter:false,
       table_config: {
         display_size: 10,
         page: 1,
@@ -168,7 +256,7 @@ export default {
     ])
   },
   created() {
-    this.fetchOvertimeSchedule(this.query);
+    this.fetchOT(this.query);
   },
   watch: {
     "form.schedule": function(v) {
@@ -188,11 +276,8 @@ export default {
       if (fail) {
         this.table_config.loader = false;
         this.table_config.data = [];
-        this.$message({
-          type: "error",
-          message: this.fetchOvertimeScheduleError,
-          duration: 5000
-        });
+        this.table_config.count = 0;
+
       }
     },
     searchOvertimeScheduleState({ initial, success, fail }) {
@@ -208,27 +293,11 @@ export default {
       if (fail) {
         this.table_config.loader = false;
         this.table_config.data = [];
-        this.$message({
-          type: "error",
-          message: this.searchOvertimeScheduleError,
-          duration: 5000
-        });
+        this.table_config.count = 0;
       }
     },
     searchQuery(v) {
-      this.query.offset = 0;
-      if (v == null) {
-        v = "";
-      }
-      if (v != "") {
-        this.query["target[]"] = "start_event";
-        this.query.query = moment(v).format("YYYY-MM-DD");
-        this.searchOvertimeSchedule(this.query);
-      } else {
-        delete this.query["target[]"];
-        delete this.query.query;
-        this.fetchOvertimeSchedule(this.query);
-      }
+      this.fetchOT();
     },
     createOvertimeScheduleState({ initial, success, fail }) {
       if (initial) {
@@ -239,7 +308,7 @@ export default {
         this.query.offset = 0;
         this.form.show = false;
         this.resetForm();
-        this.fetchOvertimeSchedule(this.query);
+        this.fetchOT(this.query);
         this.$message({
           type: "success",
           message: "You have successfully created a schedule."
@@ -262,7 +331,7 @@ export default {
         this.query.offset = 0;
         this.form.show = false;
         this.resetForm();
-        this.fetchOvertimeSchedule(this.query);
+        this.fetchOT(this.query);
         this.$message({
           type: "success",
           message: this.updateOvertimeScheduleTitle,
@@ -281,7 +350,7 @@ export default {
     deleteOvertimeScheduleState({ initial, success, fail }) {
       if (success) {
         this.query.offset = 0;
-        this.fetchOvertimeSchedule(this.query);
+        this.fetchOT(this.query);
         this.$message({
           type: "success",
           message: this.deleteOvertimeScheduleTitle
@@ -296,6 +365,24 @@ export default {
     }
   },
   methods: {
+    fetchOT(){
+      if(this.filter){
+        this.query.offset = 0;
+        if (this.searchQuery !== "" && this.searchQuery !== null) {
+          this.query.target = ["start_event"];
+          this.query.query = moment(this.searchQuery).format("YYYY-MM-DD");
+          this.searchOvertimeSchedule(this.query);
+        }
+      }else{
+        this.query.target=null;
+        this.query.query = null;
+        this.fetchOvertimeSchedule(this.query);
+      }
+    },
+    filterOr(v){
+      this.filter = v;
+      this.fetchOT(this.query)
+    },
     ...mapActions([
       "fetchOvertimeSchedule",
       "searchOvertimeSchedule",
@@ -391,11 +478,7 @@ export default {
       //     duration: 5000
       //   });
       // } else {
-      if (
-        confirm(
-          "Do you want to proceed?"
-        )
-      ) {
+      if (confirm("Do you want to proceed?")) {
         this.deleteOvertimeSchedule({ id: data.id });
       }
       // }
@@ -453,24 +536,72 @@ export default {
     tableSizeChange(value) {
       this.query.limit = value;
       const data = this.query;
-      this.fetchOvertimeSchedule(data);
+      this.fetchOT(data);
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
       const data = this.query;
-      this.fetchOvertimeSchedule(data);
+      this.fetchOT(data);
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-.app-container {
-  .roles-table {
-    margin-top: 30px;
-  }
-  .permission-tree {
-    margin-bottom: 30px;
-  }
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
+}
+
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left:5px solid crimson;
+  height:45px;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>
