@@ -11,20 +11,20 @@
                     </div>
                     <template v-if="board.button">
                         <div>
-                            <template v-if="schedule.vto_at===null">
+                            <!-- <template v-if="schedule.vto_at===null"> -->
                                 <template v-if="board.button == 'start'">
                                     <el-button round type="success" size="small" @click="startWork()" :disabled="button.start">Start Work</el-button>
                                 </template>
                                 <template v-if="board.button == 'join_ot'">
-                                    <el-button round type="warning" size="small" :disabled="button.join">Join OT</el-button>
+                                    <el-button round type="warning" size="small" :disabled="button.join" @click="joinOt()" :loading="joinOvertimeScheduleState.initial">Join OT</el-button>
                                 </template>
                                 <template v-if="board.button == 'end'">
                                     <el-button round type="primary" size="small" @click="endWork()" :disabled="button.end">End Work</el-button>
                                 </template>
-                            </template>
-                            <template v-else>
+                            <!-- </template> -->
+                            <!-- <template v-else>
                                     <el-button round type="success" size="small" :disabled="true">Start Work</el-button>
-                            </template>
+                            </template> -->
                         </div>
                     </template>
                 </div>
@@ -99,6 +99,14 @@ export default {
         ]),
     },
     watch:{
+        joinOvertimeScheduleState({initial,success,fail}){
+            if(success){
+                this.fetchTodaysSchedule({userid:this.user_id})
+            }
+            if(fail){
+                this.fetchTodaysSchedule({userid:this.user_id})
+            }
+        },
         agentTimeOutState({ initial, success, fail }) {
             if (success) {
                 this.fetchTodaysSchedule({userid:this.user_id});
@@ -218,11 +226,16 @@ export default {
                     this.board.log = false;
                 }else{
                     if(this.schedule.title_id==1){
-                        this.board.title = "Regular Work";
-                        this.board.color = "#dc143c";
-                        this.board.small_sub = this.formatDate(this.schedule.date.ymd,"","ddd, MMM. DD, YYYY");
-                        this.board.sub = this.formatDate(this.schedule.start_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase()
-                        +" - "+this.formatDate(this.schedule.end_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase();
+                            this.board.title = "Regular Work";
+                            this.board.color = "#dc143c";
+                            this.board.small_sub = this.formatDate(this.schedule.date.ymd,"","ddd, MMM. DD, YYYY");
+                            this.board.sub = this.formatDate(this.schedule.start_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase()
+                            +" - "+this.formatDate(this.schedule.end_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase();
+                        if(schedule.vto_at === null){
+                            this.button.start = false;
+                        }else{
+                            this.button.start = true;
+                        }
                     }else{
                         this.board.title = "Overtime";
                         this.board.color = "#938af1";
@@ -279,6 +292,9 @@ export default {
                 this.agentTimeOut(data);
             }
         },
+        joinOt(){
+            this.joinOvertimeSchedule();
+        }
     }
 }
 </script>
