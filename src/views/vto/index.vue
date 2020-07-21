@@ -7,15 +7,25 @@
             <div class="title-wrapper" style="margin-right:10px;">
               Voluntary Timeout
             </div>
+
+            <div
+              class="button-icon round active"
+              style="display:flex;justify-content:center;margin-right:5px;"
+              @click="createForm"
+            >
+              <el-tooltip placement="top" content="Add VTO">
+                <plus-icon></plus-icon>
+              </el-tooltip>
+            </div>
           </div>
         </el-col>
         <el-col :md="{ span: 8 }">
-          <el-input placeholder="Search..." v-model="searchQuery"></el-input>
+          <el-input placeholder="Search..." v-model="searchQuery" @input="debounceInput" :disabled="fetchVtoState.initial"></el-input>
         </el-col>
         <el-col :md="{ span: 4 }">
           <el-select
             style="width:100%"
-            :disabled="filter.select.vto_list.disabled"
+            :disabled="fetchVtoListState.initial || fetchVtoState.initial"
             v-model="filter.select.vto_list.model"
           >
             <el-option
@@ -33,8 +43,9 @@
       <el-row>
         <el-col :md="{ span: 24 }">
           <el-pagination
+            :disabled="fetchVtoState.initial"
             style="float:right"
-            pager-count="4"
+            :pager-count="5"
             :page-sizes="[10, 25, 50]"
             :page-size="table_config.display_size"
             layout="total, sizes, prev, pager, next"
@@ -50,68 +61,81 @@
           <el-table
             :data="table_config.data"
             style="width:100%;"
-            v-loading="table_config.loader"
+            v-loading="fetchVtoListState.initial||fetchVtoState.initial"
             class="monday"
           >
-            <el-table-column label="Agent">
+            <el-table-column label="Agent" align="left" width="350" fixed>
               <template slot-scope="scope">
-                <div class="user-block">
-                  <img
-                    v-if="scope.row.user_info.image_url"
-                    class="img-circle"
-                    :src="scope.row.user_info.image_url"
-                  />
-                  <div
-                    v-else
-                    class="img-circle text-muted"
-                    style="background-color:#d9d9d9;display:flex"
+                <div style="display:flex">
+                  <el-tooltip
+                    :content="scope.row.user_info.email"
+                    placement="top"
                   >
                     <div
-                      style="align-self:center;width:100%;text-align:center;"
-                      class="text-point-eight-em"
+                      style="width:100%;align-self:center;padding-left:20px;"
                     >
-                      {{
-                        getAvatarLetters(
-                          scope.row.user_info.firstname,
-                          scope.row.user_info.lastname
-                        )
-                      }}
+                      {{ scope.row.user_info.full_name }}
+                    </div>
+                  </el-tooltip>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column align="center" width="50" fixed>
+              <template slot-scope="scope">
+                <div class="user-block">
+                  <div v-if="scope.row.user_info.image_url" style="width:100%;">
+                    <div style="margin:0 auto;height:30px;width:30px;">
+                      <img
+                        class="img-circle"
+                        style="margin:0 auto;"
+                        :src="scope.row.user_info.image_url"
+                      />
                     </div>
                   </div>
-                  <span>
-                    {{ scope.row.user_info.full_name }}
-                  </span>
+                  <div v-else class="text-muted" style="width:100%;">
+                    <div
+                      class="img-circle"
+                      style="background-color:white;margin:0 auto;"
+                    >
+                      <div style="display:flex;height:30px;width:30px;">
+                        <div
+                          style="align-self:center;width:100%;text-align:center;font-weight:bold;font-size:.8em"
+                        >
+                          {{
+                            getAvatarLetters(
+                              scope.row.user_info.firstname,
+                              scope.row.user_info.lastname
+                            )
+                          }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </template>
             </el-table-column>
             <el-table-column label="VTO Hours">
               <template slot-scope="scope">
-                <span>{{ scope.row.vto_hours.time }}</span>
+                <span style="font-size:1.5em;padding-left:20px;">{{ scope.row.vto_hours.time }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Rendered Hours">
               <template slot-scope="scope">
-                <span>{{
-                  scope.row.rendered_hours.billable.second / 60 / 60 + "hr/s"
+                <span  style="font-size:1.5em;padding-left:20px;">{{
+                  Number((getRenderedHours(scope.row.time_in.date,scope.row.vto_at.date)).toFixed(2)) + " hr/s"
                 }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="Conformance">
+            <el-table-column label="Del" width="50">
               <template slot-scope="scope">
-                <el-progress
-                  :percentage="scope.row.conformance | toFix"
-                  color="#6f7ad3"
-                ></el-progress>
-              </template>
-            </el-table-column>
-            <el-table-column label="Remove" width="200px">
-              <template slot-scope="scope">
-                <el-button
-                  size="mini"
-                  type="danger"
+                <div
+                  style="height:45px;display:flex;justify-content:center;cursor:pointer;"
                   @click="deleteVto(scope.row)"
-                  >Delete</el-button
                 >
+                  <div style="align-self:center;color:gray;font-size:2em">
+                    <delete-icon></delete-icon>
+                  </div>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -129,22 +153,25 @@
       width="30%"
     >
       <el-row>
-        <el-col style="margin-bottom:8px;">
-          <label width="100%">VTO at</label>
+        <el-col>
+          <div class="form-label">VTO at</div>
+          <div class="form-item">
           <el-date-picker
             style="width:100%"
             type="datetime"
             placeholder="Set vto at..."
             v-model="form.field.vto_at"
-            size="mini"
-          ></el-date-picker> </el-col
-        ><el-col>
-          <label for="dates">Agents</label>
+          ></el-date-picker>
+          </div>
+          </el-col>
+        <el-col>
+          <div class="form-label" style="margin-top:8px;">Agents</div>
+          <div class="form-item">
+            
           <el-select
             v-model="form.field.agents"
             class="form-input"
-            style="width:100%;padding-bottom:2px"
-            size="mini"
+            style="width:100%;"
             multiple
             filterable
             remote
@@ -160,6 +187,7 @@
               :value="item.id"
             />
           </el-select>
+          </div>
           <span
             style="float:right;font-size:12px;color:grey;padding-right:10px;margin-bottom:10px;"
             >count: {{ form.field.agents.length }}</span
@@ -274,6 +302,7 @@
 
 <script>
 import axios from "axios";
+import {debounce} from "debounce";
 import { mapActions, mapGetters } from "vuex";
 import moment from "moment";
 export default {
@@ -303,7 +332,9 @@ export default {
         offset: 0,
         limit: 10,
         order: "desc",
-        sort: "created_at"
+        sort: "created_at",
+        target:["full_name"],
+        query:null
       },
       form: {
         show: false,
@@ -350,7 +381,7 @@ export default {
       "agentsfetchState"
     ])
   },
-  created() {
+  mounted() {
     this.fetchVtoList();
   },
   watch: {
@@ -400,7 +431,6 @@ export default {
           }))
           .sort(this.descVtoList);
         this.filter.select.vto_list.model = this.filter.options.vto_list[0].value;
-        this.filter.select.vto_list.disabled = false;
       }
       if (fail) {
         this.filter.select.vto_list.disabled = false;
@@ -434,18 +464,23 @@ export default {
       }
       this.fetchVto(data);
     },
-    searchQuery(v) {
-      let data = {};
-      data.timestamp = this.filter.select.vto_list.model;
-      if (v != "") {
-        data["target[]"] = "full_name";
-        data["query"] = v;
-      }
-      this.fetchVto(data);
-    }
   },
   methods: {
     ...mapActions(["fetchVtoList", "fetchAgents", "fetchVto", "cancelVto"]),
+    debounceInput:debounce(function(e){
+      if(this.searchQuery!==null && this.searchQuery!==""){
+        this.query.target = ["full_name"];
+        this.query.query = this.searchQuery;
+      }else{
+        this.query.target = null;
+        this.query.query = null;
+      }
+      this.fetchVto(this.query)
+},1000),
+    getRenderedHours(start,end){
+      let duration = moment.duration(moment(end).diff(moment(start)));
+      return  duration.asHours();
+    },
     closeCreateVtoReport() {
       if (this.form.report.progress == 100) {
         this.form.report.dialog = false;
@@ -572,23 +607,17 @@ export default {
       this.form.action = "Create";
       this.form.schedule = null;
     },
-    filterHeadName(head_id) {
-      return accesslevels.filter(i => i.id == head_id)[0].name;
-    },
     tableSizeChange(value) {
       this.query.limit = value;
-      const data = this.query;
-      this.fetchOvertimeSchedule(data);
+      this.fetchVto(this.query);
     },
     tablePageChange(value) {
       this.query.offset = (value - 1) * this.query.limit;
-      const data = this.query;
-      this.fetchOvertimeSchedule(data);
+      this.fetchVto(this.query);
     }
   }
 };
 </script>
-
 
 <style scoped>
 .user-block >>> .img-circle {
@@ -612,8 +641,8 @@ export default {
   font-weight: light !important;
 }
 .monday >>> td:first-child {
-  border-left:5px solid crimson;
-  height:45px;
+  border-left: 5px solid crimson;
+  height: 45px;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;
