@@ -177,27 +177,30 @@ export default {
           break;
         case "rta manager":
           permit = this.isPermitted([
+            "rta manager",
             "representative - order placer",
             "rta supervisor",
             "rta analyst"
           ]);
         case "rta supervisor":
           permit = this.isPermitted([
+            "rta supervisor",
             "representative - order placer",
             "rta analyst"
           ]);
           break;
         case "rta analyst":
-          permit = this.isPermitted(["representative - order placer"]);
+          permit = this.isPermitted(["rta analyst","representative - order placer"]);
           break;
         case "operations manager":
           permit = this.isPermitted([
+            "operations manager",
             "representative - order placer",
             "team leader"
           ]);
           break;
         case "team leader":
-          permit = this.isPermitted(["representative - order placer"]);
+          permit = this.isPermitted(["team leader","representative - order placer"]);
           break;
       }
       return permit;
