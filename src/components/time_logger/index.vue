@@ -11,14 +11,19 @@
                     </div>
                     <template v-if="board.button">
                         <div>
-                            <template v-if="board.button == 'start'">
-                                <el-button round type="success" size="small" @click="startWork()" :disabled="button.start">Start Work</el-button>
+                            <template v-if="schedule.vto_at===null">
+                                <template v-if="board.button == 'start'">
+                                    <el-button round type="success" size="small" @click="startWork()" :disabled="button.start">Start Work</el-button>
+                                </template>
+                                <template v-if="board.button == 'join_ot'">
+                                    <el-button round type="warning" size="small" :disabled="button.join">Join OT</el-button>
+                                </template>
+                                <template v-if="board.button == 'end'">
+                                    <el-button round type="primary" size="small" @click="endWork()" :disabled="button.end">End Work</el-button>
+                                </template>
                             </template>
-                            <template v-if="board.button == 'join_ot'">
-                                <el-button round type="warning" size="small" :disabled="button.join">Join OT</el-button>
-                            </template>
-                            <template v-if="board.button == 'end'">
-                                <el-button round type="primary" size="small" @click="endWork()" :disabled="button.end">End Work</el-button>
+                            <template v-else>
+                                    <el-button round type="success" size="small" :disabled="true">Start Work</el-button>
                             </template>
                         </div>
                     </template>
