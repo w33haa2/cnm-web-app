@@ -1,27 +1,50 @@
 <template>
   <div>
     <div class="app-container">
-      <h4 style="color:#646464">Missed Logs</h4>
-      <div class="filter-container">
+      <div class="title-bar shadow">
+        <el-row :gutter="10">
+          <el-col :md="{ span: 12 }">
+            <div class="d-flex">
+              <div class="title-wrapper">
+                Missed Logs
+              </div>
+            </div>
+          </el-col>
+          <el-col :md="{ span: 8 }">
+            <el-input
+              v-model="table.request.query"
+              placeholder="Date..."
+              @input="debounceInput"
+              :disabled="fetchMissedLogsState.initial"
+            ></el-input>
+          </el-col>
+          <el-col :md="{ span: 4 }">
+            <el-select v-model="table.request.type" :disabled="fetchMissedLogsState.initial">
+              <el-option :value="null" label="All" />
+              <el-option value="tardy" label="Tardy" />
+              <el-option value="undertime" label="Undertime" />
+              <el-option value="no_timeout" label="No Timeout" />
+            </el-select>
+          </el-col>
+        </el-row>
+      </div>
+      <div class="table-container shadow">
         <!-- DISPLAY RECORDS & PAGINATION -->
-        <el-row :gutter="8" style="padding-right:8px;margin-bottom:15px;">
-          <el-col :md="{span: 4}" style="margin-bottom:5px;">
-            <el-input v-model="table.request.query" placeholder="Date..." size="mini"></el-input>
+        <el-row :gutter="8">
+          <el-col :md="{span:12}">
+            {{
+              table.request.type
+                ? ucwords(remUnderscore(table.request.type))
+                : "All"
+            }}
           </el-col>
-          <el-col :md="{span:12,offset:8}">
-            <el-radio-group v-model="table.request.type" size="mini" style="float:right">
-              <el-radio-button :label="null">All</el-radio-button>
-              <!-- <el-radio-button label="Washington">w/o Coaching</el-radio-button> -->
-              <el-radio-button label="tardy">Tardy</el-radio-button>
-              <el-radio-button label="undertime">Undertime</el-radio-button>
-              <el-radio-button label="no_timeout">No Timeout</el-radio-button>
-            </el-radio-group>
-          </el-col>
-          <el-col :md="{span: 12,offset:12}">
+          <el-col :md="{ span: 12 }">
             <el-pagination
               style="float:right"
               small
               background
+              :disabled="fetchMissedLogsState.initial"
+              :pager-count="5"
               :page-sizes="[15, 50, 100]"
               :current-page.sync="table.request.page"
               :page-size="table.request.perpage"
@@ -31,29 +54,41 @@
               @size-change="tableSizeChange"
             />
           </el-col>
-        </el-row>
 
-        <el-row>
-          <el-col>
+          <el-col :md="{ span: 24 }">
             <el-table
-              :data="fetchMissedLogsData.missed_logs.data"
-              v-loading="table.loader"
+              :data="table.data"
+              v-loading="fetchMissedLogsState.initial"
               @sort-change="columnSort"
+              style="margin-top:5px;"
+              class="monday"
             >
               <el-table-column label="Type">
                 <template slot-scope="scope">
                   <span
-                    :style="scope.row.log_status[0]!='punctual'?'color:#F56C6C':''"
-                  >{{ scope.row.log_status[0] }}</span>
+                    :style="
+                      scope.row.log_status[0] != 'punctual'
+                        ? 'color:#F56C6C'
+                        : ''
+                    "
+                    >{{ scope.row.log_status[0] }}</span
+                  >
                   <span>-</span>
                   <span
-                    :style="scope.row.log_status[1]!='timed_out'?'color:#F56C6C':''"
-                  >{{ scope.row.log_status[1] }}</span>
+                    :style="
+                      scope.row.log_status[1] != 'timed_out'
+                        ? 'color:#F56C6C'
+                        : ''
+                    "
+                    >{{ scope.row.log_status[1] }}</span
+                  >
                 </template>
               </el-table-column>
               <el-table-column label="Date" sortable="custom" prop="date">
                 <template slot-scope="scope">
-                  <span>{{ scope.row.date.day+", "+ scope.row.date.ymd }}</span>
+                  <span>{{
+                    scope.row.date.day + ", " + scope.row.date.ymd
+                  }}</span>
                 </template>
               </el-table-column>
               <!-- <el-table-column label="Employee" sortable="custom" prop="user_info.full_name">
@@ -68,14 +103,22 @@
               </el-table-column>-->
               <el-table-column label="Schedule">
                 <template slot-scope="scope">
-                  <span>{{ formatDate(scope.row.start_event.date,"","hh:mm a") +" - "+ formatDate(scope.row.end_event.date,"","hh:mm a") }}</span>
+                  <span>{{
+                    formatDate(scope.row.start_event.date, "", "hh:mm a") +
+                      " - " +
+                      formatDate(scope.row.end_event.date, "", "hh:mm a")
+                  }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="Log">
                 <template slot-scope="scope">
-                  <span>{{ formatDate(scope.row.time_in.date,"","hh:mm a") +" - "}}</span>
+                  <span>{{
+                    formatDate(scope.row.time_in.date, "", "hh:mm a") + " - "
+                  }}</span>
                   <template v-if="scope.row.time_out">
-                    <span>{{ formatDate(scope.row.time_out.date,"","hh:mm a") }}</span>
+                    <span>{{
+                      formatDate(scope.row.time_out.date, "", "hh:mm a")
+                    }}</span>
                   </template>
                   <template v-else>
                     <span style="color:#F56C6C">No data</span>
@@ -85,83 +128,124 @@
               <el-table-column label="Coaching approval">
                 <template slot-scope="scope">
                   <el-tag
-                    :type="scope.row.coaching?
-                    scope.row.coaching.filed_to_action?
-                    scope.row.coaching.filed_to_action=='approved'?
-                    'success':'danger'
-                    :
-                    'warning'
-                    :
-                    'info'"
+                    :type="
+                      scope.row.coaching
+                        ? scope.row.coaching.filed_to_action
+                          ? scope.row.coaching.filed_to_action == 'approved'
+                            ? 'success'
+                            : 'danger'
+                          : 'warning'
+                        : 'info'
+                    "
                   >
-                    {{ scope.row.coaching?
-                    scope.row.coaching.filed_to_action?
-                    scope.row.coaching.filed_to_action=='approved'?
-                    "Approved":"Disapproved"
-                    :
-                    "Please respond"
-                    :
-                    "No coaching available" }}
+                    {{
+                      scope.row.coaching
+                        ? scope.row.coaching.filed_to_action
+                          ? scope.row.coaching.filed_to_action == "approved"
+                            ? "Approved"
+                            : "Disapproved"
+                          : "Please respond"
+                        : "No coaching available"
+                    }}
                   </el-tag>
                 </template>
               </el-table-column>
               <el-table-column label="Coaching progress">
                 <template slot-scope="scope">
-                  <template v-if="scope.row.log_status[1]=='no_timeout'">
+                  <template v-if="scope.row.log_status[1] == 'no_timeout'">
                     <div
-                      :style="scope.row.coaching?'cursor:pointer':''"
-                      @click="scope.row.coaching?viewRow(scope.row):''"
+                      :style="scope.row.coaching ? 'cursor:pointer' : ''"
+                      @click="scope.row.coaching ? viewRow(scope.row) : ''"
                     >
                       <el-row gutter="1">
-                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                        <el-col
+                          :xs="{ span: 8 }"
+                          :sm="{ span: 8 }"
+                          :md="{ span: 8 }"
+                        >
                           <el-tooltip
-                            :content="scope.row.coaching?'Coaching available':'No coaching filed'"
+                            :content="
+                              scope.row.coaching
+                                ? 'Coaching available'
+                                : 'No coaching filed'
+                            "
                           >
                             <div
                               class="progress-box"
-                              :style="'background-color:'+(scope.row.coaching?'#67C23A':'')"
+                              :style="
+                                'background-color:' +
+                                  (scope.row.coaching ? '#67C23A' : '')
+                              "
                             ></div>
                           </el-tooltip>
                         </el-col>
-                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                        <el-col
+                          :xs="{ span: 8 }"
+                          :sm="{ span: 8 }"
+                          :md="{ span: 8 }"
+                        >
                           <el-tooltip
-                            :content="scope.row.coaching?
-                        scope.row.coaching.filed_to_action?
-                        scope.row.coaching.filed_to_action == 'approved'?'Approved':'Disapproved'
-                        :'Waiting for agent response'
-                        :'No coaching filed'"
+                            :content="
+                              scope.row.coaching
+                                ? scope.row.coaching.filed_to_action
+                                  ? scope.row.coaching.filed_to_action ==
+                                    'approved'
+                                    ? 'Approved'
+                                    : 'Disapproved'
+                                  : 'Waiting for agent response'
+                                : 'No coaching filed'
+                            "
                           >
                             <div
                               class="progress-box"
-                              :style="'background-color:'+(scope.row.coaching?
-                          scope.row.coaching.filed_to_action?
-                          scope.row.coaching.filed_to_action == 'approved'?'#67C23A':'#F56C6C':'#E6A23C':'')"
+                              :style="
+                                'background-color:' +
+                                  (scope.row.coaching
+                                    ? scope.row.coaching.filed_to_action
+                                      ? scope.row.coaching.filed_to_action ==
+                                        'approved'
+                                        ? '#67C23A'
+                                        : '#F56C6C'
+                                      : '#E6A23C'
+                                    : '')
+                              "
                             ></div>
                           </el-tooltip>
                         </el-col>
-                        <el-col :xs="{span:8}" :sm="{span:8}" :md="{span:8}">
+                        <el-col
+                          :xs="{ span: 8 }"
+                          :sm="{ span: 8 }"
+                          :md="{ span: 8 }"
+                        >
                           <el-tooltip
-                            :content="scope.row.coaching?
-                        scope.row.coaching.filed_to_action?
-                        scope.row.coaching.filed_to_action == 'approved'?
-                        scope.row.coaching.verified_by?
-                        'Verified'
-                        :'Waiting for verification'
-                        :'Process denied'
-                        :'Waiting for agent response'
-                        :'No coaching filed'"
+                            :content="
+                              scope.row.coaching
+                                ? scope.row.coaching.filed_to_action
+                                  ? scope.row.coaching.filed_to_action ==
+                                    'approved'
+                                    ? scope.row.coaching.verified_by
+                                      ? 'Verified'
+                                      : 'Waiting for verification'
+                                    : 'Process denied'
+                                  : 'Waiting for agent response'
+                                : 'No coaching filed'
+                            "
                           >
                             <div
                               class="progress-box"
-                              :style="'background-color:'+(scope.row.coaching?
-                          scope.row.coaching.filed_to_action?
-                          scope.row.coaching.filed_to_action == 'approved'?
-                        scope.row.coaching.verified_by?
-                        '#67C23A'
-                        :'#E6A23C'
-                        :'#F56C6C'
-                        :''
-                        :'')"
+                              :style="
+                                'background-color:' +
+                                  (scope.row.coaching
+                                    ? scope.row.coaching.filed_to_action
+                                      ? scope.row.coaching.filed_to_action ==
+                                        'approved'
+                                        ? scope.row.coaching.verified_by
+                                          ? '#67C23A'
+                                          : '#E6A23C'
+                                        : '#F56C6C'
+                                      : ''
+                                    : '')
+                              "
                             ></div>
                           </el-tooltip>
                         </el-col>
@@ -169,7 +253,9 @@
                     </div>
                   </template>
                   <template v-else>
-                    <el-tag type="info" style="text-align:center;width:100%">Coaching Unavailable</el-tag>
+                    <el-tag type="info" style="text-align:center;width:100%"
+                      >Coaching Unavailable</el-tag
+                    >
                   </template>
                 </template>
               </el-table-column>
@@ -184,18 +270,22 @@
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
-        :title="form.coaching.action+' Coaching'"
+        :title="form.coaching.action + ' Coaching'"
         width="30%"
       >
         <el-row>
-          <template v-if="form.coaching.action!='View'">
+          <template v-if="form.coaching.action != 'View'">
             <el-col style="margin-bottom:10px;">
-              <span
-                style="font-size:0.8em"
-              >{{ form.coaching.field.imageName ? form.coaching.field.imageName : "Select image file."}}</span>
+              <span style="font-size:0.8em">{{
+                form.coaching.field.imageName
+                  ? form.coaching.field.imageName
+                  : "Select image file."
+              }}</span>
             </el-col>
             <el-col style="margin-bottom:10px;">
-              <el-button size="mini" @click="uploadProofClick">Upload Proof</el-button>
+              <el-button size="mini" @click="uploadProofClick"
+                >Upload Proof</el-button
+              >
               <input
                 ref="proofInput"
                 type="file"
@@ -205,7 +295,7 @@
               />
             </el-col>
           </template>
-          <template v-if="form.coaching.action!='Create'">
+          <template v-if="form.coaching.action != 'Create'">
             <el-button size="mini" @click="showProof()">Show Proof</el-button>
           </template>
           <el-col>
@@ -244,7 +334,7 @@
           <el-col>
             <h5>Remarks</h5>
           </el-col>
-          <template v-if="form.coaching.action!='View'">
+          <template v-if="form.coaching.action != 'View'">
             <el-col>
               <el-input
                 type="textarea"
@@ -262,28 +352,54 @@
         </el-row>
         <span slot="footer" class="dialog-footer">
           <el-button size="mini" @click="cancelFormCoaching">Cancel</el-button>
-          <template v-if="position.toLowerCase()=='representative - order placer'">
+          <template
+            v-if="position.toLowerCase() == 'representative - order placer'"
+          >
             <el-button-group>
-            <el-button
-              type="danger"
-              size="mini"
-              plain
-              :loading="form.coaching.btn.confirm.loader"
-              @click="updateAgentApproval({id:form.coaching.details.id,approval:'disapproved'})"
-              :disabled="(form.coaching.details.verified_by?true:false)||(form.coaching.details.filed_to_action? form.coaching.details.filed_to_action =='disapproved'? true:false:false)"
-            >
-              <svg-icon icon-class="thumbs-down"></svg-icon>
-            </el-button>
-            <el-button
-              type="success"
-              size="mini"
-              plain
-              :loading="form.coaching.btn.confirm.loader"
-              @click="updateAgentApproval({id:form.coaching.details.id,approval:'approved'})"
-              :disabled="(form.coaching.details.verified_by?true:false)||(form.coaching.details.filed_to_action? form.coaching.details.filed_to_action =='approved'? true:false:false)"
-            >
-              <svg-icon icon-class="thumbs-up"></svg-icon>
-            </el-button>
+              <el-button
+                type="danger"
+                size="mini"
+                plain
+                :loading="form.coaching.btn.confirm.loader"
+                @click="
+                  updateAgentApproval({
+                    id: form.coaching.details.id,
+                    approval: 'disapproved'
+                  })
+                "
+                :disabled="
+                  (form.coaching.details.verified_by ? true : false) ||
+                    (form.coaching.details.filed_to_action
+                      ? form.coaching.details.filed_to_action == 'disapproved'
+                        ? true
+                        : false
+                      : false)
+                "
+              >
+                <svg-icon icon-class="thumbs-down"></svg-icon>
+              </el-button>
+              <el-button
+                type="success"
+                size="mini"
+                plain
+                :loading="form.coaching.btn.confirm.loader"
+                @click="
+                  updateAgentApproval({
+                    id: form.coaching.details.id,
+                    approval: 'approved'
+                  })
+                "
+                :disabled="
+                  (form.coaching.details.verified_by ? true : false) ||
+                    (form.coaching.details.filed_to_action
+                      ? form.coaching.details.filed_to_action == 'approved'
+                        ? true
+                        : false
+                      : false)
+                "
+              >
+                <svg-icon icon-class="thumbs-up"></svg-icon>
+              </el-button>
             </el-button-group>
           </template>
         </span>
@@ -294,10 +410,10 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-
+import { debounce } from "debounce";
 import axios from "axios";
 export default {
-  name: "RTA-MissedLogs",
+  name: "Agent-MissedLogs",
   data() {
     return {
       axios: {
@@ -317,7 +433,7 @@ export default {
             }
           },
           details: {
-          id: null,
+            id: null,
             proof: null,
             full_name: null,
             date: null,
@@ -326,7 +442,7 @@ export default {
             log_status: null,
             coach: null,
             verified_by: null,
-            filed_to_action:null
+            filed_to_action: null
           },
           field: {
             imageName: null,
@@ -343,6 +459,7 @@ export default {
       },
       table: {
         loader: false,
+        data:[],
         request: {
           page: 1,
           perpage: 15,
@@ -350,12 +467,13 @@ export default {
           tl_id: null,
           om_id: null,
           id: null,
-          status: null
+          status: null,
+          type: null
         }
       }
     };
   },
-  created() {
+  mounted() {
     this.table.request.id = this.user_id;
     this.fetchMissedLogs(this.unsetNull(this.table.request));
   },
@@ -373,17 +491,22 @@ export default {
     ])
   },
   watch: {
-    "table.request.query": function(v) {
-      setTimeout(() => {
-        this.fetchMissedLogs(this.unsetNull(this.table.request));
-      }, 3000);
+    fetchMissedLogsState:function({initial,success,fail}){
+      if(success){
+        this.table.data = this.fetchMissedLogsData.missed_logs.data;
+      }else{
+        this.table.data = [];
+      }
     },
-    "table.request.status": function(v) {
-      this.fetchMissedLogs(this.unsetNull(this.table.request));
-    }
+    // "table.request.status": function(v) {
+    //   this.fetchMissedLogs(this.unsetNull(this.table.request));
+    // }
   },
   methods: {
     ...mapActions(["fetchMissedLogs", "createCoaching"]),
+    debounceInput:debounce(function(e){
+      this.fetchMissedLogs(this.table.request)
+    },1000),
     updateAgentApproval(data) {
       if (confirm("Do you want to proceed?")) {
         axios
@@ -444,7 +567,8 @@ export default {
       this.form.coaching.action = "View";
       this.form.coaching.field.remarks = data.coaching.remarks;
       this.form.coaching.details.proof = data.coaching.img_proof_url;
-      this.form.coaching.details.filed_to_action = data.coaching.filed_to_action;
+      this.form.coaching.details.filed_to_action =
+        data.coaching.filed_to_action;
       this.form.coaching.details.verified_by = data.coaching.verified_by;
       this.form.coaching.details.id = data.coaching.id;
     },
@@ -552,7 +676,6 @@ export default {
   }
 };
 </script>
-
 
 <style lang="scss">
 .card-content-text {
