@@ -870,3 +870,37 @@
                 border-radius: 10px;
             }
         }
+        
+        .el-table {
+            .col-header {
+                font-size: .8em;
+                cursor: default;
+                .sub-col-header {
+                    padding: 0px;
+                    border-radius: 3px;
+                    display: inline-block;
+                    line-height: normal;
+                    padding: 0px 3px;
+                    &.danger {
+                        background-color: crimson;
+                        color: white;
+                    }
+                    &.primary {
+                        background-color: #0072ff;
+                        color: white;
+                    }
+                    &.success {
+                        background-color: #67c23a;
+                        color: white;
+                    }
+                    &.warning {
+                        background-color: #e6a23c;
+                        color: white;
+                    }
+                    &.secondary {
+                        background-color: #808080;
+                        color: white;
+                    }
+                }
+            }
+        }
