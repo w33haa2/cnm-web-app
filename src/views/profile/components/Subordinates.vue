@@ -2,20 +2,16 @@
   <div>
     <div class="custom-card shadow" style="padding:15px;">
       <el-row>
-        <el-col :md="{ span: 8 }">
+        <el-col :md="{ span: 12 }" class="my-3">
           <div style="font-size:1.3em;">Subordinates</div>
         </el-col>
-        <el-col :md="{ span: 1, offset: 15 }"> </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :md="{ span: 12 }" style="margin-top:5px;">
+        <el-col :md="{ span: 12 }" class="my-3">
           <div class="d-flex">
             <div
               class="button-icon round"
               style="display:flex;justify-content:center;margin-right:10px;"
-              :style="sort_order > 0 ? 'background-color:#ccc' : ''"
-              @click="columnSort()"
+              :style="(sort_order > 0 ? 'background-color:#ccc;' : '')+(fetchSubordinatesState.initial?'cursor:not-allowed;':'')"
+              @click="fetchSubordinatesState.initial?null:columnSort()"
             >
               <el-tooltip placement="top" :content="sort.tooltip">
                 <template v-if="sort_order < 2">
@@ -26,13 +22,14 @@
                 </template>
               </el-tooltip>
             </div>
-            <div>
-              <el-input type="text" placeholder="Search..." v-model="table_config.query.query" @input="debounceInput" style="width:calc(100%-60px)"></el-input>
+            <div style="width:100%">
+              <el-input type="text" :disabled="fetchSubordinatesState.initial" placeholder="Search..." v-model="table_config.query.query" @input="debounceInput" style="width:100%"></el-input>
             </div>
           </div>
         </el-col>
-        <el-col :md="{ span: 12 }" style="margin-top:5px;">
+        <el-col :md="{ span: 24 }" class="my-3">
           <el-pagination
+          :disabled="fetchSubordinatesState.initial"
             style="float:right"
             :pager-count="5"
             :page-sizes="[10, 25, 50]"
@@ -185,7 +182,6 @@ export default {
       if (success) {
         this.table_config.data = this.fetchSubordinatesData.subordinates;
         this.table_config.count = this.fetchSubordinatesData.count;
-        this.table_config.page = this.fetchSubordinatesData.hierarchy_log.current_page;
       }
     }
   },
