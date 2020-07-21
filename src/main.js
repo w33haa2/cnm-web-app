@@ -48,6 +48,8 @@ import SortAlphabeticalAscendingIcon from 'vue-material-design-icons/SortAlphabe
 Vue.component('sort-alpha-asc-icon', SortAlphabeticalAscendingIcon);
 import SortAlphabeticalDescendingIcon from 'vue-material-design-icons/SortAlphabeticalDescending.vue';
 Vue.component('sort-alpha-desc-icon', SortAlphabeticalDescendingIcon);
+import CheckBoldIcon from 'vue-material-design-icons/CheckBold.vue';
+Vue.component('check-bold-icon', CheckBoldIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
