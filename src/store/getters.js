@@ -364,6 +364,12 @@ const getters = {
     fetchUserWeeklyLeaveRequestsData: state =>
         state.fetch_user_weekly_leave_requests.data,
     fetchUserWeeklyLeaveRequestsTitle: state =>
-        state.fetch_user_weekly_leave_requests.title
+        state.fetch_user_weekly_leave_requests.title,
+
+
+    // fetch_schedules
+    fetchSchedulesState: state => state.fetch_schedules.state,
+    fetchSchedulesData: state => state.fetch_schedules.data,
+    fetchSchedulesTitle: state => state.fetch_schedules.title,
 };
 export default getters;
