@@ -91,16 +91,6 @@
                   }}</span>
                 </template>
               </el-table-column>
-              <!-- <el-table-column label="Employee" sortable="custom" prop="user_info.full_name">
-                <template slot-scope="scope">
-                  <span>{{ scope.row.user_info.full_name }}</span>
-                </template>
-              </el-table-column>-->
-              <!-- <el-table-column label="Supervisor" sortable="custom" prop="coaching.filed_by.full_name">
-              <template slot-scope="scope">
-                <span>{{ scope.row.coaching.filed_by.full_name }}</span>
-              </template>
-              </el-table-column>-->
               <el-table-column label="Schedule">
                 <template slot-scope="scope">
                   <span>{{
@@ -493,7 +483,7 @@ export default {
   watch: {
     fetchMissedLogsState:function({initial,success,fail}){
       if(success){
-        this.table.data = this.fetchMissedLogsData.missed_logs.data;
+        this.table.data = this.fetchMissedLogsData.missed_logs;
       }else{
         this.table.data = [];
       }

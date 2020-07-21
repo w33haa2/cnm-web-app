@@ -2,13 +2,19 @@
   <div style="width:100%;">
     <template v-if="Object.keys(mslot).length>0">
       <el-tooltip content="available slots/issued slots">
-        <el-tag :type="select" size="mini" @click="updateDelete(mslot)" style="cursor:pointer">{{mslot.value +"/"+mslot.original_value}}</el-tag>
+        <div :class="'tag-'+select"  @click="updateDelete(mslot)" class="cursor-pointer tag d-flex">
+          <div style="align-self:center;font-weight:700">
+            {{mslot.value +"/"+mslot.original_value}}
+          </div>
+        </div>
       </el-tooltip>
     </template>
     <template v-else>
-      <span style="color:red;">
-        NA
-      </span>
+        <div class="cursor-pointer tag d-flex tag-danger">
+          <div style="align-self:center;font-weight:700">
+            NA
+          </div>
+        </div>
     </template>
   </div>
 </template>

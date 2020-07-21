@@ -182,6 +182,7 @@ export default {
             "rta supervisor",
             "rta analyst"
           ]);
+          break;
         case "rta supervisor":
           permit = this.isPermitted([
             "rta supervisor",
