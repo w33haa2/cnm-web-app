@@ -37,7 +37,23 @@ router.beforeEach(async(to, from, next) => {
                     "permission/generateRoutes",
                     store.getters.roles
                 );
-                next();
+                var accessString = JSON.stringify(accessRoutes);
+                console.log(to.path);
+                if(to.path=="/" || to.path=="/dashboard"){
+                    next();
+                }else if(to.path.includes("/profile/index/")){
+                    next();
+                }else{
+                    // console.log(accessRoutes);
+                    // console.log(accessString);
+                    // console.log("allow:"+ accessString.includes('"path":"'+to.path+'",'));
+                    if(!accessString.includes(to.path)){
+                        next('/404');
+                    }
+                        next();
+
+                }
+
                 // alert(store.state.user.userDetails.position);
                 // router.addRoutes(accessRoutes)
             } else {

@@ -34,6 +34,21 @@ export function filterAsyncRoutes(routes, roles) {
     return res
 }
 
+
+// export function filterPermitRoutes(routes, to) {
+//     const res = []
+
+//     routes.forEach(route => {
+//         const tmp = {...route }
+//             if (tmp.children) {
+//                 tmp.children = filterPermitRoutes(tmp.children, to)
+//             }
+//             res.push(tmp)
+//     })
+
+//     return res
+// }
+
 const state = {
     routes: [],
     addRoutes: []
