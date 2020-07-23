@@ -129,29 +129,29 @@
     </div>
     <el-dialog
       title="Mandatory Change Password"
-      :visible.sync="changePassDiag"
+      :visible.sync="changePassDiag || userDetails.login_flag===0"
       :close-on-click-modal="false"
       :show-close="false"
       width="30%"
     >
-      <label>New Password</label>
-      <el-input
-        v-model="newPassword1"
-        type="password"
-        style="margin-top:3px; margin-bottom:10px;"
-      />
-      <label style="margin-top:5px; margin-bottom:3px"
-        >Confirm New Password</label
-      >
-      <el-input
-        v-model="newPassword2"
-        type="password"
-        style="margin-top:3px; margin-bottom:5px;"
-      />
+      <div class="form-label">New Password</div>
+      <div class="form-item">
+        <el-input
+          v-model="newPassword1"
+          type="password"
+        />
+      </div>
+      <div class="form-label" style="margin-top:10px;">Confirm New Password</div>
+      <div class="form-item">
+        <el-input
+          v-model="newPassword2"
+          type="password"
+        />
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="logout">Cancel</el-button>
         <el-button
-          type="primary"
+          class="change-pass-confirm"
           :disabled="employeeUpdateState.initial"
           @click="confirmChangePass"
           >Confirm</el-button
@@ -183,6 +183,8 @@ export default {
       }
     };
     return {
+      pass1_error:false,
+      pass2_error:false,
       changePassDiag: false,
       loginForm: {
         username: "",
@@ -213,7 +215,27 @@ export default {
       "employeeUpdateState",
       "employeeErrors",
       "loginError"
-    ])
+    ]),
+    validateConfirmPassword(){
+      let valid = false, pass1 = false, pass2 = false, isEqual = false;
+      if(this.newPassword1.length>7){
+          pass1 = true;
+      }
+      if(this.newPassword2.length>7){
+          pass2 = true;
+      }
+      if(this.newPassword1 == this.newPassword2){
+        isEqual = true;
+      }
+
+      if(pass1 && pass2 && isEqual){
+        valid = true;
+      }
+
+      return valid;
+    }
+
+
   },
   watch: {
     $route: {
@@ -228,6 +250,7 @@ export default {
     },
     employeeUpdateState({ initial, success, fail }) {
       if (success) {
+        this.authenticate({data:{username:this.userDetails.c_email,password: this.newPassword1}});
         this.$router.push({
           path: "/dashboard"
         });
@@ -317,22 +340,29 @@ export default {
     },
     confirmChangePass() {
       // validate first
-      if (this.newPassword1 === this.newPassword2) {
+      if (this.validateConfirmPassword) {
         const data = {
           id: this.userDetails.id,
           password: this.newPassword1
         };
         this.changePassEmployee(data);
-      } else if (this.newPassword1 !== this.newPassword2) {
-        Message.error({
-          message: "Password does not match.",
-          duration: "2500"
-        });
       } else {
-        Message.error({
-          message: "Please fill in the fields correctly.",
-          duration: "2500"
-        });
+        if (this.newPassword1.length < 8){
+            Message.error({
+              message: "Password must contain atlease 8 characters.",
+              duration: "2500"
+            });
+        }else if(this.newPassword1 !== this.newPassword2) {
+            Message.error({
+              message: "Password does not match.",
+              duration: "2500"
+            });
+        } else {
+          Message.error({
+            message: "Please fill in the fields correctly.",
+            duration: "2500"
+          });
+        }
       }
     }
   }
@@ -7658,6 +7688,16 @@ iframe {
   color: #555555;
   line-height: 1.2;
   padding: 0 26px;
+}
+
+.change-pass-confirm{
+  border-top-left-radius:0px;
+  border-bottom-right-radius:0px;
+  border-top-right-radius:10px;
+  border-bottom-left-radius:10px;
+  color:white;
+  background-color:crimson;
+  padding:10px 15px;
 }
 
 input.input100 {

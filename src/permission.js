@@ -22,66 +22,73 @@ router.beforeEach(async(to, from, next) => {
     const hasToken = store.state.user.token;
 
     if (hasToken) {
-        if (to.path === "/login") {
-            // if is logged in, redirect to the home page
-            next({ path: "/" });
+        const loginFlag = store.getters.userDetails.login_flag;
+        console.log(loginFlag)
+        if (loginFlag == 0) {
+            if (to.path != "/login") {
+                next("/login")
+            } else {
+                next();
+            }
             NProgress.done();
-        } else if (from.path === "/login") {
-            NProgress.start();
-            window.location.reload(true);
-        } else {
-            // determine whether the user has obtained his permission roles through getInfo
-            const hasRoles = store.getters.roles && store.getters.roles.length > 0;
-            if (hasRoles) {
-                const accessRoutes = await store.dispatch(
-                    "permission/generateRoutes",
-                    store.getters.roles
-                );
-                var accessString = JSON.stringify(accessRoutes);
-                console.log(accessString);
-                if (to.path == "/" || to.path == "/dashboard") {
-                    next();
-                } else if (to.path.includes("/profile/index/")) {
-                    next();
-                } else {
-                    // console.log(accessRoutes);
-                    // console.log(accessString);
-                    // console.log("allow:"+ accessString.includes('"path":"'+to.path+'",'));
-                    if (accessString.includes(to.path)) {
+        } else if (loginFlag == 1) {
+            if (to.path === "/login") {
+                // if is logged in, redirect to the home page
+                next({ path: "/" });
+                NProgress.done();
+            } else if (from.path === "/login") {
+                NProgress.start();
+                window.location.reload(true);
+            } else {
+                // determine whether the user has obtained his permission roles through getInfo
+                const hasRoles = store.getters.roles && store.getters.roles.length > 0;
+                if (hasRoles) {
+                    const accessRoutes = await store.dispatch(
+                        "permission/generateRoutes",
+                        store.getters.roles
+                    );
+                    var accessString = JSON.stringify(accessRoutes);
+                    if (to.path == "/" || to.path == "/dashboard") {
+                        next();
+                    } else if (to.path.includes("/profile/index/")) {
                         next();
                     } else {
-                        if (from.path !== "/404") {
-                            next("/404");
+                        // console.log(accessRoutes);
+                        // console.log(accessString);
+                        // console.log("allow:"+ accessString.includes('"path":"'+to.path+'",'));
+                        if (!accessString.includes(to.path)) {
+                            next('/404');
                         }
+                        next();
+
+                    }
+
+                    // alert(store.state.user.userDetails.position);
+                    // router.addRoutes(accessRoutes)
+                } else {
+                    try {
+                        // get user info
+                        // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
+                        // const { roles } = await store.dispatch("user/getInfo");
+                        // const roles = store.getters.roles;
+                        // // generate accessible routes map based on roles
+                        // const accessRoutes = await store.dispatch(
+                        //     "permission/generateRoutes",
+                        //     roles
+                        // );
+                        // // dynamically add accessible routes
+                        // router.addRoutes(accessRoutes);
+                        // // hack method to ensure that addRoutes is complete
+                        // // set the replace: true, so the navigation will not leave a history record
+                        // next({...to, replace: true });
+                    } catch (error) {
+                        // remove token and go to login page to re-login
+                        await store.dispatch("user/resetToken");
+                        Message.error(error || "Has Error");
+
+                        next(`/login?redirect=${to.path}`);
                         NProgress.done();
                     }
-                }
-
-                // alert(store.state.user.userDetails.position);
-                // router.addRoutes(accessRoutes)
-            } else {
-                try {
-                    // get user info
-                    // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-                    // const { roles } = await store.dispatch("user/getInfo");
-                    // const roles = store.getters.roles;
-                    // // generate accessible routes map based on roles
-                    // const accessRoutes = await store.dispatch(
-                    //     "permission/generateRoutes",
-                    //     roles
-                    // );
-                    // // dynamically add accessible routes
-                    // router.addRoutes(accessRoutes);
-                    // // hack method to ensure that addRoutes is complete
-                    // // set the replace: true, so the navigation will not leave a history record
-                    // next({...to, replace: true });
-                } catch (error) {
-                    // remove token and go to login page to re-login
-                    await store.dispatch("user/resetToken");
-                    Message.error(error || "Has Error");
-
-                    next(`/login?redirect=${to.path}`);
-                    NProgress.done();
                 }
             }
         }

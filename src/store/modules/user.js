@@ -207,6 +207,28 @@ const mutations = {
         state.userFullName = null;
         state.userEmail = null;
         state.loginSuccess = false;
+        state.userDetails = {
+            full_name: null,
+            id: null,
+            firstname: null,
+            lastname: null,
+            middlename: null,
+            birth_date: null,
+            gender: null,
+            address: null,
+            p_email: null,
+            contact_number: null,
+            company_id: null,
+            position: null,
+            position_id: null,
+            image_url: null,
+            login_flag: null,
+            head: null,
+            parent_id: null,
+            hired_date: null,
+            c_email: null,
+            contract: null
+        };
         resetRouter();
         ls.removeAll();
         router.push({
@@ -214,6 +236,7 @@ const mutations = {
         });
     },
     [LOGOUT.fail](state, payload) {
+        state.userDetails = null;
         state.token = null;
         state.userFullName = null;
         state.userEmail = null;
