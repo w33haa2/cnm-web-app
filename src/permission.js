@@ -38,20 +38,23 @@ router.beforeEach(async(to, from, next) => {
                     store.getters.roles
                 );
                 var accessString = JSON.stringify(accessRoutes);
-                console.log(to.path);
-                if(to.path=="/" || to.path=="/dashboard"){
+                console.log(accessString);
+                if (to.path == "/" || to.path == "/dashboard") {
                     next();
-                }else if(to.path.includes("/profile/index/")){
+                } else if (to.path.includes("/profile/index/")) {
                     next();
-                }else{
+                } else {
                     // console.log(accessRoutes);
                     // console.log(accessString);
                     // console.log("allow:"+ accessString.includes('"path":"'+to.path+'",'));
-                    if(!accessString.includes(to.path)){
-                        next('/404');
-                    }
+                    if (accessString.includes(to.path)) {
                         next();
-
+                    } else {
+                        if (from.path !== "/404") {
+                            next("/404");
+                        }
+                        NProgress.done();
+                    }
                 }
 
                 // alert(store.state.user.userDetails.position);

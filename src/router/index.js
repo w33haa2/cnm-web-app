@@ -62,18 +62,6 @@ export const constantRoutes = [{
         hidden: true
     },
     {
-        path: "/404",
-        component: () =>
-            import ("@/views/error-page/404"),
-        hidden: true
-    },
-    {
-        path: "/401",
-        component: () =>
-            import ("@/views/error-page/401"),
-        hidden: true
-    },
-    {
         path: "/",
         component: Layout,
         redirect: "/dashboard",
@@ -95,7 +83,18 @@ export const constantRoutes = [{
                 import ("@/views/profile/index")
         }]
     },
-
+    {
+        path: "/401",
+        component: () =>
+            import ("@/views/error-page/401"),
+        hidden: true
+    },
+    {
+        path: "/404",
+        component: () =>
+            import ("@/views/error-page/404"),
+        hidden: true
+    }
 ];
 
 /**
@@ -119,8 +118,8 @@ export const asyncRoutes = [{
                     import ("@/views/employee/index"),
                 name: "List",
                 meta: {
-                    title: "List"
-                        //  roles: ["admin"] // or you can only set roles in sub nav
+                    title: "List",
+                    roles: ["Admin", "HR Manager", "HR Assistant"]
                 }
             },
             {
@@ -129,8 +128,8 @@ export const asyncRoutes = [{
                     import ("@/views/employee/position"),
                 name: "Position",
                 meta: {
-                    title: "Position"
-                        // if do not set roles, means: this page does not requireincident_report
+                    title: "Position",
+                    roles: ["Admin", "HR Manager", "HR Assistant"]
                 }
             },
             {
@@ -139,8 +138,8 @@ export const asyncRoutes = [{
                     import ("@/views/employee/status"),
                 name: "Status",
                 meta: {
-                    title: "Status"
-                        // if do not set roles, means: this page does not requireincident_report
+                    title: "Status",
+                    roles: ["Admin", "HR Manager", "HR Assistant"]
                 }
             },
             {
@@ -149,7 +148,8 @@ export const asyncRoutes = [{
                     import ("@/views/cluster_log/admin"),
                 name: "Assignment",
                 meta: {
-                    title: "Assignment"
+                    title: "Assignment",
+                    roles: ["Admin", "HR Manager", "HR Assistant"]
                 }
             }
         ]
@@ -172,7 +172,8 @@ export const asyncRoutes = [{
             name: "Leave Credits",
             meta: {
                 title: "Leave Credits",
-                noCache: false
+                noCache: false,
+                roles: ["HR Manager"]
             }
         }]
     },
@@ -207,7 +208,8 @@ export const asyncRoutes = [{
             name: "Leaves",
             meta: {
                 title: "Leaves",
-                icon: "calendar-check"
+                icon: "calendar-check",
+                roles: ["Representative - Order Placer"]
             }
         }]
     },
@@ -233,7 +235,16 @@ export const asyncRoutes = [{
             meta: {
                 title: "Work Force",
                 icon: "work-force",
-                noCache: false
+                noCache: false,
+
+                roles: [
+                    "RTA Manager",
+                    "RTA Supervisor",
+                    "RTA Analyst",
+                    "Admin",
+                    "Operations Manager",
+                    "Team Leader"
+                ]
             }
         }]
     },
@@ -251,7 +262,8 @@ export const asyncRoutes = [{
             meta: {
                 title: "Cluster Log",
                 icon: "table",
-                noCache: false
+                noCache: false,
+                roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
             }
         }]
     },
@@ -268,7 +280,8 @@ export const asyncRoutes = [{
             name: "Work Report",
             meta: {
                 title: "Work Report",
-                icon: "work-report"
+                icon: "work-report",
+                roles: ["Representative - Order Placer"]
             }
         }]
     },
@@ -295,7 +308,18 @@ export const asyncRoutes = [{
             name: "Incident Reports",
             meta: {
                 title: "Incident Reports",
-                icon: "documentation"
+                icon: "documentation",
+                roles: [
+                    "Representative - Order Placer",
+                    "IT Specialist",
+                    "IT Support",
+                    "RTA Analyst",
+                    "Product Trainer", ,
+                    "Maintenance Staff",
+                    "QA Assurance Analyst",
+                    "Payroll Assistant",
+                    "Accountant"
+                ]
             }
         }]
     },
@@ -324,7 +348,8 @@ export const asyncRoutes = [{
                     import ("@/views/incident_reports/receive"),
                 name: "Receive",
                 meta: {
-                    title: "Receive"
+                    title: "Receive",
+
                 }
             },
             {
@@ -333,7 +358,17 @@ export const asyncRoutes = [{
                     import ("@/views/incident_reports/issue"),
                 name: "Issue",
                 meta: {
-                    title: "Issue"
+                    title: "Issue",
+                    roles: [
+                        "Finance Officer",
+                        "Team Leader",
+                        "Operations Manager",
+                        "RTA Supervisor",
+                        "RTA Manager",
+                        "QA Supervisor",
+                        "T & Q Manager",
+                        "IT Supervisor"
+                    ]
                 }
             }
         ]
@@ -360,7 +395,17 @@ export const asyncRoutes = [{
             name: "Agent Schedules",
             meta: {
                 title: "Agent Schedules",
-                icon: "calendar"
+                icon: "calendar",
+                roles: [
+                    "Operations Manager",
+                    "Team Leader",
+                    "RTA Manager",
+                    "RTA Supervisor",
+                    "RTA Analyst",
+                    "HR Manager",
+                    "HR Assistant",
+                    "Admin"
+                ]
             }
         }]
     },
@@ -384,7 +429,14 @@ export const asyncRoutes = [{
             meta: {
                 title: "Agent Leave",
                 noCache: false,
-                icon: "calendar-check"
+                icon: "calendar-check",
+                roles: [
+                    "Operations Manager",
+                    "Team Leader",
+                    "RTA Manager",
+                    "RTA Supervisor",
+                    "RTA Analyst"
+                ]
 
                 // if do not set roles, means: this page does not requireincident_report
             }
@@ -404,7 +456,8 @@ export const asyncRoutes = [{
             meta: {
                 title: "Agent Leave Slots",
                 noCache: false,
-                icon: "calendar-slots"
+                icon: "calendar-slots",
+                roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
 
                 // if do not set roles, means: this page does not requireincident_report
             }
@@ -424,7 +477,9 @@ export const asyncRoutes = [{
             meta: {
                 title: "Agent VTO",
                 noCache: false,
-                icon: "vto"
+                icon: "vto",
+
+                roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
             }
         }]
     },
@@ -432,7 +487,14 @@ export const asyncRoutes = [{
         path: "/missed_logs",
         component: Layout,
         meta: {
-            roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst", "Operations Manager", "Team Leader", "Representative - Order Placer"]
+            roles: [
+                "RTA Manager",
+                "RTA Supervisor",
+                "RTA Analyst",
+                "Operations Manager",
+                "Team Leader",
+                "Representative - Order Placer"
+            ]
         },
         children: [{
             path: "/missed_logs",
@@ -442,7 +504,16 @@ export const asyncRoutes = [{
             meta: {
                 title: "Missed Logs",
                 icon: "missed_logs",
-                noCache: false
+                noCache: false,
+
+                roles: [
+                    "RTA Manager",
+                    "RTA Supervisor",
+                    "RTA Analyst",
+                    "Operations Manager",
+                    "Team Leader",
+                    "Representative - Order Placer"
+                ]
             }
         }]
     },
@@ -469,6 +540,9 @@ export const asyncRoutes = [{
         component: Layout,
         redirect: "/action_logs",
         //  alwaysShow: true, // will always show the root menu
+        meta: {
+            roles: ["Admin", "HR Manager"]
+        },
         children: [{
             path: "/action_logs",
             component: () =>
@@ -485,6 +559,9 @@ export const asyncRoutes = [{
         path: "overtime_schedules",
         component: Layout,
         redirect: "/overtime_schedules",
+        meta: {
+            roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
+        },
         //  alwaysShow: true, // will always show the root menu
         children: [{
             path: "/overtime_schedules",
@@ -502,6 +579,9 @@ export const asyncRoutes = [{
         path: "overtime_agents",
         component: Layout,
         hidden: true,
+        meta: {
+            roles: ["RTA Manager", "RTA Supervisor", "RTA Analyst"]
+        },
         children: [{
             path: "/overtime_agents/:id*",
             component: () =>
@@ -515,7 +595,6 @@ export const asyncRoutes = [{
 
     // 404 page must be placed at the end !!!
     { path: "*", redirect: "/404", hidden: true }
-
 ];
 
 const createRouter = () =>
