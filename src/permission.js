@@ -57,9 +57,14 @@ router.beforeEach(async(to, from, next) => {
                         // console.log(accessString);
                         // console.log("allow:"+ accessString.includes('"path":"'+to.path+'",'));
                         if (!accessString.includes(to.path)) {
-                            next('/404');
+                            if (from.path !== "/404") {
+                                next('/404');
+                            } else {
+                                NProgress.done();
+                            }
+                        } else {
+                            next();
                         }
-                        next();
 
                     }
 
