@@ -25,7 +25,7 @@
             :current-page.sync="table.request.page"
             :page-size="table.request.perpage"
             layout="total, sizes, prev, pager, next"
-            :total="fetchMissedLogsData.missed_logs.total"
+            :total="fetchMissedLogsData.count"
             @current-change="tablePageChange"
             @size-change="tableSizeChange"
           />
@@ -238,7 +238,7 @@
       <el-row>
         <el-col>
           <el-table
-            :data="fetchMissedLogsData.missed_logs.data"
+            :data="fetchMissedLogsData.missed_logs"
             v-loading="table.loader"
             @sort-change="columnSort"
           >
