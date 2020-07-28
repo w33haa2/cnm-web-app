@@ -149,7 +149,7 @@
         />
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="logout">Cancel</el-button>
+        <!-- <el-button @click="logout">Cancel</el-button> -->
         <el-button
           class="change-pass-confirm"
           :disabled="employeeUpdateState.initial"

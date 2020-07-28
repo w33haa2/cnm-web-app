@@ -19,7 +19,10 @@
             ></el-input>
           </el-col>
           <el-col :md="{ span: 4 }">
-            <el-select v-model="table.request.type" :disabled="fetchMissedLogsState.initial">
+            <el-select
+              v-model="table.request.type"
+              :disabled="fetchMissedLogsState.initial"
+            >
               <el-option :value="null" label="All" />
               <el-option value="tardy" label="Tardy" />
               <el-option value="undertime" label="Undertime" />
@@ -31,7 +34,7 @@
       <div class="table-container shadow">
         <!-- DISPLAY RECORDS & PAGINATION -->
         <el-row :gutter="8">
-          <el-col :md="{span:12}">
+          <el-col :md="{ span: 12 }">
             {{
               table.request.type
                 ? ucwords(remUnderscore(table.request.type))
@@ -45,11 +48,11 @@
               background
               :disabled="fetchMissedLogsState.initial"
               :pager-count="5"
-              :page-sizes="[15, 50, 100]"
+              :page-sizes="[10, 25, 50]"
               :current-page.sync="table.request.page"
               :page-size="table.request.perpage"
               layout="total, sizes, prev, pager, next"
-              :total="fetchMissedLogsData.missed_logs.total"
+              :total="table.count"
               @current-change="tablePageChange"
               @size-change="tableSizeChange"
             />
@@ -63,190 +66,182 @@
               style="margin-top:5px;"
               class="monday"
             >
-              <el-table-column label="Type">
-                <template slot-scope="scope">
-                  <span
-                    :style="
-                      scope.row.log_status[0] != 'punctual'
-                        ? 'color:#F56C6C'
-                        : ''
-                    "
-                    >{{ scope.row.log_status[0] }}</span
-                  >
-                  <span>-</span>
-                  <span
-                    :style="
-                      scope.row.log_status[1] != 'timed_out'
-                        ? 'color:#F56C6C'
-                        : ''
-                    "
-                    >{{ scope.row.log_status[1] }}</span
-                  >
-                </template>
-              </el-table-column>
               <el-table-column label="Date" sortable="custom" prop="date">
                 <template slot-scope="scope">
-                  <span>{{
-                    scope.row.date.day + ", " + scope.row.date.ymd
-                  }}</span>
+                  <div style="display:flex;justify-content:center">
+                    <div style="align-self:center;">
+                      {{
+                        formatDate(scope.row.date.ymd, "", "ddd. MMM Do, YYYY")
+                      }}
+                    </div>
+                  </div>
                 </template>
               </el-table-column>
-              <el-table-column label="Schedule">
+              <el-table-column label="Type">
                 <template slot-scope="scope">
-                  <span>{{
-                    formatDate(scope.row.start_event.date, "", "hh:mm a") +
-                      " - " +
-                      formatDate(scope.row.end_event.date, "", "hh:mm a")
-                  }}</span>
+                  <div class="d-flex" style="justify-content:center">
+                    <div style="align-self:center">
+                      <span
+                        :style="
+                          scope.row.log_status[0] != 'punctual'
+                            ? 'color:#F56C6C'
+                            : ''
+                        "
+                        >{{
+                          ucwords(remUnderscore(scope.row.log_status[0]))
+                        }}</span
+                      >
+                      <span>-</span>
+                      <span
+                        :style="
+                          scope.row.log_status[1] != 'timed_out'
+                            ? 'color:#F56C6C'
+                            : ''
+                        "
+                        >{{
+                          ucwords(remUnderscore(scope.row.log_status[1]))
+                        }}</span
+                      >
+                    </div>
+                  </div>
                 </template>
               </el-table-column>
-              <el-table-column label="Log">
+              <!-- view coaching -->
+              <el-table-column width="50">
                 <template slot-scope="scope">
-                  <span>{{
-                    formatDate(scope.row.time_in.date, "", "hh:mm a") + " - "
-                  }}</span>
-                  <template v-if="scope.row.time_out">
-                    <span>{{
-                      formatDate(scope.row.time_out.date, "", "hh:mm a")
-                    }}</span>
+                  <template v-if="scope.row.log_status[1] == 'no_timeout'">
+                    <el-tooltip content="View Coaching" placement="top">
+                      <div
+                        style="height:45px;display:flex;justify-content:center;cursor:pointer;"
+                        :style="
+                          scope.row.coaching != null
+                            ? 'cursor:pointer;'
+                            : 'cursor:not-allowed;'
+                        "
+                        @click="
+                          scope.row.coaching != null ? viewRow(scope.row) : null
+                        "
+                      >
+                        <div style="align-self:center;color:gray;font-size:2em">
+                          <eye-icon></eye-icon>
+                        </div>
+                      </div>
+                    </el-tooltip>
                   </template>
-                  <template v-else>
-                    <span style="color:#F56C6C">No data</span>
-                  </template>
                 </template>
               </el-table-column>
-              <el-table-column label="Coaching approval">
+
+              <el-table-column width="60">
                 <template slot-scope="scope">
-                  <el-tag
-                    :type="
+                  <el-tooltip
+                    :content="
+                      scope.row.coaching
+                        ? 'Coaching available'
+                        : 'No coaching filed'
+                    "
+                    placement="top"
+                  >
+                    <div
+                      style="height:45px;"
+                      class="tag w-100"
+                      :class="
+                        scope.row.coaching != null
+                          ? 'tag-success'
+                          : 'tag-warning'
+                      "
+                    ></div>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+              <el-table-column width="60">
+                <template slot-scope="scope">
+                  <el-tooltip
+                    placement="top"
+                    :content="
                       scope.row.coaching
                         ? scope.row.coaching.filed_to_action
                           ? scope.row.coaching.filed_to_action == 'approved'
-                            ? 'success'
-                            : 'danger'
-                          : 'warning'
-                        : 'info'
+                            ? 'Approved'
+                            : 'Disapproved'
+                          : 'Waiting for agent response'
+                        : 'No coaching filed'
                     "
                   >
-                    {{
-                      scope.row.coaching
-                        ? scope.row.coaching.filed_to_action
-                          ? scope.row.coaching.filed_to_action == "approved"
-                            ? "Approved"
-                            : "Disapproved"
-                          : "Please respond"
-                        : "No coaching available"
-                    }}
-                  </el-tag>
+                    <div
+                      class="tag w-100"
+                      :class="
+                        scope.row.coaching
+                          ? scope.row.coaching.filed_to_action
+                            ? scope.row.coaching.filed_to_action == 'approved'
+                              ? 'tag-success'
+                              : 'tag-danger'
+                            : 'tag-warning'
+                          : 'tag-warning'
+                      "
+                    ></div>
+                  </el-tooltip>
                 </template>
               </el-table-column>
-              <el-table-column label="Coaching progress">
+              <el-table-column width="60">
                 <template slot-scope="scope">
-                  <template v-if="scope.row.log_status[1] == 'no_timeout'">
+                  <el-tooltip
+                    placement="top"
+                    :content="
+                      scope.row.coaching
+                        ? scope.row.coaching.filed_to_action
+                          ? scope.row.coaching.filed_to_action == 'approved'
+                            ? scope.row.coaching.verified_by
+                              ? 'Verified'
+                              : 'Waiting for verification'
+                            : 'Process denied'
+                          : 'Waiting for agent response'
+                        : 'No coaching filed'
+                    "
+                  >
                     <div
-                      :style="scope.row.coaching ? 'cursor:pointer' : ''"
-                      @click="scope.row.coaching ? viewRow(scope.row) : ''"
-                    >
-                      <el-row gutter="1">
-                        <el-col
-                          :xs="{ span: 8 }"
-                          :sm="{ span: 8 }"
-                          :md="{ span: 8 }"
-                        >
-                          <el-tooltip
-                            :content="
-                              scope.row.coaching
-                                ? 'Coaching available'
-                                : 'No coaching filed'
-                            "
-                          >
-                            <div
-                              class="progress-box"
-                              :style="
-                                'background-color:' +
-                                  (scope.row.coaching ? '#67C23A' : '')
-                              "
-                            ></div>
-                          </el-tooltip>
-                        </el-col>
-                        <el-col
-                          :xs="{ span: 8 }"
-                          :sm="{ span: 8 }"
-                          :md="{ span: 8 }"
-                        >
-                          <el-tooltip
-                            :content="
-                              scope.row.coaching
-                                ? scope.row.coaching.filed_to_action
-                                  ? scope.row.coaching.filed_to_action ==
-                                    'approved'
-                                    ? 'Approved'
-                                    : 'Disapproved'
-                                  : 'Waiting for agent response'
-                                : 'No coaching filed'
-                            "
-                          >
-                            <div
-                              class="progress-box"
-                              :style="
-                                'background-color:' +
-                                  (scope.row.coaching
-                                    ? scope.row.coaching.filed_to_action
-                                      ? scope.row.coaching.filed_to_action ==
-                                        'approved'
-                                        ? '#67C23A'
-                                        : '#F56C6C'
-                                      : '#E6A23C'
-                                    : '')
-                              "
-                            ></div>
-                          </el-tooltip>
-                        </el-col>
-                        <el-col
-                          :xs="{ span: 8 }"
-                          :sm="{ span: 8 }"
-                          :md="{ span: 8 }"
-                        >
-                          <el-tooltip
-                            :content="
-                              scope.row.coaching
-                                ? scope.row.coaching.filed_to_action
-                                  ? scope.row.coaching.filed_to_action ==
-                                    'approved'
-                                    ? scope.row.coaching.verified_by
-                                      ? 'Verified'
-                                      : 'Waiting for verification'
-                                    : 'Process denied'
-                                  : 'Waiting for agent response'
-                                : 'No coaching filed'
-                            "
-                          >
-                            <div
-                              class="progress-box"
-                              :style="
-                                'background-color:' +
-                                  (scope.row.coaching
-                                    ? scope.row.coaching.filed_to_action
-                                      ? scope.row.coaching.filed_to_action ==
-                                        'approved'
-                                        ? scope.row.coaching.verified_by
-                                          ? '#67C23A'
-                                          : '#E6A23C'
-                                        : '#F56C6C'
-                                      : ''
-                                    : '')
-                              "
-                            ></div>
-                          </el-tooltip>
-                        </el-col>
-                      </el-row>
+                      class="tag w-100"
+                      :class="
+                        scope.row.coaching
+                          ? scope.row.coaching.filed_to_action
+                            ? scope.row.coaching.filed_to_action == 'approved'
+                              ? scope.row.coaching.verified_by
+                                ? 'tag-success'
+                                : 'tag-warning'
+                              : 'tag-danger'
+                            : 'tag-warning'
+                          : 'tag-warning'
+                      "
+                    ></div>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+              <el-table-column label="Status">
+                <template slot-scope="scope">
+                  <div
+                    style="justify-content:center;height:45px;color:white;"
+                    class="d-flex"
+                    :class="
+                      scope.row.coaching
+                        ? scope.row.coaching.filed_to_action
+                          ? scope.row.coaching.filed_to_action == 'approved'
+                            ? 'bg-warning'
+                            : 'bg-danger'
+                          : 'bg-warning'
+                        : 'bg-info'
+                    "
+                  >
+                    <div style="align-self:center">
+                      {{
+                        scope.row.coaching
+                          ? scope.row.coaching.filed_to_action
+                            ? scope.row.coaching.filed_to_action == "approved"
+                              ? "Waiting for RTA Verification"
+                              : "Disapproved"
+                            : "Waiting for your approval"
+                          : "No coaching available"
+                      }}
                     </div>
-                  </template>
-                  <template v-else>
-                    <el-tag type="info" style="text-align:center;width:100%"
-                      >Coaching Unavailable</el-tag
-                    >
-                  </template>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
@@ -286,12 +281,16 @@
             </el-col>
           </template>
           <template v-if="form.coaching.action != 'Create'">
-            <el-button size="mini" @click="showProof()">Show Proof</el-button>
+            <el-col>
+              <el-button size="mini" @click="showProof()">Show Proof</el-button>
+            </el-col>
           </template>
-          <el-col>
-            <h5>Coaching Details</h5>
+          <el-col style="margin-top:30px;">
+            <div class="form-label">Coaching Details</div>
           </el-col>
-          <el-col :md="8" style="margin-bottom:5px;">
+          <el-col style="margin-top:10px;">
+            <el-row>
+              <el-col :md="8" style="margin-bottom:5px;">
             <span>Agent</span>
           </el-col>
           <el-col :md="16" style="margin-bottom:5px;">
@@ -321,8 +320,10 @@
           <el-col :md="16" style="margin-bottom:5px;">
             <span>{{ form.coaching.details.log_status }}</span>
           </el-col>
+            </el-row>
+          </el-col>
           <el-col>
-            <h5>Remarks</h5>
+            <div class="form-label mt-15">Remarks</div>
           </el-col>
           <template v-if="form.coaching.action != 'View'">
             <el-col>
@@ -345,8 +346,8 @@
           <template
             v-if="position.toLowerCase() == 'representative - order placer'"
           >
-            <el-button-group>
               <el-button
+              style="color:white"
                 type="danger"
                 size="mini"
                 plain
@@ -366,9 +367,11 @@
                       : false)
                 "
               >
-                <svg-icon icon-class="thumbs-down"></svg-icon>
+              Disapprove
+                <!-- <svg-icon icon-class="thumbs-down"></svg-icon> -->
               </el-button>
               <el-button
+              style="color:white"
                 type="success"
                 size="mini"
                 plain
@@ -388,9 +391,9 @@
                       : false)
                 "
               >
-                <svg-icon icon-class="thumbs-up"></svg-icon>
+              Approve
+                <!-- <svg-icon icon-class="thumbs-up"></svg-icon> -->
               </el-button>
-            </el-button-group>
           </template>
         </span>
       </el-dialog>
@@ -449,7 +452,8 @@ export default {
       },
       table: {
         loader: false,
-        data:[],
+        data: [],
+        count: 0,
         request: {
           page: 1,
           perpage: 15,
@@ -481,22 +485,24 @@ export default {
     ])
   },
   watch: {
-    fetchMissedLogsState:function({initial,success,fail}){
-      if(success){
+    fetchMissedLogsState: function({ initial, success, fail }) {
+      if (success) {
         this.table.data = this.fetchMissedLogsData.missed_logs;
-      }else{
+        this.table.count = this.fetchMissedLogsData.count;
+      } else {
         this.table.data = [];
+        this.table.count = 0;
       }
-    },
+    }
     // "table.request.status": function(v) {
     //   this.fetchMissedLogs(this.unsetNull(this.table.request));
     // }
   },
   methods: {
     ...mapActions(["fetchMissedLogs", "createCoaching"]),
-    debounceInput:debounce(function(e){
-      this.fetchMissedLogs(this.table.request)
-    },1000),
+    debounceInput: debounce(function(e) {
+      this.fetchMissedLogs(this.table.request);
+    }, 1000),
     updateAgentApproval(data) {
       if (confirm("Do you want to proceed?")) {
         axios
@@ -667,45 +673,61 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.card-content-text {
-  color: #777;
-  font-size: 0.7em;
+<style scoped>
+.user-block >>> .img-circle {
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
 }
-.clear-fix:before,
-.clear-fix:after {
-  display: table;
-  content: "";
-}
-
-.clear-fix:after {
-  clear: both;
+.monday >>> td > .user-block >>> div > img {
+  padding: 0px;
+  margin: 0px;
 }
 
-.user-block {
-  .username,
-  .description {
-    display: block;
-    margin-left: 50px;
-    padding: 2px 0;
-  }
-  .username {
-    // font-size: 0.8em;
-    color: #777;
-  }
-  :after {
-    clear: both;
-  }
-  .img-circle {
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    float: left;
-  }
-  span {
-    font-weight: 500;
-    margin-left: 10px;
-    // font-size: 0.8em;
-  }
+.monday >>> th {
+  background-color: white !important;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
+
+.monday >>> th >>> .cell {
+  font-weight: light !important;
+}
+.monday >>> td:first-child {
+  border-left: 5px solid crimson;
+  height: 45px;
+}
+.monday >>> .el-table__row tr {
+  background-color: #efefef;
+  border-left: white solid 1px;
+  border-bottom: white solid 1px;
+  padding: 0px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+.monday >>> td {
+  background-color: #efefef;
+  border: white solid 1px;
+  padding: 0px;
+}
+.monday >>> .cell {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+.monday >>> td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+th >>> .cell {
+  font-weight: normal !important;
+  font-size: 0.8em !important;
 }
 </style>

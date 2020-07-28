@@ -310,6 +310,7 @@ export default {
 }
 .monday >>> td:first-child {
   border-left:5px solid crimson;
+  height:45px;
 }
 .monday >>> .el-table__row tr {
   background-color: #efefef;
