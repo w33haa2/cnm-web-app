@@ -904,3 +904,23 @@
                 }
             }
         }
+        
+        .step-badge {
+            padding: 5px 15px;
+            border-radius: 3px;
+            border: .5px solid rgb(168, 168, 255);
+            background-color: #c8deff;
+            font-size: .8em;
+            font-weight: bold;
+            color: rgb(100, 100, 161);
+        }
+        
+        .hint-badge {
+            padding: 5px 15px;
+            border-radius: 3px;
+            border: .5px solid rgb(255, 217, 168);
+            background-color: rgb(255, 234, 208);
+            font-size: .8em;
+            font-weight: bold;
+            color: rgb(196, 152, 95);
+        }

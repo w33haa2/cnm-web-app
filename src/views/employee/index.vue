@@ -50,7 +50,7 @@
               style="display:flex;justify-content:center;margin-right:5px;"
               @click="handleCommand('downloadEmployeeList')"
             >
-              <el-tooltip placement="top" content="Export Employee">
+              <el-tooltip placement="top" content="Export Employees">
                 <file-export-icon></file-export-icon>
               </el-tooltip>
             </div>

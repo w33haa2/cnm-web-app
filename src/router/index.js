@@ -5,6 +5,7 @@ Vue.use(Router);
 
 /* Layout */
 import Layout from "@/layout";
+import GuideLayout from "@/layout/guide";
 
 /* Router Modules */
 import componentsRouter from "./modules/components";
@@ -153,6 +154,19 @@ export const asyncRoutes = [{
                 }
             }
         ]
+    },
+
+    {
+        path: "guide",
+        component: GuideLayout,
+        redirect: "/guide",
+        children: [{
+            path: "/guide",
+            component: () =>
+                import ("@/views/guide/index"),
+            name: "Guide",
+            meta: { title: "Guide", icon: "user", affix: true }
+        }]
     },
     IrRouter,
     {

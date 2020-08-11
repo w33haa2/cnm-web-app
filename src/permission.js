@@ -47,6 +47,7 @@ router.beforeEach(async(to, from, next) => {
                         "permission/generateRoutes",
                         store.getters.roles
                     );
+                    console.log(to.path);
                     var accessString = JSON.stringify(accessRoutes);
                     if (to.path == "/" || to.path == "/dashboard") {
                         next();

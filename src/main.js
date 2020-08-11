@@ -9,6 +9,10 @@ import './styles/element-variables.scss';
 
 import moment from 'moment';
 
+import VueScrollTo from "vue-scrollto";
+Vue.use(VueScrollTo);
+import NavScroll from 'navscroll';
+Vue.use(NavScroll);
 // material icons
 import TuneIcon from 'vue-material-design-icons/Tune.vue';
 Vue.component('tune-icon', TuneIcon);
@@ -56,6 +60,8 @@ import CheckBoldIcon from 'vue-material-design-icons/CheckBold.vue';
 Vue.component('check-bold-icon', CheckBoldIcon);
 import MicrosoftExcelIcon from 'vue-material-design-icons/MicrosoftExcel.vue';
 Vue.component('ms-excel-icon', MicrosoftExcelIcon);
+import OpenInNewIcon from 'vue-material-design-icons/OpenInNew.vue';
+Vue.component('open-in-new-icon', OpenInNewIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
