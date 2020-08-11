@@ -53,6 +53,8 @@ router.beforeEach(async(to, from, next) => {
                         next();
                     } else if (to.path.includes("/profile/index/")) {
                         next();
+                    } else if (to.path.includes("/guide/index")) {
+                        next();
                     } else {
                         // console.log(accessRoutes);
                         // console.log(accessString);

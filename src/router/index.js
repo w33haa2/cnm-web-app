@@ -84,6 +84,18 @@ export const constantRoutes = [{
                 import ("@/views/profile/index")
         }]
     },
+
+
+    {
+        path: "/guide",
+        component: GuideLayout,
+        hidden: true,
+        children: [{
+            path: "index",
+            component: () =>
+                import ("@/views/guide/index"),
+        }]
+    },
     {
         path: "/401",
         component: () =>
@@ -156,18 +168,6 @@ export const asyncRoutes = [{
         ]
     },
 
-    {
-        path: "guide",
-        component: GuideLayout,
-        redirect: "/guide",
-        children: [{
-            path: "/guide",
-            component: () =>
-                import ("@/views/guide/index"),
-            name: "Guide",
-            meta: { title: "Guide", icon: "user", affix: true }
-        }]
-    },
     IrRouter,
     {
         path: "leave_credits",
@@ -606,7 +606,6 @@ export const asyncRoutes = [{
             }
         }]
     },
-
     // 404 page must be placed at the end !!!
     { path: "*", redirect: "/404", hidden: true }
 ];

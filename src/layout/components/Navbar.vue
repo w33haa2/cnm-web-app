@@ -34,6 +34,9 @@
           <router-link :to="'/profile/index/'+userDetails.id">
             <el-dropdown-item>Profile</el-dropdown-item>
           </router-link>
+          <router-link :to="'/guide/index'" target="_blank">
+            <el-dropdown-item>Guide</el-dropdown-item>
+          </router-link>
           <router-link to="/">
             <el-dropdown-item>Dashboard</el-dropdown-item>
           </router-link>
