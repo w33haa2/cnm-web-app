@@ -1,3 +1,53 @@
+/**
+ *  THE API GUIDE
+ * 
+ * 
+ * -> name (string) -> represent the page name.
+ * 
+ * -> url (string) -> path of the page which creates an icon button for redirect.
+ * 
+ * -> link (string) -> a unique key which is used for navigation events (on click and on scroll).
+ * 
+ * -> roles (array) -> array of string that contains role names. This will be the basis for the data visibility by role (If the array is empty it will be visible to all roles, else it will only be visible to the listed roles.).
+ * 
+ * -> features (array of object) -> list of the features under the page.
+ * 
+ * 
+ * 
+ * features object
+ * 
+ * ---> name (string) -> represent the feature name.
+ * 
+ * ---> description (string) -> additional information that is display beside the feature name.
+ * 
+ * ---> link (string) -> a unique key which is used for navigation events (on click and on scroll).
+ * 
+ * ---> roles (array) -> array of string that contains role names. This will be the basis for the data visibility by role (If the array is empty it will be visible to all roles, else it will only be visible to the listed roles.)
+ * 
+ * ---> steps (array object) -> array that contains steps under this feature. (numbering of steps is based on the array order).
+ * 
+ * ---> hints (array object) -> array that contains steps under this feature. (numbering of steps is based on the array order).
+ * 
+ * 
+ * 
+ * steps object
+ * 
+ * ------> step (string) -> step instruction.
+ * ------> link (string) -> key that correspond to other links on the guide page. (for guide redirection).
+ * 
+ * 
+ * 
+ * hints object
+ * 
+ * ------> hint (string)
+ * ------> link (string) -> key that correspond to other links on the guide page. (for guide redirection).
+ */
+
+
+
+
+
+
 export const guide_obj = [
     // employee page
     {
@@ -13,7 +63,7 @@ export const guide_obj = [
         description: null,
         url: "/employee",
         link: "employee_list",
-        roles: ["HR Manager", "HR Assistant", "Admin"], // this will only show to roles included
+        roles: ["HR Manager", "HR Assistant", "Admin"],
         features: [
             // add employee
             {
@@ -43,7 +93,7 @@ export const guide_obj = [
                     style: "",
                     class: "",
                     icon: "",
-                    tooltip: ""
+                    tooltip: "Change Employee Status"
                 },
                 steps: [],
                 hints: [],
