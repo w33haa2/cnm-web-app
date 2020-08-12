@@ -23,7 +23,7 @@
           </div>
         </a>
         <template v-if="item.features.length > 0">
-          <div :key="index" class="sub-nav">
+          <div :key="'sub'+index" class="sub-nav">
             <template v-for="(item1, index1) in item.features">
               <a
                 @click.prevent="redirectBack"

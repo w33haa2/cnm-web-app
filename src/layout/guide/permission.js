@@ -18,12 +18,13 @@ export const guide_obj = [
             // add employee
             {
                 name: "Add Employee",
-                description: null,
+                description: "Adding an employee using the application form.",
                 link: "add_employee",
                 button: {
                     style: "",
-                    class: "",
-                    icon: "",
+                    class: "active",
+                    icon: "plus-icon",
+                    tooltip: "Add Employee"
                 },
                 steps: [
                     { step: "Click the button to display form.", link: null, },
@@ -31,7 +32,7 @@ export const guide_obj = [
                     { step: "Click confirm to save.", link: null, },
                 ],
                 hints: [{ hint: "To upload an existing image to the form, Click the avatar image on the form to trigger image upload.", link: null }],
-                roles: [],
+                roles: ["HR Manager", "HR Assistant", "Admin"],
             },
             // change employee status
             {
@@ -42,6 +43,7 @@ export const guide_obj = [
                     style: "",
                     class: "",
                     icon: "",
+                    tooltip: ""
                 },
                 steps: [],
                 hints: [],

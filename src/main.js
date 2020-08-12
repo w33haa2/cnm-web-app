@@ -62,6 +62,8 @@ import MicrosoftExcelIcon from 'vue-material-design-icons/MicrosoftExcel.vue';
 Vue.component('ms-excel-icon', MicrosoftExcelIcon);
 import OpenInNewIcon from 'vue-material-design-icons/OpenInNew.vue';
 Vue.component('open-in-new-icon', OpenInNewIcon);
+import ArrowRightThickIcon from 'vue-material-design-icons/ArrowRightThick.vue';
+Vue.component('arrow-right-thick-icon', ArrowRightThickIcon);
 import 'vue-material-design-icons/styles.css';
 
 import '@/styles/index.scss' // global css
