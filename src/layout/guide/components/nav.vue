@@ -1,5 +1,5 @@
 <template>
-  <div style="width:100%; padding:10px 0px 15px 30px;">
+  <div style="width:100%; padding:10px 15px 15px 30px;" class="page-nav">
     <navscroll
       container=".content-container"
       item-selector=".guide-nav-item"
@@ -75,18 +75,15 @@ export default {
 .guide-nav {
   min-height: 100vh;
   width: 100%;
-  background-color: #ffecec;
+  background-color: #f4f4f4;
   .navscroll-js {
     .guide-nav-item {
       font-size: 0.8em;
       cursor: pointer;
 
       &.active div {
-        background-color: white;
-        border-radius: 8px 0px 0px 8px;
-        padding-left: 15px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        // background-color: white;
+        border-radius: 5px 5px 5px 5px;
         font-weight: bold;
         color: crimson;
       }
@@ -95,6 +92,11 @@ export default {
 
   .sub-nav {
     padding-left: 20px;
+  }
+
+  .page-nav{
+      height:calc(100vh - 70px);
+      overflow-y:scroll;
   }
 }
 </style>

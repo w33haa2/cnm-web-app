@@ -1,9 +1,9 @@
 <template>
   <div>
       <template v-for="(item,index) in guide_obj">
-          <div :key="'page'+index" v-if="item.name!='Introduction'">
+          <div :key="'page'+index" v-if="item.name!='Introduction'" :id="item.link">
               <template v-if="item.roles.length===0 || item.roles.includes(position)">
-              <page-title :title="item.name" :url="item.url" style="margin-bottom:30px;"></page-title>
+              <page-title :title="item.name" :url="item.url" style="margin-bottom:50px;" :description="item.description"></page-title>
                 <!-- features -->
                 <template v-if="item.features.length>0">
                     <template v-for="(feature,index1) in item.features">

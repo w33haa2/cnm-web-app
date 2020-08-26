@@ -1,7 +1,7 @@
 <template>
   <div class="guide-wrapper">
     <el-row>
-      <el-col :md="{ span: 5 }">
+      <el-col :md="{ span: 5 }" :sm="{ span: 8 }" :xs="{ span: 0 }">
         <div class="guide-nav">
           <div
             style="display:flex;font-size:1.1em;padding:10px;height:50px;padding-top:20px;justify-content:center"
@@ -24,16 +24,22 @@
           </div>
           <hr style="color:#eee;background-color:#eee" />
           <guide-nav />
+          <!-- <div style="background-color:white">
+            <img src="miniwithlabel.png" alt="" height="50px;">
+          </div> -->
         </div>
       </el-col>
-      <el-col :md="{ span: 19 }">
+      <el-col :md="{ span: 19 }" :sm="{ span: 16 }" :xs="{ span: 24 }">
         <div class="content-container">
           <div style="font-weight:bolder;font-size:2em;">
             Guide
           </div>
           <!-- navigate content-->
 
-          <div style="margin-top:30px;font-size:1.5em;color:gray" id="introduction">
+          <div
+            style="margin-top:30px;font-size:1.5em;color:gray"
+            id="introduction"
+          >
             Introduction
           </div>
           <div class="intro-content text indent">
@@ -51,77 +57,85 @@
             title bar for easy usage.
           </div>
 
-          <div class="divider text indent">
-            As a {{ this.position }}, the role is basically focused on managing
-            employee details, leaves and monitoring incident reports. Below is
-            the list of pages you can access together with its features.
-          </div>
-          <div style="margin-top:40px;" id="employee_list">
+          <template>
+            <div class="divider text indent" style="padding-bottom:70px;">
+              As an Order Placer, You can use this web application to create your timelogs, review your work reports, request for leaves (leave of absence or vacation leave, other leave type that requires document approval from HR must be done personally.) and respond to Issued incident reports by your leaders.
+            </div>
+          </template>
+
+          <template v-if="position == 'Representative - Order Placer'">
+            <div>
+              <div class="divider" style="margin-top:30px;">
+                <div class="d-flex">
+                  <div style="width:50px;align-self:center">
+                    <div
+                      style="background-color:coral;color:white;border-radius:8px 0px 0px 8px;display:flex;justify-content:center;min-height:50px;"
+                    >
+                      <i
+                        class="el-icon-timer drawer-button-icon"
+                        style="align-self:center;font-size:2em;"
+                      />
+                    </div>
+                  </div>
+                  <div
+                    style="font-size:1.2em;color:gray;align-self:center;margin-left:20px;"
+                  >
+                    Time Logger Drawer
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider text indent">
+                A button found on the lower-right side of your pages. This
+                button toggles a side drawer that contains time log
+                functionalities and the display of work history.
+              </div>
+              <!-- start work -->
+              <div class="divider" style="margin-top:30px;">
+                <div>
+                  The <el-button round type="success" size="small">Start Work</el-button> Button
+                </div>
+                <div class="divider text indent">
+                  A button that will log your work time in stamp. This will only be visible when you have a schedule. If your current schedule has an approved leave then this button is not visible. After activating this button it will be replaced by the End Work Button.
+                </div>
+              </div>
+              <!-- end work -->
+              <div class="divider" style="margin-top:30px;">
+                <div>
+                  The <el-button round type="primary" size="small">End Work</el-button> Button
+                </div>
+                <div class="divider text indent">
+                  A button that will log your work time out stamp.
+                </div>
+              </div>
+              <!-- join ot -->
+              <div class="divider" style="margin-top:30px;">
+                <div>
+                  The <el-button round type="warning" size="small">Join OT</el-button> Button <small>(Join Overtime)</small>
+                </div>
+                <div class="divider text indent">
+                  A button that will creates your overtime schedule and automatically creates your time in stamp. This button will only be visible if the Overtime schedule has no conflicts with your regular schedule. After activating this button it will be replaced by the End Work Button.
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div style="margin-top:40px;">
             <page-and-features></page-and-features>
           </div>
         </div>
       </el-col>
     </el-row>
-    <!-- <div
-      style="background-color:crimson;color:white;display:flex;justify-content:space-between;padding:10px 30px;"
-    >
-      <div style="align-self:center">
-        CNM Web Application User Guide
-      </div>
-      <div style="align-self:center">
-        <el-input size="large" placeholder="Search"></el-input>
-      </div>
-    </div>
-    <div style="width:100%;margin-top:20px;">
-      <div class="el-container shadow">
-        <div style="width:100%">
-          <el-row>
-            <el-col>
-              <div style="color:crimson;width:100%">
-                This are the list of functions you can do with your role.
-              </div>
-            </el-col>
-            <el-col>
-              <div style="color:gray;width:100%;margin-top:20px;">
-                <ul>
-                    <li>Employee Page
-                        <ul>
-                            <li>Add &amp; Update Employee (In App)</li>
-                            <li>Add &amp; Update Employee (Import Excel)</li>
-                            <li>Change Employee Status</li>
-                            <li>Export All Employees</li>
-                            <li>Employee Reset Password</li>
-                        </ul>
-                    </li>
-                    <li>Status Page
-                        <ul>
-                            <li>Add, Update and Delete User Status</li>
-                            <li>Add and Delete Employee Assignment</li>
-                        </ul>
-                    </li>
-                    <li>Incident Report (Issue)
-                        <ul>File and Update Incident Reports.</ul>
-                        <ul>Sanction Types and Levels.</ul>
-                    </li>
-                    <li>Add Employee Leave</li>
-                </ul>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import pageTitle from "./components/page_title";
 import pageAndFeatures from "./components/page_and_features";
 import guideNav from "./components/nav";
 export default {
   name: "Guide",
-  components: { pageTitle, guideNav, pageAndFeatures },
+  components: { guideNav, pageAndFeatures },
   data() {
     return {};
   },
@@ -129,9 +143,7 @@ export default {
     ...mapGetters(["position"]),
     intro() {
       return (
-        "CNM Web Application is an Employee Management System that allows user to perform functions or tasks base on certain role or department. In this case, Logged in user has the role of  " +
-        this.position +
-        " which belongs to HR Department. This guide will be focusing on the said role."
+        "CNM Web Application is an Employee Management System that allows user to perform functions or tasks base on certain role or department."
       );
     }
   },

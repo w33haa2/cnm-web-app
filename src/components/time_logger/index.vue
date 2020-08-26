@@ -231,7 +231,7 @@ export default {
                             this.board.small_sub = this.formatDate(this.schedule.date.ymd,"","ddd, MMM. DD, YYYY");
                             this.board.sub = this.formatDate(this.schedule.start_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase()
                             +" - "+this.formatDate(this.schedule.end_event.date,"yyyy-mm-dd HH:mm:ss","hh:mm a").replace(" ","").toUpperCase();
-                        if(schedule.vto_at === null){
+                        if(this.schedule.vto_at === null){
                             this.button.start = false;
                         }else{
                             this.button.start = true;

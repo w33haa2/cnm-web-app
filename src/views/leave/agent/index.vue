@@ -14,7 +14,7 @@
                 style="display:flex;justify-content:center;margin-right:5px;"
                 @click="leaveForm({ action: 'create' })"
               >
-                <el-tooltip placement="top" content="Report an Incident">
+                <el-tooltip placement="top" content="Add Leave">
                   <plus-icon></plus-icon>
                 </el-tooltip>
               </div>
